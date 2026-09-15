@@ -294,6 +294,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   max-height:85vh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
 }
+.sheet:focus{outline:none}
 .sheet h2{margin:0 0 4px;font-size:21px}
 .sheet p.sub{margin:0 0 18px;font-size:15px;color:var(--ink-soft)}
 .field{margin-bottom:16px}
@@ -980,6 +981,12 @@ document.getElementById('tabs').addEventListener('click', e => {
   renderAll();
 });
 
+function openDialog(dlg){
+  dlg.showModal();
+  const sheet = dlg.querySelector('.sheet');
+  if(sheet){ sheet.setAttribute('tabindex','-1'); sheet.focus({preventScroll:true}); }
+}
+
 /* ---------- check-in ---------- */
 const dlgCheckin = document.getElementById('dlgCheckin');
 const ciRange = document.getElementById('ciRange');
@@ -1002,7 +1009,7 @@ function openCheckin(){
   ];
   document.getElementById('ciPresets').innerHTML = presets
     .map(([n,v]) => `<button class="chip" data-ci="${v}">${n} · ${v}</button>`).join('');
-  dlgCheckin.showModal();
+  openDialog(dlgCheckin);
 }
 document.getElementById('ciPresets').addEventListener('click', e => {
   const b = e.target.closest('[data-ci]'); if(!b) return;
@@ -1094,14 +1101,18 @@ function openTaskSheet(dateKey){
     : `Empieza el ${fmtDate(dateKey)}.`;
   const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
   document.getElementById('taskSuggest').innerHTML = top
-    .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}">${esc(l.name)}</button>`).join('');
-  tSync(); repSync(); dlgTask.showModal();
+    .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}" aria-pressed="false">${esc(l.name)}</button>`).join('');
+  tSync(); repSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
 document.getElementById('taskSuggest').addEventListener('click', e => {
   const b = e.target.closest('[data-sug]'); if(!b) return;
   const c = +b.dataset.cost;
   tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tSync();
+  document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', x === b));
+});
+document.getElementById('tName').addEventListener('input', () => {
+  document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
 });
 document.getElementById('tCancel').addEventListener('click', () => dlgTask.close());
 document.getElementById('tSave').addEventListener('click', () => {
@@ -1184,7 +1195,7 @@ function openLib(item){
     : 'Sube o baja de media en media cuchara.';
   document.getElementById('lDelete').hidden = !item;
   document.getElementById('lReset').hidden = !(st && st.n);
-  lSync(); dlgLib.showModal();
+  lSync(); openDialog(dlgLib);
 }
 document.getElementById('btnAddLib').addEventListener('click', () => openLib(null));
 document.getElementById('libList').addEventListener('click', e => {
@@ -1237,7 +1248,7 @@ document.getElementById('btnCheckout').addEventListener('click', () => {
   coEnergy = co ? co.energy : 3;
   coSensory = co ? co.sensory : 3;
   document.getElementById('coNote').value = co ? (co.note || '') : '';
-  coSync(); dlgCheckout.showModal();
+  coSync(); openDialog(dlgCheckout);
 });
 document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.close());
 document.getElementById('coSave').addEventListener('click', () => {
@@ -1272,7 +1283,7 @@ function openTpl(dateKey){
   document.getElementById('tplSaveDay').textContent = dateKey === todayKey()
     ? 'Guardar el día de hoy como día tipo'
     : 'Guardar ese día como día tipo';
-  renderTplList(); dlgTpl.showModal();
+  renderTplList(); openDialog(dlgTpl);
 }
 document.getElementById('btnTpl').addEventListener('click', () => openTpl(todayKey()));
 document.getElementById('tplClose').addEventListener('click', () => { dlgTpl.close(); renderAll(); });
@@ -1344,7 +1355,7 @@ function renderDaySheet(){
 }
 document.getElementById('calGrid').addEventListener('click', e => {
   const c = e.target.closest('[data-day]'); if(!c) return;
-  selectedDay = c.dataset.day; renderDaySheet(); dlgDay.showModal();
+  selectedDay = c.dataset.day; renderDaySheet(); openDialog(dlgDay);
 });
 document.getElementById('dAdd').addEventListener('click', () => openTaskSheet(selectedDay));
 document.getElementById('dTpl').addEventListener('click', () => openTpl(selectedDay));
