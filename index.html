@@ -81,6 +81,10 @@ input,select,textarea{font:inherit;color:inherit}
 .count small{font-weight:400;font-size:15px;color:var(--ink-soft)}
 .overdrawn{color:var(--alert)}
 .notice{margin:9px 0 0;font-size:14px;color:var(--alert)}
+.extra-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.extra-label{font-size:14px;color:var(--ink-soft)}
+.extra-block .count{color:var(--alert)}
+.spoons.over{--spoon:var(--alert)}
 
 .linkbtn{
   background:none;border:none;padding:6px 0;
@@ -252,6 +256,12 @@ textarea{
   border-radius:10px;padding:10px 15px;font-size:15px;
 }
 .btn.warn{color:var(--alert)}
+.ocrow{padding:15px 0;border-bottom:1px solid var(--line)}
+.ocrow strong{display:block;margin-bottom:2px}
+.ocrow p{margin:0 0 10px;font-size:14px;color:var(--ink-soft)}
+.ocgrid{display:flex;gap:8px}
+.ocgrid label{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft)}
+.ocgrid input{width:100%;text-align:center;padding:9px 2px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-variant-numeric:tabular-nums}
 
 /* ---- Tab bar ---- */
 .tabs{
@@ -346,6 +356,13 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
       </div>
       <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
       <p class="notice" id="spoonNotice" hidden></p>
+      <div class="extra-block" id="overBlock" hidden>
+        <div class="meter-foot">
+          <span class="extra-label">Sobrestimulación</span>
+          <span class="count" id="overCount"></span>
+        </div>
+        <div class="spoons over" id="overRow" role="img"></div>
+      </div>
     </div>
 
     <div class="sectionhead">
@@ -401,6 +418,11 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
         <output id="maxOut"></output>
         <button id="maxPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
+    </div>
+    <div class="ocrow">
+      <strong>Coste de la sobrestimulación</strong>
+      <p>Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
+      <div class="ocgrid" id="overCostGrid"></div>
     </div>
     <div class="row">
       <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
@@ -615,7 +637,8 @@ const SEED = [
   {name:'Ver a gente', est:4, samples:[]},
   {name:'Descanso sensorial', est:-1, samples:[]}
 ];
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12 } };
+const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} } };
 let currentTab = 'hoy';
 
 const todayKey = () => new Date().toISOString().slice(0,10);
@@ -625,7 +648,7 @@ const fmtDate = k => {
 };
 const uid = () => Math.random().toString(36).slice(2,9);
 const day = (k=todayKey()) => {
-  if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'' };
+  if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'', extras:[] };
   return state.days[k];
 };
 const save = () => store.set(state);
@@ -724,6 +747,19 @@ function renderMeter(){
     : 'Check-out de hoy';
   document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
   document.getElementById('closerHint').hidden = !!co;
+
+  const overEntry = (d.extras || []).find(x => x.type === 'sobrestimulacion');
+  const overBlock = document.getElementById('overBlock');
+  if(overEntry && overEntry.coste){
+    const n = Math.abs(overEntry.coste);
+    overBlock.hidden = false;
+    document.getElementById('overCount').textContent = `-${fmtN(n)}`;
+    const row = document.getElementById('overRow');
+    row.innerHTML = spoonRowHTML(n, n);
+    row.setAttribute('aria-label', `${fmtN(n)} cucharas de sobrestimulación`);
+  }else{
+    overBlock.hidden = true;
+  }
 }
 function renderTasks(){
   const d = day();
@@ -811,29 +847,33 @@ const NEED = 14;   // check-outs mínimos para que una tendencia signifique algo
 const shortDate = k => new Date(k+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'});
 const longDate = d => d.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
 
-/* dos series de 1 a 5 sobre los últimos check-outs.
-   Se diferencian por forma de marca además de por color. */
+/* dos series sobre los últimos check-outs: cucharas gastadas (escala propia)
+   y tolerancia sensorial de 1 a 5. Se diferencian por forma de marca además de por color. */
 function patternsChart(keys){
   const W = 300, H = 118, L = 20, R = 6, T = 8, B = 20;
   const x = i => keys.length < 2 ? L : L + i * (W - L - R) / (keys.length - 1);
-  const y = v => T + (5 - v) * (H - T - B) / 4;
-  const line = f => keys.map((k,i) => `${x(i).toFixed(1)},${y(f(state.days[k].checkout)).toFixed(1)}`).join(' ');
-  const dots = (f, shape, color) => keys.map((k,i) => {
-    const cx = x(i), cy = y(f(state.days[k].checkout));
+  const ySens = v => T + (5 - v) * (H - T - B) / 4;
+  const spentVals = keys.map(k => dayLoad(k).spent);
+  const sensVals = keys.map(k => state.days[k].checkout.sensory);
+  const maxSpent = Math.max(1, state.settings.max, ...spentVals);
+  const ySpent = v => T + (maxSpent - v) * (H - T - B) / maxSpent;
+  const line = (vals, yfn) => keys.map((k,i) => `${x(i).toFixed(1)},${yfn(vals[i]).toFixed(1)}`).join(' ');
+  const dots = (vals, yfn, shape, color) => keys.map((k,i) => {
+    const cx = x(i), cy = yfn(vals[i]);
     return shape === 'circle'
       ? `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="${color}"/>`
       : `<rect x="${(cx-2.7).toFixed(1)}" y="${(cy-2.7).toFixed(1)}" width="5.4" height="5.4" fill="${color}"/>`;
   }).join('');
   const grid = [1,3,5].map(v =>
-    `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>
-     <text x="0" y="${(y(v)+3.5).toFixed(1)}">${v}</text>`).join('');
+    `<line x1="${L}" y1="${ySens(v)}" x2="${W-R}" y2="${ySens(v)}" stroke="var(--line)" stroke-width="1"/>
+     <text x="0" y="${(ySens(v)+3.5).toFixed(1)}">${v}</text>`).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img"
-    aria-label="Capacidad y tolerancia sensorial en los últimos ${keys.length} check-out, del ${shortDate(keys[0])} al ${shortDate(keys[keys.length-1])}">
+    aria-label="Cucharas gastadas y tolerancia sensorial en los últimos ${keys.length} check-out, del ${shortDate(keys[0])} al ${shortDate(keys[keys.length-1])}">
     ${grid}
-    <polyline points="${line(c=>c.energy)}" fill="none" stroke="var(--spoon)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <polyline points="${line(c=>c.sensory)}" fill="none" stroke="var(--deposit)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${dots(c=>c.energy,'circle','var(--spoon)')}
-    ${dots(c=>c.sensory,'square','var(--deposit)')}
+    <polyline points="${line(spentVals, ySpent)}" fill="none" stroke="var(--spoon)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${line(sensVals, ySens)}" fill="none" stroke="var(--deposit)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots(spentVals, ySpent, 'circle', 'var(--spoon)')}
+    ${dots(sensVals, ySens, 'square', 'var(--deposit)')}
     <text x="${L}" y="${H-5}">${shortDate(keys[0])}</text>
     <text x="${W-R}" y="${H-5}" text-anchor="end">${shortDate(keys[keys.length-1])}</text>
   </svg>`;
@@ -851,10 +891,10 @@ function renderPatterns(){
   }
   const shown = keys.slice(-NEED);
   const last7 = keys.slice(-7), prev7 = keys.slice(-14,-7);
-  const avg = (ks,f) => ks.length ? Math.round((ks.reduce((a,k)=>a+f(state.days[k].checkout),0)/ks.length)*10)/10 : null;
-  const e1 = avg(last7,c=>c.energy), e0 = avg(prev7,c=>c.energy);
-  const s1 = avg(last7,c=>c.sensory), s0 = avg(prev7,c=>c.sensory);
-  const vals = last7.map(k => state.days[k].checkout.energy);
+  const avg = (ks,f) => ks.length ? Math.round((ks.reduce((a,k)=>a+f(k),0)/ks.length)*10)/10 : null;
+  const sp1 = avg(last7, k=>dayLoad(k).spent), sp0 = avg(prev7, k=>dayLoad(k).spent);
+  const s1 = avg(last7, k=>state.days[k].checkout.sensory), s0 = avg(prev7, k=>state.days[k].checkout.sensory);
+  const vals = last7.map(k => state.days[k].checkout.sensory);
   const flat = last7.length >= 7 && (Math.max(...vals) - Math.min(...vals)) <= 1;
   const rising = state.library.filter(l => { const r = recoveryStats(l.name); return r && r.rising; }).map(l => l.name);
   const mark = shape => shape === 'circle'
@@ -864,7 +904,7 @@ function renderPatterns(){
   let out = `<h2>Patrones</h2><p>Tus últimos ${shown.length} check-out.</p>`;
   out += patternsChart(shown);
   out += `<div class="series">
-    <p class="serie">${mark('circle')}<span>Capacidad ${fmtN(e1)} de 5 <small>${e0 != null ? `· antes ${fmtN(e0)}` : '· media de los últimos 7'}</small></span></p>
+    <p class="serie">${mark('circle')}<span>Cucharas gastadas ${fmtN(sp1)} <small>${sp0 != null ? `· antes ${fmtN(sp0)}` : '· media de los últimos 7'}</small></span></p>
     <p class="serie">${mark('square')}<span>Tolerancia sensorial ${fmtN(s1)} de 5 <small>${s0 != null ? `· antes ${fmtN(s0)}` : '· media de los últimos 7'}</small></span></p>
   </div>`;
   if(flat) out += '<p class="insight">Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
@@ -897,7 +937,13 @@ function renderCal(){
   }
   document.getElementById('calGrid').innerHTML = html;
 }
-function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns();
+function renderOverCost(){
+  const el = document.getElementById('overCostGrid');
+  el.innerHTML = [1,2,3,4,5].map(v =>
+    `<label>${v}<input type="number" step="1" inputmode="numeric" data-oc="${v}" value="${state.settings.overCost[v]}"></label>`
+  ).join('');
+}
+function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost();
   document.getElementById('maxOut').textContent = state.settings.max;
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -1166,7 +1212,11 @@ document.getElementById('btnCheckout').addEventListener('click', () => {
 });
 document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.close());
 document.getElementById('coSave').addEventListener('click', () => {
-  day().checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
+  const d = day();
+  d.checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
+  const coste = state.settings.overCost[coSensory] ?? 0;
+  d.extras = (d.extras || []).filter(x => x.type !== 'sobrestimulacion');
+  if(coste) d.extras.push({ type:'sobrestimulacion', coste });
   save(); dlgCheckout.close(); renderAll();
 });
 
@@ -1309,6 +1359,12 @@ document.getElementById('contrastPick').addEventListener('click', e => {
   state.settings.contrast = b.dataset.contrast;
   applyContrast(); save();
 });
+document.getElementById('overCostGrid').addEventListener('change', e => {
+  const inp = e.target.closest('[data-oc]'); if(!inp) return;
+  const n = parseInt(inp.value, 10);
+  state.settings.overCost[inp.dataset.oc] = Number.isFinite(n) ? n : 0;
+  save(); renderMeter();
+});
 document.getElementById('btnExport').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -1324,13 +1380,15 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     if(!parsed.days) throw new Error('formato');
     state = parsed;
     if(!state.settings) state.settings = { max:12 };
+    if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
     await save(); applyContrast(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Cucharas.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast} };
+  const overCost = state.settings.overCost;
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost} };
   save(); renderAll();
 });
 
@@ -1341,6 +1399,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(!state.library || !state.library.length) state.library = SEED.map(s=>({...s,samples:[]}));
   state.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!state.settings) state.settings = { max:12 };
+  if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
   if(!state.templates) state.templates = [];
   applyContrast();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
