@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF2F3">
+<meta name="color-scheme" content="light only">
+<title>Cucharas</title>
+<style>
+:root{
+  --bg:#FBF2F3;
+  --surface:#FFF8F9;
+  --surface-2:#F6E5E8;
+  --line:#EDD5D9;
+  --ink:#4B3A3F;
+  --ink-soft:#8B7378;
+  --spoon:#E2A6B3;
+  --spoon-spent:#F0E1E4;
+  --accent:#B36A7C;
+  --alert:#A7623F;
+  --deposit:#6F9D88;
+  --radius:14px;
+  --pad:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color-scheme:light}
+body{
+  color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  font-size:17px;
+  line-height:1.5;
+  font-style:normal;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+*:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.app{max-width:520px;margin:0 auto;padding:0 var(--pad) 96px}
+.screen{display:none}
+.screen.on{display:block}
+
+.top{padding:22px 0 6px}
+.date{font-size:15px;color:var(--ink-soft);margin:0}
+.title{font-size:27px;margin:2px 0 0;letter-spacing:-0.01em}
+
+/* ---- Spoon meter ---- */
+.meter{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px 16px 14px;
+  margin-top:16px;
+}
+.spoons{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.spoons svg{width:19px;height:38px;display:block}
+.meter-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.count{font-size:20px;font-weight:700}
+.count small{font-weight:400;font-size:15px;color:var(--ink-soft)}
+.overdrawn{color:var(--alert)}
+
+.linkbtn{
+  background:none;border:none;padding:6px 0;
+  color:var(--accent);text-decoration:underline;text-underline-offset:3px;
+  font-size:15px;
+}
+
+/* ---- Tasks ---- */
+.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:26px 0 10px}
+.sectionhead h2{font-size:18px;margin:0}
+.hint{font-size:14px;color:var(--ink-soft);margin:0 0 14px}
+
+.task{
+  display:flex;align-items:center;gap:13px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:13px 14px;
+  margin-bottom:9px;
+}
+.task.done{background:transparent;border-style:dashed}
+.task.done .task-name{color:var(--ink-soft);text-decoration:line-through}
+.check{
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--line);background:var(--surface-2);
+  display:grid;place-items:center;padding:0;
+}
+.check.on{background:var(--accent);border-color:var(--accent)}
+.check svg{width:14px;height:14px;display:none}
+.check.on svg{display:block}
+.task-body{flex:1 1 auto;min-width:0}
+.task-name{display:block;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-meta{font-size:13.5px;color:var(--ink-soft)}
+.cost{flex:0 0 auto;font-size:15px;color:var(--ink-soft);display:flex;align-items:center;gap:4px}
+.cost svg{width:9px;height:18px}
+
+.adjust{
+  border:1px solid var(--line);border-top:none;
+  border-radius:0 0 var(--radius) var(--radius);
+  background:var(--surface-2);
+  margin:-10px 0 9px;padding:11px 14px;
+  font-size:14.5px;color:var(--ink-soft);
+}
+.arow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.arow+.arow{margin-top:12px;display:block}
+.arow .chips{margin:7px 0 0}
+.arow .chip{padding:7px 11px;font-size:14px}
+.cost.dep{color:var(--deposit)}
+.libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
+.scale{display:flex;gap:7px}
+.scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:11px;font-size:17px}
+.scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+.scale-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
+.card h3{margin:0 0 9px;font-size:16px}
+.card p{margin:0 0 7px;color:var(--ink-soft);font-size:14.5px}
+.card p:last-child{margin-bottom:0}
+.mini .use{font-size:15px;color:var(--accent)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{
+  width:34px;height:34px;border-radius:9px;
+  border:1px solid var(--line);background:var(--surface);
+  font-size:19px;line-height:1;padding:0;
+}
+.stepper output{min-width:1.6em;text-align:center;font-size:17px;color:var(--ink)}
+
+.empty{
+  border:1px dashed var(--line);border-radius:var(--radius);
+  padding:24px 18px;text-align:center;color:var(--ink-soft);font-size:15px;
+}
+
+.add{
+  width:100%;padding:14px;margin-top:4px;
+  background:var(--surface);border:1px dashed var(--line);
+  border-radius:var(--radius);color:var(--accent);font-size:16px;
+}
+
+/* ---- Library ---- */
+.lib{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:13px 14px;margin-bottom:9px;
+  width:100%;text-align:left;
+}
+.bigrow button.warn{color:var(--alert)}
+.lib-name{font-size:17px}
+.lib-note{font-size:13.5px;color:var(--ink-soft)}
+.pill{
+  border:1px solid var(--line);background:var(--surface-2);
+  border-radius:999px;padding:5px 12px;font-size:14.5px;color:var(--ink-soft);
+}
+
+/* ---- Diary ---- */
+.day{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:14px;margin-bottom:9px;
+}
+.day-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.day-date{font-size:16px}
+.day-fig{font-size:14.5px;color:var(--ink-soft)}
+.bar{height:7px;border-radius:4px;background:var(--surface-2);margin:10px 0 0;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--spoon)}
+.bar span.over{background:var(--alert)}
+.day-note{font-size:14.5px;color:var(--ink-soft);margin:9px 0 0}
+
+textarea{
+  width:100%;min-height:96px;resize:vertical;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:13px;
+}
+
+/* ---- Calendar ---- */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
+.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:10px;width:42px;height:42px;font-size:18px;padding:0}
+.cal-nav strong{font-size:17px}
+.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:6px}
+.dow span{text-align:center;font-size:12.5px;color:var(--ink-soft)}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;grid-auto-rows:58px}
+.cell{
+  display:block;width:100%;height:100%;overflow:hidden;
+  border:1px solid var(--line);background:var(--surface);
+  border-radius:11px;padding:9px 0 0;text-align:center;
+  font-size:15.5px;line-height:1.1;
+}
+.cell.blank{border:none;background:none;pointer-events:none}
+.cell.past{color:var(--ink-soft);background:var(--bg)}
+.cell.today{border:2px solid var(--accent);padding-top:8px}
+.load{display:block;height:12px;margin-top:6px;font-size:13px;line-height:12px;letter-spacing:1px;color:var(--spoon)}
+.cell.heavy .load{color:var(--alert)}
+.legend{font-size:13.5px;color:var(--ink-soft);margin:16px 0 0}
+.mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:8px}
+.mini button{background:none;border:none;color:var(--ink-soft);font-size:20px;padding:0 4px;line-height:1}
+
+/* ---- Settings ---- */
+.row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:15px 0;border-bottom:1px solid var(--line);
+}
+.row:last-child{border-bottom:none}
+.row p{margin:0;font-size:14px;color:var(--ink-soft)}
+.btn{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:10px 15px;font-size:15.5px;
+}
+.btn.warn{color:var(--alert)}
+
+/* ---- Tab bar ---- */
+.tabs{
+  position:fixed;left:0;right:0;bottom:0;
+  background:var(--surface);border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);
+}
+.tabs button{
+  flex:1;background:none;border:none;padding:11px 4px 13px;
+  font-size:12.5px;color:var(--ink-soft);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
+.tabs svg{width:21px;height:21px}
+
+/* ---- Sheet ---- */
+dialog{
+  border:none;padding:0;background:none;width:100%;max-width:520px;
+  margin:auto auto 0;
+}
+dialog::backdrop{background:rgba(58,64,58,.35)}
+.sheet{
+  background:var(--bg);
+  border-radius:var(--radius) var(--radius) 0 0;
+  border-top:1px solid var(--line);
+  padding:22px var(--pad) calc(24px + env(safe-area-inset-bottom));
+}
+.sheet h3{margin:0 0 4px;font-size:21px}
+.sheet p.sub{margin:0 0 18px;font-size:15px;color:var(--ink-soft)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:14.5px;color:var(--ink-soft);margin-bottom:6px}
+.field input[type=text]{
+  width:100%;padding:13px;background:var(--surface);
+  border:1px solid var(--line);border-radius:10px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{
+  border:1px solid var(--line);background:var(--surface);
+  border-radius:999px;padding:9px 14px;font-size:15px;
+}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+.bigrow{display:flex;gap:10px;margin-top:6px}
+.bigrow button{flex:1;padding:15px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.bigrow button.primary{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+.slider{width:100%;margin:8px 0 2px;accent-color:var(--spoon)}
+.bigcount{text-align:center;font-size:32px;font-weight:700;margin:4px 0 0}
+.bigcount small{display:block;font-size:14.5px;font-weight:400;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="spoon" viewBox="0 0 20 40">
+    <path d="M10 1c4.4 0 7 3.6 7 8s-2.6 8-7 8-7-3.6-7-8 2.6-8 7-8z"/>
+    <rect x="8" y="16" width="4" height="23" rx="2"/>
+  </symbol>
+  <symbol id="tick" viewBox="0 0 16 16">
+    <path d="M2 8.5l4 4 8-9" fill="none" stroke="#FFF8F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ===== HOY ===== -->
+  <section class="screen on" id="s-hoy">
+    <header class="top">
+      <p class="date" id="todayDate"></p>
+      <h1 class="title">Hoy</h1>
+    </header>
+
+    <div class="meter">
+      <div class="spoons" id="spoonRow" role="img" aria-label="Cucharas restantes"></div>
+      <div class="meter-foot">
+        <span class="count" id="spoonCount"></span>
+        <button class="linkbtn" id="btnAdjustBudget">Ajustar</button>
+      </div>
+      <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
+    </div>
+
+    <div class="sectionhead">
+      <h2>Tareas</h2>
+      <button class="linkbtn" id="btnTpl">Días tipo</button>
+    </div>
+    <div id="taskList"></div>
+    <button class="add" id="btnAddTask">Añadir tarea</button>
+    <button class="add" id="btnCheckout" style="margin-top:10px">Check-out de hoy</button>
+  </section>
+
+  <!-- ===== CUCHARAS ===== -->
+  <section class="screen" id="s-lib">
+    <header class="top">
+      <p class="date">Calculadora</p>
+      <h1 class="title">Cuánto cuesta</h1>
+    </header>
+    <p class="hint">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
+    <div id="libList"></div>
+    <button class="add" id="btnAddLib">Añadir actividad</button>
+  </section>
+
+  <!-- ===== CALENDARIO ===== -->
+  <section class="screen" id="s-cal">
+    <header class="top">
+      <p class="date">Toca un día para ver o planificar</p>
+      <h1 class="title">Calendario</h1>
+    </header>
+    <div class="cal-nav">
+      <button id="calPrev" aria-label="Mes anterior">‹</button>
+      <strong id="calLabel"></strong>
+      <button id="calNext" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="grid" id="calGrid"></div>
+    <p class="legend">Cada punto son dos cucharas. En otro color, los días por encima de tu media.</p>
+    <div class="card" id="patterns"></div>
+  </section>
+
+  <!-- ===== AJUSTES ===== -->
+  <section class="screen" id="s-set">
+    <header class="top">
+      <p class="date">Tus datos no salen del teléfono</p>
+      <h1 class="title">Ajustes</h1>
+    </header>
+    <div class="row">
+      <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
+      <div class="stepper">
+        <button id="maxMinus" aria-label="Menos">−</button>
+        <output id="maxOut"></output>
+        <button id="maxPlus" aria-label="Más">+</button>
+      </div>
+    </div>
+    <div class="row">
+      <div><strong>Copia de seguridad</strong><p>Descarga un archivo con todo tu historial.</p></div>
+      <button class="btn" id="btnExport">Exportar</button>
+    </div>
+    <div class="row">
+      <div><strong>Restaurar</strong><p>Carga un archivo exportado antes.</p></div>
+      <button class="btn" id="btnImport">Importar</button>
+    </div>
+    <div class="row">
+      <div><strong>Borrar todo</strong><p>No se puede deshacer.</p></div>
+      <button class="btn warn" id="btnWipe">Borrar</button>
+    </div>
+    <input type="file" id="fileIn" accept="application/json" hidden>
+  </section>
+
+</div>
+
+<nav class="tabs" id="tabs">
+  <button data-go="hoy" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Hoy</button>
+  <button data-go="lib">
+    <svg viewBox="0 0 20 40" fill="currentColor" style="width:11px;height:21px"><use href="#spoon"/></svg>Cucharas</button>
+  <button data-go="cal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Calendario</button>
+  <button data-go="set">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>Ajustes</button>
+</nav>
+
+<!-- ===== Check-in ===== -->
+<dialog id="dlgCheckin">
+  <div class="sheet">
+    <h3>¿Con cuántas cucharas te levantas?</h3>
+    <p class="sub">Sin pensarlo mucho. Puedes cambiarlo durante el día.</p>
+    <div class="bigcount"><span id="ciNum">8</span><small id="ciWord"></small></div>
+    <input type="range" class="slider" id="ciRange" min="0" max="12" step="1" value="8">
+    <div class="chips" id="ciPresets"></div>
+    <div class="bigrow"><button class="primary" id="ciSave">Empezar el día</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Nueva tarea ===== -->
+<dialog id="dlgTask">
+  <div class="sheet">
+    <h3>Añadir tarea</h3>
+    <p class="sub">Elige de tu lista o escribe una nueva.</p>
+    <div class="chips" id="taskSuggest"></div>
+    <div class="field">
+      <label for="tName">Qué vas a hacer</label>
+      <input type="text" id="tName" placeholder="Ducha, compra, llamada…">
+    </div>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="chips" id="tKind">
+        <button class="chip" data-kind="gasto" aria-pressed="true">Gasta cucharas</button>
+        <button class="chip" data-kind="recarga">Recarga cucharas</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="tCost" id="tCostLab">Cuánto crees que te va a costar</label>
+      <div class="stepper">
+        <button id="tMinus" aria-label="Menos">−</button>
+        <output id="tCost">2</output>
+        <button id="tPlus" aria-label="Más">+</button>
+        <span class="lib-note" id="tLearned"></span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Repetir</label>
+      <div class="chips" id="repMode">
+        <button class="chip" data-rep="once" aria-pressed="true">Solo ese día</button>
+        <button class="chip" data-rep="weekdays">De lunes a viernes</button>
+        <button class="chip" data-rep="daily">Todos los días</button>
+        <button class="chip" data-rep="custom">Elegir días</button>
+      </div>
+      <div class="chips" id="repDays" hidden></div>
+      <div class="stepper" id="repDur" hidden>
+        <button id="wMinus" aria-label="Menos semanas">−</button>
+        <output id="wOut">4</output>
+        <button id="wPlus" aria-label="Más semanas">+</button>
+        <span class="lib-note" id="wLabel">semanas</span>
+      </div>
+    </div>
+    <div class="bigrow">
+      <button id="tCancel">Cancelar</button>
+      <button class="primary" id="tSave">Añadir</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== Actividad de la calculadora ===== -->
+<dialog id="dlgLib">
+  <div class="sheet">
+    <h3 id="lTitle">Actividad</h3>
+    <p class="sub" id="lSub"></p>
+    <div class="field">
+      <label for="lName">Nombre</label>
+      <input type="text" id="lName" placeholder="Ducha, trabajo, ver a gente…">
+    </div>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="chips" id="lKind">
+        <button class="chip" data-kind="gasto" aria-pressed="true">Gasta cucharas</button>
+        <button class="chip" data-kind="recarga">Recarga cucharas</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="lCost" id="lCostLab">Lo que te cuesta</label>
+      <div class="stepper">
+        <button id="lMinus" aria-label="Menos">−</button>
+        <output id="lCost">2</output>
+        <button id="lPlus" aria-label="Más">+</button>
+        <span class="lib-note" id="lHint"></span>
+      </div>
+    </div>
+    <button class="linkbtn" id="lReset" hidden>Olvidar lo que ha aprendido</button>
+    <div class="bigrow">
+      <button class="warn" id="lDelete">Borrar</button>
+      <button class="primary" id="lSave">Guardar</button>
+    </div>
+    <div class="bigrow"><button id="lCancel">Cancelar</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Check-out ===== -->
+<dialog id="dlgCheckout">
+  <div class="sheet">
+    <h3>Check-out de hoy</h3>
+    <p class="sub">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
+    <div class="field">
+      <label>¿Cuánta capacidad te queda ahora?</label>
+      <div class="scale" id="coEnergy"></div>
+      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
+    </div>
+    <div class="field">
+      <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
+      <div class="scale" id="coSensory"></div>
+      <div class="scale-lab"><span>Nada</span><span>Todo llevadero</span></div>
+    </div>
+    <div class="field">
+      <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
+      <input type="text" id="coNote" placeholder="El secador, no. La oficina, sí.">
+    </div>
+    <div class="bigrow">
+      <button id="coCancel">Ahora no</button>
+      <button class="primary" id="coSave">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===== Días tipo ===== -->
+<dialog id="dlgTpl">
+  <div class="sheet">
+    <h3>Días tipo</h3>
+    <p class="sub" id="tplSub"></p>
+    <div id="tplList"></div>
+    <button class="add" id="tplSaveDay">Guardar este día como día tipo</button>
+    <div class="bigrow"><button id="tplClose">Cerrar</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Detalle de día ===== -->
+<dialog id="dlgDay">
+  <div class="sheet">
+    <h3 id="dTitle"></h3>
+    <p class="sub" id="dSub"></p>
+    <div id="dTasks"></div>
+    <button class="add" id="dAdd">Añadir tarea a este día</button>
+    <button class="add" id="dTpl" style="margin-top:9px">Usar un día tipo</button>
+    <div class="field" style="margin-top:18px">
+      <label for="dNote">Nota</label>
+      <textarea id="dNote" placeholder="Qué pesó, qué ayudó, qué repetirías."></textarea>
+    </div>
+    <div class="bigrow"><button class="primary" id="dClose">Cerrar</button></div>
+  </div>
+</dialog>
+
+<script>
+/* ---------- storage: window.storage inside Claude, localStorage standalone ---------- */
+const KEY = 'cucharas:data';
+const store = {
+  async get(){
+    try{
+      if(window.storage){ const r = await window.storage.get(KEY, false); return r ? JSON.parse(r.value) : null; }
+      const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  },
+  async set(v){
+    try{
+      const s = JSON.stringify(v);
+      if(window.storage){ await window.storage.set(KEY, s, false); return; }
+      localStorage.setItem(KEY, s);
+    }catch(e){ console.error('No se pudo guardar', e); }
+  }
+};
+
+/* ---------- state ---------- */
+const SEED = [
+  {name:'Ducha', est:2, samples:[]},
+  {name:'Desayuno', est:1, samples:[]},
+  {name:'Compra', est:3, samples:[]},
+  {name:'Llamada de teléfono', est:2, samples:[]},
+  {name:'Salir de casa', est:2, samples:[]},
+  {name:'Trabajo', est:5, samples:[]},
+  {name:'Ver a gente', est:4, samples:[]},
+  {name:'Descanso sensorial', est:-1, samples:[]}
+];
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12 } };
+let currentTab = 'hoy';
+
+const todayKey = () => new Date().toISOString().slice(0,10);
+const fmtDate = k => {
+  const d = new Date(k+'T12:00:00');
+  return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+};
+const uid = () => Math.random().toString(36).slice(2,9);
+const day = (k=todayKey()) => {
+  if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'' };
+  return state.days[k];
+};
+const save = () => store.set(state);
+
+/* learned cost: manual estimate blended with the last real costs */
+const RECOV = [[0,'Nada'],[15,'15 min'],[30,'30 min'],[60,'1 h'],[120,'2 h'],[300,'Media tarde'],[1440,'Al día siguiente']];
+const recovLabel = m => (RECOV.find(r => r[0] === m) || [null,'—'])[1];
+function recoveryStats(name){
+  const all = [];
+  Object.keys(state.days).sort().forEach(k =>
+    state.days[k].tasks.forEach(t => {
+      if(t.recovery != null && t.name.toLowerCase() === name.toLowerCase()) all.push(t.recovery);
+    }));
+  if(!all.length) return null;
+  const avg = a => a.reduce((x,y)=>x+y,0) / a.length;
+  const half = Math.floor(all.length/2);
+  return {
+    n: all.length,
+    last: all[all.length-1],
+    rising: all.length >= 4 && avg(all.slice(half)) > avg(all.slice(0,half)) * 1.5
+  };
+}
+const fmtN = n => Number.isInteger(n) ? String(n) : String(Math.round(n*10)/10).replace('.', ',');
+function libItem(name){
+  return state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
+}
+function learned(name){
+  const item = libItem(name);
+  if(!item) return null;
+  const s = item.samples.slice(-5);
+  const base = { est:item.est, fixed:!!item.fixed, n:s.length };
+  if(s.length < 2) return { ...base, avg:null, suggest:item.est };
+  const avg = Math.round((s.reduce((a,b)=>a+b,0)/s.length) * 10) / 10;
+  return { ...base, avg, suggest: item.fixed ? item.est : avg };
+}
+function record(name, est, real){
+  let item = state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
+  if(!item){ item = {id:uid(), name, est, samples:[]}; state.library.push(item); }
+  if(real != null) item.samples.push(real);
+}
+
+/* ---------- render ---------- */
+function spoonSVG(filled){
+  return `<svg viewBox="0 0 20 40" fill="${filled ? 'var(--spoon)' : 'var(--spoon-spent)'}"><use href="#spoon"/></svg>`;
+}
+function renderMeter(){
+  const d = day();
+  const budget = d.budget ?? 0;
+  const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
+  const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
+  const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
+  const left = budget - gasto + recarga;
+  const row = document.getElementById('spoonRow');
+  const total = Math.max(budget, left, 0);
+  let html = '';
+  for(let i=0;i<total;i++) html += spoonSVG(i < left);
+  row.innerHTML = html || '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
+  row.setAttribute('aria-label', `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
+  const c = document.getElementById('spoonCount');
+  c.className = 'count' + (left < 0 ? ' overdrawn' : '');
+  c.innerHTML = left < 0
+    ? `${fmtN(Math.abs(left))} prestadas <small>de mañana</small>`
+    : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
+  document.getElementById('spoonBreak').textContent = (gasto || recarga)
+    ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}`
+    : '';
+  const co = d.checkout;
+  document.getElementById('btnCheckout').textContent = co
+    ? `Check-out hecho · capacidad ${co.energy} de 5`
+    : 'Check-out de hoy';
+}
+function renderTasks(){
+  const d = day();
+  const el = document.getElementById('taskList');
+  if(!d.tasks.length){
+    el.innerHTML = '<div class="empty">Nada apuntado. Añade solo lo que de verdad va a pasar hoy.</div>';
+    return;
+  }
+  el.innerHTML = d.tasks.map(t => {
+    const cost = t.real ?? t.est;
+    const dep = cost < 0;
+    const l = learned(t.name);
+    const notes = [];
+    if(t.series) notes.push('Se repite');
+    if(dep) notes.push('Recarga');
+    if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(`sueles gastar ${fmtN(l.avg)}`);
+    const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
+    return `
+    <div class="task ${t.done?'done':''}">
+      <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${t.done?'Desmarcar':'Marcar'} ${esc(t.name)}" aria-pressed="${t.done}">
+        <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
+      </button>
+      <span class="task-body"><span class="task-name">${esc(t.name)}</span>${meta}</span>
+      <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(cost))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
+    </div>
+    ${t.done ? `
+    <div class="adjust">
+      <div class="arow">
+        <span>${dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?'}</span>
+        <div class="stepper">
+          <button data-real="${t.id}" data-delta="${dep?1:-1}" aria-label="Menos">−</button>
+          <output>${fmtN(Math.abs(cost))}</output>
+          <button data-real="${t.id}" data-delta="${dep?-1:1}" aria-label="Más">+</button>
+        </div>
+      </div>
+      ${dep ? '' : `<div class="arow">
+        <span>¿Cuánto tardaste en recuperarte?</span>
+        <div class="chips">${RECOV.map(([m,lab]) =>
+          `<button class="chip" data-rec="${t.id}" data-min="${m}" aria-pressed="${t.recovery===m}">${lab}</button>`).join('')}</div>
+      </div>`}
+    </div>` : ''}`;
+  }).join('');
+}
+function renderLib(){
+  const el = document.getElementById('libList');
+  if(!state.library.length){ el.innerHTML = '<div class="empty">Todavía no hay actividades. Añade las que más se repiten en tu día.</div>'; return; }
+  const row = l => {
+    const st = learned(l.name);
+    const rc = recoveryStats(l.name);
+    const dep = l.est < 0;
+    let note;
+    if(st.avg == null) note = st.n ? `${st.n} registro${st.n===1?'':'s'}` : 'Sin registros todavía';
+    else if(st.fixed) note = `Lo has fijado tú · sueles ${dep?'recuperar':'gastar'} ${fmtN(Math.abs(st.avg))}`;
+    else if(Math.abs(st.avg - st.est) < 0.5) note = `Tu estimación acierta · ${st.n} registros`;
+    else note = `Estimabas ${fmtN(Math.abs(st.est))}, ${dep?'recuperas':'gastas'} ${fmtN(Math.abs(st.avg))}`;
+    if(rc) note += ` · recuperación ${recovLabel(rc.last)}${rc.rising ? ', va a más' : ''}`;
+    return `<button class="lib" data-lib="${l.id}">
+      <span><span class="lib-name">${esc(l.name)}</span><br><span class="lib-note">${note}</span></span>
+      <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(st.suggest))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
+    </button>`;
+  };
+  const byUse = a => a.sort((x,y) => y.samples.length - x.samples.length);
+  const gastan = byUse(state.library.filter(l => l.est >= 0));
+  const recargan = byUse(state.library.filter(l => l.est < 0));
+  el.innerHTML =
+    (gastan.length ? `<p class="libsec">Gastan cucharas</p>${gastan.map(row).join('')}` : '') +
+    (recargan.length ? `<p class="libsec">Recargan cucharas</p>${recargan.map(row).join('')}` : '');
+}
+
+/* typical budget: what a normal day has looked like lately */
+function typicalBudget(){
+  const b = Object.keys(state.days).sort().slice(-7)
+    .map(k => state.days[k].budget).filter(v => v != null);
+  if(!b.length) return Math.round(state.settings.max * 0.65);
+  return Math.round(b.reduce((a,c)=>a+c,0) / b.length);
+}
+function dayLoad(k){
+  const d = state.days[k]; if(!d) return { planned:0, spent:0, has:false };
+  const planned = d.tasks.reduce((a,t)=>a+(t.real ?? t.est), 0);
+  const spent = d.tasks.filter(t=>t.done).reduce((a,t)=>a+(t.real ?? t.est), 0);
+  return { planned, spent, has:d.tasks.length > 0 || !!d.note };
+}
+
+function renderPatterns(){
+  const el = document.getElementById('patterns');
+  const keys = Object.keys(state.days).sort().filter(k => state.days[k].checkout);
+  if(keys.length < 5){
+    el.innerHTML = `<h3>Patrones</h3><p>Aparecerán con unos días de check-out. Llevas ${keys.length} de 5.</p>`;
+    return;
+  }
+  const last7 = keys.slice(-7), prev7 = keys.slice(-14,-7);
+  const avg = (ks,f) => ks.length ? Math.round((ks.reduce((a,k)=>a+f(state.days[k].checkout),0)/ks.length)*10)/10 : null;
+  const e1 = avg(last7,c=>c.energy), e0 = avg(prev7,c=>c.energy);
+  const s1 = avg(last7,c=>c.sensory), s0 = avg(prev7,c=>c.sensory);
+  const vals = last7.map(k => state.days[k].checkout.energy);
+  const flat = last7.length >= 7 && (Math.max(...vals) - Math.min(...vals)) <= 1;
+  const rising = state.library.filter(l => { const r = recoveryStats(l.name); return r && r.rising; }).map(l => l.name);
+  let out = '<h3>Patrones</h3>';
+  out += `<p>Capacidad, últimos días: ${fmtN(e1)} de 5${e0 != null ? ` · antes ${fmtN(e0)}` : ''}.</p>`;
+  out += `<p>Tolerancia sensorial: ${fmtN(s1)} de 5${s0 != null ? ` · antes ${fmtN(s0)}` : ''}.</p>`;
+  if(flat) out += '<p>Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
+  if(rising.length) out += `<p>Tardas más que antes en recuperarte de: ${esc(rising.join(', '))}.</p>`;
+  el.innerHTML = out;
+}
+
+let calMonth = new Date();
+function renderCal(){
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  document.getElementById('calLabel').textContent =
+    calMonth.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+  const first = new Date(y, m, 1);
+  const offset = (first.getDay() + 6) % 7;            // semana empieza en lunes
+  const total = new Date(y, m+1, 0).getDate();
+  const typical = typicalBudget();
+  let html = '';
+  for(let i=0;i<offset;i++) html += '<div class="cell blank"></div>';
+  for(let n=1;n<=total;n++){
+    const k = `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
+    const { planned } = dayLoad(k);
+    const heavy = planned > typical;
+    const dots = Math.min(5, Math.ceil(planned / 2));
+    const cls = [
+      k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
+      heavy ? 'heavy' : ''
+    ].join(' ');
+    html += `<button class="cell ${cls}" data-day="${k}" aria-label="${fmtDate(k)}${planned?`, ${planned} cucharas`:''}">${n}<span class="load">${'•'.repeat(dots)}</span></button>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns();
+  document.getElementById('maxOut').textContent = state.settings.max;
+}
+const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+/* ---------- tabs ---------- */
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-go]'); if(!b) return;
+  currentTab = b.dataset.go;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById('s-' + currentTab).classList.add('on');
+  document.querySelectorAll('#tabs button').forEach(x => x.removeAttribute('aria-current'));
+  b.setAttribute('aria-current','page');
+  window.scrollTo(0,0);
+  renderAll();
+});
+
+/* ---------- check-in ---------- */
+const dlgCheckin = document.getElementById('dlgCheckin');
+const ciRange = document.getElementById('ciRange');
+const WORDS = ['En reserva','Muy justo','Muy justo','Poco','Poco','A medias','A medias','Normal','Normal','Bien','Bien','Con margen','Con margen'];
+function ciSync(){
+  const v = +ciRange.value;
+  document.getElementById('ciNum').textContent = v;
+  document.getElementById('ciWord').textContent = WORDS[Math.min(v, WORDS.length-1)];
+}
+ciRange.addEventListener('input', ciSync);
+function openCheckin(){
+  ciRange.max = state.settings.max;
+  ciRange.value = day().budget ?? Math.round(state.settings.max * 0.65);
+  ciSync();
+  const presets = [
+    ['Agotado', Math.max(1, Math.round(state.settings.max*0.25))],
+    ['Justo', Math.round(state.settings.max*0.5)],
+    ['Bien', Math.round(state.settings.max*0.8)],
+    ['De sobra', state.settings.max]
+  ];
+  document.getElementById('ciPresets').innerHTML = presets
+    .map(([n,v]) => `<button class="chip" data-ci="${v}">${n} · ${v}</button>`).join('');
+  dlgCheckin.showModal();
+}
+document.getElementById('ciPresets').addEventListener('click', e => {
+  const b = e.target.closest('[data-ci]'); if(!b) return;
+  ciRange.value = b.dataset.ci; ciSync();
+});
+document.getElementById('ciSave').addEventListener('click', () => {
+  day().budget = +ciRange.value; save(); dlgCheckin.close(); renderAll();
+});
+document.getElementById('btnAdjustBudget').addEventListener('click', openCheckin);
+
+/* ---------- add task ---------- */
+const dlgTask = document.getElementById('dlgTask');
+const tName = document.getElementById('tName');
+const tCostOut = document.getElementById('tCost');
+let tCost = 2, tKind = 'gasto';
+let taskDate = todayKey();
+function tSync(){
+  tCostOut.textContent = fmtN(tCost);
+  document.querySelectorAll('#tKind .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.kind === tKind));
+  document.getElementById('tCostLab').textContent = tKind === 'recarga'
+    ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar';
+  const l = tName.value.trim() ? learned(tName.value.trim()) : null;
+  document.getElementById('tLearned').textContent =
+    (l && l.avg != null) ? `Sueles ${l.avg < 0 ? 'recuperar' : 'gastar'} ${fmtN(Math.abs(l.avg))}` : '';
+}
+document.getElementById('tKind').addEventListener('click', e => {
+  const b = e.target.closest('[data-kind]'); if(!b) return;
+  tKind = b.dataset.kind; tSync();
+});
+document.getElementById('tMinus').addEventListener('click', () => { tCost = Math.max(0, tCost-1); tSync(); });
+document.getElementById('tPlus').addEventListener('click', () => { tCost = Math.min(12, tCost+1); tSync(); });
+tName.addEventListener('input', tSync);
+const DOW = ['L','M','X','J','V','S','D'];   // 0 = lunes
+let repMode = 'once', repDays = new Set(), repWeeks = 4;
+const mondayIndex = d => (d.getDay() + 6) % 7;
+
+function repSync(){
+  document.querySelectorAll('#repMode .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.rep === repMode));
+  const custom = repMode === 'custom';
+  document.getElementById('repDays').hidden = !custom;
+  document.getElementById('repDur').hidden = repMode === 'once';
+  if(custom){
+    document.getElementById('repDays').innerHTML = DOW
+      .map((d,i) => `<button class="chip" data-dow="${i}" aria-pressed="${repDays.has(i)}">${d}</button>`).join('');
+  }
+  document.getElementById('wOut').textContent = repWeeks;
+  document.getElementById('wLabel').textContent = repWeeks === 1 ? 'semana' : 'semanas';
+}
+document.getElementById('repMode').addEventListener('click', e => {
+  const b = e.target.closest('[data-rep]'); if(!b) return;
+  repMode = b.dataset.rep;
+  if(repMode === 'custom' && !repDays.size) repDays.add(mondayIndex(new Date(taskDate+'T12:00:00')));
+  repSync();
+});
+document.getElementById('repDays').addEventListener('click', e => {
+  const b = e.target.closest('[data-dow]'); if(!b) return;
+  const i = +b.dataset.dow;
+  repDays.has(i) ? repDays.delete(i) : repDays.add(i);
+  repSync();
+});
+document.getElementById('wMinus').addEventListener('click', () => { repWeeks = Math.max(1, repWeeks-1); repSync(); });
+document.getElementById('wPlus').addEventListener('click', () => { repWeeks = Math.min(26, repWeeks+1); repSync(); });
+
+/* fechas en las que cae la tarea, desde el día elegido */
+function expandDates(startKey){
+  if(repMode === 'once') return [startKey];
+  const out = [];
+  const start = new Date(startKey + 'T12:00:00');
+  for(let i = 0; i < repWeeks * 7; i++){
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const w = mondayIndex(d);
+    const hit = repMode === 'daily'
+      || (repMode === 'weekdays' && w < 5)
+      || (repMode === 'custom' && repDays.has(w));
+    if(hit) out.push(d.toISOString().slice(0,10));
+  }
+  return out.length ? out : [startKey];
+}
+
+function openTaskSheet(dateKey){
+  taskDate = dateKey;
+  tName.value = ''; tCost = 2; tKind = 'gasto';
+  repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
+    ? 'Elige de tu lista o escribe una nueva.'
+    : `Empieza el ${fmtDate(dateKey)}.`;
+  const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
+  document.getElementById('taskSuggest').innerHTML = top
+    .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}">${esc(l.name)}</button>`).join('');
+  tSync(); repSync(); dlgTask.showModal();
+}
+document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
+document.getElementById('taskSuggest').addEventListener('click', e => {
+  const b = e.target.closest('[data-sug]'); if(!b) return;
+  const c = +b.dataset.cost;
+  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tSync();
+});
+document.getElementById('tCancel').addEventListener('click', () => dlgTask.close());
+document.getElementById('tSave').addEventListener('click', () => {
+  const name = tName.value.trim(); if(!name){ tName.focus(); return; }
+  const dates = expandDates(taskDate);
+  const series = dates.length > 1 ? uid() : null;
+  const est = tKind === 'recarga' ? -tCost : tCost;
+  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null }));
+  record(name, est, null);
+  save(); dlgTask.close(); renderAll();
+  if(dlgDay.open) renderDaySheet();
+});
+
+/* ---------- task interactions ---------- */
+document.getElementById('taskList').addEventListener('click', e => {
+  const tog = e.target.closest('[data-toggle]');
+  if(tog){
+    const t = day().tasks.find(x => x.id === tog.dataset.toggle);
+    t.done = !t.done;
+    if(t.done){ t.real = t.est; record(t.name, t.est, t.est); }
+    else{
+      const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
+      if(item) item.samples.pop();
+      t.real = null;
+    }
+    save(); renderAll(); return;
+  }
+  const rec = e.target.closest('[data-rec]');
+  if(rec){
+    const t = day().tasks.find(x => x.id === rec.dataset.rec);
+    const m = +rec.dataset.min;
+    t.recovery = (t.recovery === m) ? null : m;
+    save(); renderAll(); return;
+  }
+  const adj = e.target.closest('[data-real]');
+  if(adj){
+    const t = day().tasks.find(x => x.id === adj.dataset.real);
+    const v = (t.real ?? t.est) + (+adj.dataset.delta);
+    t.real = t.est < 0 ? Math.min(0, v) : Math.max(0, v);
+    const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
+    if(item && item.samples.length){ item.samples[item.samples.length-1] = t.real; }
+    save(); renderAll();
+  }
+});
+
+/* ---------- library editor ---------- */
+const dlgLib = document.getElementById('dlgLib');
+const lName = document.getElementById('lName');
+let libEditing = null, lCost = 2, lKind = 'gasto';
+function lSync(){
+  document.getElementById('lCost').textContent = fmtN(lCost);
+  document.querySelectorAll('#lKind .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.kind === lKind));
+  document.getElementById('lCostLab').textContent = lKind === 'recarga'
+    ? 'Cuántas cucharas te devuelve' : 'Lo que te cuesta';
+  const rc = libEditing ? recoveryStats(libEditing.name) : null;
+  document.getElementById('lHint').textContent = rc ? `Recuperación: ${recovLabel(rc.last)}` : '';
+}
+document.getElementById('lKind').addEventListener('click', e => {
+  const b = e.target.closest('[data-kind]'); if(!b) return;
+  lKind = b.dataset.kind; lSync();
+});
+function openLib(item){
+  libEditing = item;
+  lName.value = item ? item.name : '';
+  lKind = item && item.est < 0 ? 'recarga' : 'gasto';
+  lCost = item ? Math.abs(item.est) : 2;
+  document.getElementById('lTitle').textContent = item ? 'Editar actividad' : 'Nueva actividad';
+  const st = item ? learned(item.name) : null;
+  document.getElementById('lSub').textContent = (st && st.avg != null)
+    ? `De media son ${fmtN(Math.abs(st.avg))} en ${st.n} registros. Si pones un valor a mano, se usará ese.`
+    : 'Sube o baja de media en media cuchara.';
+  document.getElementById('lDelete').hidden = !item;
+  document.getElementById('lReset').hidden = !(st && st.n);
+  lSync(); dlgLib.showModal();
+}
+document.getElementById('btnAddLib').addEventListener('click', () => openLib(null));
+document.getElementById('libList').addEventListener('click', e => {
+  const b = e.target.closest('[data-lib]'); if(!b) return;
+  openLib(state.library.find(l => l.id === b.dataset.lib));
+});
+document.getElementById('lMinus').addEventListener('click', () => { lCost = Math.max(0, lCost-0.5); lSync(); });
+document.getElementById('lPlus').addEventListener('click', () => { lCost = Math.min(12, lCost+0.5); lSync(); });
+document.getElementById('lCancel').addEventListener('click', () => dlgLib.close());
+document.getElementById('lReset').addEventListener('click', () => {
+  if(libEditing){ libEditing.samples = []; save(); renderAll(); openLib(libEditing); }
+});
+document.getElementById('lDelete').addEventListener('click', () => {
+  if(!libEditing) return;
+  if(!confirm(`¿Quitar "${libEditing.name}" de la calculadora? Las tareas ya apuntadas se quedan como están.`)) return;
+  state.library = state.library.filter(l => l.id !== libEditing.id);
+  save(); dlgLib.close(); renderAll();
+});
+document.getElementById('lSave').addEventListener('click', () => {
+  const name = lName.value.trim(); if(!name){ lName.focus(); return; }
+  const est = lKind === 'recarga' ? -lCost : lCost;
+  if(libEditing){
+    libEditing.name = name; libEditing.est = est; libEditing.fixed = true;
+  }else{
+    const dup = libItem(name);
+    if(dup){ dup.est = est; dup.fixed = true; }
+    else state.library.push({ id:uid(), name, est, fixed:true, samples:[] });
+  }
+  save(); dlgLib.close(); renderAll();
+});
+
+/* ---------- check-out ---------- */
+const dlgCheckout = document.getElementById('dlgCheckout');
+let coEnergy = 3, coSensory = 3;
+function coSync(){
+  const paint = (id, val) => {
+    document.getElementById(id).innerHTML = [1,2,3,4,5]
+      .map(v => `<button data-v="${v}" aria-pressed="${v===val}">${v}</button>`).join('');
+  };
+  paint('coEnergy', coEnergy); paint('coSensory', coSensory);
+}
+document.getElementById('coEnergy').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return; coEnergy = +b.dataset.v; coSync();
+});
+document.getElementById('coSensory').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
+});
+document.getElementById('btnCheckout').addEventListener('click', () => {
+  const co = day().checkout;
+  coEnergy = co ? co.energy : 3;
+  coSensory = co ? co.sensory : 3;
+  document.getElementById('coNote').value = co ? (co.note || '') : '';
+  coSync(); dlgCheckout.showModal();
+});
+document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.close());
+document.getElementById('coSave').addEventListener('click', () => {
+  day().checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
+  save(); dlgCheckout.close(); renderAll();
+});
+
+/* ---------- días tipo ---------- */
+const dlgTpl = document.getElementById('dlgTpl');
+let tplTarget = todayKey();
+function renderTplList(){
+  const el = document.getElementById('tplList');
+  el.innerHTML = state.templates.length
+    ? state.templates.map(t => `<div class="mini">
+        <span>${esc(t.name)}<br><span class="lib-note">${t.items.length} tarea${t.items.length===1?'':'s'}</span></span>
+        <span class="cost">
+          <button class="use" data-use="${t.id}">Usar</button>
+          <button data-tdel="${t.id}" aria-label="Borrar ${esc(t.name)}">×</button>
+        </span>
+      </div>`).join('')
+    : '<div class="empty">Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.</div>';
+}
+function openTpl(dateKey){
+  tplTarget = dateKey;
+  document.getElementById('tplSub').textContent = dateKey === todayKey()
+    ? 'Se añadirán a hoy.'
+    : `Se añadirán al ${fmtDate(dateKey)}.`;
+  document.getElementById('tplSaveDay').textContent = dateKey === todayKey()
+    ? 'Guardar el día de hoy como día tipo'
+    : 'Guardar ese día como día tipo';
+  renderTplList(); dlgTpl.showModal();
+}
+document.getElementById('btnTpl').addEventListener('click', () => openTpl(todayKey()));
+document.getElementById('tplClose').addEventListener('click', () => { dlgTpl.close(); renderAll(); });
+document.getElementById('tplList').addEventListener('click', e => {
+  const use = e.target.closest('[data-use]');
+  if(use){
+    const tpl = state.templates.find(t => t.id === use.dataset.use);
+    tpl.items.forEach(i => day(tplTarget).tasks.push({
+      id:uid(), series:null, name:i.name, est:i.est, real:null, done:false, recovery:null
+    }));
+    save(); dlgTpl.close(); renderAll();
+    if(dlgDay.open) renderDaySheet();
+    return;
+  }
+  const del = e.target.closest('[data-tdel]');
+  if(del){
+    state.templates = state.templates.filter(t => t.id !== del.dataset.tdel);
+    save(); renderTplList();
+  }
+});
+document.getElementById('tplSaveDay').addEventListener('click', () => {
+  const items = day(tplTarget).tasks.map(t => ({ name:t.name, est:t.est }));
+  if(!items.length){ alert('Ese día no tiene tareas que guardar.'); return; }
+  const name = prompt('¿Cómo llamamos a este día tipo?', 'Día de trabajo');
+  if(!name || !name.trim()) return;
+  state.templates.push({ id:uid(), name:name.trim(), items });
+  save(); renderTplList();
+});
+
+/* ---------- calendar ---------- */
+document.getElementById('calPrev').addEventListener('click', () => {
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal();
+});
+document.getElementById('calNext').addEventListener('click', () => {
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal();
+});
+
+const dlgDay = document.getElementById('dlgDay');
+let selectedDay = todayKey();
+function renderDaySheet(){
+  const k = selectedDay, d = day(k), past = k < todayKey(), isToday = k === todayKey();
+  const { planned, spent } = dayLoad(k);
+  const typical = typicalBudget();
+  document.getElementById('dTitle').textContent =
+    isToday ? 'Hoy' : fmtDate(k).replace(/^./, c => c.toUpperCase());
+  const sub = document.getElementById('dSub');
+  if(past || isToday){
+    sub.textContent = d.budget != null
+      ? `${spent} cucharas gastadas de ${d.budget}`
+      : `${spent} cucharas gastadas`;
+    sub.style.color = '';
+  }else{
+    sub.textContent = planned > typical
+      ? `${fmtN(planned)} cucharas previstas. Tu media es ${fmtN(typical)}.`
+      : `${fmtN(planned)} cucharas previstas de las ${fmtN(typical)} que sueles tener.`;
+    sub.style.color = planned > typical ? 'var(--alert)' : '';
+  }
+  const list = document.getElementById('dTasks');
+  list.innerHTML = d.tasks.length
+    ? d.tasks.map(t => `<div class="mini">
+        <span>${esc(t.name)}${t.done?' · hecha':''}</span>
+        <span class="cost">${t.real ?? t.est}
+          <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
+          <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}">×</button>
+        </span>
+      </div>`).join('')
+    : '<div class="empty">Nada planificado para este día.</div>';
+  document.getElementById('dNote').value = d.note || '';
+}
+document.getElementById('calGrid').addEventListener('click', e => {
+  const c = e.target.closest('[data-day]'); if(!c) return;
+  selectedDay = c.dataset.day; renderDaySheet(); dlgDay.showModal();
+});
+document.getElementById('dAdd').addEventListener('click', () => openTaskSheet(selectedDay));
+document.getElementById('dTpl').addEventListener('click', () => openTpl(selectedDay));
+document.getElementById('dTasks').addEventListener('click', e => {
+  const b = e.target.closest('[data-del]'); if(!b) return;
+  const d = day(selectedDay);
+  const t = d.tasks.find(x => x.id === b.dataset.del);
+  if(t && t.series && confirm('Esta tarea se repite en más días. ¿Quitarla de todos?\n\nAceptar: la quita de toda la serie.\nCancelar: solo de este día.')){
+    Object.keys(state.days).forEach(k => {
+      state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === t.series && !x.done));
+    });
+  }else{
+    d.tasks = d.tasks.filter(x => x.id !== b.dataset.del);
+  }
+  save(); renderDaySheet(); renderAll();
+});
+let noteTimer;
+document.getElementById('dNote').addEventListener('input', e => {
+  day(selectedDay).note = e.target.value;
+  clearTimeout(noteTimer); noteTimer = setTimeout(save, 500);
+});
+document.getElementById('dClose').addEventListener('click', () => { dlgDay.close(); renderAll(); });
+
+/* ---------- settings ---------- */
+document.getElementById('maxMinus').addEventListener('click', () => {
+  state.settings.max = Math.max(4, state.settings.max-1); save(); renderAll();
+});
+document.getElementById('maxPlus').addEventListener('click', () => {
+  state.settings.max = Math.min(24, state.settings.max+1); save(); renderAll();
+});
+document.getElementById('btnExport').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cucharas-${todayKey()}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+});
+document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change', async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const parsed = JSON.parse(await f.text());
+    if(!parsed.days) throw new Error('formato');
+    state = parsed; await save(); renderAll();
+  }catch(err){ alert('Ese archivo no es una copia de Cucharas.'); }
+});
+document.getElementById('btnWipe').addEventListener('click', () => {
+  if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12} };
+  save(); renderAll();
+});
+
+/* ---------- boot ---------- */
+(async function init(){
+  const loaded = await store.get();
+  if(loaded) state = loaded;
+  if(!state.library || !state.library.length) state.library = SEED.map(s=>({...s,samples:[]}));
+  state.library.forEach(l => { if(!l.id) l.id = uid(); });
+  if(!state.settings) state.settings = { max:12 };
+  if(!state.templates) state.templates = [];
+  document.getElementById('todayDate').textContent = fmtDate(todayKey());
+  renderAll();
+  if(day().budget == null) openCheckin();
+})();
+</script>
+</body>
+</html>
