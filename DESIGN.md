@@ -1,5 +1,5 @@
 ---
-name: Cucharas
+name: Spoony
 description: Organización diaria por energía, no por tiempo, para personas autistas y perfiles de disfunción ejecutiva.
 colors:
   cotton-pink: "#FBF2F3"
@@ -123,15 +123,17 @@ components:
     padding: "9px 14px"
 ---
 
-# Design System: Cucharas
+# Design System: Spoony
 
 ## Overview
 
 **Creative North Star: "La Sala de Estar"**
 
-Cucharas se ve como un espacio doméstico, no como una herramienta de productividad ni un panel clínico. La superficie es casi silenciosa: color pastel cálido, bordes finos de 1px, sin sombra ni relieve, sin nada que compita por atención. El sistema existe para que la persona pueda mirarlo sin esfuerzo el día entero — cada elemento tiene una sola posición, un solo color de estado, y no cambia de sitio de una sesión a otra.
+Spoony se ve como un espacio doméstico, no como una herramienta de productividad ni un panel clínico. La superficie es casi silenciosa: color pastel cálido, bordes finos de 1px, sin sombra ni relieve, sin nada que compita por atención. El sistema existe para que la persona pueda mirarlo sin esfuerzo el día entero — cada elemento tiene una sola posición, un solo color de estado, y no cambia de sitio de una sesión a otra.
 
-La calidez viene del color (rosas y ciruela suaves), no del gesto. No hay confeti, no hay mascotas, no hay barra de progreso festiva: el registro es honesto sobre cómo ha ido el día, incluso cuando ha ido mal, sin dramatizarlo ni celebrarlo de más. Esto excluye explícitamente dos mundos visuales: la estética clínica/médica (fría, gris, con iconografía de diagnóstico) y la estética de gamificación tipo Duolingo (rachas, insignias, mascotas, refuerzo positivo ruidoso).
+La calidez viene del color (rosas y ciruela suaves), no del gesto. No hay confeti, no hay barra de progreso festiva: el registro es honesto sobre cómo ha ido el día, incluso cuando ha ido mal, sin dramatizarlo ni celebrarlo de más. Esto excluye explícitamente dos mundos visuales: la estética clínica/médica (fría, gris, con iconografía de diagnóstico) y la estética de gamificación tipo Duolingo (rachas, insignias, refuerzo positivo ruidoso).
+
+> **Excepción documentada (2026-09-16):** el usuario pidió explícitamente un logo de mascota (cuchara 3D antropomorfizada, render pulido, azul fuera de la paleta) para la marca "Spoony", pese a que contradice la frase anterior y la Regla de la Quietud. Se usa tal cual, solo como logo/favicon — no se extiende el estilo de mascota al resto de la interfaz.
 
 Los componentes son suaves y silenciosos: superficie casi plana, borde fino como único límite, radio de esquina generoso pero discreto (14px en tarjetas). Un componente no debe "llamar" — debe estar ahí, legible, y desaparecer cuando no hace falta mirarlo.
 

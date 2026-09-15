@@ -40,7 +40,7 @@ Planifica por energía, no por tiempo: la diferencia estructural frente a cualqu
 
 ## Brand Commitments
 
-Nombre del producto: **Cucharas**, asentado.
+Nombre del producto: **Spoony** (antes "Cucharas", renombrado a petición explícita del usuario el 2026-09-16 pese al choque con los principios de marca de accesibilidad — ver nota en Design System). Incluye un logo de mascota 3D (cuchara antropomorfizada) que el usuario aportó y pidió usar tal cual.
 
 ## Evidence on Hand
 
