@@ -92,12 +92,15 @@ typography:
 rounded:
   hair: "1px"
   focus: "6px"
-  stepper: "9px"
-  control: "10px"
-  cell: "11px"
-  action: "12px"
-  card: "14px"
+  stepper: "11px"
+  control: "13px"
+  cell: "14px"
+  row: "15px"
+  block: "18px"
+  card: "20px"
+  nav: "26px"
   pill: "999px"
+cornerShape: squircle
 spacing:
   page: "18px"
 components:
@@ -209,18 +212,25 @@ Columna única, ancho máximo 520px centrado, padding lateral de 18px (`--pad`).
 
 ## Elevation & Depth
 
-Sistema completamente plano por decisión deliberada de accesibilidad, no por omisión: sin `box-shadow`, sin `transition` ni `animation` en ninguna regla del prototipo. La única señal de profundidad es el borde de 1px (Rosa Polvo) entre una superficie y otra, y el cambio de fondo (Blanco Cálido sobre Rosa Algodón). Esto corresponde al principio de "control sensorial" del producto: el movimiento en pantalla consume atención y puede resultar desregulador para el usuario objetivo.
+> **Excepción documentada (2026-09-16):** el usuario levantó explícitamente la Regla de la Quietud para permitir la barra de pestañas flotante de cristal. El documento pedía confirmarlo antes de tocarlo y está confirmado. Alcance de lo permitido: sombra proyectada bajo la barra flotante y fundidos de color en los cambios de estado (180ms). Sigue vetado todo lo que se desplace o rebote, y `prefers-reduced-motion` se respeta como suelo — es WCAG, no parte de esta regla.
+
+Fuera de esa excepción el sistema sigue siendo plano: sin `box-shadow`, sin `transition` ni `animation` en ninguna otra regla. La única señal de profundidad es el borde de 1px (Rosa Polvo) entre una superficie y otra, y el cambio de fondo (Blanco Cálido sobre Rosa Algodón). Esto corresponde al principio de "control sensorial" del producto: el movimiento en pantalla consume atención y puede resultar desregulador para el usuario objetivo.
 
 Los cambios de estado (pulsar un chip, marcar una tarea, pestaña activa) son instantáneos — cambio directo de color de fondo/borde, sin fundido ni desplazamiento. Esto no es una limitación temporal del prototipo: es la regla, con una única salvedad admitida — un cambio de estado instantáneo (color o borde, nunca movimiento) puede añadirse donde haga falta, pero sombra, transición animada y `animation` siguen prohibidas sin excepción.
 
 ### Named Rules
-**La Regla de la Quietud.** Nada se anima, se desliza ni proyecta sombra. Un estado cambia de golpe, no de forma gradual. Si una revisión de diseño añade un `transition`, ha entrado en conflicto con un principio de accesibilidad del producto, no solo con una preferencia visual — confirmar con el usuario antes de tocarlo.
+**La Regla de la Quietud** *(levantada parcialmente el 2026-09-16, ver arriba)*. Nada se desliza ni se desplaza. Los cambios de estado pueden fundir color durante 180ms, pero nada cambia de posición ni de tamaño, y la única sombra del sistema es la de la barra flotante. Si una revisión de diseño quiere ampliar esto, sigue siendo un conflicto con un principio de accesibilidad del producto y no solo con una preferencia visual — confirmar con el usuario antes de tocarlo.
 
 **La Regla de la Convicción.** La quietud no es la única palanca de personalidad del sistema, es la más restringida. Cuando algo se sienta soso, la respuesta correcta es subir la convicción del color y la forma en ese punto concreto (acento más presente, glifo más propio, salto tipográfico más marcado) — nunca añadir movimiento para compensar. Ver también la variante de alto contraste pendiente (brief, punto 7): es la palanca reservada para quien necesite más intensidad visual sin tocar esta regla.
 
 ## Shapes
 
-Esquinas redondeadas en toda la interfaz, nunca esquinas vivas. La escala real tiene ocho pasos, pero solo tres son de uso general: **control** (10px) en botones y campos, **card** (14px) en tarjetas y contenedores grandes (medidor, fila de tarea, tarjeta de patrones, hoja modal), y **pill** (999px) en chips y píldoras. Los demás (`stepper` 9px, `cell` 11px, `action` 12px) son valores heredados de componentes concretos: se conservan donde están, pero un componente nuevo usa control, card o pill. La hoja modal (`dialog`) redondea solo las dos esquinas superiores, ya que nace pegada al borde inferior de la pantalla.
+**La esquina es superelíptica, no circular** (`corner-shape: squircle` sobre el `border-radius`). La superelipse entra en la curva antes y sale después, de modo que el borde no tiene el corte seco del arco circular. Donde el navegador no conoce `corner-shape` la propiedad se ignora y queda el radio circular de siempre: no hay degradación funcional, solo una esquina menos.
+
+Cinco pasos de uso general, cada uno con un trabajo: **control** (13px) en botones pequeños y campos, **cell** (14px) en celdas de calendario y escalas, **row** (15px) en filas dentro de un grupo, **block** (18px) en botones de bloque, estados vacíos y `textarea`, y **card** (20px) en tarjetas y contenedores de grupo. Aparte quedan **pill** (999px) para chips y píldoras, **nav** (26px) para la barra de pestañas flotante y **stepper** (11px) para los botones de paso. Los radios subieron respecto a la escala anterior porque la superelipse lee más ceñida al mismo número. La hoja modal (`dialog`) redondea solo las dos esquinas superiores, ya que nace pegada al borde inferior de la pantalla.
+
+### Named Rules
+**La Regla Concéntrica.** Cuando una forma redondeada vive dentro de otra, el radio de dentro es el de fuera menos el padding que los separa: un grupo de 20px con 5px de padding lleva filas de 15px. Así las dos curvas corren paralelas en vez de cruzarse. Si un radio interior se elige "a ojo", se ha roto la regla.
 
 El borde discontinuo (`dashed`) es vocabulario, no decoración: significa "aquí no hay nada todavía" o "esto añade algo". Lo llevan los botones de añadir y los estados vacíos, y nada más.
 
@@ -239,12 +249,16 @@ El borde discontinuo (`dashed`) es vocabulario, no decoración: significa "aquí
 - **Style:** fondo Blanco Cálido, borde 1px Rosa Polvo, radio 999px (cápsula completa)
 - **State:** `aria-pressed="true"` invierte a fondo Ciruela Suave y texto Blanco Cálido, sin transición
 
+### Grupo (contenedor de filas)
+Las filas relacionadas (tareas, actividades de la biblioteca, ajustes) no son tarjetas sueltas separadas 9px: viven en un contenedor único de radio 20px y 5px de padding, con separadores de 1px a **100% de Rosa Polvo** —3,33:1 sobre Blanco Cálido, porque el separador es la única señal estructural y le aplica el 3:1 de WCAG 1.4.11— sangrados hasta donde empieza el texto. Un borde en vez de seis. Los estados vacíos quedan **fuera** del grupo: su borde discontinuo ya es su propio contenedor.
+
 ### Cards / Containers
-- **Corner Style:** radio 14px
+- **Corner Style:** radio 20px
 - **Background:** Blanco Cálido sobre fondo Rosa Algodón
 - **Shadow Strategy:** ninguna — ver Elevation & Depth
 - **Border:** 1px sólido Rosa Polvo (discontinuo en estados "vacío" o "añadir")
 - **Internal Padding:** 13-18px
+- **Texto sobre Rosa Niebla:** Marrón Ciruela, nunca Malva Apagado. Malva sobre Rosa Niebla da 3,96:1 y el panel de ajuste es texto de 14px; Marrón Ciruela lo sube a 7,48:1.
 
 ### Inputs / Fields
 - **Style:** fondo Blanco Cálido, borde 1px Rosa Polvo, radio 10px, padding 13px
@@ -252,7 +266,11 @@ El borde discontinuo (`dashed`) es vocabulario, no decoración: significa "aquí
 - **Error / Disabled:** no implementado en el prototipo actual
 
 ### Navigation
-- **Style:** barra fija inferior de 4 pestañas con icono + etiqueta de texto, siempre visibles, nunca solo icono. Etiqueta en Meta (13px). Pestaña activa cambia de Malva Apagado a Ciruela Suave y pasa a peso 700 — sin subrayado, sin indicador animado.
+- **Style:** barra **flotante** de 4 pestañas con icono + etiqueta de texto, siempre visibles, nunca solo icono. Separada 14px de los bordes y del inferior (sumado a `env(safe-area-inset-bottom)`), radio 26px, pastilla interior 19px por la Regla Concéntrica. El contenido pasa por debajo.
+- **Cristal:** fondo Blanco Cálido al 70% con `backdrop-filter: blur(20px) saturate(1.4)` y sombra proyectada. Es la única superficie translúcida del sistema y la única sombra.
+- **Etiqueta inactiva en Marrón Ciruela, no Malva Apagado.** Sobre un fondo variable el contraste deja de ser fijo: en Malva el peor caso cae a 3,14:1, y en Marrón Ciruela es 5,92:1. No es una preferencia, es la condición que hace legal el cristal.
+- **Pestaña activa:** relleno Ciruela Suave con texto Blanco Cálido (5,20:1) y peso 700. Al ser opaca, su contraste no depende de lo que pase por debajo.
+- **El cristal se apaga solo** en tres casos: variante de alto contraste (existe para quien necesita más definición, y un fondo variable la contradice), `prefers-reduced-transparency: reduce`, y donde no haya `backdrop-filter` — translúcido sin desenfocar es peor que opaco.
 
 ### Iconos
 Todos dibujados como SVG propio, trazo 1,7, esquinas redondeadas, 18px en controles y 21px en la barra de pestañas. Ningún glifo Unicode hace de icono: `−`, `+`, `×`, `‹`, `›` son dibujos, no caracteres. Ningún icono va sin etiqueta de texto o `aria-label`. No hay iconos por actividad y no debe haberlos sin una necesidad demostrada: una metáfora visual mal entendida cuesta más que leer una palabra.
@@ -266,7 +284,7 @@ El componente más distintivo del sistema, y el único que representa el estado 
 - Debajo, el recuento en texto y el desglose ("Gastadas 7,5 · recuperadas 1"). El número siempre acompaña a la forma: nunca hay que contar cucharas para saber cuántas quedan.
 
 ### Task Row (componente insignia)
-Círculo de marcado (26px, aro de 2px en Rosa Cuchara, se rellena de Ciruela Suave con la marca al completar) + nombre de tarea + coste en cucharas. Al marcar, despliega en línea (aparición instantánea, sin animación) un panel Rosa Niebla con el ajuste de coste real y la escala de recuperación — nunca en una pantalla o modal aparte, para mantener visible el contexto de la tarea mientras se corrige. La tarea hecha pierde el fondo y tacha el nombre; conserva el borde sólido, porque el discontinuo significa otra cosa.
+Círculo de marcado (26px, aro de 2px en Rosa Cuchara, se rellena de Ciruela Suave con la marca al completar) + nombre de tarea + coste en cucharas. Al marcar, despliega en línea (aparición instantánea, sin animación) un panel Rosa Niebla con el ajuste de coste real y la escala de recuperación — nunca en una pantalla o modal aparte, para mantener visible el contexto de la tarea mientras se corrige. La tarea hecha tacha el nombre y rellena el círculo de marcado; **no** cambia de fondo, porque dentro de un grupo Rosa Algodón sobre Blanco Cálido son 1,05:1, es decir, invisible. Los dos signos que quedan son de forma, no de tono, que es justo lo que pide La Regla del Color Que No Va Solo.
 
 ### Cierre del día
 El check-out no es un "añadir": es el cierre. Botón de bloque de borde **sólido** (frente al discontinuo de "Añadir tarea"), separado por 30px del bloque de tareas, con una línea debajo que explica qué es y para qué sirve mientras no se haya hecho. Una vez hecho, el botón enuncia el resultado ("Check-out hecho · capacidad 3 de 5"), pasa a texto secundario y la explicación desaparece.
@@ -297,7 +315,9 @@ Borde discontinuo, texto centrado, y siempre la misma estructura: qué falta y q
 - **Do** comprobar el contraste con números antes de dar por buena una paleta: 4,5:1 en texto, 3:1 en marcas y bordes de control.
 
 ### Don't:
-- **Don't** añadir `box-shadow`, `transition` con movimiento, ni `animation` a ningún componente — rompe un principio de accesibilidad del producto, no solo una preferencia visual.
+- **Don't** añadir `box-shadow` fuera de la barra flotante, ni `transition` que desplace o redimensione, ni `animation` — rompe un principio de accesibilidad del producto, no solo una preferencia visual. Los fundidos de color de 180ms sí están permitidos desde la excepción del 2026-09-16.
+- **Don't** elegir un radio interior a ojo: sale del exterior menos el padding — La Regla Concéntrica.
+- **Don't** poner texto sobre una superficie translúcida sin calcular el peor caso: el contraste deja de ser fijo en cuanto el fondo se mueve.
 - **Don't** introducir un segundo color de acento interactivo; Verde Musgo y Terracota Templada son solo estado.
 - **Don't** usar iconos sin etiqueta de texto, ni metáforas visuales sin explicar.
 - **Don't** introducir mecánicas de gamificación (rachas, insignias, confeti, mascotas) ni estética clínica/médica — ambas son anti-referencia explícita del sistema.

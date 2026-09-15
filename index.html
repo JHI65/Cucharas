@@ -20,7 +20,13 @@
   --accent:#9E5266;
   --alert:#9C5A39;
   --deposit:#4F7566;
-  --radius:14px;
+  --radius:20px;        /* grupo y tarjeta */
+  --r-row:15px;         /* fila dentro de un grupo: 20 − 5 de padding */
+  --r-block:18px;       /* botón de bloque, estado vacío, textarea */
+  --r-control:13px;     /* botón pequeño, campo */
+  --r-cell:14px;        /* celda de calendario, escala */
+  --r-nav:26px;         /* barra de pestañas flotante */
+  --glass:rgba(255,248,249,.70);
   --pad:18px;
 }
 :root[data-contrast="alto"]{
@@ -34,6 +40,7 @@
   --accent:#7E3550;
   --alert:#7A3F22;
   --deposit:#2F5A46;
+  --glass:#FFFFFF;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none !important}
@@ -59,7 +66,7 @@ input,select,textarea{font:inherit;color:inherit}
 *:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
 .ic{width:18px;height:18px;display:block;flex:0 0 auto}
 
-.app{max-width:520px;margin:0 auto;padding:0 var(--pad) 96px}
+.app{max-width:520px;margin:0 auto;padding:0 var(--pad) calc(104px + env(safe-area-inset-bottom))}
 .screen{display:none}
 .screen.on{display:block}
 
@@ -103,11 +110,10 @@ input,select,textarea{font:inherit;color:inherit}
   display:flex;align-items:center;gap:13px;
   background:var(--surface);
   border:1px solid var(--line);
-  border-radius:var(--radius);
+  border-radius:var(--r-row);
   padding:13px 14px;
   margin-bottom:9px;
 }
-.task.done{background:transparent}
 .task.done .task-name{color:var(--ink-soft);text-decoration:line-through}
 .check{
   flex:0 0 auto;width:26px;height:26px;border-radius:50%;
@@ -127,11 +133,13 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .cost svg{width:9px;height:18px}
 
 .adjust{
-  border:1px solid var(--line);border-top:none;
-  border-radius:0 0 var(--radius) var(--radius);
+  border:1px solid var(--line);
+  border-radius:var(--r-row);
   background:var(--surface-2);
-  margin:-10px 0 9px;padding:11px 14px;
-  font-size:14px;color:var(--ink-soft);
+  margin:2px 0 4px;padding:11px 14px;
+  /* Malva Apagado sobre Rosa Niebla da 3,96:1 y esto es texto de 14px.
+     Marrón Ciruela lo sube a 7,48:1. */
+  font-size:14px;color:var(--ink);
 }
 .arow{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .arow+.arow{margin-top:12px;display:block}
@@ -140,7 +148,7 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
 .scale{display:flex;gap:7px}
-.scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:11px;font-size:17px}
+.scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:17px}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
@@ -161,7 +169,7 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .mini .use{font-size:15px;color:var(--accent)}
 .stepper{display:flex;align-items:center;gap:10px}
 .stepper button{
-  width:34px;height:34px;border-radius:9px;
+  width:34px;height:34px;border-radius:11px;
   border:1px solid var(--line);background:var(--surface);
   line-height:1;padding:0;
   display:grid;place-items:center;color:var(--accent);
@@ -169,21 +177,21 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .stepper output{min-width:1.6em;text-align:center;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
 
 .empty{
-  border:1px dashed var(--line);border-radius:var(--radius);
+  border:1px dashed var(--line);border-radius:var(--r-block);
   padding:24px 18px;text-align:center;color:var(--ink-soft);font-size:15px;
 }
 
 .add{
   width:100%;padding:14px;margin-top:4px;
   background:var(--surface);border:1px dashed var(--line);
-  border-radius:var(--radius);color:var(--accent);font-size:16px;
+  border-radius:var(--r-block);color:var(--accent);font-size:16px;
 }
 
 /* ---- Cierre del día ---- */
 .closer{margin-top:30px}
 .closer button{
   width:100%;padding:16px;background:var(--surface);
-  border:1px solid var(--line);border-radius:var(--radius);
+  border:1px solid var(--line);border-radius:var(--r-block);
   color:var(--accent);font-size:16px;
 }
 .closer.done button{color:var(--ink-soft)}
@@ -193,7 +201,7 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .lib{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--radius);padding:13px 14px;margin-bottom:9px;
+  border-radius:var(--r-row);padding:13px 14px;margin-bottom:9px;
   width:100%;text-align:left;
 }
 .bigrow button.warn{color:var(--alert)}
@@ -220,12 +228,12 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 textarea{
   width:100%;min-height:96px;resize:vertical;
   background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--radius);padding:13px;
+  border-radius:var(--r-block);padding:13px;
 }
 
 /* ---- Calendar ---- */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
-.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:10px;width:42px;height:42px;padding:0;display:grid;place-items:center;color:var(--accent)}
+.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-cell);width:42px;height:42px;padding:0;display:grid;place-items:center;color:var(--accent)}
 .cal-nav strong{font-size:17px}
 .dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:6px}
 .dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
@@ -233,7 +241,7 @@ textarea{
 .cell{
   display:block;width:100%;height:100%;overflow:hidden;
   border:1px solid var(--line);background:var(--surface);
-  border-radius:11px;padding:9px 0 0;text-align:center;
+  border-radius:var(--r-cell);padding:9px 0 0;text-align:center;
   font-size:15px;line-height:1.1;font-variant-numeric:tabular-nums;
 }
 .cell.blank{border:none;background:none;pointer-events:none}
@@ -244,7 +252,7 @@ textarea{
 .cell.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:8px}
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
 .mini button{background:none;border:none;color:var(--ink-soft);font-size:15px;padding:0 4px;line-height:1;display:grid;place-items:center}
 .mini .use{padding:6px 2px}
 
@@ -258,7 +266,7 @@ textarea{
 .row .chips{margin:0;flex:0 0 auto}
 .btn{
   background:var(--surface);border:1px solid var(--line);
-  border-radius:10px;padding:10px 15px;font-size:15px;
+  border-radius:var(--r-control);padding:10px 15px;font-size:15px;
 }
 .btn.warn{color:var(--alert)}
 .ocrow{padding:15px 0;border-bottom:1px solid var(--line)}
@@ -266,20 +274,33 @@ textarea{
 .ocrow p{margin:0 0 10px;font-size:14px;color:var(--ink-soft)}
 .ocgrid{display:flex;gap:8px}
 .ocgrid label{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft)}
-.ocgrid input{width:100%;text-align:center;padding:9px 2px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-variant-numeric:tabular-nums}
+.ocgrid input{width:100%;text-align:center;padding:9px 2px;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-variant-numeric:tabular-nums}
 
 /* ---- Tab bar ---- */
 .tabs{
-  position:fixed;left:0;right:0;bottom:0;
-  background:var(--surface);border-top:1px solid var(--line);
-  display:flex;padding-bottom:env(safe-area-inset-bottom);
+  position:fixed;left:14px;right:14px;
+  bottom:calc(14px + env(safe-area-inset-bottom));
+  max-width:520px;margin:0 auto;
+  display:flex;gap:4px;padding:7px;
+  background:var(--glass);
+  border:1px solid var(--line);
+  border-radius:var(--r-nav);
+  backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  box-shadow:0 8px 28px rgba(75,58,63,.16),0 2px 6px rgba(75,58,63,.10);
 }
 .tabs button{
-  flex:1;background:none;border:none;padding:11px 4px 13px;
-  font-size:13px;color:var(--ink-soft);
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+  flex:1;background:none;border:none;
+  padding:7px 2px 9px;min-height:52px;
+  /* Sube de Malva Apagado a Marrón Ciruela: sobre cristal el fondo es variable
+     y en Malva el peor caso cae a 3,14:1. En Marrón Ciruela es 5,92:1. */
+  font-size:13px;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border-radius:19px;
+  transition:background-color .18s ease,color .18s ease;
 }
-.tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
+/* Relleno opaco: su contraste no depende de lo que pase por debajo (5,20:1). */
+.tabs button[aria-current="page"]{background:var(--accent);color:var(--surface);font-weight:700}
 .tabs svg{width:21px;height:21px}
 
 /* ---- Sheet ---- */
@@ -303,7 +324,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .field label{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:6px}
 .field input[type=text],.field input[type=time]{
   width:100%;padding:13px;background:var(--surface);
-  border:1px solid var(--line);border-radius:10px;
+  border:1px solid var(--line);border-radius:var(--r-control);
 }
 .task-time{color:var(--ink-soft)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
@@ -313,11 +334,81 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 }
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .bigrow{display:flex;gap:10px;margin-top:6px}
-.bigrow button{flex:1;padding:15px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.bigrow button{flex:1;padding:15px;border-radius:var(--r-block);border:1px solid var(--line);background:var(--surface)}
 .bigrow button.primary{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .slider{width:100%;margin:8px 0 2px;accent-color:var(--spoon)}
 .bigcount{text-align:center;font-size:32px;font-weight:700;margin:4px 0 0;font-variant-numeric:tabular-nums}
 .bigcount small{display:block;font-size:14px;font-weight:400;color:var(--ink-soft)}
+
+/* ==========================================================================
+   Rediseño squircle — 2026-09-16
+   Geometría superelíptica, filas agrupadas y barra de pestañas flotante.
+   La Regla de la Quietud queda levantada por decisión explícita del usuario
+   (ver la excepción fechada en DESIGN.md). Se conserva prefers-reduced-motion
+   como suelo, que es WCAG y no forma parte de esa regla.
+   ========================================================================== */
+
+/* Superelipse en toda la geometría de contenedor. Donde el navegador no conoce
+   corner-shape la propiedad se ignora y queda el radio circular de siempre:
+   no hay degradación funcional, solo una esquina menos. */
+.meter,.task,.adjust,.card,.empty,.add,.closer button,.lib,.day,.group,
+.cell,.btn,.scale button,.stepper button,.cal-nav button,.bigrow button,
+.mini,.ocgrid input,.field input[type=text],.field input[type=time],
+textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
+
+/* Contenedor de grupo: un borde en vez de seis. El radio de la fila sale de la
+   regla concéntrica — 20 de fuera menos 5 de padding = 15 de dentro. */
+.group{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:5px;
+}
+.group .task,.group .lib,.group .row,.group .ocrow{position:relative}
+.group .task,.group .lib{
+  background:transparent;border:none;margin-bottom:0;border-radius:var(--r-row);
+}
+/* Separador fino al 100% de Rosa Polvo: es la única señal estructural del
+   sistema y debe cumplir el 3:1 de WCAG 1.4.11 (3,33:1 sobre Blanco Cálido). */
+.group .task+.task::before,.group .lib+.lib::before{
+  content:"";position:absolute;top:0;right:0;height:1px;background:var(--line);
+}
+.group .task+.task::before{left:53px}
+.group .lib+.lib::before{left:14px}
+.group .row,.group .ocrow{padding:14px}
+.group .row:last-child,.group .ocrow:last-child{border-bottom:none}
+
+/* La fila hecha ya no cambia de relleno: dentro del grupo, Rosa Algodón sobre
+   Blanco Cálido son 1,05:1, es decir, invisible. El estado lo llevan el tachado
+   y el círculo relleno, que son forma y no tono. El tachado sigue definido
+   arriba, en el bloque de .task. */
+
+/* Cambios de estado. La Quietud está levantada, pero el movimiento se limita a
+   fundidos de color: nada se desplaza ni rebota. */
+.check,.chip,.scale button,.cell,.btn,.task{
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+
+/* El cristal es una preferencia sensorial antes que un efecto. Se apaga solo en
+   alto contraste —esa variante existe para quien necesita más definición, y un
+   fondo variable la contradice—, con prefers-reduced-transparency, y donde no
+   haya backdrop-filter, porque translúcido sin desenfocar es peor que opaco. */
+:root[data-contrast="alto"] .tabs{
+  backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface);
+}
+@media (prefers-reduced-transparency:reduce){
+  .tabs{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--surface)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .tabs{background:var(--surface)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    transition-duration:.01ms !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -420,6 +511,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
       <h1 class="title">Ajustes</h1>
       <p class="sub">Tus datos no salen del teléfono</p>
     </header>
+    <div class="group">
     <div class="row">
       <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
       <div class="stepper">
@@ -451,6 +543,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
     <div class="row">
       <div><strong>Borrar todo</strong><p>No se puede deshacer.</p></div>
       <button class="btn warn" id="btnWipe">Borrar</button>
+    </div>
     </div>
     <input type="file" id="fileIn" accept="application/json" hidden>
   </section>
@@ -778,7 +871,7 @@ function renderTasks(){
     el.innerHTML = '<div class="empty">Nada apuntado. Añade solo lo que de verdad va a pasar hoy.</div>';
     return;
   }
-  el.innerHTML = d.tasks.map(t => {
+  el.innerHTML = '<div class="group">' + d.tasks.map(t => {
     const cost = t.real ?? t.est;
     const dep = cost < 0;
     const l = learned(t.name);
@@ -820,7 +913,7 @@ function renderTasks(){
           `<button class="chip" data-rec="${t.id}" data-min="${m}" aria-pressed="${t.recovery===m}">${lab}</button>`).join('')}</div>
       </div>`}
     </div>` : ''}`;
-  }).join('');
+  }).join('') + '</div>';
 }
 function renderLib(){
   const el = document.getElementById('libList');
@@ -844,8 +937,8 @@ function renderLib(){
   const gastan = byUse(state.library.filter(l => l.est >= 0));
   const recargan = byUse(state.library.filter(l => l.est < 0));
   el.innerHTML =
-    (gastan.length ? `<p class="libsec">Gastan cucharas</p>${gastan.map(row).join('')}` : '') +
-    (recargan.length ? `<p class="libsec">Recargan cucharas</p>${recargan.map(row).join('')}` : '');
+    (gastan.length ? `<p class="libsec">Gastan cucharas</p><div class="group">${gastan.map(row).join('')}</div>` : '') +
+    (recargan.length ? `<p class="libsec">Recargan cucharas</p><div class="group">${recargan.map(row).join('')}</div>` : '');
 }
 
 /* typical budget: what a normal day has looked like lately */
