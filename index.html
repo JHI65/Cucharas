@@ -116,8 +116,11 @@ input,select,textarea{font:inherit;color:inherit}
 .check svg{width:14px;height:14px;display:none}
 .check.on svg{display:block}
 .task-body{flex:1 1 auto;min-width:0}
+button.task-body{text-align:left;background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer}
 .task-name{display:block;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .task-meta{font-size:13px;color:var(--ink-soft)}
+.chev{flex:0 0 auto;width:16px;height:16px;color:var(--ink-soft);transform:rotate(-90deg)}
+.chev.closed{transform:rotate(90deg)}
 .cost{flex:0 0 auto;font-size:15px;color:var(--ink-soft);display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .cost svg{width:9px;height:18px}
 
@@ -293,10 +296,11 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .sheet p.sub{margin:0 0 18px;font-size:15px;color:var(--ink-soft)}
 .field{margin-bottom:16px}
 .field label{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:6px}
-.field input[type=text]{
+.field input[type=text],.field input[type=time]{
   width:100%;padding:13px;background:var(--surface);
   border:1px solid var(--line);border-radius:10px;
 }
+.task-time{color:var(--ink-soft)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .chip{
   border:1px solid var(--line);background:var(--surface);
@@ -498,6 +502,10 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
       </div>
     </div>
     <div class="field">
+      <label for="tTime">A qué hora (opcional)</label>
+      <input type="time" id="tTime">
+    </div>
+    <div class="field">
       <label>Repetir</label>
       <div class="chips" id="repMode">
         <button class="chip" data-rep="once" aria-pressed="true">Solo ese día</button>
@@ -640,6 +648,7 @@ const SEED = [
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} } };
 let currentTab = 'hoy';
+const collapsedTasks = new Set();
 
 const todayKey = () => new Date().toISOString().slice(0,10);
 const fmtDate = k => {
@@ -777,15 +786,24 @@ function renderTasks(){
     if(dep) notes.push('Recarga');
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(`sueles gastar ${fmtN(l.avg)}`);
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
+    const isOpen = t.done && !collapsedTasks.has(t.id);
+    const timeTag = t.time ? `<span class="task-time">${t.time}</span> ` : '';
+    const body = t.done
+      ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
+          <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
+        </button>`
+      : `<span class="task-body"><span class="task-name">${timeTag}${esc(t.name)}</span>${meta}</span>`;
+    const chev = t.done ? `<svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>` : '';
     return `
     <div class="task ${t.done?'done':''}">
       <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${t.done?'Desmarcar':'Marcar'} ${esc(t.name)}" aria-pressed="${t.done}">
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
       </button>
-      <span class="task-body"><span class="task-name">${esc(t.name)}</span>${meta}</span>
+      ${body}
       <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(cost))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
+      ${chev}
     </div>
-    ${t.done ? `
+    ${isOpen ? `
     <div class="adjust">
       <div class="arow">
         <span>${dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?'}</span>
@@ -997,6 +1015,7 @@ document.getElementById('btnAdjustBudget').addEventListener('click', openCheckin
 const dlgTask = document.getElementById('dlgTask');
 const tName = document.getElementById('tName');
 const tCostOut = document.getElementById('tCost');
+const tTime = document.getElementById('tTime');
 let tCost = 2, tKind = 'gasto';
 let taskDate = todayKey();
 function tSync(){
@@ -1066,7 +1085,7 @@ function expandDates(startKey){
 
 function openTaskSheet(dateKey){
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto';
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
     ? 'Elige de tu lista o escribe una nueva.'
@@ -1088,7 +1107,8 @@ document.getElementById('tSave').addEventListener('click', () => {
   const dates = expandDates(taskDate);
   const series = dates.length > 1 ? uid() : null;
   const est = tKind === 'recarga' ? -tCost : tCost;
-  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null }));
+  const time = tTime.value || null;
+  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null, time }));
   record(name, est, null);
   save(); dlgTask.close(); renderAll();
   if(dlgDay.open) renderDaySheet();
@@ -1100,13 +1120,20 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     t.done = !t.done;
-    if(t.done){ t.real = t.est; record(t.name, t.est, t.est); }
+    if(t.done){ t.real = t.est; record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
     else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
       if(item) item.samples.pop();
       t.real = null;
+      collapsedTasks.delete(t.id);
     }
     save(); renderAll(); return;
+  }
+  const trow = e.target.closest('[data-trow]');
+  if(trow){
+    if(collapsedTasks.has(trow.dataset.trow)) collapsedTasks.delete(trow.dataset.trow);
+    else collapsedTasks.add(trow.dataset.trow);
+    renderTasks(); return;
   }
   const rec = e.target.closest('[data-rec]');
   if(rec){
@@ -1304,7 +1331,7 @@ function renderDaySheet(){
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
-        <span>${esc(t.name)}${t.done?' · hecha':''}</span>
+        <span>${t.time?`${t.time} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
         <span class="cost">${t.real ?? t.est}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
           <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
