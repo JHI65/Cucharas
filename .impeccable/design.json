@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-15T17:13:01.857123Z",
+  "title": "Design System: Cucharas",
+  "extensions": {
+    "colorMeta": {
+      "soft-plum": {
+        "role": "primary",
+        "displayName": "Ciruela Suave",
+        "canonical": "oklch(45% 0.10 2)",
+        "tonalRamp": [
+          "oklch(15% 0.05 2)",
+          "oklch(28% 0.07 2)",
+          "oklch(40% 0.08 2)",
+          "oklch(52% 0.09 2)",
+          "oklch(64% 0.08 2)",
+          "oklch(75% 0.06 2)",
+          "oklch(85% 0.04 2)",
+          "oklch(95% 0.01 2)"
+        ],
+        "hex": "#9E5266"
+      },
+      "moss-green": {
+        "role": "secondary",
+        "displayName": "Verde Musgo",
+        "canonical": "oklch(46% 0.06 158)",
+        "tonalRamp": [
+          "oklch(18% 0.04 155)",
+          "oklch(30% 0.05 155)",
+          "oklch(44% 0.06 155)",
+          "oklch(58% 0.06 155)",
+          "oklch(68% 0.055 155)",
+          "oklch(78% 0.045 155)",
+          "oklch(88% 0.03 155)",
+          "oklch(96% 0.01 155)"
+        ],
+        "hex": "#4F7566"
+      },
+      "warm-terracotta": {
+        "role": "secondary",
+        "displayName": "Terracota Templada",
+        "canonical": "oklch(50% 0.09 48)",
+        "tonalRamp": [
+          "oklch(16% 0.06 45)",
+          "oklch(28% 0.08 45)",
+          "oklch(38% 0.095 45)",
+          "oklch(48% 0.10 45)",
+          "oklch(60% 0.09 45)",
+          "oklch(72% 0.07 45)",
+          "oklch(84% 0.045 45)",
+          "oklch(95% 0.015 45)"
+        ],
+        "hex": "#9C5A39"
+      },
+      "spoon-pink": {
+        "role": "neutral",
+        "displayName": "Rosa Cuchara",
+        "canonical": "oklch(59% 0.09 3)",
+        "tonalRamp": [
+          "oklch(20% 0.05 5)",
+          "oklch(35% 0.06 5)",
+          "oklch(50% 0.07 5)",
+          "oklch(62% 0.075 5)",
+          "oklch(74% 0.07 5)",
+          "oklch(82% 0.05 5)",
+          "oklch(90% 0.03 5)",
+          "oklch(97% 0.01 5)"
+        ],
+        "hex": "#B87385"
+      },
+      "cotton-pink": {
+        "role": "neutral",
+        "displayName": "Rosa Algodón",
+        "canonical": "oklch(96% 0.01 5)"
+      },
+      "warm-white": {
+        "role": "neutral",
+        "displayName": "Blanco Cálido",
+        "canonical": "oklch(98% 0.005 5)"
+      },
+      "misty-pink": {
+        "role": "neutral",
+        "displayName": "Rosa Niebla",
+        "canonical": "oklch(89% 0.025 5)",
+        "hex": "#ECD2D8"
+      },
+      "dusty-pink": {
+        "role": "neutral",
+        "displayName": "Rosa Polvo",
+        "canonical": "oklch(60% 0.06 5)",
+        "hex": "#AD7C88"
+      },
+      "plum-brown": {
+        "role": "neutral",
+        "displayName": "Marrón Ciruela",
+        "canonical": "oklch(28% 0.02 10)",
+        "tonalRamp": [
+          "oklch(12% 0.015 10)",
+          "oklch(20% 0.018 10)",
+          "oklch(28% 0.02 10)",
+          "oklch(38% 0.02 10)",
+          "oklch(50% 0.018 10)",
+          "oklch(64% 0.015 10)",
+          "oklch(78% 0.01 10)",
+          "oklch(92% 0.005 10)"
+        ]
+      },
+      "muted-mauve": {
+        "role": "neutral",
+        "displayName": "Malva Apagado",
+        "canonical": "oklch(50% 0.03 5)",
+        "hex": "#7A6167"
+      },
+      "hc-palette": {
+        "role": "neutral",
+        "displayName": "Alto contraste",
+        "canonical": "variant",
+        "note": "Mismos roles, valores subidos: ver tokens hc-* en el frontmatter de DESIGN.md."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "El número grande de cucharas en hojas modales."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Título de pantalla, uno por pantalla, siempre en la misma posición."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cabecera de sección y título de hoja modal."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto de tarea y contenido general."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadatos, hints, etiquetas de escala, leyendas."
+      },
+      "sheet-title": {
+        "displayName": "Sheet title",
+        "purpose": "Título de hoja modal."
+      },
+      "count": {
+        "displayName": "Count",
+        "purpose": "Cucharas restantes en el medidor. Una de las tres únicas negritas del sistema."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Texto de botón de bloque."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Botones pequeños, chips, celdas de calendario, coste de tarea."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Metadatos, leyendas, etiquetas de pestaña."
+      },
+      "axis": {
+        "displayName": "Axis",
+        "purpose": "Números de eje de la gráfica de patrones. Su único uso."
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de una hoja modal, ej. \"Empezar el día\".",
+      "html": "<button class=\"ds-btn-primary\">Empezar el día</button>",
+      "css": ".ds-btn-primary { background: var(--accent); color: var(--surface); border: 1px solid var(--accent); border-radius: 10px; padding: 15px; font-size: 17px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-btn-primary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria o neutra, ej. \"Exportar\".",
+      "html": "<button class=\"ds-btn-secondary\">Exportar</button>",
+      "css": ".ds-btn-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 15px; font-size: 15px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-btn-secondary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Add Button",
+      "kind": "button",
+      "refersTo": "button-add",
+      "description": "Patrón distintivo para \"añadir algo nuevo\": borde discontinuo, texto en acento.",
+      "html": "<button class=\"ds-btn-add\">Añadir tarea</button>",
+      "css": ".ds-btn-add { width: 100%; background: var(--surface); color: var(--accent); border: 1px dashed var(--line); border-radius: 14px; padding: 14px; font-size: 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-btn-add:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Selector de opción única/múltiple, cápsula completa; estado activo invierte fondo/texto sin transición.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"false\">Ducha</button><button class=\"ds-chip\" aria-pressed=\"true\">Compra</button>",
+      "css": ".ds-chip { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; font-size: 15px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin-right: 8px; } .ds-chip[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: var(--surface); } .ds-chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Task Row",
+      "kind": "custom",
+      "refersTo": "task-row",
+      "description": "Componente insignia: círculo de marcado + nombre + coste en cucharas. Al marcar despliega ajuste en línea.",
+      "html": "<div class=\"ds-task\"><button class=\"ds-check\" aria-label=\"Marcar\"><svg viewBox=\"0 0 16 16\" width=\"14\" height=\"14\"><path d=\"M2 8.5l4 4 8-9\" fill=\"none\" stroke=\"#FFF8F9\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button><div class=\"ds-task-body\"><span class=\"ds-task-name\">Ducha</span><span class=\"ds-task-meta\">Gasta 2 cucharas</span></div><span class=\"ds-cost\">2</span></div>",
+      "css": ".ds-task { display: flex; align-items: center; gap: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-check { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--spoon); background: var(--surface-2, #F6E5E8); display: grid; place-items: center; padding: 0; } .ds-check.on { background: var(--accent); border-color: var(--accent); } .ds-task-body { flex: 1 1 auto; display: flex; flex-direction: column; } .ds-task-name { font-size: 17px; color: var(--ink); } .ds-task-meta { font-size: 13px; color: var(--ink-soft); } .ds-cost { font-size: 15px; color: var(--ink-soft); }"
+    },
+    {
+      "name": "Spoon Meter",
+      "kind": "custom",
+      "refersTo": "spoon-meter",
+      "description": "Componente insignia: cucharas llenas (relleno), gastadas (contorno) y medias, agrupadas de cinco, con el recuento escrito debajo.",
+      "html": "<div class=\"ds-meter\"><div class=\"ds-spoons\"><span class=\"ds-sgroup\"><svg class=\"ds-sp\" viewBox=\"0 0 20 40\"><use href=\"#spoon\" fill=\"var(--spoon)\"/></svg><svg class=\"ds-sp\" viewBox=\"0 0 20 40\"><use href=\"#spoon\" fill=\"var(--spoon)\"/></svg><svg class=\"ds-sp\" viewBox=\"0 0 20 40\"><use href=\"#spoon\" fill=\"var(--spoon)\"/></svg><svg class=\"ds-sp\" viewBox=\"0 0 20 40\"><use href=\"#spoon\" fill=\"none\" stroke=\"var(--spoon)\" stroke-width=\"1.8\"/><use href=\"#spoon\" fill=\"var(--spoon)\" clip-path=\"url(#halfL)\"/></svg><svg class=\"ds-sp\" viewBox=\"0 0 20 40\"><use href=\"#spoon\" fill=\"none\" stroke=\"var(--spoon)\" stroke-width=\"1.8\"/></svg></span></div><div class=\"ds-meter-foot\"><span class=\"ds-count\">3,5 <small>de 5 · quedan</small></span></div><p class=\"ds-notice\">Lo apuntado para hoy suma 6 y tienes 5.</p></div>",
+      "css": ".ds-meter{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px 14px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.ds-spoons{display:flex;flex-wrap:wrap;gap:8px 17px;margin-bottom:12px}.ds-sgroup{display:flex;gap:6px}.ds-sp{width:19px;height:38px;display:block}.ds-meter-foot{display:flex;align-items:baseline;justify-content:space-between}.ds-count{font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.ds-count small{font-weight:400;font-size:15px;color:var(--ink-soft)}.ds-notice{margin:9px 0 0;font-size:14px;color:var(--alert)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Contenedor genérico plano, usado para la tarjeta de patrones y bloques informativos.",
+      "html": "<div class=\"ds-card\"><h3>Patrones</h3><p>Tu capacidad ha bajado los últimos tres días.</p></div>",
+      "css": ".ds-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 15px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-card h3 { margin: 0 0 9px; font-size: 16px; color: var(--ink); } .ds-card p { margin: 0; color: var(--ink-soft); font-size: 14px; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Barra de pestañas inferior fija, icono + etiqueta de texto siempre visible.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" width=\"21\" height=\"21\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M4 6h16M4 12h16M4 18h10\"/></svg>Hoy</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" width=\"21\" height=\"21\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15\" rx=\"2.5\"/></svg>Calendario</button></nav>",
+      "css": ".ds-tabs { display: flex; background: var(--surface); border-top: 1px solid var(--line); } .ds-tab { flex: 1; background: none; border: none; padding: 11px 4px 13px; font-size: 13px; color: var(--ink-soft); display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-tab[aria-current='page'] { color: var(--accent); font-weight: 700; } .ds-tab:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Campo de texto de línea única en hojas modales.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-input-1\">Qué vas a hacer</label><input class=\"ds-input\" id=\"ds-input-1\" type=\"text\" placeholder=\"Ducha, compra, llamada…\">",
+      "css": ".ds-field-label { display: block; font-size: 14px; color: var(--ink-soft); margin-bottom: 6px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; } .ds-input { width: 100%; padding: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 17px; font-family: inherit; color: var(--ink); } .ds-input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Day Closer",
+      "kind": "custom",
+      "refersTo": "closer",
+      "description": "El cierre del día: borde sólido (no discontinuo) y una línea que explica qué es mientras no se haya hecho.",
+      "html": "<div class=\"ds-closer\"><button>Check-out de hoy</button><p>Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.</p></div>",
+      "css": ".ds-closer button{width:100%;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--accent);font-size:16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.ds-closer button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.ds-closer p{margin:9px 2px 0;font-size:14px;color:var(--ink-soft);font-family:inherit}"
+    },
+    {
+      "name": "Calendar Cell",
+      "kind": "custom",
+      "refersTo": "calendar-cell",
+      "description": "Día del calendario con marcas de carga. El día por encima de la media cambia de forma de marca además de color.",
+      "html": "<button class=\"ds-cell\">15<span class=\"ds-load\"><i></i><i></i><i></i></span></button><button class=\"ds-cell ds-heavy\">18<span class=\"ds-load\"><i></i><i></i><i></i><i></i><i></i></span></button>",
+      "css": ".ds-cell{width:58px;height:58px;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:9px 0 0;text-align:center;font-size:15px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--ink);margin-right:5px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.ds-load{display:flex;justify-content:center;align-items:flex-end;gap:3px;height:11px;margin-top:6px}.ds-load i{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}.ds-heavy .ds-load i{width:3px;height:11px;border-radius:1px;background:var(--alert)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Sala de Estar",
+    "overview": "Cucharas se ve como un espacio doméstico, no como una herramienta de productividad ni un panel clínico. La superficie es casi silenciosa: color pastel cálido, bordes finos de 1px, sin sombra ni relieve, sin nada que compita por atención. El sistema existe para que la persona pueda mirarlo sin esfuerzo el día entero — cada elemento tiene una sola posición, un solo color de estado, y no cambia de sitio de una sesión a otra. La calidez viene del color (rosas y ciruela suaves), no del gesto. No hay confeti, no hay mascotas, no hay barra de progreso festiva: el registro es honesto sobre cómo ha ido el día, incluso cuando ha ido mal, sin dramatizarlo ni celebrarlo de más. Esto excluye explícitamente dos mundos visuales: la estética clínica/médica y la estética de gamificación tipo Duolingo. Los componentes son suaves y silenciosos: superficie casi plana, borde fino como único límite, radio de esquina generoso pero discreto. Un componente no debe \"llamar\" — debe estar ahí, legible, y desaparecer cuando no hace falta mirarlo.",
+    "keyCharacteristics": [
+      "Paleta pastel cálida y doméstica, nunca clínica ni corporativa",
+      "Superficies planas: borde de 1px es la única señal de profundidad",
+      "Un color de acento (ciruela) usado con moderación para lo interactivo",
+      "Radio de esquina consistente y generoso, sin esquinas vivas",
+      "Tipografía del sistema únicamente, sin peso decorativo"
+    ],
+    "rules": [
+      {
+        "name": "La Regla del Acento Único",
+        "body": "Ciruela Suave es el único color que significa \"interactivo/activo\" en todo el sistema. Verde y terracota nunca son clicables — son estado, no acción.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de la Quietud",
+        "body": "Nada se anima, se desliza ni proyecta sombra. Un estado cambia de golpe, no de forma gradual. Un cambio de estado instantáneo (color o borde) es la única excepción admitida.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla de la Convicción",
+        "body": "La quietud no es la única palanca de personalidad del sistema, es la más restringida. Cuando algo se sienta soso, la respuesta correcta es subir la convicción del color y la forma en ese punto concreto — nunca añadir movimiento para compensar.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla del Color Que No Va Solo",
+        "body": "Ningún estado se comunica solo por color. El día cargado cambia de color y de forma de marca; la cuchara gastada pasa a contorno; las dos series de la gráfica se distinguen por círculo frente a cuadrado.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Peso Único",
+        "body": "La negrita existe en exactamente tres sitios: el número grande de las hojas modales, el recuento de cucharas del medidor y la etiqueta de la pestaña activa. En los tres el peso carga información, nunca énfasis decorativo.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Título Primero",
+        "body": "Ningún texto se sienta encima del h1 de pantalla — eso es un kicker/eyebrow, prohibido sin excepción. El título va primero; el texto secundario, si existe, va después como .sub. Un rótulo puramente redundante con la pestaña activa se elimina en vez de reordenarse.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "Do usar Ciruela Suave únicamente para lo interactivo/activo — La Regla del Acento Único.",
+      "Do mantener cambios de estado instantáneos: color o borde, nunca animación ni sombra — La Regla de la Quietud.",
+      "Do etiquetar todo icono con texto; ningún icono va solo, ni siquiera en la barra de pestañas.",
+      "Do mantener el outline de foco de 3px visible en todo elemento interactivo — es la única señal de foco del sistema.",
+      "Do usar el borde discontinuo (dashed) exclusivamente para \"añadir/vacío\", nunca como decoración.",
+      "Do subir la convicción del color/forma cuando algo se sienta soso, en vez de añadir movimiento — La Regla de la Convicción.",
+      "Do duplicar toda señal de color con una de forma — La Regla del Color Que No Va Solo.",
+      "Do escribir el número junto a cualquier representación gráfica.",
+      "Do tematizar lo que pinta el navegador: selección, cursor, scrollbar, accent-color y cifras tabulares.",
+      "Do comprobar el contraste con números: 4,5:1 en texto, 3:1 en marcas y bordes de control."
+    ],
+    "donts": [
+      "Don't añadir box-shadow, transition con movimiento, ni animation a ningún componente — rompe un principio de accesibilidad del producto, no solo una preferencia visual.",
+      "Don't introducir un segundo color de acento interactivo; Verde Musgo y Terracota Templada son solo estado.",
+      "Don't usar iconos sin etiqueta de texto, ni metáforas visuales sin explicar.",
+      "Don't introducir mecánicas de gamificación (rachas, insignias, confeti, mascotas) ni estética clínica/médica.",
+      "Don't mover la posición de una pestaña, sección o control entre versiones sin que sea estrictamente necesario.",
+      "Don't distinguir dos estados solo por tono, ni dejar una forma sin su número al lado.",
+      "Don't usar iconografía de urgencia (triángulos, exclamaciones) en los avisos.",
+      "Don't añadir tamaños de letra intermedios a la escala.",
+      "Don't poner texto encima de un h1 de pantalla — La Regla del Título Primero."
+    ]
+  }
+}

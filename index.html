@@ -10,40 +10,60 @@
 :root{
   --bg:#FBF2F3;
   --surface:#FFF8F9;
-  --surface-2:#F6E5E8;
-  --line:#EDD5D9;
+  --surface-2:#ECD2D8;
+  --line:#AD7C88;
   --ink:#4B3A3F;
-  --ink-soft:#8B7378;
-  --spoon:#E2A6B3;
-  --spoon-spent:#F0E1E4;
-  --accent:#B36A7C;
-  --alert:#A7623F;
-  --deposit:#6F9D88;
+  --ink-soft:#7A6167;
+  --spoon:#B87385;
+  --accent:#9E5266;
+  --alert:#9C5A39;
+  --deposit:#4F7566;
   --radius:14px;
   --pad:18px;
 }
+:root[data-contrast="alto"]{
+  --bg:#FFF7F8;
+  --surface:#FFFFFF;
+  --surface-2:#E9BEC9;
+  --line:#A8838D;
+  --ink:#241A1D;
+  --ink-soft:#5A464B;
+  --spoon:#96455C;
+  --accent:#7E3550;
+  --alert:#7A3F22;
+  --deposit:#2F5A46;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none !important}
-html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color-scheme:light}
+html,body{
+  margin:0;padding:0;min-height:100%;background:var(--bg);color-scheme:light;
+  accent-color:var(--accent);
+  scrollbar-color:var(--line) transparent;
+  scrollbar-width:thin;
+}
 body{
   color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   font-size:17px;
   line-height:1.5;
   font-style:normal;
+  caret-color:var(--accent);
   -webkit-font-smoothing:antialiased;
 }
+::selection{background:var(--line);color:var(--ink)}
+::placeholder{color:var(--ink-soft);opacity:1}
 button{font:inherit;color:inherit;cursor:pointer}
 input,select,textarea{font:inherit;color:inherit}
 *:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.ic{width:18px;height:18px;display:block;flex:0 0 auto}
 
 .app{max-width:520px;margin:0 auto;padding:0 var(--pad) 96px}
 .screen{display:none}
 .screen.on{display:block}
 
 .top{padding:22px 0 6px}
-.date{font-size:15px;color:var(--ink-soft);margin:0}
-.title{font-size:27px;margin:2px 0 0;letter-spacing:-0.01em}
+.title{font-size:27px;margin:0;letter-spacing:-0.01em}
+.sub{font-size:15px;color:var(--ink-soft);margin:5px 0 0}
 
 /* ---- Spoon meter ---- */
 .meter{
@@ -53,12 +73,14 @@ input,select,textarea{font:inherit;color:inherit}
   padding:18px 16px 14px;
   margin-top:16px;
 }
-.spoons{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
-.spoons svg{width:19px;height:38px;display:block}
+.spoons{display:flex;flex-wrap:wrap;gap:8px 17px;margin-bottom:12px}
+.sgroup{display:flex;gap:6px}
+.sp{width:19px;height:38px;display:block}
 .meter-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.count{font-size:20px;font-weight:700}
+.count{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
 .count small{font-weight:400;font-size:15px;color:var(--ink-soft)}
 .overdrawn{color:var(--alert)}
+.notice{margin:9px 0 0;font-size:14px;color:var(--alert)}
 
 .linkbtn{
   background:none;border:none;padding:6px 0;
@@ -79,11 +101,11 @@ input,select,textarea{font:inherit;color:inherit}
   padding:13px 14px;
   margin-bottom:9px;
 }
-.task.done{background:transparent;border-style:dashed}
+.task.done{background:transparent}
 .task.done .task-name{color:var(--ink-soft);text-decoration:line-through}
 .check{
   flex:0 0 auto;width:26px;height:26px;border-radius:50%;
-  border:2px solid var(--line);background:var(--surface-2);
+  border:2px solid var(--spoon);background:var(--surface-2);
   display:grid;place-items:center;padding:0;
 }
 .check.on{background:var(--accent);border-color:var(--accent)}
@@ -91,8 +113,8 @@ input,select,textarea{font:inherit;color:inherit}
 .check.on svg{display:block}
 .task-body{flex:1 1 auto;min-width:0}
 .task-name{display:block;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.task-meta{font-size:13.5px;color:var(--ink-soft)}
-.cost{flex:0 0 auto;font-size:15px;color:var(--ink-soft);display:flex;align-items:center;gap:4px}
+.task-meta{font-size:13px;color:var(--ink-soft)}
+.cost{flex:0 0 auto;font-size:15px;color:var(--ink-soft);display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .cost svg{width:9px;height:18px}
 
 .adjust{
@@ -100,7 +122,7 @@ input,select,textarea{font:inherit;color:inherit}
   border-radius:0 0 var(--radius) var(--radius);
   background:var(--surface-2);
   margin:-10px 0 9px;padding:11px 14px;
-  font-size:14.5px;color:var(--ink-soft);
+  font-size:14px;color:var(--ink-soft);
 }
 .arow{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .arow+.arow{margin-top:12px;display:block}
@@ -111,19 +133,31 @@ input,select,textarea{font:inherit;color:inherit}
 .scale{display:flex;gap:7px}
 .scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:11px;font-size:17px}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
-.scale-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);margin-top:6px}
+.scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
-.card h3{margin:0 0 9px;font-size:16px}
-.card p{margin:0 0 7px;color:var(--ink-soft);font-size:14.5px}
+.card h2,.card h3{margin:0 0 9px;font-size:16px}
+.card p{margin:0 0 7px;color:var(--ink-soft);font-size:14px}
 .card p:last-child{margin-bottom:0}
+
+/* ---- Patrones ---- */
+#patterns{padding:18px 16px;margin-top:22px}
+#patterns h2{font-size:18px;margin:0 0 4px}
+.chart{display:block;width:100%;height:auto;margin:12px 0 4px}
+.chart text{font-size:11px;fill:var(--ink-soft)}
+.series{margin:2px 0 0}
+.serie{display:flex;align-items:baseline;gap:8px;font-size:14px;color:var(--ink);margin:0 0 6px;font-variant-numeric:tabular-nums}
+.serie svg{width:10px;height:10px;flex:0 0 auto;align-self:center}
+.serie small{font-size:14px;color:var(--ink-soft)}
+.insight{margin-top:11px !important}
 .mini .use{font-size:15px;color:var(--accent)}
 .stepper{display:flex;align-items:center;gap:10px}
 .stepper button{
   width:34px;height:34px;border-radius:9px;
   border:1px solid var(--line);background:var(--surface);
-  font-size:19px;line-height:1;padding:0;
+  line-height:1;padding:0;
+  display:grid;place-items:center;color:var(--accent);
 }
-.stepper output{min-width:1.6em;text-align:center;font-size:17px;color:var(--ink)}
+.stepper output{min-width:1.6em;text-align:center;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
 
 .empty{
   border:1px dashed var(--line);border-radius:var(--radius);
@@ -136,6 +170,16 @@ input,select,textarea{font:inherit;color:inherit}
   border-radius:var(--radius);color:var(--accent);font-size:16px;
 }
 
+/* ---- Cierre del día ---- */
+.closer{margin-top:30px}
+.closer button{
+  width:100%;padding:16px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);
+  color:var(--accent);font-size:16px;
+}
+.closer.done button{color:var(--ink-soft)}
+.closer p{margin:9px 2px 0;font-size:14px;color:var(--ink-soft)}
+
 /* ---- Library ---- */
 .lib{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -145,10 +189,10 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .bigrow button.warn{color:var(--alert)}
 .lib-name{font-size:17px}
-.lib-note{font-size:13.5px;color:var(--ink-soft)}
+.lib-note{font-size:13px;color:var(--ink-soft)}
 .pill{
   border:1px solid var(--line);background:var(--surface-2);
-  border-radius:999px;padding:5px 12px;font-size:14.5px;color:var(--ink-soft);
+  border-radius:999px;padding:5px 12px;font-size:14px;color:var(--ink-soft);
 }
 
 /* ---- Diary ---- */
@@ -158,11 +202,11 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .day-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .day-date{font-size:16px}
-.day-fig{font-size:14.5px;color:var(--ink-soft)}
+.day-fig{font-size:14px;color:var(--ink-soft)}
 .bar{height:7px;border-radius:4px;background:var(--surface-2);margin:10px 0 0;overflow:hidden}
 .bar span{display:block;height:100%;background:var(--spoon)}
 .bar span.over{background:var(--alert)}
-.day-note{font-size:14.5px;color:var(--ink-soft);margin:9px 0 0}
+.day-note{font-size:14px;color:var(--ink-soft);margin:9px 0 0}
 
 textarea{
   width:100%;min-height:96px;resize:vertical;
@@ -172,26 +216,28 @@ textarea{
 
 /* ---- Calendar ---- */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
-.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:10px;width:42px;height:42px;font-size:18px;padding:0}
+.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:10px;width:42px;height:42px;padding:0;display:grid;place-items:center;color:var(--accent)}
 .cal-nav strong{font-size:17px}
 .dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:6px}
-.dow span{text-align:center;font-size:12.5px;color:var(--ink-soft)}
+.dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
 .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;grid-auto-rows:58px}
 .cell{
   display:block;width:100%;height:100%;overflow:hidden;
   border:1px solid var(--line);background:var(--surface);
   border-radius:11px;padding:9px 0 0;text-align:center;
-  font-size:15.5px;line-height:1.1;
+  font-size:15px;line-height:1.1;font-variant-numeric:tabular-nums;
 }
 .cell.blank{border:none;background:none;pointer-events:none}
 .cell.past{color:var(--ink-soft);background:var(--bg)}
 .cell.today{border:2px solid var(--accent);padding-top:8px}
-.load{display:block;height:12px;margin-top:6px;font-size:13px;line-height:12px;letter-spacing:1px;color:var(--spoon)}
-.cell.heavy .load{color:var(--alert)}
-.legend{font-size:13.5px;color:var(--ink-soft);margin:16px 0 0}
+.load{display:flex;justify-content:center;align-items:flex-end;gap:3px;height:11px;margin-top:6px}
+.lm{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
+.cell.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
+.legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:8px}
-.mini button{background:none;border:none;color:var(--ink-soft);font-size:20px;padding:0 4px;line-height:1}
+.mini button{background:none;border:none;color:var(--ink-soft);font-size:15px;padding:0 4px;line-height:1;display:grid;place-items:center}
+.mini .use{padding:6px 2px}
 
 /* ---- Settings ---- */
 .row{
@@ -200,9 +246,10 @@ textarea{
 }
 .row:last-child{border-bottom:none}
 .row p{margin:0;font-size:14px;color:var(--ink-soft)}
+.row .chips{margin:0;flex:0 0 auto}
 .btn{
   background:var(--surface);border:1px solid var(--line);
-  border-radius:10px;padding:10px 15px;font-size:15.5px;
+  border-radius:10px;padding:10px 15px;font-size:15px;
 }
 .btn.warn{color:var(--alert)}
 
@@ -214,7 +261,7 @@ textarea{
 }
 .tabs button{
   flex:1;background:none;border:none;padding:11px 4px 13px;
-  font-size:12.5px;color:var(--ink-soft);
+  font-size:13px;color:var(--ink-soft);
   display:flex;flex-direction:column;align-items:center;gap:4px;
 }
 .tabs button[aria-current="page"]{color:var(--accent);font-weight:700}
@@ -232,10 +279,10 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   border-top:1px solid var(--line);
   padding:22px var(--pad) calc(24px + env(safe-area-inset-bottom));
 }
-.sheet h3{margin:0 0 4px;font-size:21px}
+.sheet h2{margin:0 0 4px;font-size:21px}
 .sheet p.sub{margin:0 0 18px;font-size:15px;color:var(--ink-soft)}
 .field{margin-bottom:16px}
-.field label{display:block;font-size:14.5px;color:var(--ink-soft);margin-bottom:6px}
+.field label{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:6px}
 .field input[type=text]{
   width:100%;padding:13px;background:var(--surface);
   border:1px solid var(--line);border-radius:10px;
@@ -250,8 +297,8 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .bigrow button{flex:1;padding:15px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
 .bigrow button.primary{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .slider{width:100%;margin:8px 0 2px;accent-color:var(--spoon)}
-.bigcount{text-align:center;font-size:32px;font-weight:700;margin:4px 0 0}
-.bigcount small{display:block;font-size:14.5px;font-weight:400;color:var(--ink-soft)}
+.bigcount{text-align:center;font-size:32px;font-weight:700;margin:4px 0 0;font-variant-numeric:tabular-nums}
+.bigcount small{display:block;font-size:14px;font-weight:400;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -262,8 +309,24 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
     <rect x="8" y="16" width="4" height="23" rx="2"/>
   </symbol>
   <symbol id="tick" viewBox="0 0 16 16">
-    <path d="M2 8.5l4 4 8-9" fill="none" stroke="#FFF8F9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M2 8.5l4 4 8-9" fill="none" stroke="var(--surface)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24">
+    <path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-next" viewBox="0 0 24 24">
+    <path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24">
+    <path d="M6 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24">
+    <path d="M12 6v12M6 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24">
+    <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+  <clipPath id="halfL" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="0.5" height="1"/></clipPath>
 </svg>
 
 <div class="app">
@@ -271,8 +334,8 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   <!-- ===== HOY ===== -->
   <section class="screen on" id="s-hoy">
     <header class="top">
-      <p class="date" id="todayDate"></p>
       <h1 class="title">Hoy</h1>
+      <p class="sub" id="todayDate"></p>
     </header>
 
     <div class="meter">
@@ -282,6 +345,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
         <button class="linkbtn" id="btnAdjustBudget">Ajustar</button>
       </div>
       <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
+      <p class="notice" id="spoonNotice" hidden></p>
     </div>
 
     <div class="sectionhead">
@@ -290,13 +354,16 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
     </div>
     <div id="taskList"></div>
     <button class="add" id="btnAddTask">Añadir tarea</button>
-    <button class="add" id="btnCheckout" style="margin-top:10px">Check-out de hoy</button>
+
+    <div class="closer" id="closer">
+      <button id="btnCheckout">Check-out de hoy</button>
+      <p id="closerHint">Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.</p>
+    </div>
   </section>
 
   <!-- ===== CUCHARAS ===== -->
   <section class="screen" id="s-lib">
     <header class="top">
-      <p class="date">Calculadora</p>
       <h1 class="title">Cuánto cuesta</h1>
     </header>
     <p class="hint">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
@@ -307,32 +374,39 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   <!-- ===== CALENDARIO ===== -->
   <section class="screen" id="s-cal">
     <header class="top">
-      <p class="date">Toca un día para ver o planificar</p>
       <h1 class="title">Calendario</h1>
+      <p class="sub">Toca un día para ver o planificar</p>
     </header>
     <div class="cal-nav">
-      <button id="calPrev" aria-label="Mes anterior">‹</button>
+      <button id="calPrev" aria-label="Mes anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
       <strong id="calLabel"></strong>
-      <button id="calNext" aria-label="Mes siguiente">›</button>
+      <button id="calNext" aria-label="Mes siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
     <div class="dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
     <div class="grid" id="calGrid"></div>
-    <p class="legend">Cada punto son dos cucharas. En otro color, los días por encima de tu media.</p>
+    <p class="legend">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
     <div class="card" id="patterns"></div>
   </section>
 
   <!-- ===== AJUSTES ===== -->
   <section class="screen" id="s-set">
     <header class="top">
-      <p class="date">Tus datos no salen del teléfono</p>
       <h1 class="title">Ajustes</h1>
+      <p class="sub">Tus datos no salen del teléfono</p>
     </header>
     <div class="row">
       <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
       <div class="stepper">
-        <button id="maxMinus" aria-label="Menos">−</button>
+        <button id="maxMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="maxOut"></output>
-        <button id="maxPlus" aria-label="Más">+</button>
+        <button id="maxPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+      </div>
+    </div>
+    <div class="row">
+      <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
+      <div class="chips" id="contrastPick" role="group" aria-label="Contraste">
+        <button class="chip" data-contrast="normal" aria-pressed="true">Normal</button>
+        <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
       </div>
     </div>
     <div class="row">
@@ -366,7 +440,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Check-in ===== -->
 <dialog id="dlgCheckin">
   <div class="sheet">
-    <h3>¿Con cuántas cucharas te levantas?</h3>
+    <h2>¿Con cuántas cucharas te levantas?</h2>
     <p class="sub">Sin pensarlo mucho. Puedes cambiarlo durante el día.</p>
     <div class="bigcount"><span id="ciNum">8</span><small id="ciWord"></small></div>
     <input type="range" class="slider" id="ciRange" min="0" max="12" step="1" value="8">
@@ -378,7 +452,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Nueva tarea ===== -->
 <dialog id="dlgTask">
   <div class="sheet">
-    <h3>Añadir tarea</h3>
+    <h2>Añadir tarea</h2>
     <p class="sub">Elige de tu lista o escribe una nueva.</p>
     <div class="chips" id="taskSuggest"></div>
     <div class="field">
@@ -395,9 +469,9 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
     <div class="field">
       <label for="tCost" id="tCostLab">Cuánto crees que te va a costar</label>
       <div class="stepper">
-        <button id="tMinus" aria-label="Menos">−</button>
+        <button id="tMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="tCost">2</output>
-        <button id="tPlus" aria-label="Más">+</button>
+        <button id="tPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="tLearned"></span>
       </div>
     </div>
@@ -411,9 +485,9 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
       </div>
       <div class="chips" id="repDays" hidden></div>
       <div class="stepper" id="repDur" hidden>
-        <button id="wMinus" aria-label="Menos semanas">−</button>
+        <button id="wMinus" aria-label="Menos semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="wOut">4</output>
-        <button id="wPlus" aria-label="Más semanas">+</button>
+        <button id="wPlus" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="wLabel">semanas</span>
       </div>
     </div>
@@ -427,7 +501,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Actividad de la calculadora ===== -->
 <dialog id="dlgLib">
   <div class="sheet">
-    <h3 id="lTitle">Actividad</h3>
+    <h2 id="lTitle">Actividad</h2>
     <p class="sub" id="lSub"></p>
     <div class="field">
       <label for="lName">Nombre</label>
@@ -443,9 +517,9 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
     <div class="field">
       <label for="lCost" id="lCostLab">Lo que te cuesta</label>
       <div class="stepper">
-        <button id="lMinus" aria-label="Menos">−</button>
+        <button id="lMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="lCost">2</output>
-        <button id="lPlus" aria-label="Más">+</button>
+        <button id="lPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="lHint"></span>
       </div>
     </div>
@@ -461,7 +535,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Check-out ===== -->
 <dialog id="dlgCheckout">
   <div class="sheet">
-    <h3>Check-out de hoy</h3>
+    <h2>Check-out de hoy</h2>
     <p class="sub">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
     <div class="field">
       <label>¿Cuánta capacidad te queda ahora?</label>
@@ -487,7 +561,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Días tipo ===== -->
 <dialog id="dlgTpl">
   <div class="sheet">
-    <h3>Días tipo</h3>
+    <h2>Días tipo</h2>
     <p class="sub" id="tplSub"></p>
     <div id="tplList"></div>
     <button class="add" id="tplSaveDay">Guardar este día como día tipo</button>
@@ -498,7 +572,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 <!-- ===== Detalle de día ===== -->
 <dialog id="dlgDay">
   <div class="sheet">
-    <h3 id="dTitle"></h3>
+    <h2 id="dTitle"></h2>
     <p class="sub" id="dSub"></p>
     <div id="dTasks"></div>
     <button class="add" id="dAdd">Añadir tarea a este día</button>
@@ -594,8 +668,24 @@ function record(name, est, real){
 }
 
 /* ---------- render ---------- */
-function spoonSVG(filled){
-  return `<svg viewBox="0 0 20 40" fill="${filled ? 'var(--spoon)' : 'var(--spoon-spent)'}"><use href="#spoon"/></svg>`;
+/* una cuchara: llena, media o vacía. Vacía = contorno, no relleno claro:
+   la diferencia es de forma, no solo de color. */
+function spoonSVG(halves){
+  const outline = '<use href="#spoon" fill="none" stroke="var(--spoon)" stroke-width="1.8"/>';
+  if(halves >= 2) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon" fill="var(--spoon)"/></svg>`;
+  if(halves === 1) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}<use href="#spoon" fill="var(--spoon)" clip-path="url(#halfL)"/></svg>`;
+  return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}</svg>`;
+}
+/* en grupos de cinco: a partir de ocho cucharas, una fila continua ya no se cuenta de un vistazo */
+function spoonRowHTML(left, total){
+  const slots = Math.ceil(Math.max(total, 0));
+  const leftHalves = Math.round(Math.max(left, 0) * 2);
+  let html = '', group = '';
+  for(let i = 0; i < slots; i++){
+    group += spoonSVG(Math.min(2, Math.max(0, leftHalves - i * 2)));
+    if((i + 1) % 5 === 0 || i === slots - 1){ html += `<span class="sgroup">${group}</span>`; group = ''; }
+  }
+  return html;
 }
 function renderMeter(){
   const d = day();
@@ -605,11 +695,11 @@ function renderMeter(){
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
   const left = budget - gasto + recarga;
   const row = document.getElementById('spoonRow');
-  const total = Math.max(budget, left, 0);
-  let html = '';
-  for(let i=0;i<total;i++) html += spoonSVG(i < left);
-  row.innerHTML = html || '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
-  row.setAttribute('aria-label', `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
+  const total = Math.ceil(Math.max(budget, left, 0));
+  row.innerHTML = total ? spoonRowHTML(left, total) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
+  row.setAttribute('aria-label', left < 0
+    ? `${fmtN(Math.abs(left))} cucharas prestadas de mañana`
+    : `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
   const c = document.getElementById('spoonCount');
   c.className = 'count' + (left < 0 ? ' overdrawn' : '');
   c.innerHTML = left < 0
@@ -618,10 +708,22 @@ function renderMeter(){
   document.getElementById('spoonBreak').textContent = (gasto || recarga)
     ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}`
     : '';
+
+  /* aviso de día cargado: dice el hecho, no juzga */
+  const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
+  const notice = document.getElementById('spoonNotice');
+  let msg = '';
+  if(left < 0) msg = 'Estás por debajo de cero: lo de más sale de las cucharas de mañana.';
+  else if(budget > 0 && planned > budget) msg = `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(budget)}.`;
+  notice.textContent = msg;
+  notice.hidden = !msg;
+
   const co = d.checkout;
   document.getElementById('btnCheckout').textContent = co
     ? `Check-out hecho · capacidad ${co.energy} de 5`
     : 'Check-out de hoy';
+  document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
+  document.getElementById('closerHint').hidden = !!co;
 }
 function renderTasks(){
   const d = day();
@@ -652,9 +754,9 @@ function renderTasks(){
       <div class="arow">
         <span>${dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?'}</span>
         <div class="stepper">
-          <button data-real="${t.id}" data-delta="${dep?1:-1}" aria-label="Menos">−</button>
+          <button data-real="${t.id}" data-delta="${dep?1:-1}" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
           <output>${fmtN(Math.abs(cost))}</output>
-          <button data-real="${t.id}" data-delta="${dep?-1:1}" aria-label="Más">+</button>
+          <button data-real="${t.id}" data-delta="${dep?-1:1}" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         </div>
       </div>
       ${dep ? '' : `<div class="arow">
@@ -705,13 +807,49 @@ function dayLoad(k){
   return { planned, spent, has:d.tasks.length > 0 || !!d.note };
 }
 
+const NEED = 14;   // check-outs mínimos para que una tendencia signifique algo
+const shortDate = k => new Date(k+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+const longDate = d => d.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
+
+/* dos series de 1 a 5 sobre los últimos check-outs.
+   Se diferencian por forma de marca además de por color. */
+function patternsChart(keys){
+  const W = 300, H = 118, L = 20, R = 6, T = 8, B = 20;
+  const x = i => keys.length < 2 ? L : L + i * (W - L - R) / (keys.length - 1);
+  const y = v => T + (5 - v) * (H - T - B) / 4;
+  const line = f => keys.map((k,i) => `${x(i).toFixed(1)},${y(f(state.days[k].checkout)).toFixed(1)}`).join(' ');
+  const dots = (f, shape, color) => keys.map((k,i) => {
+    const cx = x(i), cy = y(f(state.days[k].checkout));
+    return shape === 'circle'
+      ? `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="${color}"/>`
+      : `<rect x="${(cx-2.7).toFixed(1)}" y="${(cy-2.7).toFixed(1)}" width="5.4" height="5.4" fill="${color}"/>`;
+  }).join('');
+  const grid = [1,3,5].map(v =>
+    `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>
+     <text x="0" y="${(y(v)+3.5).toFixed(1)}">${v}</text>`).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img"
+    aria-label="Capacidad y tolerancia sensorial en los últimos ${keys.length} check-out, del ${shortDate(keys[0])} al ${shortDate(keys[keys.length-1])}">
+    ${grid}
+    <polyline points="${line(c=>c.energy)}" fill="none" stroke="var(--spoon)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polyline points="${line(c=>c.sensory)}" fill="none" stroke="var(--deposit)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots(c=>c.energy,'circle','var(--spoon)')}
+    ${dots(c=>c.sensory,'square','var(--deposit)')}
+    <text x="${L}" y="${H-5}">${shortDate(keys[0])}</text>
+    <text x="${W-R}" y="${H-5}" text-anchor="end">${shortDate(keys[keys.length-1])}</text>
+  </svg>`;
+}
+
 function renderPatterns(){
   const el = document.getElementById('patterns');
   const keys = Object.keys(state.days).sort().filter(k => state.days[k].checkout);
-  if(keys.length < 5){
-    el.innerHTML = `<h3>Patrones</h3><p>Aparecerán con unos días de check-out. Llevas ${keys.length} de 5.</p>`;
+  if(keys.length < NEED){
+    const eta = new Date(); eta.setDate(eta.getDate() + (NEED - keys.length));
+    el.innerHTML = `<h2>Patrones</h2>
+      <p>Todavía no hay suficientes datos para ver una tendencia. Hacen falta ${NEED} check-out.</p>
+      <p>Con uno al día, a partir del ${longDate(eta)}.</p>`;
     return;
   }
+  const shown = keys.slice(-NEED);
   const last7 = keys.slice(-7), prev7 = keys.slice(-14,-7);
   const avg = (ks,f) => ks.length ? Math.round((ks.reduce((a,k)=>a+f(state.days[k].checkout),0)/ks.length)*10)/10 : null;
   const e1 = avg(last7,c=>c.energy), e0 = avg(prev7,c=>c.energy);
@@ -719,11 +857,18 @@ function renderPatterns(){
   const vals = last7.map(k => state.days[k].checkout.energy);
   const flat = last7.length >= 7 && (Math.max(...vals) - Math.min(...vals)) <= 1;
   const rising = state.library.filter(l => { const r = recoveryStats(l.name); return r && r.rising; }).map(l => l.name);
-  let out = '<h3>Patrones</h3>';
-  out += `<p>Capacidad, últimos días: ${fmtN(e1)} de 5${e0 != null ? ` · antes ${fmtN(e0)}` : ''}.</p>`;
-  out += `<p>Tolerancia sensorial: ${fmtN(s1)} de 5${s0 != null ? ` · antes ${fmtN(s0)}` : ''}.</p>`;
-  if(flat) out += '<p>Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
-  if(rising.length) out += `<p>Tardas más que antes en recuperarte de: ${esc(rising.join(', '))}.</p>`;
+  const mark = shape => shape === 'circle'
+    ? '<svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="var(--spoon)"/></svg>'
+    : '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1.2" y="1.2" width="7.6" height="7.6" fill="var(--deposit)"/></svg>';
+
+  let out = `<h2>Patrones</h2><p>Tus últimos ${shown.length} check-out.</p>`;
+  out += patternsChart(shown);
+  out += `<div class="series">
+    <p class="serie">${mark('circle')}<span>Capacidad ${fmtN(e1)} de 5 <small>${e0 != null ? `· antes ${fmtN(e0)}` : '· media de los últimos 7'}</small></span></p>
+    <p class="serie">${mark('square')}<span>Tolerancia sensorial ${fmtN(s1)} de 5 <small>${s0 != null ? `· antes ${fmtN(s0)}` : '· media de los últimos 7'}</small></span></p>
+  </div>`;
+  if(flat) out += '<p class="insight">Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
+  if(rising.length) out += `<p class="insight">Tardas más que antes en recuperarte de: ${esc(rising.join(', '))}.</p>`;
   el.innerHTML = out;
 }
 
@@ -742,12 +887,13 @@ function renderCal(){
     const k = `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
     const { planned } = dayLoad(k);
     const heavy = planned > typical;
-    const dots = Math.min(5, Math.ceil(planned / 2));
+    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)));
     const cls = [
       k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
       heavy ? 'heavy' : ''
     ].join(' ');
-    html += `<button class="cell ${cls}" data-day="${k}" aria-label="${fmtDate(k)}${planned?`, ${planned} cucharas`:''}">${n}<span class="load">${'•'.repeat(dots)}</span></button>`;
+    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}`;
+    html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
   }
   document.getElementById('calGrid').innerHTML = html;
 }
@@ -1034,7 +1180,7 @@ function renderTplList(){
         <span>${esc(t.name)}<br><span class="lib-note">${t.items.length} tarea${t.items.length===1?'':'s'}</span></span>
         <span class="cost">
           <button class="use" data-use="${t.id}">Usar</button>
-          <button data-tdel="${t.id}" aria-label="Borrar ${esc(t.name)}">×</button>
+          <button data-tdel="${t.id}" aria-label="Borrar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
         </span>
       </div>`).join('')
     : '<div class="empty">Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.</div>';
@@ -1111,7 +1257,7 @@ function renderDaySheet(){
         <span>${esc(t.name)}${t.done?' · hecha':''}</span>
         <span class="cost">${t.real ?? t.est}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
-          <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}">×</button>
+          <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
         </span>
       </div>`).join('')
     : '<div class="empty">Nada planificado para este día.</div>';
@@ -1150,6 +1296,19 @@ document.getElementById('maxMinus').addEventListener('click', () => {
 document.getElementById('maxPlus').addEventListener('click', () => {
   state.settings.max = Math.min(24, state.settings.max+1); save(); renderAll();
 });
+const THEME_COLOR = { normal:'#FBF2F3', alto:'#FFF7F8' };
+function applyContrast(){
+  const v = state.settings.contrast === 'alto' ? 'alto' : 'normal';
+  document.documentElement.dataset.contrast = v;
+  document.querySelector('meta[name=theme-color]').setAttribute('content', THEME_COLOR[v]);
+  document.querySelectorAll('#contrastPick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.contrast === v));
+}
+document.getElementById('contrastPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-contrast]'); if(!b) return;
+  state.settings.contrast = b.dataset.contrast;
+  applyContrast(); save();
+});
 document.getElementById('btnExport').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -1163,12 +1322,15 @@ document.getElementById('fileIn').addEventListener('change', async e => {
   try{
     const parsed = JSON.parse(await f.text());
     if(!parsed.days) throw new Error('formato');
-    state = parsed; await save(); renderAll();
+    state = parsed;
+    if(!state.settings) state.settings = { max:12 };
+    await save(); applyContrast(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Cucharas.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12} };
+  const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast} };
   save(); renderAll();
 });
 
@@ -1180,6 +1342,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   state.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!state.settings) state.settings = { max:12 };
   if(!state.templates) state.templates = [];
+  applyContrast();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   renderAll();
   if(day().budget == null) openCheckin();
