@@ -260,6 +260,11 @@ textarea{
 .load{display:flex;justify-content:center;align-items:flex-end;gap:3px;height:11px;margin-top:6px}
 .lm{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
 .cell.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
+/* Sangrado: la misma marca que ya usa el calendario —el punto .lm— en Ciruela,
+   que es el color que la rejilla ya usa para el día de hoy. No es un símbolo
+   nuevo ni una fila nueva: es un punto más en la misma tira de marcas. Se
+   redeclara la forma para que un día cargado no lo convierta en raya alta. */
+.cell .lm.bleed{width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
@@ -274,6 +279,7 @@ textarea{
 .row:last-child{border-bottom:none}
 .row p{margin:0;font-size:14px;color:var(--ink-soft)}
 .row .chips{margin:0;flex:0 0 auto}
+.row .ocgrid{flex:0 0 92px}
 .btn{
   background:var(--surface);border:1px solid var(--line);
   border-radius:var(--r-control);padding:10px 15px;font-size:15px;
@@ -311,6 +317,11 @@ textarea{
 }
 /* Relleno opaco: su contraste no depende de lo que pase por debajo (5,20:1). */
 .tabs button[aria-current="page"]{background:var(--accent);color:var(--surface);font-weight:700}
+/* Con el módulo de ciclo activo la barra pasa de cinco pestañas a seis y
+   "Calendario" ya no cabe a 13px en una pantalla de 390. Solo baja el cuerpo
+   del texto: ni el icono ni el área táctil de 52px cambian. */
+.tabs.compact{gap:2px}
+.tabs.compact button{font-size:11px;padding-left:0;padding-right:0}
 .tabs svg{width:21px;height:21px}
 
 /* ---- Sheet ---- */
@@ -515,6 +526,37 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="card" id="patterns"></div>
   </section>
 
+  <!-- ===== CICLO ===== -->
+  <section class="screen" id="s-ciclo">
+    <header class="top">
+      <h1 class="title">Ciclo</h1>
+      <p class="sub" id="cycleHead"></p>
+    </header>
+
+    <div class="card">
+      <h2>Registro de hoy</h2>
+      <div class="field">
+        <label>Sangrado</label>
+        <div class="chips" id="cycBleed" role="group" aria-label="Sangrado">
+          <button class="chip" data-bleed="si" aria-pressed="false">Sí</button>
+          <button class="chip" data-bleed="no" aria-pressed="false">No</button>
+        </div>
+      </div>
+      <div class="field" id="cycIntField" hidden>
+        <label>Intensidad del sangrado</label>
+        <div class="scale" id="cycIntensity"></div>
+        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Dolor físico</label>
+        <div class="scale" id="cycPain"></div>
+        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
+      </div>
+    </div>
+
+    <div class="card" id="cyclePattern"></div>
+  </section>
+
   <!-- ===== FINANZAS ===== -->
   <section class="screen" id="s-fin">
     <header class="top">
@@ -570,6 +612,19 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div class="ocgrid" id="overCostGrid"></div>
     </div>
     <div class="row">
+      <div><strong>Seguimiento del ciclo</strong><p>Añade una sección para apuntar sangrado y dolor.</p></div>
+      <div class="chips" id="cyclePick" role="group" aria-label="Seguimiento del ciclo">
+        <button class="chip" data-cycle="on" aria-pressed="false">Activado</button>
+        <button class="chip" data-cycle="off" aria-pressed="true">Desactivado</button>
+      </div>
+    </div>
+    <div class="row" id="cycleLenRow" hidden>
+      <div><strong>Duración media del ciclo</strong><p>En días. Solo se usa para estimar la fase.</p></div>
+      <div class="ocgrid">
+        <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" aria-label="Duración media del ciclo en días"></label>
+      </div>
+    </div>
+    <div class="row">
       <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
       <div class="chips" id="contrastPick" role="group" aria-label="Contraste">
         <button class="chip" data-contrast="normal" aria-pressed="true">Normal</button>
@@ -599,6 +654,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Hoy</button>
   <button data-go="lib">
     <svg viewBox="0 0 20 40" fill="currentColor" style="width:11px;height:21px"><use href="#spoon"/></svg>Cucharas</button>
+  <button data-go="ciclo" id="tabCiclo" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg>Ciclo</button>
   <button data-go="cal">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Calendario</button>
   <button data-go="fin">
@@ -827,7 +884,8 @@ const SEED = [
 ];
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} },
-  finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null } };
+  finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null },
+  cycleEnabled:false, avgCycleLength:28, cycleLogs:[] };
 let currentTab = 'hoy';
 const collapsedTasks = new Set();
 
@@ -1134,6 +1192,128 @@ function openHistDetail(h){
   openDialog(dlgHist);
 }
 
+/* ---------- ciclo ---------- */
+const CYCLE_LEN_DEFAULT = 28;
+function ensureCycle(){
+  if(typeof state.cycleEnabled !== 'boolean') state.cycleEnabled = false;
+  if(!Number.isFinite(state.avgCycleLength)) state.avgCycleLength = CYCLE_LEN_DEFAULT;
+  if(!Array.isArray(state.cycleLogs)) state.cycleLogs = [];
+}
+const cycleLog = k => (state.cycleLogs || []).find(l => l.date === k) || null;
+const shiftKey = (k, n) => {
+  const d = new Date(k + 'T12:00:00'); d.setDate(d.getDate() + n); return localDateKey(d);
+};
+const daysBetween = (a, b) =>
+  Math.round((new Date(b+'T12:00:00') - new Date(a+'T12:00:00')) / 86400000);
+
+/* Un inicio de ciclo no es cualquier día de sangrado: es el primero de una
+   racha, o sea el que viene precedido de un día sin sangrado o sin registro. */
+function cycleStarts(){
+  return (state.cycleLogs || [])
+    .filter(l => l.bleeding)
+    .map(l => l.date)
+    .sort()
+    .filter(k => { const p = cycleLog(shiftKey(k, -1)); return !(p && p.bleeding); });
+}
+function lastStartOn(k){
+  const s = cycleStarts().filter(x => x <= k);
+  return s.length ? s[s.length-1] : null;
+}
+function cycleDayOn(k){
+  const s = lastStartOn(k);
+  return s ? daysBetween(s, k) + 1 : null;
+}
+/* Días seguidos de sangrado desde un inicio: es lo que dura la fase menstrual
+   de ese ciclo en concreto, en vez de un número fijo de manual. */
+function bleedRunFrom(startKey){
+  let n = 0, k = startKey;
+  while(n < 30){
+    const l = cycleLog(k);
+    if(!l || !l.bleeding) break;
+    n++; k = shiftKey(k, 1);
+  }
+  return n;
+}
+/* Función pura. Los límites son aproximados a propósito: la ovulación se marca
+   como un entorno de ±2 días alrededor de la mitad del ciclo, no como un día. */
+function cyclePhase(dayNum, avgLen, bleedDays){
+  const ovu = Math.round(avgLen / 2);
+  if(dayNum <= Math.max(1, bleedDays)) return 'Menstrual';
+  if(Math.abs(dayNum - ovu) <= 2) return 'Ovulación';
+  if(dayNum < ovu) return 'Folicular';
+  return 'Lútea';
+}
+function paintScale(id, val){
+  document.getElementById(id).innerHTML = [1,2,3,4,5]
+    .map(v => `<button data-v="${v}" aria-pressed="${v === val}">${v}</button>`).join('');
+}
+function renderCycle(){
+  if(!state.cycleEnabled) return;
+  const k = todayKey();
+  const head = document.getElementById('cycleHead');
+  const dayNum = (state.cycleLogs || []).length ? cycleDayOn(k) : null;
+  head.textContent = dayNum == null
+    ? 'Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.'
+    : `Día ${dayNum} del ciclo — Fase estimada: ${cyclePhase(dayNum, state.avgCycleLength, bleedRunFrom(lastStartOn(k)))}`;
+
+  const log = cycleLog(k);
+  const bleeding = log ? log.bleeding : null;
+  document.querySelectorAll('#cycBleed .chip').forEach(c =>
+    c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
+  document.getElementById('cycIntField').hidden = !bleeding;
+  paintScale('cycIntensity', log ? log.bleedingIntensity : null);
+  paintScale('cycPain', log ? log.pain : null);
+  renderCyclePattern();
+}
+/* Descripción de lo ya ocurrido: se promedia, por cada día del ciclo, lo que
+   se gastó ese día en los ciclos ya cerrados, y se busca la racha seguida que
+   queda por debajo de la media. No predice nada ni habla de hormonas. */
+function renderCyclePattern(){
+  const el = document.getElementById('cyclePattern');
+  const starts = cycleStarts();
+  const closed = Math.max(0, starts.length - 1);
+  if(closed < 2){
+    el.innerHTML = `<h2>Patrón</h2>
+      <p>Hacen falta dos ciclos completos para poder describir un patrón. Llevas ${closed}.</p>`;
+    return;
+  }
+  const perDay = [];
+  for(let i = 0; i < starts.length - 1; i++){
+    const n = daysBetween(starts[i], starts[i+1]);
+    for(let d = 0; d < n; d++){
+      const key = shiftKey(starts[i], d);
+      const rec = state.days[key];
+      if(!rec || !rec.tasks.length) continue;
+      (perDay[d] = perDay[d] || []).push(dayLoad(key).spent);
+    }
+  }
+  const avgByDay = perDay.map(a => (a && a.length >= 2) ? a.reduce((x,y)=>x+y,0) / a.length : null);
+  const vals = avgByDay.filter(v => v != null);
+  if(vals.length < 5){
+    el.innerHTML = `<h2>Patrón</h2>
+      <p>Tienes ${closed} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.</p>`;
+    return;
+  }
+  const overall = vals.reduce((a,b)=>a+b,0) / vals.length;
+  let best = null, cur = null;
+  avgByDay.forEach((v, i) => {
+    if(v != null && v < overall){
+      cur = cur || { from:i, to:i };
+      cur.to = i;
+      if(!best || (cur.to - cur.from) > (best.to - best.from)) best = { ...cur };
+    }else{
+      cur = null;
+    }
+  });
+  const span = best
+    ? (best.from === best.to ? `el día ${best.from+1}` : `entre el día ${best.from+1} y el día ${best.to+1}`)
+    : null;
+  el.innerHTML = `<h2>Patrón</h2>` + (span
+    ? `<p>En tus últimos ciclos, tus cucharas bajaron ${span}.</p>
+       <p>Es lo que ya pasó, no una previsión de lo que va a pasar.</p>`
+    : `<p>De momento no hay ninguna bajada que se repita de un ciclo a otro.</p>`);
+}
+
 /* typical budget: what a normal day has looked like lately */
 function typicalBudget(){
   const b = Object.keys(state.days).sort().slice(-7)
@@ -1232,12 +1412,14 @@ function renderCal(){
     const k = `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
     const { planned } = dayLoad(k);
     const heavy = planned > typical;
-    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)));
+    const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
+    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)))
+      + (bleed ? '<i class="lm bleed"></i>' : '');
     const cls = [
       k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
       heavy ? 'heavy' : ''
     ].join(' ');
-    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}`;
+    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}${bleed ? ', con sangrado' : ''}`;
     html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -1248,7 +1430,7 @@ function renderOverCost(){
     `<label>${v}<input type="number" step="1" inputmode="numeric" data-oc="${v}" value="${state.settings.overCost[v]}"></label>`
   ).join('');
 }
-function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin();
+function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin(); renderCycle();
   document.getElementById('maxOut').textContent = state.settings.max;
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -1814,6 +1996,53 @@ document.getElementById('contrastPick').addEventListener('click', e => {
   state.settings.contrast = b.dataset.contrast;
   applyContrast(); save();
 });
+/* El módulo es opcional: si está apagado, no hay pestaña ni nada calculado. */
+function applyCycleUI(){
+  const on = !!state.cycleEnabled;
+  document.getElementById('tabCiclo').hidden = !on;
+  document.getElementById('cycleLenRow').hidden = !on;
+  document.getElementById('tabs').classList.toggle('compact', on);
+  document.getElementById('cycleLen').value = state.avgCycleLength;
+  document.querySelectorAll('#cyclePick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', (c.dataset.cycle === 'on') === on));
+}
+document.getElementById('cyclePick').addEventListener('click', e => {
+  const b = e.target.closest('[data-cycle]'); if(!b) return;
+  state.cycleEnabled = b.dataset.cycle === 'on';
+  applyCycleUI(); save(); renderAll();
+});
+document.getElementById('cycleLen').addEventListener('change', e => {
+  const n = parseInt(e.target.value, 10);
+  state.avgCycleLength = Number.isFinite(n) ? Math.min(60, Math.max(15, n)) : CYCLE_LEN_DEFAULT;
+  e.target.value = state.avgCycleLength;
+  save(); renderCycle();
+});
+function todayCycleLog(){
+  const k = todayKey();
+  let l = cycleLog(k);
+  if(!l){ l = { date:k, bleeding:false, bleedingIntensity:null, pain:null }; state.cycleLogs.push(l); }
+  return l;
+}
+document.getElementById('cycBleed').addEventListener('click', e => {
+  const b = e.target.closest('[data-bleed]'); if(!b) return;
+  const l = todayCycleLog();
+  l.bleeding = b.dataset.bleed === 'si';
+  if(!l.bleeding) l.bleedingIntensity = null;
+  save(); renderAll();
+});
+document.getElementById('cycIntensity').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = todayCycleLog();
+  l.bleedingIntensity = l.bleedingIntensity === +b.dataset.v ? null : +b.dataset.v;
+  save(); renderCycle();
+});
+document.getElementById('cycPain').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = todayCycleLog();
+  l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
+  save(); renderCycle();
+});
+
 document.getElementById('overCostGrid').addEventListener('change', e => {
   const inp = e.target.closest('[data-oc]'); if(!inp) return;
   const n = parseInt(inp.value, 10);
@@ -1836,16 +2065,20 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     state = parsed;
     if(!state.settings) state.settings = { max:12 };
     if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
-    ensureFinanzas();
-    await save(); applyContrast(); renderAll();
+    ensureFinanzas(); ensureCycle();
+    await save(); applyContrast(); applyCycleUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const overCost = state.settings.overCost;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost} };
-  save(); renderAll();
+  const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
+  const avgCycleLength = state.avgCycleLength;
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost},
+    cycleEnabled, avgCycleLength, cycleLogs:[] };
+  ensureFinanzas(); ensureCycle();
+  save(); applyCycleUI(); renderAll();
 });
 
 /* ---------- cerrar tocando fuera ---------- */
@@ -1878,8 +2111,8 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(!state.settings) state.settings = { max:12 };
   if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
   if(!state.templates) state.templates = [];
-  ensureFinanzas();
-  applyContrast();
+  ensureFinanzas(); ensureCycle();
+  applyContrast(); applyCycleUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   renderAll();
   if(day().budget == null) openCheckin();
