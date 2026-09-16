@@ -494,21 +494,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div id="taskList"></div>
     <button class="add" id="btnAddTask">Añadir tarea</button>
+    <button class="linkbtn" id="btnLib" style="margin-top:9px">Editar cuánto cuesta cada actividad</button>
 
     <div class="closer" id="closer">
       <button id="btnCheckout">Check-out de hoy</button>
       <p id="closerHint">Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.</p>
     </div>
-  </section>
-
-  <!-- ===== CUCHARAS ===== -->
-  <section class="screen" id="s-lib">
-    <header class="top">
-      <h1 class="title">Cuánto cuesta</h1>
-    </header>
-    <p class="hint">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
-    <div id="libList"></div>
-    <button class="add" id="btnAddLib">Añadir actividad</button>
   </section>
 
   <!-- ===== CALENDARIO ===== -->
@@ -663,8 +654,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <nav class="tabs" id="tabs">
   <button data-go="hoy" aria-current="page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Hoy</button>
-  <button data-go="lib">
-    <svg viewBox="0 0 20 40" fill="currentColor" style="width:11px;height:21px"><use href="#spoon"/></svg>Cucharas</button>
   <button data-go="ciclo" id="tabCiclo" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg>Ciclo</button>
   <button data-go="cal">
@@ -855,6 +844,16 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </dialog>
 
 <!-- ===== Detalle de día ===== -->
+<dialog id="dlgLibList">
+  <div class="sheet">
+    <h2>Cuánto cuesta</h2>
+    <p class="hint">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
+    <div id="libList"></div>
+    <button class="add" id="btnAddLib">Añadir actividad</button>
+    <div class="bigrow" style="margin-top:18px"><button class="primary" id="libListClose">Cerrar</button></div>
+  </div>
+</dialog>
+
 <dialog id="dlgDay">
   <div class="sheet">
     <h2 id="dTitle"></h2>
@@ -1773,6 +1772,9 @@ function openTaskEdit(taskId){
   tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
+const dlgLibList = document.getElementById('dlgLibList');
+document.getElementById('btnLib').addEventListener('click', () => { renderLib(); openDialog(dlgLibList); });
+document.getElementById('libListClose').addEventListener('click', () => dlgLibList.close());
 document.getElementById('taskSuggest').addEventListener('click', e => {
   const b = e.target.closest('[data-sug]'); if(!b) return;
   const c = +b.dataset.cost;
@@ -2289,6 +2291,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
 [
   ['dlgTask', 'tCancel'],
   ['dlgLib', 'lCancel'],
+  ['dlgLibList', 'libListClose'],
   ['dlgCheckout', 'coCancel'],
   ['dlgTpl', 'tplClose'],
   ['dlgDay', 'dClose'],
