@@ -992,10 +992,13 @@ function record(name, est, real){
    la diferencia es de forma, no solo de color. */
 function spoonSVG(halves, margin){
   const outline = '<use href="#spoon" fill="none" stroke="var(--spoon)" stroke-width="1.8"/>';
-  const drop = margin ? '<use href="#drop" x="11" y="1" width="8" height="8" fill="var(--accent)" opacity=".7"/>' : '';
-  if(halves >= 2) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon" fill="var(--spoon)"/>${drop}</svg>`;
-  if(halves === 1) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}<use href="#spoon" fill="var(--spoon)" clip-path="url(#halfL)"/>${drop}</svg>`;
-  return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}${drop}</svg>`;
+  const drop = '<use href="#drop" x="11" y="1" width="8" height="8" fill="var(--accent)" opacity=".7"/>';
+  /* las del margen se dibujan como la cuchara vacía (contorno + gota), aunque
+     sí se puedan gastar: son un aviso visual, no un reflejo del gasto real. */
+  if(margin) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}${drop}</svg>`;
+  if(halves >= 2) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon" fill="var(--spoon)"/></svg>`;
+  if(halves === 1) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}<use href="#spoon" fill="var(--spoon)" clip-path="url(#halfL)"/></svg>`;
+  return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}</svg>`;
 }
 /* en grupos de cinco: a partir de ocho cucharas, una fila continua ya no se cuenta de un vistazo.
    El margen del ciclo no resta nada: solo marca con una gotita las últimas
