@@ -81,7 +81,13 @@ input,select,textarea{font:inherit;color:inherit}
   border-radius:var(--radius);
   padding:18px 16px 14px;
   margin-top:16px;
+  position:relative;
 }
+/* toda la tarjeta abre el check-in, igual que una tarea se abre tocándola.
+   Es un botón estirado por debajo del contenido, no un botón que lo envuelva:
+   así el "¿Por qué?" sigue siendo un botón aparte y no queda uno dentro de otro. */
+.meter-hit{position:absolute;inset:0;width:100%;background:none;border:none;padding:0;border-radius:var(--radius);cursor:pointer}
+.meter .linkbtn{position:relative;z-index:1}
 .spoons{display:flex;flex-wrap:wrap;gap:8px 17px;margin-bottom:12px}
 .sgroup{display:flex;gap:6px}
 .sp{width:19px;height:38px;display:block}
@@ -477,10 +483,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </header>
 
     <div class="meter">
+      <button class="meter-hit" id="btnAdjustBudget" aria-label="Ajustar las cucharas de hoy"></button>
       <div class="spoons" id="spoonRow" role="img" aria-label="Cucharas restantes"></div>
       <div class="meter-foot">
         <span class="count" id="spoonCount"></span>
-        <button class="linkbtn" id="btnAdjustBudget">Ajustar</button>
       </div>
       <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
       <p class="notice" id="spoonNotice" hidden></p>
