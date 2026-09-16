@@ -1597,6 +1597,25 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   save(); renderAll();
 });
 
+/* ---------- cerrar tocando fuera ---------- */
+/* El <dialog> ocupa solo el alto de su .sheet (hoja anclada abajo), así que
+   un click que aterriza en el propio <dialog> -no en un descendiente- es un
+   click en el ::backdrop, es decir, fuera del mockup. Se reutiliza el mismo
+   botón de cerrar de cada hoja para no duplicar su lógica (algunas hacen
+   renderAll() al cerrar y otras no). dlgCheckin queda fuera: es el check-in
+   obligatorio del día y no tiene botón de cancelar. */
+[
+  ['dlgTask', 'tCancel'],
+  ['dlgLib', 'lCancel'],
+  ['dlgCheckout', 'coCancel'],
+  ['dlgTpl', 'tplClose'],
+  ['dlgDay', 'dClose'],
+].forEach(([dlgId, btnId]) => {
+  document.getElementById(dlgId).addEventListener('click', e => {
+    if(e.target.id === dlgId) document.getElementById(btnId).click();
+  });
+});
+
 /* ---------- boot ---------- */
 (async function init(){
   const loaded = await store.get();
