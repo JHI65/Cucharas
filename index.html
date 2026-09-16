@@ -101,6 +101,8 @@ input,select,textarea{font:inherit;color:inherit}
   color:var(--accent);text-decoration:underline;text-underline-offset:3px;
   font-size:15px;
 }
+/* enlace metido dentro de una línea de texto pequeño, no suelto en su fila */
+.linkbtn.inline{font-size:13px;padding:0}
 
 /* ---- Tasks ---- */
 .sectionhead{display:flex;align-items:center;justify-content:space-between;margin:26px 0 10px}
@@ -847,6 +849,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </dialog>
 
 <!-- ===== Detalle de día ===== -->
+<dialog id="dlgWhyMargin">
+  <div class="sheet">
+    <h2>¿Por qué se restan cucharas?</h2>
+    <p class="hint">No es un dato médico ni una previsión de cómo te vas a encontrar. Es un colchón que pones tú.</p>
+    <p class="hint">Los días de sangrado —los que has apuntado y el día previo al inicio estimado— la app aparta una parte de las cucharas del día para que no cuentes con ellas al planificar. Así, si el día viene peor de lo normal, lo que tenías apuntado sigue cabiendo.</p>
+    <p class="hint">Las cucharas apartadas no desaparecen: siguen en el total del día, marcadas con una gota. Si el día va bien, ahí están, y nada te impide gastarlas.</p>
+    <p class="hint" id="whyMarginNow"></p>
+    <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
+  </div>
+</dialog>
+
 <dialog id="dlgLibList">
   <div class="sheet">
     <h2>Cuánto cuesta</h2>
@@ -1022,12 +1035,13 @@ function renderMeter(){
      disponible con el margen del ciclo señalado con una gota, no en prosa */
   const breakParts = [`${fmtN(gasto)} gastadas`];
   if(recarga) breakParts.push(`${fmtN(recarga)} recuperadas`);
-  const dropIcon = precaution
+  const dropIcon = marginAmount > 0
     ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg>' +
       `−${fmtN(marginAmount)} cucharas`
     : '';
   breakParts.push(`${fmtN(Math.max(0, left))} disponibles${dropIcon}`);
-  document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ');
+  document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ') +
+    (marginAmount > 0 ? ' <button class="linkbtn inline" id="btnWhyMargin">¿Por qué?</button>' : '');
 
   /* aviso de día cargado: dice el hecho, no juzga. El titular ya dice si vas
      por debajo, así que aquí solo se avisa si lo apuntado no cabe. */
@@ -1780,6 +1794,16 @@ function openTaskEdit(taskId){
   tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
+const dlgWhyMargin = document.getElementById('dlgWhyMargin');
+/* la línea del desglose se reescribe en cada render, así que el enlace se
+   escucha desde el párrafo, que sí se queda */
+document.getElementById('spoonBreak').addEventListener('click', e => {
+  if(!e.target.closest('#btnWhyMargin')) return;
+  document.getElementById('whyMarginNow').textContent =
+    `Ahora apartas el ${fmtN(state.marginPercent)}% del día. Puedes cambiarlo, o dejarlo en 0, en Ajustes. Con dos ciclos completos apuntados, la sección Ciclo puede proponerte el porcentaje que encaja con lo que ya te ha pasado.`;
+  openDialog(dlgWhyMargin);
+});
+document.getElementById('whyMarginClose').addEventListener('click', () => dlgWhyMargin.close());
 const dlgLibList = document.getElementById('dlgLibList');
 document.getElementById('btnLib').addEventListener('click', () => { renderLib(); openDialog(dlgLibList); });
 document.getElementById('libListClose').addEventListener('click', () => dlgLibList.close());
@@ -2300,6 +2324,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgTask', 'tCancel'],
   ['dlgLib', 'lCancel'],
   ['dlgLibList', 'libListClose'],
+  ['dlgWhyMargin', 'whyMarginClose'],
   ['dlgCheckout', 'coCancel'],
   ['dlgTpl', 'tplClose'],
   ['dlgDay', 'dClose'],
