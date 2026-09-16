@@ -613,7 +613,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label for="tTime">A qué hora (opcional)</label>
       <input type="time" id="tTime">
     </div>
-    <div class="field">
+    <div class="field" id="repField">
       <label>Repetir</label>
       <div class="chips" id="repMode">
         <button class="chip" data-rep="once" aria-pressed="true">Solo ese día</button>
@@ -903,7 +903,9 @@ function renderTasks(){
       ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`
-      : `<span class="task-body"><span class="task-name">${timeTag}${esc(t.name)}</span>${meta}</span>`;
+      : `<button class="task-body" data-edit="${t.id}" aria-label="Editar ${esc(t.name)}">
+          <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
+        </button>`;
     const chev = t.done ? `<button class="chev-btn" data-trow="${t.id}" aria-expanded="${isOpen}" aria-label="${isOpen?'Ocultar detalle':'Ver detalle'} de ${esc(t.name)}"><svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>` : '';
     return `
     <div class="task ${t.done?'done':''}">
@@ -1133,8 +1135,10 @@ const dlgTask = document.getElementById('dlgTask');
 const tName = document.getElementById('tName');
 const tCostOut = document.getElementById('tCost');
 const tTime = document.getElementById('tTime');
+const tSave = document.getElementById('tSave');
 let tCost = 2, tKind = 'gasto';
 let taskDate = todayKey();
+let editingTask = null;
 function tSync(){
   tCostOut.textContent = fmtN(tCost);
   document.querySelectorAll('#tKind .chip').forEach(c =>
@@ -1201,16 +1205,39 @@ function expandDates(startKey){
 }
 
 function openTaskSheet(dateKey){
+  editingTask = null;
   taskDate = dateKey;
   tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
     ? 'Elige de tu lista o escribe una nueva.'
     : `Empieza el ${fmtDate(dateKey)}.`;
+  document.getElementById('taskSuggest').hidden = false;
+  document.getElementById('repField').hidden = false;
+  tSave.textContent = 'Añadir';
   const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
   document.getElementById('taskSuggest').innerHTML = top
     .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}" aria-pressed="false">${esc(l.name)}</button>`).join('');
   tSync(); repSync(); openDialog(dlgTask);
+}
+function openTaskEdit(taskId){
+  const t = day().tasks.find(x => x.id === taskId);
+  if(!t) return;
+  editingTask = taskId;
+  taskDate = todayKey();
+  tName.value = t.name;
+  tKind = t.est < 0 ? 'recarga' : 'gasto';
+  tCost = Math.abs(t.est);
+  tTime.value = t.time || '';
+  repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  document.querySelector('#dlgTask h2').textContent = 'Editar tarea';
+  document.querySelector('#dlgTask .sub').textContent = 'Cambia lo que haga falta.';
+  document.getElementById('taskSuggest').hidden = true;
+  document.getElementById('taskSuggest').innerHTML = '';
+  document.getElementById('repField').hidden = true;
+  tSave.textContent = 'Guardar';
+  tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
 document.getElementById('taskSuggest').addEventListener('click', e => {
@@ -1223,12 +1250,19 @@ document.getElementById('tName').addEventListener('input', () => {
   document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
 });
 document.getElementById('tCancel').addEventListener('click', () => dlgTask.close());
-document.getElementById('tSave').addEventListener('click', () => {
+tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
-  const dates = expandDates(taskDate);
-  const series = dates.length > 1 ? uid() : null;
   const est = tKind === 'recarga' ? -tCost : tCost;
   const time = tTime.value || null;
+  if(editingTask){
+    const t = day().tasks.find(x => x.id === editingTask);
+    if(t){ t.name = name; t.est = est; t.time = time; }
+    record(name, est, null);
+    save(); dlgTask.close(); renderAll();
+    return;
+  }
+  const dates = expandDates(taskDate);
+  const series = dates.length > 1 ? uid() : null;
   dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null, time }));
   record(name, est, null);
   save(); dlgTask.close(); renderAll();
@@ -1237,6 +1271,8 @@ document.getElementById('tSave').addEventListener('click', () => {
 
 /* ---------- task interactions ---------- */
 document.getElementById('taskList').addEventListener('click', e => {
+  const editBtn = e.target.closest('[data-edit]');
+  if(editBtn){ openTaskEdit(editBtn.dataset.edit); return; }
   const tog = e.target.closest('[data-toggle]');
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
