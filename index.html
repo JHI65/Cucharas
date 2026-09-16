@@ -408,6 +408,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 .group .lib+.lib::before{left:14px}
 .group .row,.group .ocrow{padding:14px}
 .group .row:last-child,.group .ocrow:last-child{border-bottom:none}
+/* el grupo de Ciclo esconde dos filas cuando está apagado: la última que queda
+   visible cierra el grupo, así que tampoco lleva línea. */
+.group .row:not(:has(~ .row:not([hidden]))){border-bottom:none}
 
 /* La fila hecha ya no cambia de relleno: dentro del grupo, Rosa Algodón sobre
    Blanco Cálido son 1,05:1, es decir, invisible. El estado lo llevan el tachado
@@ -604,6 +607,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <h1 class="title">Ajustes</h1>
       <p class="sub">Tus datos no salen del teléfono</p>
     </header>
+    <p class="libsec">Tus cucharas</p>
     <div class="group">
     <div class="row">
       <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
@@ -618,6 +622,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <p>Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
       <div class="ocgrid" id="overCostGrid"></div>
     </div>
+    </div>
+
+    <p class="libsec">Ciclo</p>
+    <div class="group">
     <div class="row">
       <div><strong>Seguimiento del ciclo</strong><p>Añade una sección para apuntar sangrado y dolor.</p></div>
       <div class="chips" id="cyclePick" role="group" aria-label="Seguimiento del ciclo">
@@ -637,6 +645,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <label><input type="number" id="cycleMargin" step="1" min="0" max="90" inputmode="numeric" aria-label="Margen de precaución en porcentaje"></label>
       </div>
     </div>
+    </div>
+
+    <p class="libsec">Cómo se ve</p>
+    <div class="group">
     <div class="row">
       <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
       <div class="chips" id="contrastPick" role="group" aria-label="Contraste">
@@ -644,6 +656,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
       </div>
     </div>
+    </div>
+
+    <p class="libsec">Tus datos</p>
+    <div class="group">
     <div class="row">
       <div><strong>Copia de seguridad</strong><p>Descarga un archivo con todo tu historial.</p></div>
       <button class="btn" id="btnExport">Exportar</button>
