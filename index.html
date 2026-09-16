@@ -2230,6 +2230,9 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ensureFinanzas(); ensureCycle();
   applyContrast(); applyCycleUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
+  // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
+  // quedaron abiertas antes de cerrar: se colapsan todas de inicio.
+  day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
   renderAll();
   if(day().budget == null) openCheckin();
 })();
