@@ -127,7 +127,8 @@ input,select,textarea{font:inherit;color:inherit}
 button.task-body{text-align:left;background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer}
 .task-name{display:block;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .task-meta{font-size:13px;color:var(--ink-soft)}
-.chev{flex:0 0 auto;width:16px;height:16px;color:var(--ink-soft);transform:rotate(-90deg)}
+.chev-btn{flex:0 0 auto;background:none;border:none;padding:6px;margin:-6px;cursor:pointer;display:grid;place-items:center}
+.chev{width:16px;height:16px;color:var(--ink-soft);transform:rotate(-90deg)}
 .chev.closed{transform:rotate(90deg)}
 .cost{flex:0 0 auto;font-size:15px;color:var(--ink-soft);display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .cost svg{width:9px;height:18px}
@@ -140,6 +141,15 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
   /* Malva Apagado sobre Rosa Niebla da 3,96:1 y esto es texto de 14px.
      Marrón Ciruela lo sube a 7,48:1. */
   font-size:14px;color:var(--ink);
+  overflow:hidden;
+  transition:max-height .22s ease,opacity .22s ease,padding .22s ease,margin .22s ease,border-color .22s ease;
+}
+/* Cierre automático al terminar de rellenar el check-in: el alto de partida
+   lo fija JS (scrollHeight) para que el colapso sea proporcional, no un salto
+   al final. Respeta prefers-reduced-motion vía la regla global de abajo. */
+.adjust.closing{
+  max-height:0 !important;opacity:0;
+  padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-color:transparent;
 }
 .arow{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .arow+.arow{margin-top:12px;display:block}
@@ -894,7 +904,7 @@ function renderTasks(){
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`
       : `<span class="task-body"><span class="task-name">${timeTag}${esc(t.name)}</span>${meta}</span>`;
-    const chev = t.done ? `<svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>` : '';
+    const chev = t.done ? `<button class="chev-btn" data-trow="${t.id}" aria-expanded="${isOpen}" aria-label="${isOpen?'Ocultar detalle':'Ver detalle'} de ${esc(t.name)}"><svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>` : '';
     return `
     <div class="task ${t.done?'done':''}">
       <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${t.done?'Desmarcar':'Marcar'} ${esc(t.name)}" aria-pressed="${t.done}">
@@ -1251,7 +1261,9 @@ document.getElementById('taskList').addEventListener('click', e => {
     const t = day().tasks.find(x => x.id === rec.dataset.rec);
     const m = +rec.dataset.min;
     t.recovery = (t.recovery === m) ? null : m;
-    save(); renderAll(); return;
+    save(); renderAll();
+    if(t.recovery !== null) closeAdjustPanel(t.id);
+    return;
   }
   const adj = e.target.closest('[data-real]');
   if(adj){
@@ -1261,8 +1273,27 @@ document.getElementById('taskList').addEventListener('click', e => {
     const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
     if(item && item.samples.length){ item.samples[item.samples.length-1] = t.real; }
     save(); renderAll();
+    if(t.est < 0) closeAdjustPanel(t.id);
   }
 });
+
+/* Cierre automático del check-in al completarlo: para una tarea que resta
+   cucharas, se cierra al elegir recuperación (el último dato que falta); para
+   una que las devuelve no hay recuperación, así que se cierra al ajustar el
+   coste real, que es el único dato. El alto de partida sale de scrollHeight
+   para que el colapso sea proporcional al contenido real del panel. */
+function closeAdjustPanel(id){
+  const btn = document.querySelector(`[data-trow="${id}"]`);
+  const panel = btn && btn.closest('.task') && btn.closest('.task').nextElementSibling;
+  if(!panel || !panel.classList.contains('adjust')){ collapsedTasks.add(id); renderTasks(); return; }
+  const finish = () => { collapsedTasks.add(id); renderTasks(); };
+  panel.style.maxHeight = panel.scrollHeight + 'px';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    panel.classList.add('closing');
+  }));
+  panel.addEventListener('transitionend', finish, {once:true});
+  setTimeout(finish, 320);
+}
 
 /* ---------- library editor ---------- */
 const dlgLib = document.getElementById('dlgLib');
