@@ -521,24 +521,24 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <h1 class="title">Finanzas</h1>
     </header>
     <div class="chips" id="finTabs" role="group" aria-label="Vista de finanzas">
-      <button class="chip" data-fintab="gastos" aria-pressed="true">Gastos</button>
+      <button class="chip" data-fintab="fijos" aria-pressed="true">Gastos fijos</button>
+      <button class="chip" data-fintab="variables" aria-pressed="false">Gastos variables</button>
       <button class="chip" data-fintab="historial" aria-pressed="false">Historial</button>
     </div>
 
-    <div id="finGastos">
-      <div class="sectionhead"><h2>Gastos fijos</h2></div>
+    <div id="finFijos">
       <div id="finFijosList"></div>
       <button class="add" id="btnAddFijo">Añadir gasto fijo</button>
+      <div class="card">
+        <p>Total gastos fijos: <strong id="finTotalFijos"></strong></p>
+      </div>
+    </div>
 
-      <div class="sectionhead"><h2>Gastos variables</h2></div>
+    <div id="finVariables" hidden>
       <div id="finVariablesList"></div>
       <button class="add" id="btnAddVariable">Añadir gasto variable</button>
-
-      <div class="card" id="finTotales">
-        <h2>Totales</h2>
-        <p>Total gastos fijos: <strong id="finTotalFijos"></strong></p>
+      <div class="card">
         <p>Total gastos variables: <strong id="finTotalVariables"></strong></p>
-        <p>Total del mes: <strong id="finTotalMes"></strong></p>
       </div>
     </div>
 
@@ -1094,7 +1094,6 @@ function renderFin(){
   const totalVariables = f.gastosVariables.reduce((a,g)=>a+g.importe,0);
   document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
   document.getElementById('finTotalVariables').textContent = fmtMoney(totalVariables);
-  document.getElementById('finTotalMes').textContent = fmtMoney(totalFijos + totalVariables);
   renderFinHistorial();
 }
 function renderFinHistorial(){
@@ -1623,9 +1622,10 @@ document.getElementById('gDelete').addEventListener('click', () => {
 document.getElementById('finTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-fintab]'); if(!b) return;
   document.querySelectorAll('#finTabs .chip').forEach(c => c.setAttribute('aria-pressed', c === b));
-  const showGastos = b.dataset.fintab === 'gastos';
-  document.getElementById('finGastos').hidden = !showGastos;
-  document.getElementById('finHistorial').hidden = showGastos;
+  const view = b.dataset.fintab;
+  document.getElementById('finFijos').hidden = view !== 'fijos';
+  document.getElementById('finVariables').hidden = view !== 'variables';
+  document.getElementById('finHistorial').hidden = view !== 'historial';
 });
 document.getElementById('finHistList').addEventListener('click', e => {
   const b = e.target.closest('[data-hist]'); if(!b) return;
