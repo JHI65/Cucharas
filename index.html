@@ -733,6 +733,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <span class="lib-note" id="wLabel">semanas</span>
       </div>
     </div>
+    <div class="bigrow" id="tDeleteRow" hidden>
+      <button class="warn" id="tDelete">Borrar tarea</button>
+    </div>
     <div class="bigrow">
       <button id="tCancel">Cancelar</button>
       <button class="primary" id="tSave">Añadir</button>
@@ -1742,6 +1745,7 @@ function openTaskSheet(dateKey){
     : `Empieza el ${fmtDate(dateKey)}.`;
   document.getElementById('taskSuggest').hidden = false;
   document.getElementById('repField').hidden = false;
+  document.getElementById('tDeleteRow').hidden = true;
   tSave.textContent = 'Añadir';
   const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
   document.getElementById('taskSuggest').innerHTML = top
@@ -1763,6 +1767,7 @@ function openTaskEdit(taskId){
   document.getElementById('taskSuggest').hidden = true;
   document.getElementById('taskSuggest').innerHTML = '';
   document.getElementById('repField').hidden = true;
+  document.getElementById('tDeleteRow').hidden = false;
   tSave.textContent = 'Guardar';
   tSync(); openDialog(dlgTask);
 }
@@ -1777,6 +1782,19 @@ document.getElementById('tName').addEventListener('input', () => {
   document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
 });
 document.getElementById('tCancel').addEventListener('click', () => dlgTask.close());
+document.getElementById('tDelete').addEventListener('click', () => {
+  if(!editingTask) return;
+  const d = day(taskDate);
+  const t = d.tasks.find(x => x.id === editingTask);
+  if(t && t.series && confirm('Esta tarea se repite en más días. ¿Quitarla de todos?\n\nAceptar: la quita de toda la serie.\nCancelar: solo de este día.')){
+    Object.keys(state.days).forEach(k => {
+      state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === t.series && !x.done));
+    });
+  }else{
+    d.tasks = d.tasks.filter(x => x.id !== editingTask);
+  }
+  save(); dlgTask.close(); renderAll();
+});
 tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
   const est = tKind === 'recarga' ? -tCost : tCost;
