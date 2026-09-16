@@ -85,6 +85,7 @@ input,select,textarea{font:inherit;color:inherit}
 .spoons{display:flex;flex-wrap:wrap;gap:8px 17px;margin-bottom:12px}
 .sgroup{display:flex;gap:6px}
 .sp{width:19px;height:38px;display:block}
+.drop-ic{width:11px;height:11px;vertical-align:-1px}
 .meter-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .count{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
 .count small{font-weight:400;font-size:15px;color:var(--ink-soft)}
@@ -440,6 +441,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <path d="M10 1c4.4 0 7 3.6 7 8s-2.6 8-7 8-7-3.6-7-8 2.6-8 7-8z"/>
     <rect x="8" y="16" width="4" height="23" rx="2"/>
   </symbol>
+  <symbol id="drop" viewBox="0 0 24 24">
+    <path d="M12 2C12 2 5 11.6 5 16.2A7 7 0 0 0 19 16.2C19 11.6 12 2 12 2z"/>
+  </symbol>
   <symbol id="tick" viewBox="0 0 16 16">
     <path d="M2 8.5l4 4 8-9" fill="none" stroke="var(--surface)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
@@ -477,7 +481,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="linkbtn" id="btnAdjustBudget">Ajustar</button>
       </div>
       <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
-      <p class="lib-note" id="cycleMarginNote" hidden></p>
       <p class="notice" id="spoonNotice" hidden></p>
       <div class="extra-block" id="overBlock" hidden>
         <div class="meter-foot">
@@ -968,19 +971,26 @@ function record(name, est, real){
 /* ---------- render ---------- */
 /* una cuchara: llena, media o vacía. Vacía = contorno, no relleno claro:
    la diferencia es de forma, no solo de color. */
-function spoonSVG(halves){
+function spoonSVG(halves, margin){
   const outline = '<use href="#spoon" fill="none" stroke="var(--spoon)" stroke-width="1.8"/>';
-  if(halves >= 2) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon" fill="var(--spoon)"/></svg>`;
-  if(halves === 1) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}<use href="#spoon" fill="var(--spoon)" clip-path="url(#halfL)"/></svg>`;
-  return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}</svg>`;
+  const drop = margin ? '<use href="#drop" x="11" y="1" width="8" height="8" fill="var(--accent)" opacity=".7"/>' : '';
+  if(halves >= 2) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon" fill="var(--spoon)"/>${drop}</svg>`;
+  if(halves === 1) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}<use href="#spoon" fill="var(--spoon)" clip-path="url(#halfL)"/>${drop}</svg>`;
+  return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}${drop}</svg>`;
 }
-/* en grupos de cinco: a partir de ocho cucharas, una fila continua ya no se cuenta de un vistazo */
-function spoonRowHTML(left, total){
+/* en grupos de cinco: a partir de ocho cucharas, una fila continua ya no se cuenta de un vistazo.
+   Las reservadas por el margen del ciclo son las vacías más próximas a las
+   disponibles: se marcan con una gotita superpuesta en vez de contarse aparte. */
+function spoonRowHTML(left, total, marginAmount){
   const slots = Math.ceil(Math.max(total, 0));
   const leftHalves = Math.round(Math.max(left, 0) * 2);
+  let marginLeft = Math.round(marginAmount || 0);
   let html = '', group = '';
   for(let i = 0; i < slots; i++){
-    group += spoonSVG(Math.min(2, Math.max(0, leftHalves - i * 2)));
+    const halves = Math.min(2, Math.max(0, leftHalves - i * 2));
+    let margin = false;
+    if(halves === 0 && marginLeft > 0){ margin = true; marginLeft--; }
+    group += spoonSVG(halves, margin);
     if((i + 1) % 5 === 0 || i === slots - 1){ html += `<span class="sgroup">${group}</span>`; group = ''; }
   }
   return html;
@@ -993,21 +1003,13 @@ function renderMeter(){
     ? Math.max(1, Math.round(budget * (1 - state.marginPercent/100)))
     : budget;
   const marginAmount = budget - effective;
-  const marginNote = document.getElementById('cycleMarginNote');
-  if(precaution){
-    marginNote.hidden = false;
-    marginNote.textContent = `${fmtN(budget)} cucharas → ${fmtN(effective)} 🩸 (margen de precaución del ciclo: −${fmtN(state.marginPercent)}%)`;
-  }else{
-    marginNote.hidden = true;
-    marginNote.textContent = '';
-  }
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
   const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
   const left = budget - gasto + recarga - marginAmount;
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
-  row.innerHTML = total ? spoonRowHTML(left, total) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
+  row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
   row.setAttribute('aria-label', left < 0
     ? `${fmtN(Math.abs(left))} cucharas por debajo de lo asignado hoy`
     : `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
@@ -1016,16 +1018,22 @@ function renderMeter(){
   c.innerHTML = left < 0
     ? `${fmtN(Math.abs(left))} <small>por debajo de lo asignado hoy</small>`
     : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
-  document.getElementById('spoonBreak').textContent = (gasto || recarga || marginAmount)
-    ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}${marginAmount ? ` · reservadas ${fmtN(marginAmount)} por el margen del ciclo` : ''}`
+  /* una sola línea con todo el desglose: gasto, recarga si la hay, y lo
+     disponible con el margen del ciclo señalado con una gota, no en prosa */
+  const breakParts = [`${fmtN(gasto)} gastadas`];
+  if(recarga) breakParts.push(`${fmtN(recarga)} recuperadas`);
+  const dropIcon = precaution
+    ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg> ' +
+      `−${fmtN(state.marginPercent)}%`
     : '';
+  breakParts.push(`${fmtN(Math.max(0, left))} disponibles${dropIcon}`);
+  document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ');
 
-  /* aviso de día cargado: dice el hecho, no juzga */
+  /* aviso de día cargado: dice el hecho, no juzga. El titular ya dice si vas
+     por debajo, así que aquí solo se avisa si lo apuntado no cabe. */
   const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
   const notice = document.getElementById('spoonNotice');
-  let msg = '';
-  if(left < 0) msg = 'Estás por debajo de cero: hoy has gastado más de lo que asignaste.';
-  else if(effective > 0 && planned > effective) msg = `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(effective)}.`;
+  const msg = (effective > 0 && planned > effective) ? `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(effective)}.` : '';
   notice.textContent = msg;
   notice.hidden = !msg;
 
