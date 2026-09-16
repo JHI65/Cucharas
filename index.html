@@ -683,6 +683,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="bigcount"><span id="ciNum">8</span><small id="ciWord"></small></div>
     <input type="range" class="slider" id="ciRange" min="0" max="12" step="1" value="8">
     <div class="chips" id="ciPresets"></div>
+    <label class="row" id="ciMarginRow" hidden style="cursor:pointer">
+      <div><strong>Hoy no necesito el margen</strong><p>Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.</p></div>
+      <input type="checkbox" id="ciMarginOff" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
+    </label>
     <div class="bigrow"><button class="primary" id="ciSave">Empezar el día</button></div>
   </div>
 </dialog>
@@ -861,6 +865,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="hint">No es un dato médico ni una previsión exacta. Es un margen de precaución que pones tú, para no planificar el día completo cuando toca sangrado.</p>
     <p class="hint">Los días de sangrado —los que has apuntado y el día previo al inicio estimado— la app resta un porcentaje de tus cucharas del día antes de repartirlas. Las que se restan se marcan con una gota, para que veas cuáles son.</p>
     <p class="hint">No desaparecen del todo: si las necesitas, las puedes gastar igual que las demás, pero entonces el aviso de "por debajo de lo asignado" salta antes, como recordatorio de que estabas contando con menos.</p>
+    <p class="hint">Si un día de estos te ves con energía, puedes desactivar el margen solo para ese día desde "¿Con cuántas cucharas te levantas?".</p>
     <p class="hint" id="whyMarginNow"></p>
     <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
   </div>
@@ -1020,7 +1025,7 @@ function spoonRowHTML(left, total, marginAmount){
 function renderMeter(){
   const d = day();
   const budget = d.budget ?? 0;
-  const precaution = d.budget != null ? precautionReason(todayKey()) : null;
+  const precaution = (d.budget != null && !d.marginOff) ? precautionReason(todayKey()) : null;
   const effective = precaution
     ? Math.max(1, Math.round(budget * (1 - state.marginPercent/100)))
     : budget;
@@ -1680,6 +1685,9 @@ function openCheckin(){
   ];
   document.getElementById('ciPresets').innerHTML = presets
     .map(([n,v]) => `<button class="chip" data-ci="${v}">${n} · ${v}</button>`).join('');
+  const marginRow = document.getElementById('ciMarginRow');
+  marginRow.hidden = !precautionReason(todayKey());
+  document.getElementById('ciMarginOff').checked = !!day().marginOff;
   openDialog(dlgCheckin);
 }
 document.getElementById('ciPresets').addEventListener('click', e => {
@@ -1687,7 +1695,9 @@ document.getElementById('ciPresets').addEventListener('click', e => {
   ciRange.value = b.dataset.ci; ciSync();
 });
 document.getElementById('ciSave').addEventListener('click', () => {
-  day().budget = +ciRange.value; save(); dlgCheckin.close(); renderAll();
+  day().budget = +ciRange.value;
+  day().marginOff = document.getElementById('ciMarginOff').checked;
+  save(); dlgCheckin.close(); renderAll();
 });
 document.getElementById('btnAdjustBudget').addEventListener('click', openCheckin);
 
