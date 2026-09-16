@@ -477,6 +477,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="linkbtn" id="btnAdjustBudget">Ajustar</button>
       </div>
       <p class="lib-note" id="spoonBreak" style="margin:9px 0 0"></p>
+      <p class="lib-note" id="cycleMarginNote" hidden></p>
       <p class="notice" id="spoonNotice" hidden></p>
       <div class="extra-block" id="overBlock" hidden>
         <div class="meter-foot">
@@ -626,6 +627,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div><strong>Duración media del ciclo</strong><p>En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.</p></div>
       <div class="ocgrid">
         <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" aria-label="Duración media del ciclo en días"></label>
+      </div>
+    </div>
+    <div class="row" id="cycleMarginRow" hidden>
+      <div><strong>Margen de precaución</strong><p>Baja las cucharas del día este porcentaje cuando toca sangrado, apuntado o estimado.</p></div>
+      <div class="ocgrid">
+        <label><input type="number" id="cycleMargin" step="1" min="0" max="90" inputmode="numeric" aria-label="Margen de precaución en porcentaje"></label>
       </div>
     </div>
     <div class="row">
@@ -889,7 +896,7 @@ const SEED = [
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null },
-  cycleEnabled:false, avgCycleLength:28, cycleLogs:[] };
+  cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
 const collapsedTasks = new Set();
 
@@ -978,7 +985,19 @@ function spoonRowHTML(left, total){
 }
 function renderMeter(){
   const d = day();
-  const budget = d.budget ?? 0;
+  const rawBudget = d.budget ?? 0;
+  const precaution = d.budget != null ? precautionReason(todayKey()) : null;
+  const budget = precaution
+    ? Math.max(1, Math.round(rawBudget * (1 - state.marginPercent/100)))
+    : rawBudget;
+  const marginNote = document.getElementById('cycleMarginNote');
+  if(precaution){
+    marginNote.hidden = false;
+    marginNote.textContent = `${fmtN(rawBudget)} cucharas → ${fmtN(budget)} 🩸 (margen de precaución del ciclo: −${fmtN(state.marginPercent)}%)`;
+  }else{
+    marginNote.hidden = true;
+    marginNote.textContent = '';
+  }
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
   const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
@@ -1198,9 +1217,11 @@ function openHistDetail(h){
 
 /* ---------- ciclo ---------- */
 const CYCLE_LEN_DEFAULT = 28;
+const MARGIN_DEFAULT = 20;
 function ensureCycle(){
   if(typeof state.cycleEnabled !== 'boolean') state.cycleEnabled = false;
   if(!Number.isFinite(state.avgCycleLength)) state.avgCycleLength = CYCLE_LEN_DEFAULT;
+  if(!Number.isFinite(state.marginPercent)) state.marginPercent = MARGIN_DEFAULT;
   if(!Array.isArray(state.cycleLogs)) state.cycleLogs = [];
 }
 const cycleLog = k => (state.cycleLogs || []).find(l => l.date === k) || null;
@@ -1290,6 +1311,22 @@ function estBleedDays(fromKey, toKey){
     s = shiftKey(s, nx.length);
   }
   return out;
+}
+/* El día previo estimado al inicio del periodo: el único día "solo estimado"
+   al que se aplica el margen, aparte de cualquier día con sangrado apuntado. */
+function precautionDayEstimate(){
+  if(!state.cycleEnabled) return null;
+  const nx = nextCycleStart();
+  return nx ? shiftKey(nx.date, -1) : null;
+}
+/* Motivo del margen para un día concreto, o null si no aplica. Si coinciden
+   sangrado apuntado y día previo estimado, manda lo apuntado y no se suma. */
+function precautionReason(k){
+  if(!state.cycleEnabled) return null;
+  const log = cycleLog(k);
+  if(log && log.bleeding) return 'real';
+  if(k === precautionDayEstimate()) return 'estimada';
+  return null;
 }
 /* Función pura. Los límites son aproximados a propósito: la ovulación se marca
    como un entorno de ±2 días alrededor de la mitad del ciclo, no como un día. */
@@ -1414,11 +1451,28 @@ function renderCyclePattern(){
   const span = best
     ? (best.from === best.to ? `el día ${best.from+1}` : `entre el día ${best.from+1} y el día ${best.to+1}`)
     : null;
+  let suggestion = '';
+  if(best){
+    const spanVals = avgByDay.slice(best.from, best.to+1).filter(v => v != null);
+    const spanAvg = spanVals.reduce((a,b)=>a+b,0) / spanVals.length;
+    const drop = Math.round((1 - spanAvg/overall) * 100);
+    if(drop > 0 && drop !== state.marginPercent){
+      suggestion = `<p class="insight">Según tus datos, tus cucharas bajan una media del ${drop}% estos días.
+        ¿Actualizar tu margen a ${drop}%?</p>
+        <button class="add" id="btnApplyMarginSuggestion" data-margin="${drop}">Actualizar margen a ${drop}%</button>`;
+    }
+  }
   el.innerHTML = `<h2>Patrón</h2>` + (span
     ? `<p>En tus últimos ciclos, tus cucharas bajaron ${span}.</p>
-       <p>Es lo que ya pasó, no una previsión de lo que va a pasar.</p>`
+       <p>Es lo que ya pasó, no una previsión de lo que va a pasar.</p>${suggestion}`
     : `<p>De momento no hay ninguna bajada que se repita de un ciclo a otro.</p>`);
 }
+document.getElementById('cyclePattern').addEventListener('click', e => {
+  const b = e.target.closest('#btnApplyMarginSuggestion'); if(!b) return;
+  state.marginPercent = Math.min(90, Math.max(0, +b.dataset.margin));
+  document.getElementById('cycleMargin').value = state.marginPercent;
+  save(); renderMeter(); renderCycle();
+});
 
 /* typical budget: what a normal day has looked like lately */
 function typicalBudget(){
@@ -2117,8 +2171,10 @@ function applyCycleUI(){
   const on = !!state.cycleEnabled;
   document.getElementById('tabCiclo').hidden = !on;
   document.getElementById('cycleLenRow').hidden = !on;
+  document.getElementById('cycleMarginRow').hidden = !on;
   document.getElementById('tabs').classList.toggle('compact', on);
   document.getElementById('cycleLen').value = state.avgCycleLength;
+  document.getElementById('cycleMargin').value = state.marginPercent;
   document.querySelectorAll('#cyclePick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.cycle === 'on') === on));
 }
@@ -2132,6 +2188,12 @@ document.getElementById('cycleLen').addEventListener('change', e => {
   state.avgCycleLength = Number.isFinite(n) ? Math.min(60, Math.max(15, n)) : CYCLE_LEN_DEFAULT;
   e.target.value = state.avgCycleLength;
   save(); renderCycle();
+});
+document.getElementById('cycleMargin').addEventListener('change', e => {
+  const n = parseInt(e.target.value, 10);
+  state.marginPercent = Number.isFinite(n) ? Math.min(90, Math.max(0, n)) : MARGIN_DEFAULT;
+  e.target.value = state.marginPercent;
+  save(); renderMeter(); renderCycle();
 });
 function todayCycleLog(){
   const k = todayKey();
@@ -2191,8 +2253,9 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const overCost = state.settings.overCost;
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
+  const marginPercent = state.marginPercent;
   state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost},
-    cycleEnabled, avgCycleLength, cycleLogs:[] };
+    cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[] };
   ensureFinanzas(); ensureCycle();
   save(); applyCycleUI(); renderAll();
 });
