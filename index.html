@@ -554,6 +554,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
 
+    <div class="card" id="cycleNext"></div>
+
     <div class="card" id="cyclePattern"></div>
   </section>
 
@@ -619,7 +621,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row" id="cycleLenRow" hidden>
-      <div><strong>Duración media del ciclo</strong><p>En días. Solo se usa para estimar la fase.</p></div>
+      <div><strong>Duración media del ciclo</strong><p>En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.</p></div>
       <div class="ocgrid">
         <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" aria-label="Duración media del ciclo en días"></label>
       </div>
@@ -1234,6 +1236,32 @@ function bleedRunFrom(startKey){
   }
   return n;
 }
+/* Duraciones ya medidas: la distancia entre dos inicios consecutivos. Con un
+   solo inicio apuntado todavía no hay ninguna, y manda el ajuste de Ajustes. */
+function cycleLengths(){
+  const s = cycleStarts();
+  const out = [];
+  for(let i = 0; i < s.length - 1; i++) out.push(daysBetween(s[i], s[i+1]));
+  return out;
+}
+/* La media se afina sola: en cuanto hay ciclos medidos se usan los seis
+   últimos en vez del número escrito a mano. */
+function effectiveCycleLength(){
+  const l = cycleLengths().slice(-6);
+  if(!l.length) return state.avgCycleLength;
+  return Math.max(10, Math.round(l.reduce((a,b)=>a+b,0) / l.length));
+}
+/* El último sangrado puede ser de hace meses, así que se avanza ciclo a ciclo
+   hasta caer en hoy o más adelante: la estimación siempre mira hacia delante. */
+function nextCycleStart(){
+  const s = cycleStarts();
+  if(!s.length) return null;
+  const L = Math.max(10, effectiveCycleLength());
+  const today = todayKey();
+  let k = shiftKey(s[s.length-1], L), jumps = 1;
+  while(k < today && jumps < 200){ k = shiftKey(k, L); jumps++; }
+  return { date:k, jumps, length:L };
+}
 /* Función pura. Los límites son aproximados a propósito: la ovulación se marca
    como un entorno de ±2 días alrededor de la mitad del ciclo, no como un día. */
 function cyclePhase(dayNum, avgLen, bleedDays){
@@ -1254,7 +1282,7 @@ function renderCycle(){
   const dayNum = (state.cycleLogs || []).length ? cycleDayOn(k) : null;
   head.textContent = dayNum == null
     ? 'Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.'
-    : `Día ${dayNum} del ciclo — Fase estimada: ${cyclePhase(dayNum, state.avgCycleLength, bleedRunFrom(lastStartOn(k)))}`;
+    : `Día ${dayNum} del ciclo — Fase estimada: ${cyclePhase(dayNum, effectiveCycleLength(), bleedRunFrom(lastStartOn(k)))}`;
 
   const log = cycleLog(k);
   const bleeding = log ? log.bleeding : null;
@@ -1263,7 +1291,56 @@ function renderCycle(){
   document.getElementById('cycIntField').hidden = !bleeding;
   paintScale('cycIntensity', log ? log.bleedingIntensity : null);
   paintScale('cycPain', log ? log.pain : null);
+  renderCyclePrediction();
   renderCyclePattern();
+}
+/* Estimación del siguiente sangrado. Funciona desde el primer ciclo apuntado,
+   aunque sea antiguo, y se va estrechando según hay ciclos medidos: primero
+   con la media escrita a mano, después con la media real y su horquilla.
+   Se dice siempre que es estimación, y nunca se estima cómo va a sentirse. */
+function renderCyclePrediction(){
+  const el = document.getElementById('cycleNext');
+  const starts = cycleStarts();
+  if(!starts.length){
+    el.innerHTML = `<h2>Próximo ciclo</h2>
+      <p>En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.</p>`;
+    return;
+  }
+  const { date, jumps, length } = nextCycleStart();
+  const falta = daysBetween(todayKey(), date);
+  const cuando = falta === 0 ? 'es hoy' : falta === 1 ? 'es mañana' : `faltan ${falta} días`;
+  const lens = cycleLengths().slice(-6);
+  const min = lens.length ? Math.min(...lens) : null;
+  const max = lens.length ? Math.max(...lens) : null;
+
+  let base;
+  if(!lens.length){
+    base = `Estimado con la duración media que tienes puesta en Ajustes (${length} días). Cuando apuntes el siguiente sangrado, la estimación pasará a usar tus ciclos reales.`;
+  }else{
+    const medidos = `${lens.length} ciclo${lens.length === 1 ? '' : 's'} medido${lens.length === 1 ? '' : 's'}`;
+    base = min === max
+      ? `Estimado con ${medidos}: ${min} días.`
+      : `Estimado con ${medidos}: entre ${min} y ${max} días, media ${length}.`;
+  }
+
+  /* Horquilla real: si los ciclos medidos no duran todos lo mismo, la fecha
+     tampoco es un punto. Con datos antiguos el salto multiplica el margen. */
+  let horquilla = '';
+  if(lens.length && min !== max){
+    const desde = shiftKey(starts[starts.length-1], min * jumps);
+    const hasta = shiftKey(starts[starts.length-1], max * jumps);
+    horquilla = `<p>Con tu variación de siempre, caería entre el ${fmtDate(desde)} y el ${fmtDate(hasta)}.</p>`;
+  }
+  const viejo = jumps > 1
+    ? `<p>Tu último sangrado apuntado es del ${fmtDate(starts[starts.length-1])}, así que esta estimación salta ${jumps} ciclos y es más floja. Apuntar el siguiente la endereza.</p>`
+    : '';
+
+  el.innerHTML = `<h2>Próximo ciclo</h2>
+    <p><strong>Estimado: ${fmtDate(date)}</strong> — ${cuando}.</p>
+    ${horquilla}
+    <p>${base}</p>
+    ${viejo}
+    <p>Es una estimación a partir de lo que has apuntado, no una certeza.</p>`;
 }
 /* Descripción de lo ya ocurrido: se promedia, por cada día del ciclo, lo que
    se gastó ese día en los ciclos ya cerrados, y se busca la racha seguida que
