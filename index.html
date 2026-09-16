@@ -862,11 +862,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <dialog id="dlgWhyMargin">
   <div class="sheet">
     <h2>¿Por qué se restan cucharas?</h2>
-    <p class="hint">No es un dato médico ni una previsión exacta. Es un margen de precaución que pones tú, para no planificar el día completo cuando toca sangrado.</p>
-    <p class="hint">Los días de sangrado —los que has apuntado y el día previo al inicio estimado— la app resta un porcentaje de tus cucharas del día antes de repartirlas. Las que se restan se marcan con una gota, para que veas cuáles son.</p>
-    <p class="hint">No desaparecen del todo: si las necesitas, las puedes gastar igual que las demás, pero entonces el aviso de "por debajo de lo asignado" salta antes, como recordatorio de que estabas contando con menos.</p>
-    <p class="hint">Si un día de estos te ves con energía, puedes desactivar el margen solo para ese día desde "¿Con cuántas cucharas te levantas?".</p>
-    <p class="hint" id="whyMarginNow"></p>
+    <p class="hint">Durante la menstruación y los días previos, tu cuerpo y tu mente pueden necesitar más descanso. El dolor, la sensibilidad, la ansiedad o la sobrecarga pueden hacer que tengas menos energía disponible para afrontar el día.</p>
+    <p class="hint">Por eso, la app reserva un pequeño margen de tus cucharas. No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</p>
+    <p class="hint">Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.</p>
+    <p class="hint">Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».</p>
+    <p class="hint">El porcentaje inicial es del 20 %. Puedes modificarlo o dejarlo en 0 desde Ajustes. Con el registro de varios ciclos, podrás conocer mejor tus ritmos y adaptar el margen a tus necesidades.</p>
+    <p class="hint">No tienes que rendir igual todos los días para estar haciéndolo bien.</p>
     <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
   </div>
 </dialog>
@@ -1818,8 +1819,6 @@ const dlgWhyMargin = document.getElementById('dlgWhyMargin');
    escucha desde el párrafo, que sí se queda */
 document.getElementById('spoonBreak').addEventListener('click', e => {
   if(!e.target.closest('#btnWhyMargin')) return;
-  document.getElementById('whyMarginNow').textContent =
-    `Ahora se marca el ${fmtN(state.marginPercent)}% del día. Puedes cambiarlo, o dejarlo en 0, en Ajustes. Con dos ciclos completos apuntados, la sección Ciclo puede proponerte el porcentaje que encaja con lo que ya te ha pasado.`;
   openDialog(dlgWhyMargin);
 });
 document.getElementById('whyMarginClose').addEventListener('click', () => dlgWhyMargin.close());
