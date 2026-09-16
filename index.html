@@ -987,12 +987,12 @@ function renderMeter(){
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
   row.setAttribute('aria-label', left < 0
-    ? `${fmtN(Math.abs(left))} cucharas prestadas de mañana`
+    ? `${fmtN(Math.abs(left))} cucharas por debajo de lo asignado hoy`
     : `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
   const c = document.getElementById('spoonCount');
   c.className = 'count' + (left < 0 ? ' overdrawn' : '');
   c.innerHTML = left < 0
-    ? `${fmtN(Math.abs(left))} prestadas <small>de mañana</small>`
+    ? `${fmtN(Math.abs(left))} <small>por debajo de lo asignado hoy</small>`
     : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
   document.getElementById('spoonBreak').textContent = (gasto || recarga)
     ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}`
@@ -1002,7 +1002,7 @@ function renderMeter(){
   const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
   const notice = document.getElementById('spoonNotice');
   let msg = '';
-  if(left < 0) msg = 'Estás por debajo de cero: lo de más sale de las cucharas de mañana.';
+  if(left < 0) msg = 'Estás por debajo de cero: hoy has gastado más de lo que asignaste.';
   else if(budget > 0 && planned > budget) msg = `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(budget)}.`;
   notice.textContent = msg;
   notice.hidden = !msg;
