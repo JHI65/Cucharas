@@ -515,6 +515,38 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="card" id="patterns"></div>
   </section>
 
+  <!-- ===== FINANZAS ===== -->
+  <section class="screen" id="s-fin">
+    <header class="top">
+      <h1 class="title">Finanzas</h1>
+    </header>
+    <div class="chips" id="finTabs" role="group" aria-label="Vista de finanzas">
+      <button class="chip" data-fintab="gastos" aria-pressed="true">Gastos</button>
+      <button class="chip" data-fintab="historial" aria-pressed="false">Historial</button>
+    </div>
+
+    <div id="finGastos">
+      <div class="sectionhead"><h2>Gastos fijos</h2></div>
+      <div id="finFijosList"></div>
+      <button class="add" id="btnAddFijo">Añadir gasto fijo</button>
+
+      <div class="sectionhead"><h2>Gastos variables</h2></div>
+      <div id="finVariablesList"></div>
+      <button class="add" id="btnAddVariable">Añadir gasto variable</button>
+
+      <div class="card" id="finTotales">
+        <h2>Totales</h2>
+        <p>Total gastos fijos: <strong id="finTotalFijos"></strong></p>
+        <p>Total gastos variables: <strong id="finTotalVariables"></strong></p>
+        <p>Total del mes: <strong id="finTotalMes"></strong></p>
+      </div>
+    </div>
+
+    <div id="finHistorial" hidden>
+      <div id="finHistList"></div>
+    </div>
+  </section>
+
   <!-- ===== AJUSTES ===== -->
   <section class="screen" id="s-set">
     <header class="top">
@@ -567,6 +599,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <svg viewBox="0 0 20 40" fill="currentColor" style="width:11px;height:21px"><use href="#spoon"/></svg>Cucharas</button>
   <button data-go="cal">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Calendario</button>
+  <button data-go="fin">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">€</text></svg>Finanzas</button>
   <button data-go="set">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>Ajustes</button>
 </nav>
@@ -707,6 +741,46 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<!-- ===== Gasto fijo/variable ===== -->
+<dialog id="dlgGasto">
+  <div class="sheet">
+    <h2 id="gTitle">Gasto</h2>
+    <div class="field">
+      <label for="gName">Nombre</label>
+      <input type="text" id="gName" placeholder="Alquiler, luz, gimnasio…">
+    </div>
+    <div class="field">
+      <label for="gImporte">Importe (€)</label>
+      <input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal">
+    </div>
+    <div class="field" id="gScopeField" hidden>
+      <label>¿Cómo aplicamos el cambio?</label>
+      <div class="chips" id="gScope">
+        <button class="chip" data-scope="siempre" aria-pressed="true">Aplicar desde ahora en adelante</button>
+        <button class="chip" data-scope="mes" aria-pressed="false">Solo este mes</button>
+      </div>
+    </div>
+    <div class="bigrow">
+      <button class="warn" id="gDelete">Borrar</button>
+      <button class="primary" id="gSave">Guardar</button>
+    </div>
+    <div class="bigrow"><button id="gCancel">Cancelar</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Detalle de mes cerrado ===== -->
+<dialog id="dlgHist">
+  <div class="sheet">
+    <h2 id="hTitle"></h2>
+    <p class="sub" id="hSub"></p>
+    <p class="libsec">Gastos fijos</p>
+    <div id="hFijos"></div>
+    <p class="libsec">Gastos variables</p>
+    <div id="hVariables"></div>
+    <div class="bigrow"><button id="hClose">Cerrar</button></div>
+  </div>
+</dialog>
+
 <!-- ===== Detalle de día ===== -->
 <dialog id="dlgDay">
   <div class="sheet">
@@ -750,7 +824,8 @@ const SEED = [
   {name:'Descanso sensorial', est:-1, samples:[]}
 ];
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} } };
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} },
+  finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null } };
 let currentTab = 'hoy';
 const collapsedTasks = new Set();
 
@@ -767,6 +842,12 @@ const fmtDate = k => {
   return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
 };
 const uid = () => Math.random().toString(36).slice(2,9);
+const monthKey = (d=new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+const nextMonthKey = k => {
+  let [y,m] = k.split('-').map(Number);
+  m++; if(m > 12){ m = 1; y++; }
+  return `${y}-${String(m).padStart(2,'0')}`;
+};
 const day = (k=todayKey()) => {
   if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'', extras:[] };
   return state.days[k];
@@ -792,6 +873,7 @@ function recoveryStats(name){
   };
 }
 const fmtN = n => Number.isInteger(n) ? String(n) : String(Math.round(n*10)/10).replace('.', ',');
+const fmtMoney = n => `${String(Math.round((n||0)*100)/100).replace('.', ',')} €`;
 function libItem(name){
   return state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
 }
@@ -960,6 +1042,88 @@ function renderLib(){
     (recargan.length ? `<p class="libsec">Recargan cucharas</p><div class="group">${recargan.map(row).join('')}</div>` : '');
 }
 
+/* ---------- finanzas ---------- */
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function ensureFinanzas(){
+  if(!state.finanzas) state.finanzas = { gastosFijos:[], gastosVariables:[], historial:[], mesActual:null };
+  if(!state.finanzas.mesActual) state.finanzas.mesActual = monthKey();
+}
+/* Al cambiar de mes, los fijos (con su importe vigente ese mes) y los
+   variables se archivan en el historial antes de vaciar los variables y
+   revertir los "solo este mes". Si la app ha estado cerrada varios meses,
+   se recorre uno a uno: los fijos no han cambiado mientras tanto y los
+   variables de los meses saltados quedan vacíos, que es lo correcto. */
+function checkMonthRollover(){
+  ensureFinanzas();
+  const f = state.finanzas;
+  const nowKey = monthKey();
+  while(f.mesActual !== nowKey){
+    const fijosSnapshot = f.gastosFijos.map(g => ({ nombre:g.nombre, importe: g.overrideMes ?? g.importe }));
+    const variablesSnapshot = f.gastosVariables.map(g => ({ nombre:g.nombre, importe:g.importe }));
+    const totalFijos = fijosSnapshot.reduce((a,g)=>a+g.importe,0);
+    const totalVariables = variablesSnapshot.reduce((a,g)=>a+g.importe,0);
+    const [y,m] = f.mesActual.split('-').map(Number);
+    f.historial.push({
+      id:uid(), year:y, month:m,
+      fijos:fijosSnapshot, variables:variablesSnapshot,
+      totalFijos, totalVariables, total: totalFijos + totalVariables
+    });
+    f.gastosFijos.forEach(g => { g.overrideMes = null; });
+    f.gastosVariables = [];
+    f.mesActual = nextMonthKey(f.mesActual);
+  }
+}
+function finRow(g, tipo){
+  const importe = tipo === 'fijo' ? (g.overrideMes ?? g.importe) : g.importe;
+  const note = (tipo === 'fijo' && g.overrideMes != null) ? 'Solo este mes' : '';
+  return `<button class="lib" data-fin="${g.id}">
+      <span><span class="lib-name">${esc(g.nombre)}</span>${note ? `<br><span class="lib-note">${note}</span>` : ''}</span>
+      <span class="cost">${fmtMoney(importe)}</span>
+    </button>`;
+}
+function renderFin(){
+  checkMonthRollover();
+  const f = state.finanzas;
+  document.getElementById('finFijosList').innerHTML = f.gastosFijos.length
+    ? `<div class="group">${f.gastosFijos.map(g => finRow(g,'fijo')).join('')}</div>`
+    : '<div class="empty">Todavía no hay gastos fijos.</div>';
+  document.getElementById('finVariablesList').innerHTML = f.gastosVariables.length
+    ? `<div class="group">${f.gastosVariables.map(g => finRow(g,'variable')).join('')}</div>`
+    : '<div class="empty">Todavía no hay gastos variables este mes.</div>';
+  const totalFijos = f.gastosFijos.reduce((a,g)=>a+(g.overrideMes ?? g.importe),0);
+  const totalVariables = f.gastosVariables.reduce((a,g)=>a+g.importe,0);
+  document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
+  document.getElementById('finTotalVariables').textContent = fmtMoney(totalVariables);
+  document.getElementById('finTotalMes').textContent = fmtMoney(totalFijos + totalVariables);
+  renderFinHistorial();
+}
+function renderFinHistorial(){
+  const el = document.getElementById('finHistList');
+  const hist = state.finanzas.historial;
+  el.innerHTML = hist.length
+    ? `<div class="group">${[...hist].reverse().map(h => `<button class="lib" data-hist="${h.id}">
+        <span><span class="lib-name">${MESES[h.month-1]} de ${h.year}</span><br>
+          <span class="lib-note">Fijos ${fmtMoney(h.totalFijos)} · Variables ${fmtMoney(h.totalVariables)}</span></span>
+        <span class="cost">${fmtMoney(h.total)}</span>
+      </button>`).join('')}</div>`
+    : '<div class="empty">Todavía no hay meses cerrados.</div>';
+}
+function histItemRow(g){
+  return `<div class="lib"><span class="lib-name">${esc(g.nombre)}</span><span class="cost">${fmtMoney(g.importe)}</span></div>`;
+}
+function openHistDetail(h){
+  document.getElementById('hTitle').textContent = `${MESES[h.month-1]} de ${h.year}`;
+  document.getElementById('hSub').textContent =
+    `Total ${fmtMoney(h.total)} · fijos ${fmtMoney(h.totalFijos)} · variables ${fmtMoney(h.totalVariables)}`;
+  document.getElementById('hFijos').innerHTML = h.fijos.length
+    ? `<div class="group">${h.fijos.map(histItemRow).join('')}</div>`
+    : '<div class="empty">Sin gastos fijos ese mes.</div>';
+  document.getElementById('hVariables').innerHTML = h.variables.length
+    ? `<div class="group">${h.variables.map(histItemRow).join('')}</div>`
+    : '<div class="empty">Sin gastos variables ese mes.</div>';
+  openDialog(dlgHist);
+}
+
 /* typical budget: what a normal day has looked like lately */
 function typicalBudget(){
   const b = Object.keys(state.days).sort().slice(-7)
@@ -1074,7 +1238,7 @@ function renderOverCost(){
     `<label>${v}<input type="number" step="1" inputmode="numeric" data-oc="${v}" value="${state.settings.overCost[v]}"></label>`
   ).join('');
 }
-function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost();
+function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin();
   document.getElementById('maxOut').textContent = state.settings.max;
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -1392,6 +1556,84 @@ document.getElementById('lSave').addEventListener('click', () => {
   save(); dlgLib.close(); renderAll();
 });
 
+/* ---------- finanzas: editor de gasto ---------- */
+const dlgGasto = document.getElementById('dlgGasto');
+const dlgHist = document.getElementById('dlgHist');
+const gName = document.getElementById('gName');
+const gImporte = document.getElementById('gImporte');
+let gType = 'fijo', gEditing = null, gScope = 'siempre';
+function gScopeSync(){
+  document.querySelectorAll('#gScope .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.scope === gScope));
+}
+document.getElementById('gScope').addEventListener('click', e => {
+  const b = e.target.closest('[data-scope]'); if(!b) return;
+  gScope = b.dataset.scope; gScopeSync();
+});
+function openGasto(tipo, item){
+  gType = tipo; gEditing = item; gScope = 'siempre';
+  gName.value = item ? item.nombre : '';
+  gImporte.value = item ? (tipo === 'fijo' ? (item.overrideMes ?? item.importe) : item.importe) : '';
+  document.getElementById('gTitle').textContent = item
+    ? `Editar gasto ${tipo === 'fijo' ? 'fijo' : 'variable'}`
+    : `Añadir gasto ${tipo === 'fijo' ? 'fijo' : 'variable'}`;
+  document.getElementById('gScopeField').hidden = !(tipo === 'fijo' && item);
+  gScopeSync();
+  document.getElementById('gDelete').hidden = !item;
+  openDialog(dlgGasto);
+}
+document.getElementById('btnAddFijo').addEventListener('click', () => openGasto('fijo', null));
+document.getElementById('btnAddVariable').addEventListener('click', () => openGasto('variable', null));
+document.getElementById('finFijosList').addEventListener('click', e => {
+  const b = e.target.closest('[data-fin]'); if(!b) return;
+  openGasto('fijo', state.finanzas.gastosFijos.find(g => g.id === b.dataset.fin));
+});
+document.getElementById('finVariablesList').addEventListener('click', e => {
+  const b = e.target.closest('[data-fin]'); if(!b) return;
+  openGasto('variable', state.finanzas.gastosVariables.find(g => g.id === b.dataset.fin));
+});
+document.getElementById('gCancel').addEventListener('click', () => dlgGasto.close());
+document.getElementById('gSave').addEventListener('click', () => {
+  const nombre = gName.value.trim(); if(!nombre){ gName.focus(); return; }
+  const raw = parseFloat(gImporte.value);
+  const importe = Number.isFinite(raw) ? Math.max(0, Math.round(raw*100)/100) : 0;
+  const f = state.finanzas;
+  if(gType === 'fijo'){
+    if(gEditing){
+      gEditing.nombre = nombre;
+      if(gScope === 'mes') gEditing.overrideMes = importe;
+      else { gEditing.importe = importe; gEditing.overrideMes = null; }
+    }else{
+      f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null });
+    }
+  }else{
+    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; }
+    else f.gastosVariables.push({ id:uid(), nombre, importe });
+  }
+  save(); dlgGasto.close(); renderFin();
+});
+document.getElementById('gDelete').addEventListener('click', () => {
+  if(!gEditing) return;
+  if(!confirm(`¿Borrar "${gEditing.nombre}"?`)) return;
+  const f = state.finanzas;
+  if(gType === 'fijo') f.gastosFijos = f.gastosFijos.filter(g => g.id !== gEditing.id);
+  else f.gastosVariables = f.gastosVariables.filter(g => g.id !== gEditing.id);
+  save(); dlgGasto.close(); renderFin();
+});
+document.getElementById('finTabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-fintab]'); if(!b) return;
+  document.querySelectorAll('#finTabs .chip').forEach(c => c.setAttribute('aria-pressed', c === b));
+  const showGastos = b.dataset.fintab === 'gastos';
+  document.getElementById('finGastos').hidden = !showGastos;
+  document.getElementById('finHistorial').hidden = showGastos;
+});
+document.getElementById('finHistList').addEventListener('click', e => {
+  const b = e.target.closest('[data-hist]'); if(!b) return;
+  const h = state.finanzas.historial.find(x => x.id === b.dataset.hist);
+  if(h) openHistDetail(h);
+});
+document.getElementById('hClose').addEventListener('click', () => dlgHist.close());
+
 /* ---------- check-out ---------- */
 const dlgCheckout = document.getElementById('dlgCheckout');
 let coEnergy = 3, coSensory = 3;
@@ -1586,6 +1828,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     state = parsed;
     if(!state.settings) state.settings = { max:12 };
     if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
+    ensureFinanzas();
     await save(); applyContrast(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
 });
@@ -1610,6 +1853,8 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgCheckout', 'coCancel'],
   ['dlgTpl', 'tplClose'],
   ['dlgDay', 'dClose'],
+  ['dlgGasto', 'gCancel'],
+  ['dlgHist', 'hClose'],
 ].forEach(([dlgId, btnId]) => {
   document.getElementById(dlgId).addEventListener('click', e => {
     if(e.target.id === dlgId) document.getElementById(btnId).click();
@@ -1625,6 +1870,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(!state.settings) state.settings = { max:12 };
   if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
   if(!state.templates) state.templates = [];
+  ensureFinanzas();
   applyContrast();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   renderAll();
