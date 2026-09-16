@@ -988,15 +988,16 @@ function spoonRowHTML(left, total){
 }
 function renderMeter(){
   const d = day();
-  const rawBudget = d.budget ?? 0;
+  const budget = d.budget ?? 0;
   const precaution = d.budget != null ? precautionReason(todayKey()) : null;
-  const budget = precaution
-    ? Math.max(1, Math.round(rawBudget * (1 - state.marginPercent/100)))
-    : rawBudget;
+  const effective = precaution
+    ? Math.max(1, Math.round(budget * (1 - state.marginPercent/100)))
+    : budget;
+  const marginAmount = budget - effective;
   const marginNote = document.getElementById('cycleMarginNote');
   if(precaution){
     marginNote.hidden = false;
-    marginNote.textContent = `${fmtN(rawBudget)} cucharas → ${fmtN(budget)} 🩸 (margen de precaución del ciclo: −${fmtN(state.marginPercent)}%)`;
+    marginNote.textContent = `${fmtN(budget)} cucharas → ${fmtN(effective)} 🩸 (margen de precaución del ciclo: −${fmtN(state.marginPercent)}%)`;
   }else{
     marginNote.hidden = true;
     marginNote.textContent = '';
@@ -1004,7 +1005,7 @@ function renderMeter(){
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
   const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
-  const left = budget - gasto + recarga;
+  const left = budget - gasto + recarga - marginAmount;
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
@@ -1016,8 +1017,8 @@ function renderMeter(){
   c.innerHTML = left < 0
     ? `${fmtN(Math.abs(left))} <small>por debajo de lo asignado hoy</small>`
     : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
-  document.getElementById('spoonBreak').textContent = (gasto || recarga)
-    ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}`
+  document.getElementById('spoonBreak').textContent = (gasto || recarga || marginAmount)
+    ? `Gastadas ${fmtN(gasto)} · recuperadas ${fmtN(recarga)}${marginAmount ? ` · reservadas ${fmtN(marginAmount)} por el margen del ciclo` : ''}`
     : '';
 
   /* aviso de día cargado: dice el hecho, no juzga */
@@ -1025,7 +1026,7 @@ function renderMeter(){
   const notice = document.getElementById('spoonNotice');
   let msg = '';
   if(left < 0) msg = 'Estás por debajo de cero: hoy has gastado más de lo que asignaste.';
-  else if(budget > 0 && planned > budget) msg = `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(budget)}.`;
+  else if(effective > 0 && planned > effective) msg = `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(effective)}.`;
   notice.textContent = msg;
   notice.hidden = !msg;
 
