@@ -857,10 +857,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <!-- ===== Detalle de día ===== -->
 <dialog id="dlgWhyMargin">
   <div class="sheet">
-    <h2>¿Qué es la gota en las cucharas?</h2>
-    <p class="hint">No es un dato médico ni una previsión de cómo te vas a encontrar. Es un aviso que pones tú, no un descuento.</p>
-    <p class="hint">Los días de sangrado —los que has apuntado y el día previo al inicio estimado— la app marca con una gota las últimas cucharas disponibles del día, las más cercanas a agotarse. Es tu colchón: si el día viene peor de lo normal, ahí tienes margen antes de quedarte a cero.</p>
-    <p class="hint">Las cucharas con gota cuentan igual que las demás: se pueden usar sin más, no hace falta guardarlas.</p>
+    <h2>¿Por qué se restan cucharas?</h2>
+    <p class="hint">No es un dato médico ni una previsión exacta. Es un margen de precaución que pones tú, para no planificar el día completo cuando toca sangrado.</p>
+    <p class="hint">Los días de sangrado —los que has apuntado y el día previo al inicio estimado— la app resta un porcentaje de tus cucharas del día antes de repartirlas. Las que se restan se marcan con una gota, para que veas cuáles son.</p>
+    <p class="hint">No desaparecen del todo: si las necesitas, las puedes gastar igual que las demás, pero entonces el aviso de "por debajo de lo asignado" salta antes, como recordatorio de que estabas contando con menos.</p>
     <p class="hint" id="whyMarginNow"></p>
     <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
   </div>
@@ -1001,18 +1001,17 @@ function spoonSVG(halves, margin){
   return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}</svg>`;
 }
 /* en grupos de cinco: a partir de ocho cucharas, una fila continua ya no se cuenta de un vistazo.
-   El margen del ciclo no resta nada: solo marca con una gotita las últimas
-   cucharas disponibles, las más cercanas a agotarse, como aviso de que ahí
-   empieza el colchón. Se pueden gastar igual que cualquier otra. */
+   Las reservadas por el margen del ciclo son las vacías más próximas a las
+   disponibles: se marcan con una gotita superpuesta en vez de contarse aparte. */
 function spoonRowHTML(left, total, marginAmount){
   const slots = Math.ceil(Math.max(total, 0));
   const leftHalves = Math.round(Math.max(left, 0) * 2);
-  const filledSlots = Math.ceil(Math.max(left, 0));
-  const marginFrom = filledSlots - Math.min(Math.round(marginAmount || 0), filledSlots);
+  let marginLeft = Math.round(marginAmount || 0);
   let html = '', group = '';
   for(let i = 0; i < slots; i++){
     const halves = Math.min(2, Math.max(0, leftHalves - i * 2));
-    const margin = halves > 0 && i >= marginFrom;
+    let margin = false;
+    if(halves === 0 && marginLeft > 0){ margin = true; marginLeft--; }
     group += spoonSVG(halves, margin);
     if((i + 1) % 5 === 0 || i === slots - 1){ html += `<span class="sgroup">${group}</span>`; group = ''; }
   }
@@ -1022,11 +1021,14 @@ function renderMeter(){
   const d = day();
   const budget = d.budget ?? 0;
   const precaution = d.budget != null ? precautionReason(todayKey()) : null;
-  const marginAmount = precaution ? Math.round(budget * state.marginPercent/100) : 0;
+  const effective = precaution
+    ? Math.max(1, Math.round(budget * (1 - state.marginPercent/100)))
+    : budget;
+  const marginAmount = budget - effective;
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
   const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
-  const left = budget - gasto + recarga;
+  const left = budget - gasto + recarga - marginAmount;
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
@@ -1039,13 +1041,12 @@ function renderMeter(){
     ? `${fmtN(Math.abs(left))} <small>por debajo de lo asignado hoy</small>`
     : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
   /* una sola línea con todo el desglose: gasto, recarga si la hay, y lo
-     disponible. El margen del ciclo no resta, solo se señala con una gota:
-     de las disponibles, cuántas son el colchón, no un descuento aparte. */
+     disponible con el margen del ciclo señalado con una gota, no en prosa */
   const breakParts = [`${fmtN(gasto)} gastadas`];
   if(recarga) breakParts.push(`${fmtN(recarga)} recuperadas`);
   const dropIcon = marginAmount > 0
     ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg>' +
-      `${fmtN(marginAmount)} de margen`
+      `−${fmtN(marginAmount)} cucharas`
     : '';
   breakParts.push(`${fmtN(Math.max(0, left))} disponibles${dropIcon}`);
   document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ') +
@@ -1055,7 +1056,7 @@ function renderMeter(){
      por debajo, así que aquí solo se avisa si lo apuntado no cabe. */
   const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
   const notice = document.getElementById('spoonNotice');
-  const msg = (budget > 0 && planned > budget) ? `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(budget)}.` : '';
+  const msg = (effective > 0 && planned > effective) ? `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(effective)}.` : '';
   notice.textContent = msg;
   notice.hidden = !msg;
 
