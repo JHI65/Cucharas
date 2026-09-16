@@ -521,24 +521,26 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <h1 class="title">Finanzas</h1>
     </header>
     <div class="chips" id="finTabs" role="group" aria-label="Vista de finanzas">
-      <button class="chip" data-fintab="fijos" aria-pressed="true">Gastos fijos</button>
-      <button class="chip" data-fintab="variables" aria-pressed="false">Gastos variables</button>
+      <button class="chip" data-fintab="fijos" aria-pressed="false">Gastos fijos</button>
+      <button class="chip" data-fintab="variables" aria-pressed="true">Gastos variables</button>
       <button class="chip" data-fintab="historial" aria-pressed="false">Historial</button>
     </div>
 
-    <div id="finFijos">
+    <div id="finFijos" hidden>
       <div id="finFijosList"></div>
       <button class="add" id="btnAddFijo">Añadir gasto fijo</button>
       <div class="card">
         <p>Total gastos fijos: <strong id="finTotalFijos"></strong></p>
+        <p>Total del mes (fijos + variables): <strong id="finTotalMesFijos"></strong></p>
       </div>
     </div>
 
-    <div id="finVariables" hidden>
+    <div id="finVariables">
       <div id="finVariablesList"></div>
       <button class="add" id="btnAddVariable">Añadir gasto variable</button>
       <div class="card">
         <p>Total gastos variables: <strong id="finTotalVariables"></strong></p>
+        <p>Total del mes (fijos + variables): <strong id="finTotalMesVariables"></strong></p>
       </div>
     </div>
 
@@ -1094,7 +1096,16 @@ function renderFin(){
   const totalVariables = f.gastosVariables.reduce((a,g)=>a+g.importe,0);
   document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
   document.getElementById('finTotalVariables').textContent = fmtMoney(totalVariables);
+  document.getElementById('finTotalMesFijos').textContent = fmtMoney(totalFijos + totalVariables);
+  document.getElementById('finTotalMesVariables').textContent = fmtMoney(totalFijos + totalVariables);
   renderFinHistorial();
+}
+function openFinTab(view){
+  document.querySelectorAll('#finTabs .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.fintab === view));
+  document.getElementById('finFijos').hidden = view !== 'fijos';
+  document.getElementById('finVariables').hidden = view !== 'variables';
+  document.getElementById('finHistorial').hidden = view !== 'historial';
 }
 function renderFinHistorial(){
   const el = document.getElementById('finHistList');
@@ -1250,6 +1261,7 @@ document.getElementById('tabs').addEventListener('click', e => {
   document.getElementById('s-' + currentTab).classList.add('on');
   document.querySelectorAll('#tabs button').forEach(x => x.removeAttribute('aria-current'));
   b.setAttribute('aria-current','page');
+  if(currentTab === 'fin') openFinTab('variables');
   window.scrollTo(0,0);
   renderAll();
 });
@@ -1621,11 +1633,7 @@ document.getElementById('gDelete').addEventListener('click', () => {
 });
 document.getElementById('finTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-fintab]'); if(!b) return;
-  document.querySelectorAll('#finTabs .chip').forEach(c => c.setAttribute('aria-pressed', c === b));
-  const view = b.dataset.fintab;
-  document.getElementById('finFijos').hidden = view !== 'fijos';
-  document.getElementById('finVariables').hidden = view !== 'variables';
-  document.getElementById('finHistorial').hidden = view !== 'historial';
+  openFinTab(b.dataset.fintab);
 });
 document.getElementById('finHistList').addEventListener('click', e => {
   const b = e.target.closest('[data-hist]'); if(!b) return;
