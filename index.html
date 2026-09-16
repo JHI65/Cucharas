@@ -260,14 +260,12 @@ textarea{
 .load{display:flex;justify-content:center;align-items:flex-end;gap:3px;height:11px;margin-top:6px}
 .lm{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
 .cell.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
-/* Sangrado: la misma marca que ya usa el calendario —el punto .lm— en Ciruela,
-   que es el color que la rejilla ya usa para el día de hoy. No es un símbolo
-   nuevo ni una fila nueva: es un punto más en la misma tira de marcas. Se
-   redeclara la forma para que un día cargado no lo convierta en raya alta. */
-.cell .lm.bleed{width:5px;height:5px;border-radius:50%;background:var(--accent)}
-/* Sangrado estimado: el mismo punto, hueco en vez de relleno. Lo apuntado se
-   ve lleno, lo estimado se ve vacío; no hay color ni forma nueva. */
-.cell .lm.bleed.est{background:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
+/* Sangrado: el punto entre las cucharas resultó poco visible y se confundía
+   con la tira de tareas. Se marca en su lugar toda la celda, en Ciruela —el
+   mismo color que ya usa el borde de "hoy"—, para que se distinga de un
+   vistazo. Estimado usa el mismo tinte pero solo de borde, a rayas. */
+.cell.bleed{background:color-mix(in srgb, var(--accent) 22%, var(--surface));border-color:var(--accent)}
+.cell.bleed-est{border:1.5px dashed var(--accent)}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
@@ -1524,12 +1522,12 @@ function renderCal(){
     const heavy = planned > typical;
     const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
     const bleedEst = !bleed && est.has(k);
-    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)))
-      + (bleed ? '<i class="lm bleed"></i>' : '')
-      + (bleedEst ? '<i class="lm bleed est"></i>' : '');
+    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)));
     const cls = [
       k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
-      heavy ? 'heavy' : ''
+      heavy ? 'heavy' : '',
+      bleed ? 'bleed' : '',
+      bleedEst ? 'bleed-est' : ''
     ].join(' ');
     const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}${bleed ? ', con sangrado' : ''}${bleedEst ? ', sangrado estimado' : ''}`;
     html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
@@ -1539,8 +1537,8 @@ function renderCal(){
   leg.hidden = !state.cycleEnabled;
   leg.textContent = !state.cycleEnabled ? ''
     : est.size
-      ? 'El punto en Ciruela es un día de sangrado apuntado. El punto hueco es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.'
-      : 'El punto en Ciruela es un día de sangrado apuntado.';
+      ? 'Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.'
+      : 'Los días teñidos en Ciruela son sangrado apuntado.';
 }
 function renderOverCost(){
   const el = document.getElementById('overCostGrid');
