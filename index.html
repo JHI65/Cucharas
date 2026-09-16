@@ -265,6 +265,9 @@ textarea{
    nuevo ni una fila nueva: es un punto más en la misma tira de marcas. Se
    redeclara la forma para que un día cargado no lo convierta en raya alta. */
 .cell .lm.bleed{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+/* Sangrado estimado: el mismo punto, hueco en vez de relleno. Lo apuntado se
+   ve lleno, lo estimado se ve vacío; no hay color ni forma nueva. */
+.cell .lm.bleed.est{background:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
@@ -523,6 +526,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
     <div class="grid" id="calGrid"></div>
     <p class="legend">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
+    <p class="legend" id="calLegendCiclo" hidden></p>
     <div class="card" id="patterns"></div>
   </section>
 
@@ -1262,6 +1266,33 @@ function nextCycleStart(){
   while(k < today && jumps < 200){ k = shiftKey(k, L); jumps++; }
   return { date:k, jumps, length:L };
 }
+/* Cuánto suele durar el sangrado: la media de las tandas ya apuntadas. Si no
+   hay ninguna tanda apuntada no se estima nada en el calendario. */
+function typicalBleedDays(){
+  const runs = cycleStarts().map(bleedRunFrom).filter(n => n > 0);
+  if(!runs.length) return 0;
+  return Math.max(1, Math.round(runs.reduce((a,b) => a+b, 0) / runs.length));
+}
+/* Días de sangrado estimados que caen entre dos fechas. Se parte de la próxima
+   estimación y se avanza ciclo a ciclo, así el calendario también los enseña
+   si se navega a meses siguientes. Nunca se estima sobre hoy ni sobre el
+   pasado: ahí manda lo apuntado. */
+function estBleedDays(fromKey, toKey){
+  const out = new Set();
+  if(!state.cycleEnabled) return out;
+  const nx = nextCycleStart(), run = typicalBleedDays();
+  if(!nx || !run) return out;
+  const today = todayKey();
+  let s = nx.date, guard = 0;
+  while(s <= toKey && guard++ < 60){
+    for(let i = 0; i < run; i++){
+      const k = shiftKey(s, i);
+      if(k > today && k >= fromKey && k <= toKey) out.add(k);
+    }
+    s = shiftKey(s, nx.length);
+  }
+  return out;
+}
 /* Función pura. Los límites son aproximados a propósito: la ovulación se marca
    como un entorno de ±2 días alrededor de la mitad del ciclo, no como un día. */
 function cyclePhase(dayNum, avgLen, bleedDays){
@@ -1483,23 +1514,33 @@ function renderCal(){
   const offset = (first.getDay() + 6) % 7;            // semana empieza en lunes
   const total = new Date(y, m+1, 0).getDate();
   const typical = typicalBudget();
+  const mk = n => `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
+  const est = estBleedDays(mk(1), mk(total));
   let html = '';
   for(let i=0;i<offset;i++) html += '<div class="cell blank"></div>';
   for(let n=1;n<=total;n++){
-    const k = `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
+    const k = mk(n);
     const { planned } = dayLoad(k);
     const heavy = planned > typical;
     const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
+    const bleedEst = !bleed && est.has(k);
     const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)))
-      + (bleed ? '<i class="lm bleed"></i>' : '');
+      + (bleed ? '<i class="lm bleed"></i>' : '')
+      + (bleedEst ? '<i class="lm bleed est"></i>' : '');
     const cls = [
       k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
       heavy ? 'heavy' : ''
     ].join(' ');
-    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}${bleed ? ', con sangrado' : ''}`;
+    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}${bleed ? ', con sangrado' : ''}${bleedEst ? ', sangrado estimado' : ''}`;
     html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
   }
   document.getElementById('calGrid').innerHTML = html;
+  const leg = document.getElementById('calLegendCiclo');
+  leg.hidden = !state.cycleEnabled;
+  leg.textContent = !state.cycleEnabled ? ''
+    : est.size
+      ? 'El punto en Ciruela es un día de sangrado apuntado. El punto hueco es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.'
+      : 'El punto en Ciruela es un día de sangrado apuntado.';
 }
 function renderOverCost(){
   const el = document.getElementById('overCostGrid');
