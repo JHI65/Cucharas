@@ -1023,8 +1023,8 @@ function renderMeter(){
   const breakParts = [`${fmtN(gasto)} gastadas`];
   if(recarga) breakParts.push(`${fmtN(recarga)} recuperadas`);
   const dropIcon = precaution
-    ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg> ' +
-      `−${fmtN(state.marginPercent)}%`
+    ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg>' +
+      `−${fmtN(marginAmount)} cucharas`
     : '';
   breakParts.push(`${fmtN(Math.max(0, left))} disponibles${dropIcon}`);
   document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ');
