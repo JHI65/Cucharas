@@ -744,7 +744,14 @@ let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCos
 let currentTab = 'hoy';
 const collapsedTasks = new Set();
 
-const todayKey = () => new Date().toISOString().slice(0,10);
+// Fecha local, no UTC. toISOString() convierte a UTC: en horario de
+// España el día cambiaba a las 01:00 o 02:00 de la madrugada, no a
+// medianoche, así que a esa hora ya se apuntaba en el día siguiente.
+const localDateKey = d => {
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+};
+const todayKey = () => localDateKey(new Date());
 const fmtDate = k => {
   const d = new Date(k+'T12:00:00');
   return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
@@ -1178,7 +1185,7 @@ function expandDates(startKey){
     const hit = repMode === 'daily'
       || (repMode === 'weekdays' && w < 5)
       || (repMode === 'custom' && repDays.has(w));
-    if(hit) out.push(d.toISOString().slice(0,10));
+    if(hit) out.push(localDateKey(d));
   }
   return out.length ? out : [startKey];
 }
