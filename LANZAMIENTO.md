@@ -54,12 +54,13 @@ Además, ni Miserandino ni Toudal/Attwood aparecían en el código: usar vocabul
 comunidad en un producto público sin dar crédito es justo lo que destruye la confianza
 (N10, editorial).
 
-Arreglo: una guía de 7 pasos (`#tour`, `TOUR_STEPS` en `index.html`) donde cada paso
+Arreglo: una guía de 10 pasos (`#tour`, `TOUR_STEPS` en `index.html`) donde cada paso
 señala el elemento del que habla con un foco y un bocadillo anclado — así queda claro no
-solo qué es una cuchara sino dónde está cada cosa. El paso 1 no tiene ancla (explica el
-concepto y da el crédito pedido); los demás señalan el medidor, "He tenido un pico
-sensorial ahora", "Añadir tarea", "Check-out de hoy" y las pestañas de Calendario y
-Ajustes. Una idea por paso, en lenguaje literal, sin animación ni desplazamiento suave:
+solo qué es una cuchara sino dónde está cada cosa. Los dos primeros no tienen ancla: qué
+es Spoony y para qué sirve, y después qué es una cuchara, con el crédito pedido. Los ocho
+restantes señalan el medidor, "He tenido un pico sensorial ahora", "Añadir tarea", "Días
+tipo", "Editar cuánto cuesta cada actividad", "Check-out de hoy" y las pestañas de
+Calendario y Ajustes. Una idea por paso, en lenguaje literal, sin animación ni desplazamiento suave:
 el recorrido salta de sitio y solo cuando el elemento no se ve entero. Saltable en
 cualquier paso ("Saltar" siempre visible, Escape también) y recuperable después desde
 Ajustes → Ayuda → "Cómo funciona la app", así saltarla no pierde nada para siempre.
@@ -77,7 +78,7 @@ Texto del primer paso:
 > gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría
 > de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).
 
-Verificado con Chrome headless: primer arranque (7 pasos → check-in), usuario con
+Verificado con Chrome headless: primer arranque (10 pasos → check-in), usuario con
 historial (no la ve), repaso desde Ajustes (vuelve a Hoy, no reabre el check-in) y una
 pasada con `window.onerror` enganchado, sin errores. La atenuación cubre la pantalla
 también en el paso sin ancla, para que el fondo no parezca usable cuando no responde.
