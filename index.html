@@ -166,18 +166,10 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .arow .chip{padding:7px 11px;font-size:14px}
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
-/* Deslizador en vez de cinco botones: el propio .slider ya existe (lo usa el
-   check-in matinal) y su relleno creciente en Rosa Cuchara es la misma señal
-   de "cantidad" sin añadir un componente nuevo. Debajo, una marca y su
-   palabra por cada parada — fijas, no solo en los extremos — para que la
-   parada no haya que adivinarla; el punto reutiliza el mismo lenguaje visual
-   que las marcas de carga del calendario. La lectura para lector de pantalla
-   va en aria-valuetext del propio input, no repetida en el texto visible. */
-.scale-steps{display:flex;margin-top:7px}
-.scale-steps span{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ink-soft);text-align:center}
-.scale-steps span:first-child{align-items:flex-start;text-align:left}
-.scale-steps span:last-child{align-items:flex-end;text-align:right}
-.scale-steps i{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
+.scale{display:flex;gap:7px}
+.scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:17px}
+.scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+.scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
 .card h2,.card h3{margin:0 0 9px;font-size:16px}
 .card p{margin:0 0 7px;color:var(--ink-soft);font-size:14px}
@@ -559,12 +551,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         </div>
       </div>
       <div class="field" id="cycIntField" hidden>
-        <label for="cycIntensity">Intensidad del sangrado</label>
-        <input type="range" class="slider" id="cycIntensity" min="1" max="5" step="1" value="3">
+        <label>Intensidad del sangrado</label>
+        <div class="scale" id="cycIntensity"></div>
+        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
       </div>
       <div class="field" style="margin-bottom:0">
-        <label for="cycPain">Dolor físico</label>
-        <input type="range" class="slider" id="cycPain" min="1" max="5" step="1" value="1">
+        <label>Dolor físico</label>
+        <div class="scale" id="cycPain"></div>
+        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
       </div>
     </div>
 
@@ -809,12 +803,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <h2>Check-out de hoy</h2>
     <p class="sub">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
     <div class="field">
-      <label for="coEnergy">¿Cuánta capacidad te queda ahora?</label>
-      <input type="range" class="slider" id="coEnergy" min="1" max="5" step="1" value="3">
+      <label>¿Cuánta capacidad te queda ahora?</label>
+      <div class="scale" id="coEnergy"></div>
+      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
     </div>
     <div class="field">
-      <label for="coSensory">¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
-      <input type="range" class="slider" id="coSensory" min="1" max="5" step="1" value="3">
+      <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
+      <div class="scale" id="coSensory"></div>
+      <div class="scale-lab"><span>Nada</span><span>Todo llevadero</span></div>
     </div>
     <div class="field">
       <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
@@ -1397,36 +1393,9 @@ function cyclePhase(dayNum, avgLen, bleedDays){
   if(dayNum < ovu) return 'Folicular';
   return 'Lútea';
 }
-/* Etiquetas de magnitud en vez de dígitos: un "1" o un "5" en una escala de
-   autoevaluación se lee como nota escolar (mal/bien), no como posición en un
-   rango. La palabra concreta es igual de literal para la alexitimia y no
-   arrastra ese juicio de valor. El dato interno sigue siendo 1-5. */
-const SCALE_LABELS = {
-  coEnergy: ['Ninguna','Poca','Media','Bastante','De sobra'],
-  coSensory: ['Nada','Poco','Algo','Bastante','Todo'],
-  cycPain: ['Ninguno','Leve','Moderado','Fuerte','Mucho'],
-  cycIntensity: ['Muy leve','Leve','Moderado','Fuerte','Muy fuerte'],
-};
-/* Fila de paradas fija, generada una sola vez: nunca se repite a mano en las
-   cuatro plantillas, así que no puede desincronizarse de SCALE_LABELS. */
-Object.keys(SCALE_LABELS).forEach(id => {
-  const input = document.getElementById(id);
-  const row = document.createElement('div');
-  row.className = 'scale-steps';
-  row.setAttribute('aria-hidden', 'true');
-  row.innerHTML = SCALE_LABELS[id].map(l => `<span><i></i>${l}</span>`).join('');
-  input.after(row);
-});
-function syncScale(id, val){
-  const labels = SCALE_LABELS[id];
-  const input = document.getElementById(id);
-  /* Un slider siempre enseña una posición, así que sin respuesta se apoya en
-     el extremo mínimo en vez de un valor medio — lo menos parecido a haber
-     contestado "moderado" sin querer. */
-  input.value = val ?? 1;
-  /* La palabra ya está fija y visible debajo (fila de paradas); para lector
-     de pantalla se anuncia por aria-valuetext en vez de repetirla en texto. */
-  input.setAttribute('aria-valuetext', val ? labels[val-1] : `${labels[0]} a ${labels[4]}, sin marcar`);
+function paintScale(id, val){
+  document.getElementById(id).innerHTML = [1,2,3,4,5]
+    .map(v => `<button data-v="${v}" aria-pressed="${v === val}">${v}</button>`).join('');
 }
 function renderCycle(){
   if(!state.cycleEnabled) return;
@@ -1442,8 +1411,8 @@ function renderCycle(){
   document.querySelectorAll('#cycBleed .chip').forEach(c =>
     c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
   document.getElementById('cycIntField').hidden = !bleeding;
-  syncScale('cycIntensity', log ? log.bleedingIntensity : null);
-  syncScale('cycPain', log ? log.pain : null);
+  paintScale('cycIntensity', log ? log.bleedingIntensity : null);
+  paintScale('cycPain', log ? log.pain : null);
   renderCyclePrediction();
   renderCyclePattern();
 }
@@ -2124,13 +2093,17 @@ document.getElementById('hClose').addEventListener('click', () => dlgHist.close(
 const dlgCheckout = document.getElementById('dlgCheckout');
 let coEnergy = 3, coSensory = 3;
 function coSync(){
-  syncScale('coEnergy', coEnergy); syncScale('coSensory', coSensory);
+  const paint = (id, val) => {
+    document.getElementById(id).innerHTML = [1,2,3,4,5]
+      .map(v => `<button data-v="${v}" aria-pressed="${v===val}">${v}</button>`).join('');
+  };
+  paint('coEnergy', coEnergy); paint('coSensory', coSensory);
 }
-document.getElementById('coEnergy').addEventListener('input', e => {
-  coEnergy = +e.target.value; coSync();
+document.getElementById('coEnergy').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return; coEnergy = +b.dataset.v; coSync();
 });
-document.getElementById('coSensory').addEventListener('input', e => {
-  coSensory = +e.target.value; coSync();
+document.getElementById('coSensory').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
 });
 document.getElementById('btnCheckout').addEventListener('click', () => {
   const co = day().checkout;
@@ -2330,12 +2303,16 @@ document.getElementById('cycBleed').addEventListener('click', e => {
   if(!l.bleeding) l.bleedingIntensity = null;
   save(); renderAll();
 });
-document.getElementById('cycIntensity').addEventListener('input', e => {
-  todayCycleLog().bleedingIntensity = +e.target.value;
+document.getElementById('cycIntensity').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = todayCycleLog();
+  l.bleedingIntensity = l.bleedingIntensity === +b.dataset.v ? null : +b.dataset.v;
   save(); renderCycle();
 });
-document.getElementById('cycPain').addEventListener('input', e => {
-  todayCycleLog().pain = +e.target.value;
+document.getElementById('cycPain').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = todayCycleLog();
+  l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
   save(); renderCycle();
 });
 
