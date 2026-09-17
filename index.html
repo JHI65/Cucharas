@@ -308,6 +308,13 @@ textarea{
 .ocgrid{display:flex;gap:8px}
 .ocgrid label{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft)}
 .ocgrid input{width:100%;text-align:center;padding:9px 2px;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-variant-numeric:tabular-nums}
+/* El selector nativo del sistema, solo redimensionado y con el mismo borde
+   que el resto de controles — nada de recrearlo a mano. */
+input[type=color]{
+  flex:0 0 auto;width:42px;height:42px;padding:2px;
+  border:1px solid var(--line);border-radius:var(--r-cell);
+  background:var(--surface);cursor:pointer;
+}
 
 /* ---- Tab bar ---- */
 .tabs{
@@ -684,6 +691,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="chip" data-contrast="normal" aria-pressed="true">Normal</button>
         <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
       </div>
+    </div>
+    <div class="row">
+      <div><strong>Color de la interfaz</strong><p>Cambia el rosa de fábrica por el tono que prefieras.</p></div>
+      <input type="color" id="customColorPick" value="#9E5266" aria-label="Elegir color de la interfaz">
+    </div>
+    <div class="row" id="colorInfoRow" hidden>
+      <div><p id="colorHint" style="margin:0"></p></div>
+      <button class="btn" id="btnColorReset">Restablecer</button>
     </div>
     </div>
 
@@ -2518,7 +2533,49 @@ function applyContrast(){
 document.getElementById('contrastPick').addEventListener('click', e => {
   const b = e.target.closest('[data-contrast]'); if(!b) return;
   state.settings.contrast = b.dataset.contrast;
-  applyContrast(); save();
+  applyContrast(); applyCustomColor(); save();
+});
+/* Color de la interfaz: cambia el único acento interactivo (y, con él, el
+   tono de la cuchara) sin tocar Verde Musgo ni Terracota Templada, que son
+   estado y deben seguir distinguiéndose del acento pase lo que pase — La
+   Regla del Acento Único no dice qué color es el acento, solo que sea uno
+   solo. En Alto contraste se suspende: ese modo existe para garantizar
+   contraste, y un color a mano podría romper justo esa garantía. */
+function relLuminance(hex){
+  const n = parseInt(hex.slice(1), 16);
+  const f = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  return 0.2126*f((n>>16)&255) + 0.7152*f((n>>8)&255) + 0.0722*f(n&255);
+}
+function contrastRatio(hexA, hexB){
+  const a = relLuminance(hexA), b = relLuminance(hexB);
+  const [hi, lo] = a > b ? [a,b] : [b,a];
+  return (hi + 0.05) / (lo + 0.05);
+}
+function applyCustomColor(){
+  const root = document.documentElement.style;
+  const hex = state.settings.customColor;
+  const infoRow = document.getElementById('colorInfoRow');
+  document.getElementById('customColorPick').value = hex || '#9E5266';
+  if(!hex || state.settings.contrast === 'alto'){
+    root.removeProperty('--accent'); root.removeProperty('--spoon');
+    infoRow.hidden = true;
+    return;
+  }
+  root.setProperty('--accent', hex);
+  root.setProperty('--spoon', `color-mix(in srgb, ${hex} 60%, white)`);
+  const ratio = contrastRatio(hex, '#FFF8F9');
+  infoRow.hidden = false;
+  document.getElementById('colorHint').textContent = ratio >= 4.5
+    ? `Contraste correcto (${ratio.toFixed(1)}:1) sobre el fondo claro.`
+    : `Contraste bajo (${ratio.toFixed(1)}:1) sobre el fondo claro — el texto puede costar de leer. Se recomienda al menos 4,5:1.`;
+}
+document.getElementById('customColorPick').addEventListener('input', e => {
+  state.settings.customColor = e.target.value;
+  applyCustomColor(); save();
+});
+document.getElementById('btnColorReset').addEventListener('click', () => {
+  state.settings.customColor = null;
+  applyCustomColor(); save();
 });
 /* El módulo es opcional: si está apagado, no hay pestaña ni nada calculado. */
 function applyCycleUI(){
@@ -2600,22 +2657,23 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     if(state.settings.peakCostPercent == null) state.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
     if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
     ensureFinanzas(); ensureCycle();
-    await save(); applyContrast(); applyCycleUI(); renderAll();
+    await save(); applyContrast(); applyCustomColor(); applyCycleUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
+  const customColor = state.settings.customColor;
   const overCost = state.settings.overCost;
   const peakCostPercent = state.settings.peakCostPercent;
   const peakPromptOff = state.settings.peakPromptOff;
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost, peakCostPercent, peakPromptOff},
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[] };
   ensureFinanzas(); ensureCycle();
-  save(); applyCycleUI(); renderAll();
+  save(); applyCustomColor(); applyCycleUI(); renderAll();
 });
 
 /* ---------- cerrar tocando fuera ---------- */
@@ -2655,7 +2713,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
   if(!state.templates) state.templates = [];
   ensureFinanzas(); ensureCycle();
-  applyContrast(); applyCycleUI();
+  applyContrast(); applyCustomColor(); applyCycleUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.
