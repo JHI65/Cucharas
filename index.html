@@ -2542,8 +2542,11 @@ document.getElementById('contrastPick').addEventListener('click', e => {
    que con otro tinte. Verde Musgo y Terracota Templada no se tocan: son
    estado, no marca, y deben seguir distinguiéndose del acento pase lo que
    pase (La Regla del Acento Único no dice qué color es el acento, solo que
-   sea uno solo). En Alto contraste se suspende: ese modo existe para
-   garantizar contraste, y un color a mano podría romper justo esa garantía. */
+   sea uno solo). En Alto contraste el color elegido se sigue viendo — mismo
+   tinte, no la paleta hc- de fábrica —, pero con las mismas proporciones que
+   ya usa esa variante (acento más oscuro, superficie blanca pura): el modo
+   sigue intensificando el contraste, solo que sobre el color de la persona
+   en vez de sobre el rosa. */
 function relLuminance(hex){
   const n = parseInt(hex.slice(1), 16);
   const f = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
@@ -2572,31 +2575,46 @@ function resolveToHex(cssColor){
     : raw.match(/[\d.]+/g).map(Number);
   return '#' + rgb.slice(0,3).map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join('');
 }
+/* Proporciones (mezcla con blanco, o con negro para el acento) calculadas
+   sobre los tokens de fábrica: normal a partir de Ciruela/Rosa Cuchara/Rosa
+   Polvo/Rosa Niebla/Rosa Algodón/Blanco Cálido, alto a partir de sus
+   equivalentes hc-. Así cualquier color elegido reproduce la misma relación
+   entre superficies que ya tenía la paleta original, en los dos modos. */
+const CUSTOM_MIX = {
+  normal: { spoon:78, line:79, surface2:24, bg:6, surface:3 },
+  alto:   { spoon:89, line:65, surface2:27, bg:3, surface:0 },
+};
 function applyCustomColor(){
   const root = document.documentElement.style;
   const hex = state.settings.customColor;
   const infoRow = document.getElementById('colorInfoRow');
   document.getElementById('customColorPick').value = hex || '#9E5266';
   const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line'];
-  if(!hex || state.settings.contrast === 'alto'){
+  if(!hex){
     props.forEach(p => root.removeProperty(p));
     infoRow.hidden = true;
     document.querySelector('meta[name=theme-color]')
       .setAttribute('content', THEME_COLOR[state.settings.contrast === 'alto' ? 'alto' : 'normal']);
     return;
   }
+  const alto = state.settings.contrast === 'alto';
+  const m = CUSTOM_MIX[alto ? 'alto' : 'normal'];
   const mix = pct => `color-mix(in srgb, ${hex} ${pct}%, white)`;
-  root.setProperty('--accent', hex);
-  root.setProperty('--spoon', mix(78));
-  root.setProperty('--line', mix(79));
-  root.setProperty('--surface-2', mix(24));
-  root.setProperty('--bg', mix(6));
-  root.setProperty('--surface', mix(3));
-  const bgHex = resolveToHex(mix(6));
-  document.querySelector('meta[name=theme-color]').setAttribute('content', bgHex);
-  const surfaceHex = resolveToHex(mix(3));
-  const lineHex = resolveToHex(mix(79));
-  const textRatio = contrastRatio(hex, surfaceHex);
+  const accentCss = alto ? `color-mix(in srgb, ${hex} 75%, black)` : hex;
+  const surfaceCss = m.surface === 0 ? '#ffffff' : mix(m.surface);
+  root.setProperty('--accent', accentCss);
+  root.setProperty('--spoon', mix(m.spoon));
+  root.setProperty('--line', mix(m.line));
+  root.setProperty('--surface-2', mix(m.surface2));
+  root.setProperty('--bg', mix(m.bg));
+  root.setProperty('--surface', surfaceCss);
+
+  const accentHex = resolveToHex(accentCss);
+  const surfaceHex = resolveToHex(surfaceCss);
+  const lineHex = resolveToHex(mix(m.line));
+  document.querySelector('meta[name=theme-color]').setAttribute('content', resolveToHex(mix(m.bg)));
+
+  const textRatio = contrastRatio(accentHex, surfaceHex);
   const borderRatio = contrastRatio(lineHex, surfaceHex);
   infoRow.hidden = false;
   const textOK = textRatio >= 4.5, borderOK = borderRatio >= 3;
