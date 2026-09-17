@@ -2619,11 +2619,8 @@ function applyCustomColor(){
   infoRow.hidden = false;
   const textOK = textRatio >= 4.5, borderOK = borderRatio >= 3;
   document.getElementById('colorHint').textContent = textOK && borderOK
-    ? `Contraste correcto: texto ${textRatio.toFixed(1)}:1, bordes ${borderRatio.toFixed(1)}:1.`
-    : `Contraste bajo: ${[
-        !textOK ? `texto ${textRatio.toFixed(1)}:1 (se recomienda 4,5:1)` : null,
-        !borderOK ? `bordes ${borderRatio.toFixed(1)}:1 (se recomienda 3:1)` : null,
-      ].filter(Boolean).join(' y ')}.`;
+    ? ''
+    : 'Este color puede costar de leer. Prueba otro más oscuro o más saturado.';
 }
 document.getElementById('customColorPick').addEventListener('input', e => {
   state.settings.customColor = e.target.value;
