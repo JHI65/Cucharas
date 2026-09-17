@@ -740,6 +740,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div><strong>Cómo funciona la app</strong><p>Vuelve a ver la explicación de cada parte, cuando quieras.</p></div>
       <button class="btn" id="btnIntroReplay">Ver</button>
     </div>
+    <div class="row" id="cicloReplayRow" hidden>
+      <div><strong>Cómo funciona Ciclo</strong><p>Vuelve a ver la guía de esta sección.</p></div>
+      <button class="btn" id="btnCicloReplay">Ver</button>
+    </div>
+    <div class="row" id="finReplayRow" hidden>
+      <div><strong>Cómo funciona Finanzas</strong><p>Vuelve a ver la guía de esta sección.</p></div>
+      <button class="btn" id="btnFinReplay">Ver</button>
+    </div>
     <div class="row">
       <div><strong>Acerca de</strong><p>Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.</p></div>
     </div>
@@ -788,6 +796,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="sub tour-step" id="tourStep"></p>
     <h2 id="tourTitle"></h2>
     <p class="sub" id="tourBody"></p>
+    <div class="chips" id="tourToggle" role="group" aria-label="Activar este módulo" hidden style="margin-bottom:14px">
+      <button class="chip" data-tv="on" aria-pressed="false">Activar</button>
+      <button class="chip" data-tv="off" aria-pressed="true">Dejar apagado</button>
+    </div>
     <div class="bigrow">
       <button id="tourSkip">Saltar</button>
       <button class="primary" id="tourNext">Siguiente</button>
@@ -1413,6 +1425,10 @@ function ensureFinanzas(){
     state.finEnabled = !!(state.finanzas.gastosFijos.length
       || state.finanzas.gastosVariables.length
       || state.finanzas.historial.length);
+  // Mismo criterio que arriba: quien ya llevaba gastos apuntados no
+  // necesita que le expliquen una pantalla que ya usaba.
+  if(state.settings && state.settings.finIntroSeen == null)
+    state.settings.finIntroSeen = state.finEnabled;
 }
 /* Al cambiar de mes, los fijos (con su importe vigente ese mes) y los
    variables se archivan en el historial antes de vaciar los variables y
@@ -1506,6 +1522,10 @@ function ensureCycle(){
   if(!Number.isFinite(state.avgCycleLength)) state.avgCycleLength = CYCLE_LEN_DEFAULT;
   if(!Number.isFinite(state.marginPercent)) state.marginPercent = MARGIN_DEFAULT;
   if(!Array.isArray(state.cycleLogs)) state.cycleLogs = [];
+  // Quien ya llevaba registros de ciclo no debe encontrarse con una guía
+  // que no pidió al entrar en la pestaña que ya conocía.
+  if(state.settings && state.settings.cicloIntroSeen == null)
+    state.settings.cicloIntroSeen = state.cycleLogs.length > 0;
 }
 const cycleLog = k => (state.cycleLogs || []).find(l => l.date === k) || null;
 const shiftKey = (k, n) => {
@@ -1935,6 +1955,9 @@ document.getElementById('tabs').addEventListener('click', e => {
   if(currentTab === 'fin') openFinTab('variables');
   window.scrollTo(0,0);
   renderAll();
+  const tourOpen = !document.getElementById('tour').hidden;
+  if(!tourOpen && currentTab === 'ciclo' && state.cycleEnabled && !state.settings.cicloIntroSeen) startCicloTour(false);
+  if(!tourOpen && currentTab === 'fin' && state.finEnabled && !state.settings.finIntroSeen) startFinTour(false);
 });
 
 function openDialog(dlg){
@@ -1959,9 +1982,25 @@ const TOUR_STEPS = [
   { sel:'#btnLib', title:'Editar cuánto cuesta cada actividad', body:'Tu lista de actividades con lo que te cuesta cada una, para no decidirlo de cero cada vez. Cuando corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.' },
   { sel:'#btnCheckout', title:'Cerrar el día', body:'Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
   { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.' },
-  { sel:'#tabs [data-go="set"]', title:'Ajustes', body:'Color, contraste y los módulos de Ciclo y Finanzas, que vienen apagados. Aquí también exportas una copia de tus datos y puedes volver a ver esta guía.' },
+  { sel:'#tabs [data-go="set"]', nav:'set', title:'Ajustes', body:'Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.' },
+  { sel:'#cyclePick', nav:'set', toggleKey:'cycleEnabled', toggleApply:'applyCycleUI', title:'Ciclo (opcional)', body:'Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
+  { sel:'#finPick', nav:'set', toggleKey:'finEnabled', toggleApply:'applyFinUI', title:'Finanzas (opcional)', body:'Añade una pestaña para tus gastos fijos y variables del mes. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
 ];
-let tourIdx = 0, tourSteps = [], tourReplay = false;
+/* Guías propias de Ciclo y Finanzas: se abren solas la primera vez que se
+   entra en esa pestaña con el módulo ya activado, y se pueden repasar
+   después desde Ajustes → Ayuda, igual que la guía principal. */
+const CICLO_TOUR_STEPS = [
+  { sel:'#cycBleed', title:'Sangrado', body:'Marca si hoy tienes sangrado. Si dices que sí, se abre una escala para la intensidad.' },
+  { sel:'#cycPain', title:'Dolor físico', body:'Del 1 al 5, sin necesidad de ponerle nombre a lo que sientes.' },
+  { sel:'#cycleNext', title:'Próximo ciclo', body:'Una estimación de cuándo llegará el siguiente sangrado, a partir de tus propios ciclos anteriores. Es para tu seguimiento, no para buscar ni evitar un embarazo.' },
+  { sel:'#cyclePattern', title:'Patrones', body:'Cuando tengas dos ciclos completos apuntados, aquí verás cómo suele cambiar tu gasto de cucharas en cada fase.' },
+];
+const FIN_TOUR_STEPS = [
+  { sel:'#finTabs', title:'Fijos, variables e historial', body:'Cambia entre tus gastos fijos, los variables de este mes y el historial de meses anteriores.' },
+  { sel:'#btnAddVariable', title:'Añadir un gasto', body:'Apunta un gasto variable de este mes. Los fijos se añaden igual, desde su propia pestaña.' },
+  { sel:'#finVariables .card', title:'Total del mes', body:'Suma gastos fijos y variables para saber cuánto llevas gastado. Al cambiar de mes, este se archiva solo en el historial.' },
+];
+let tourIdx = 0, tourSteps = [], tourReplay = false, tourSeenKey = 'introSeen', tourIsMain = true;
 
 function placeTour(){
   const step = tourSteps[tourIdx];
@@ -1999,12 +2038,26 @@ function placeTour(){
   bubble.style.left = Math.round(Math.max(G, Math.min(r.left + r.width/2 - bw/2, vw - bw - G))) + 'px';
 }
 
+const TOUR_APPLY = { applyCycleUI: () => applyCycleUI(), applyFinUI: () => applyFinUI() };
+
 function renderTourStep(){
   const step = tourSteps[tourIdx];
+  // Algunos pasos viven dentro de Ajustes: hay que estar ahí antes de
+  // buscar su ancla, no solo señalar el botón de la pestaña desde lejos.
+  if(step.nav && currentTab !== step.nav){
+    const b = document.querySelector(`#tabs [data-go="${step.nav}"]`);
+    if(b) b.click();
+  }
   document.getElementById('tourStep').textContent = `Paso ${tourIdx+1} de ${tourSteps.length}`;
   document.getElementById('tourTitle').textContent = step.title;
   document.getElementById('tourBody').textContent = step.body;
   document.getElementById('tourNext').textContent = tourIdx === tourSteps.length - 1 ? 'Empezar' : 'Siguiente';
+  const toggle = document.getElementById('tourToggle');
+  toggle.hidden = !step.toggleKey;
+  if(step.toggleKey){
+    const on = !!state[step.toggleKey];
+    toggle.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String((c.dataset.tv === 'on') === on)));
+  }
   // Sin desplazamiento suave: un movimiento largo en pantalla es un evento
   // sensorial. Salta directo y solo si el elemento no se ve entero.
   const el = step.sel ? document.querySelector(step.sel) : null;
@@ -2016,17 +2069,26 @@ function renderTourStep(){
   document.getElementById('tourNext').focus();
 }
 
-function startTour(replay){
+/* Motor común a la guía principal y a las de Ciclo/Finanzas: mismo overlay,
+   mismos botones, solo cambia la lista de pasos y qué se marca como visto. */
+function runTour(steps, { seenKey, replay, forceTab, isMain } = {}){
   tourReplay = !!replay;
-  // La guía recorre la pantalla de Hoy: si se abre desde Ajustes, vuelve ahí.
-  const hoy = document.querySelector('#tabs [data-go="hoy"]');
-  if(currentTab !== 'hoy') hoy.click();
-  // Un paso cuyo elemento no existe o está oculto (pestañas de módulos
-  // apagados) se cae del recorrido en vez de señalar al vacío.
-  tourSteps = TOUR_STEPS.filter(s => {
+  tourSeenKey = seenKey || 'introSeen';
+  tourIsMain = !!isMain;
+  if(forceTab && currentTab !== forceTab){
+    const b = document.querySelector(`#tabs [data-go="${forceTab}"]`);
+    if(b) b.click();
+  }
+  // Un paso cuyo elemento no existe o está oculto (por ejemplo un módulo
+  // todavía apagado) se cae del recorrido en vez de señalar al vacío. Los
+  // pasos con `nav` viven en una pestaña distinta a la actual, así que
+  // solo hace falta comprobar que el elemento existe: su visibilidad real
+  // se resuelve al navegar hasta él.
+  tourSteps = steps.filter(s => {
     if(!s.sel) return true;
     const el = document.querySelector(s.sel);
-    return el && el.getClientRects().length > 0;
+    if(!el) return false;
+    return s.nav ? true : el.getClientRects().length > 0;
   });
   if(!tourSteps.length) return endTour();
   tourIdx = 0;
@@ -2034,18 +2096,30 @@ function startTour(replay){
   document.getElementById('tour').hidden = false;
   renderTourStep();
 }
+function startTour(replay){ runTour(TOUR_STEPS, { seenKey:'introSeen', replay, forceTab:'hoy', isMain:true }); }
+function startCicloTour(replay){ runTour(CICLO_TOUR_STEPS, { seenKey:'cicloIntroSeen', replay }); }
+function startFinTour(replay){ runTour(FIN_TOUR_STEPS, { seenKey:'finIntroSeen', replay }); }
 
 function endTour(){
-  state.settings.introSeen = true;
+  state.settings[tourSeenKey] = true;
   save();
   document.getElementById('tour').hidden = true;
-  if(!tourReplay && day().budget == null) openCheckin();
+  if(tourIsMain && !tourReplay && day().budget == null) openCheckin();
 }
 
 document.getElementById('tourSkip').addEventListener('click', endTour);
 document.getElementById('tourNext').addEventListener('click', () => {
   if(tourIdx < tourSteps.length - 1){ tourIdx++; renderTourStep(); }
   else endTour();
+});
+document.getElementById('tourToggle').addEventListener('click', e => {
+  const b = e.target.closest('[data-tv]'); if(!b) return;
+  const step = tourSteps[tourIdx];
+  if(!step.toggleKey) return;
+  state[step.toggleKey] = b.dataset.tv === 'on';
+  TOUR_APPLY[step.toggleApply]();
+  save();
+  renderTourStep();
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && !document.getElementById('tour').hidden){ e.preventDefault(); endTour(); }
@@ -2054,6 +2128,14 @@ document.addEventListener('keydown', e => {
   if(!document.getElementById('tour').hidden) placeTour();
 }, {passive:true}));
 document.getElementById('btnIntroReplay').addEventListener('click', () => startTour(true));
+document.getElementById('btnCicloReplay').addEventListener('click', () => {
+  document.querySelector('#tabs [data-go="ciclo"]').click();
+  startCicloTour(true);
+});
+document.getElementById('btnFinReplay').addEventListener('click', () => {
+  document.querySelector('#tabs [data-go="fin"]').click();
+  startFinTour(true);
+});
 
 const dlgCheckin = document.getElementById('dlgCheckin');
 const ciRange = document.getElementById('ciRange');
@@ -2879,6 +2961,7 @@ function applyCycleUI(){
   document.getElementById('tabCiclo').hidden = !on;
   document.getElementById('cycleLenRow').hidden = !on;
   document.getElementById('cycleMarginRow').hidden = !on;
+  document.getElementById('cicloReplayRow').hidden = !on;
   updateTabsCompact();
   document.getElementById('cycleLen').value = state.avgCycleLength;
   document.getElementById('cycleMargin').value = state.marginPercent;
@@ -2893,6 +2976,7 @@ document.getElementById('cyclePick').addEventListener('click', e => {
 function applyFinUI(){
   const on = !!state.finEnabled;
   document.getElementById('tabFin').hidden = !on;
+  document.getElementById('finReplayRow').hidden = !on;
   updateTabsCompact();
   document.querySelectorAll('#finPick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === on));

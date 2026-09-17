@@ -178,6 +178,21 @@ pestaña y volver a apagarla desde Ajustes, y una carga con datos de finanzas ya
 existentes pero sin el campo `finEnabled` (lo enciende sola). Sin errores de JavaScript
 en ningún caso.
 
+**Extensión del 2026-09-17**: los dos módulos ahora se pueden activar desde dentro de la
+propia guía de bienvenida (`TOUR_STEPS`, pasos "Ciclo (opcional)" y "Finanzas
+(opcional)"), con un control Activar/Dejar apagado dentro del bocadillo — no hace falta
+salir de la guía para encenderlos. Y cada módulo tiene ahora su propia guía corta
+(`CICLO_TOUR_STEPS`, 4 pasos; `FIN_TOUR_STEPS`, 3 pasos), que se abre sola la primera vez
+que se entra en esa pestaña con el módulo ya activo, y se puede repasar después desde
+Ajustes → Ayuda ("Cómo funciona Ciclo" / "Cómo funciona Finanzas", visibles solo con el
+módulo encendido). Quien ya tenía registros de ciclo o gastos apuntados antes de este
+cambio no se encuentra la guía de esa sección sin pedirla (mismo criterio que
+`introSeen`). Verificado con Chrome headless: recorrido completo activando ambos módulos
+desde la guía principal, entrada automática en la guía de Ciclo y de Finanzas, cierre
+que no vuelve a abrirse al revisitar la pestaña, botones de repaso en Ajustes, y una
+carga con datos de ciclo/finanzas ya existentes (ninguna guía se abre sola). Sin errores
+de JavaScript.
+
 ### 2.6 Importar no valida el archivo
 
 La importación (`index.html:2702`) sustituye el estado entero sin repetir las reparaciones
