@@ -166,13 +166,18 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .arow .chip{padding:7px 11px;font-size:14px}
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
-/* Deslizador en vez de cinco botones o una rampa de botones: el propio
-   .slider ya existe (lo usa el check-in matinal) y su relleno creciente en
-   Rosa Cuchara es la misma señal de "cantidad" sin añadir un componente
-   nuevo. Solo se anclan por palabra los dos extremos — el valor marcado se
-   escribe una sola vez, debajo, en vez de forzar a leer cinco etiquetas. */
-.scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
-.scale-out{margin:7px 0 0;font-size:14px;color:var(--ink-soft)}
+/* Deslizador en vez de cinco botones: el propio .slider ya existe (lo usa el
+   check-in matinal) y su relleno creciente en Rosa Cuchara es la misma señal
+   de "cantidad" sin añadir un componente nuevo. Debajo, una marca y su
+   palabra por cada parada — fijas, no solo en los extremos — para que la
+   parada no haya que adivinarla; el punto reutiliza el mismo lenguaje visual
+   que las marcas de carga del calendario. La lectura para lector de pantalla
+   va en aria-valuetext del propio input, no repetida en el texto visible. */
+.scale-steps{display:flex;margin-top:7px}
+.scale-steps span{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ink-soft);text-align:center}
+.scale-steps span:first-child{align-items:flex-start;text-align:left}
+.scale-steps span:last-child{align-items:flex-end;text-align:right}
+.scale-steps i{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
 .card h2,.card h3{margin:0 0 9px;font-size:16px}
 .card p{margin:0 0 7px;color:var(--ink-soft);font-size:14px}
@@ -556,14 +561,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div class="field" id="cycIntField" hidden>
         <label for="cycIntensity">Intensidad del sangrado</label>
         <input type="range" class="slider" id="cycIntensity" min="1" max="5" step="1" value="3">
-        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
-        <p class="scale-out" id="cycIntensityOut"></p>
       </div>
       <div class="field" style="margin-bottom:0">
         <label for="cycPain">Dolor físico</label>
         <input type="range" class="slider" id="cycPain" min="1" max="5" step="1" value="1">
-        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
-        <p class="scale-out" id="cycPainOut"></p>
       </div>
     </div>
 
@@ -810,14 +811,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="field">
       <label for="coEnergy">¿Cuánta capacidad te queda ahora?</label>
       <input type="range" class="slider" id="coEnergy" min="1" max="5" step="1" value="3">
-      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
-      <p class="scale-out" id="coEnergyOut"></p>
     </div>
     <div class="field">
       <label for="coSensory">¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
       <input type="range" class="slider" id="coSensory" min="1" max="5" step="1" value="3">
-      <div class="scale-lab"><span>Nada</span><span>Todo</span></div>
-      <p class="scale-out" id="coSensoryOut"></p>
     </div>
     <div class="field">
       <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
@@ -1410,14 +1407,26 @@ const SCALE_LABELS = {
   cycPain: ['Ninguno','Leve','Moderado','Fuerte','Mucho'],
   cycIntensity: ['Muy leve','Leve','Moderado','Fuerte','Muy fuerte'],
 };
+/* Fila de paradas fija, generada una sola vez: nunca se repite a mano en las
+   cuatro plantillas, así que no puede desincronizarse de SCALE_LABELS. */
+Object.keys(SCALE_LABELS).forEach(id => {
+  const input = document.getElementById(id);
+  const row = document.createElement('div');
+  row.className = 'scale-steps';
+  row.setAttribute('aria-hidden', 'true');
+  row.innerHTML = SCALE_LABELS[id].map(l => `<span><i></i>${l}</span>`).join('');
+  input.after(row);
+});
 function syncScale(id, val){
   const labels = SCALE_LABELS[id];
+  const input = document.getElementById(id);
   /* Un slider siempre enseña una posición, así que sin respuesta se apoya en
      el extremo mínimo en vez de un valor medio — lo menos parecido a haber
      contestado "moderado" sin querer. */
-  document.getElementById(id).value = val ?? 1;
-  const out = document.getElementById(id + 'Out');
-  if(out) out.textContent = val ? labels[val-1] : `${labels[0]} … ${labels[4]}`;
+  input.value = val ?? 1;
+  /* La palabra ya está fija y visible debajo (fila de paradas); para lector
+     de pantalla se anuncia por aria-valuetext en vez de repetirla en texto. */
+  input.setAttribute('aria-valuetext', val ? labels[val-1] : `${labels[0]} a ${labels[4]}, sin marcar`);
 }
 function renderCycle(){
   if(!state.cycleEnabled) return;
