@@ -704,6 +704,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     </div>
 
+    <p class="libsec">Finanzas</p>
+    <div class="group">
+    <div class="row">
+      <div><strong>Seguimiento de finanzas</strong><p>Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
+      <div class="chips" id="finPick" role="group" aria-label="Seguimiento de finanzas">
+        <button class="chip" data-fin="on" aria-pressed="false">Activado</button>
+        <button class="chip" data-fin="off" aria-pressed="true">Desactivado</button>
+      </div>
+    </div>
+    </div>
+
     <p class="libsec">Cómo se ve</p>
     <div class="group">
     <div class="row">
@@ -761,7 +772,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg>Ciclo</button>
   <button data-go="cal">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Calendario</button>
-  <button data-go="fin">
+  <button data-go="fin" id="tabFin" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">€</text></svg>Finanzas</button>
   <button data-go="set">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>Ajustes</button>
@@ -1132,7 +1143,7 @@ const SEED = [
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 const PEAK_COST_PERCENT_DEFAULT = 15;
 let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT },
-  finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null },
+  finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null }, finEnabled:false,
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
 const collapsedTasks = new Set();
@@ -1395,6 +1406,13 @@ const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto'
 function ensureFinanzas(){
   if(!state.finanzas) state.finanzas = { gastosFijos:[], gastosVariables:[], historial:[], mesActual:null };
   if(!state.finanzas.mesActual) state.finanzas.mesActual = monthKey();
+  // Quien ya tenía gastos apuntados no debe encontrarse la pestaña
+  // desaparecida al actualizar (predictibilidad); solo empieza apagada
+  // para quien instala la app de cero.
+  if(typeof state.finEnabled !== 'boolean')
+    state.finEnabled = !!(state.finanzas.gastosFijos.length
+      || state.finanzas.gastosVariables.length
+      || state.finanzas.historial.length);
 }
 /* Al cambiar de mes, los fijos (con su importe vigente ese mes) y los
    variables se archivan en el historial antes de vaciar los variables y
@@ -2850,13 +2868,18 @@ document.getElementById('btnColorReset').addEventListener('click', () => {
   state.settings.customColor = null;
   applyCustomColor(); save();
 });
-/* El módulo es opcional: si está apagado, no hay pestaña ni nada calculado. */
+/* Ciclo y Finanzas son módulos opcionales: si están apagados, no hay
+   pestaña ni nada calculado. Con ambos encendidos hay cinco pestañas, así
+   que la barra pasa a modo compacto; con uno o ninguno caben holgadas. */
+function updateTabsCompact(){
+  document.getElementById('tabs').classList.toggle('compact', !!state.cycleEnabled && !!state.finEnabled);
+}
 function applyCycleUI(){
   const on = !!state.cycleEnabled;
   document.getElementById('tabCiclo').hidden = !on;
   document.getElementById('cycleLenRow').hidden = !on;
   document.getElementById('cycleMarginRow').hidden = !on;
-  document.getElementById('tabs').classList.toggle('compact', on);
+  updateTabsCompact();
   document.getElementById('cycleLen').value = state.avgCycleLength;
   document.getElementById('cycleMargin').value = state.marginPercent;
   document.querySelectorAll('#cyclePick .chip').forEach(c =>
@@ -2866,6 +2889,19 @@ document.getElementById('cyclePick').addEventListener('click', e => {
   const b = e.target.closest('[data-cycle]'); if(!b) return;
   state.cycleEnabled = b.dataset.cycle === 'on';
   applyCycleUI(); save(); renderAll();
+});
+function applyFinUI(){
+  const on = !!state.finEnabled;
+  document.getElementById('tabFin').hidden = !on;
+  updateTabsCompact();
+  document.querySelectorAll('#finPick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === on));
+  if(!on && currentTab === 'fin') document.querySelector('#tabs [data-go="hoy"]').click();
+}
+document.getElementById('finPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-fin]'); if(!b) return;
+  state.finEnabled = b.dataset.fin === 'on';
+  applyFinUI(); save(); renderAll();
 });
 document.getElementById('cycleLen').addEventListener('change', e => {
   const n = parseInt(e.target.value, 10);
@@ -2930,7 +2966,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     if(state.settings.peakCostPercent == null) state.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
     if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
     ensureFinanzas(); ensureCycle();
-    await save(); applyContrast(); applyCustomColor(); applyCycleUI(); renderAll();
+    await save(); applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
@@ -2943,10 +2979,11 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
+  const finEnabled = state.finEnabled;
   state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff},
-    cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[] };
+    cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   ensureFinanzas(); ensureCycle();
-  save(); applyCustomColor(); applyCycleUI(); renderAll();
+  save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
 });
 
 /* ---------- cerrar tocando fuera ---------- */
@@ -2990,7 +3027,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(state.settings.introSeen == null) state.settings.introSeen = Object.keys(state.days).length > 0;
   if(!state.templates) state.templates = [];
   ensureFinanzas(); ensureCycle();
-  applyContrast(); applyCustomColor(); applyCycleUI();
+  applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.

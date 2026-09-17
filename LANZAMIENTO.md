@@ -159,21 +159,24 @@ Mínimo para la v1, un ajuste "Tamaño del texto":
 Hay que probarlo con la barra de pestañas fija y con las hojas. El modo oscuro puede
 esperar a la v1.1 (implica una tercera variante de tokens, no solo invertir).
 
-### 2.5 Finanzas es una pestaña fija ajena al modelo de energía
+### 2.5 Finanzas es una pestaña fija ajena al modelo de energía — hecho el 2026-09-17
 
-Desdibuja el mensaje de "planifica por energía", ocupa sitio permanente y, con Ciclo
-activo, obliga a bajar las etiquetas a 11px. El € está escrito a mano, lo que deja fuera a
-Latinoamérica.
+Arreglo: módulo opcional como Ciclo (`state.finEnabled`, `ensureFinanzas()` en
+`index.html`), apagado por defecto para instalaciones nuevas; se activa solo para quien
+ya tenía gastos apuntados, con la misma guarda propuesta arriba, para no quitarle la
+pestaña a quien ya la usa (principio de predictibilidad). Ajustes tiene ahora un grupo
+"Finanzas" idéntico en forma al de "Ciclo" (`#finPick`, chips Activado/Desactivado);
+`applyFinUI()` muestra/oculta `#tabFin` y, si se apaga estando en esa pestaña, vuelve a
+Hoy. La barra de pestañas pasa a modo compacto (`updateTabsCompact()`) solo cuando Ciclo
+y Finanzas están los dos encendidos a la vez (5 pestañas); con uno solo caben holgadas.
+Sigue sin resolver el € escrito a mano (deja fuera a Latinoamérica) — no era parte de
+este arreglo.
 
-Arreglo: módulo opcional como Ciclo (`state.finEnabled`), apagado por defecto. Para no
-quitarle la pestaña a quien ya la usa (principio de predictibilidad):
-
-```js
-if(typeof state.finEnabled !== 'boolean')
-  state.finEnabled = !!(state.finanzas?.gastosFijos?.length
-    || state.finanzas?.gastosVariables?.length
-    || state.finanzas?.historial?.length);
-```
+Verificado con Chrome headless: instalación nueva (los dos módulos ocultos), activar
+Finanzas sola (sin modo compacto), activar también Ciclo (modo compacto), navegar a la
+pestaña y volver a apagarla desde Ajustes, y una carga con datos de finanzas ya
+existentes pero sin el campo `finEnabled` (lo enciende sola). Sin errores de JavaScript
+en ningún caso.
 
 ### 2.6 Importar no valida el archivo
 
