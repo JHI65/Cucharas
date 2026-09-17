@@ -703,7 +703,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div><strong>Hoy no necesito el margen</strong><p>Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.</p></div>
       <input type="checkbox" id="ciMarginOff" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
     </label>
-    <div class="bigrow"><button class="primary" id="ciSave">Empezar el día</button></div>
+    <div class="bigrow"><button id="ciSkip">Ahora no</button><button class="primary" id="ciSave">Empezar el día</button></div>
   </div>
 </dialog>
 
@@ -1714,6 +1714,14 @@ document.getElementById('ciPresets').addEventListener('click', e => {
 document.getElementById('ciSave').addEventListener('click', () => {
   day().budget = +ciRange.value;
   day().marginOff = document.getElementById('ciMarginOff').checked;
+  delete day().budgetUnanswered;
+  save(); dlgCheckin.close(); renderAll();
+});
+/* "Ahora no": el día no se queda sin cucharas asignadas ni bloqueando la app.
+   Usa la media reciente y marca el día como no respondido, sin preguntar nada más. */
+document.getElementById('ciSkip').addEventListener('click', () => {
+  day().budget = typicalBudget();
+  day().budgetUnanswered = true;
   save(); dlgCheckin.close(); renderAll();
 });
 document.getElementById('btnAdjustBudget').addEventListener('click', openCheckin);
@@ -2352,8 +2360,8 @@ document.getElementById('btnWipe').addEventListener('click', () => {
    un click que aterriza en el propio <dialog> -no en un descendiente- es un
    click en el ::backdrop, es decir, fuera del mockup. Se reutiliza el mismo
    botón de cerrar de cada hoja para no duplicar su lógica (algunas hacen
-   renderAll() al cerrar y otras no). dlgCheckin queda fuera: es el check-in
-   obligatorio del día y no tiene botón de cancelar. */
+   renderAll() al cerrar y otras no). dlgCheckin ya tiene salida propia
+   ("Ahora no"), así que toca fuera cierra igual que ese botón. */
 [
   ['dlgTask', 'tCancel'],
   ['dlgLib', 'lCancel'],
@@ -2364,6 +2372,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgDay', 'dClose'],
   ['dlgGasto', 'gCancel'],
   ['dlgHist', 'hClose'],
+  ['dlgCheckin', 'ciSkip'],
 ].forEach(([dlgId, btnId]) => {
   document.getElementById(dlgId).addEventListener('click', e => {
     if(e.target.id === dlgId) document.getElementById(btnId).click();
