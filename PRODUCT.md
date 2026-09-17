@@ -20,7 +20,7 @@ App de organización diaria y gestión de energía basada en la teoría de las c
 
 ## Positioning
 
-Planifica por energía, no por tiempo: la diferencia estructural frente a cualquier gestor de tareas o calendario convencional. El valor central no es la lista de tareas sino la prótesis de interocepción — muchas personas autistas no notan el agotamiento hasta que es tarde, y los datos de la app lo detectan antes que la persona. Producto público de distribución directa (no App Store).
+Planifica por energía, no por tiempo: la diferencia estructural frente a cualquier gestor de tareas o calendario convencional. El valor central no es la lista de tareas sino la prótesis de interocepción — muchas personas autistas no notan el agotamiento hasta que es tarde, y los datos de la app lo detectan antes que la persona. Producto público: se publica en App Store y Google Play, envuelto con Capacitor sobre el mismo `index.html` (decidido el 2026-09-17; antes se planteaba distribución directa). La PWA queda como vía secundaria. Ver `LANZAMIENTO.md` para el estado y lo que falta.
 
 ## Operating Context
 
