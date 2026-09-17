@@ -1203,6 +1203,10 @@ function renderTasks(){
     </div>
     ${isOpen ? `
     <div class="adjust">
+      <!-- "Entorno" no tiene coste propio: solo marca que el coste real de
+           esta tarea ya incluye la sobrecarga sensorial, para que el
+           check-out de esa noche no la vuelva a cobrar aparte (ver
+           yaSobrecargado en el guardado del check-out). -->
       <div class="arow">
         <span>${dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?'}</span>
         <div class="stepper">
@@ -1212,6 +1216,14 @@ function renderTasks(){
         </div>
       </div>
       ${dep ? '' : `<div class="arow">
+        <span>¿Cómo estaba el entorno?</span>
+        <div class="chips">
+          <button class="chip" data-ent="${t.id}" data-val="tranquilo" aria-pressed="${t.entorno==='tranquilo'}">Tranquilo</button>
+          <button class="chip" data-ent="${t.id}" data-val="normal" aria-pressed="${t.entorno==='normal'}">Normal</button>
+          <button class="chip" data-ent="${t.id}" data-val="intenso" aria-pressed="${t.entorno==='intenso'}">Intenso</button>
+        </div>
+      </div>
+      <div class="arow">
         <span>¿Cuánto tardaste en recuperarte?</span>
         <div class="chips">${RECOV.map(([m,lab]) =>
           `<button class="chip" data-rec="${t.id}" data-min="${m}" aria-pressed="${t.recovery===m}">${lab}</button>`).join('')}</div>
@@ -2102,6 +2114,14 @@ document.getElementById('taskList').addEventListener('click', e => {
     else collapsedTasks.add(trow.dataset.trow);
     renderTasks(); return;
   }
+  const ent = e.target.closest('[data-ent]');
+  if(ent){
+    const t = day().tasks.find(x => x.id === ent.dataset.ent);
+    const v = ent.dataset.val;
+    t.entorno = (t.entorno === v) ? null : v;
+    save(); renderAll();
+    return;
+  }
   const rec = e.target.closest('[data-rec]');
   if(rec){
     const t = day().tasks.find(x => x.id === rec.dataset.rec);
@@ -2305,12 +2325,14 @@ document.getElementById('coSave').addEventListener('click', () => {
   const d = day();
   d.checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
   d.extras = (d.extras || []).filter(x => x.type !== 'sobrestimulacion');
-  /* Si ya se apuntó algún pico sensorial durante el día, ese es el coste real
-     y la puntuación de la noche no vuelve a cobrarlo aparte: sería la misma
-     sobrecarga contada dos veces. Solo se cobra por la puntuación cuando no
-     hubo ningún pico que ya lo hiciera. */
-  const yaHuboPico = d.extras.some(x => x.type === 'pico-sensorial');
-  const coste = yaHuboPico ? 0 : (state.settings.overCost[coSensory] ?? 0);
+  /* Si ya se apuntó algún pico sensorial, o si alguna tarea de hoy quedó
+     marcada como entorno "intenso" (su coste real ya incluye la sobrecarga),
+     la puntuación de la noche no vuelve a cobrar aparte: sería la misma
+     sobrecarga contada dos veces. Solo se cobra por la puntuación cuando
+     ninguna de las dos ya lo hizo. */
+  const yaSobrecargado = d.extras.some(x => x.type === 'pico-sensorial')
+    || d.tasks.some(t => t.done && t.entorno === 'intenso');
+  const coste = yaSobrecargado ? 0 : (state.settings.overCost[coSensory] ?? 0);
   if(coste) d.extras.push({ type:'sobrestimulacion', coste });
   save(); dlgCheckout.close(); renderAll();
 });
