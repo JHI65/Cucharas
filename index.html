@@ -2535,12 +2535,15 @@ document.getElementById('contrastPick').addEventListener('click', e => {
   state.settings.contrast = b.dataset.contrast;
   applyContrast(); applyCustomColor(); save();
 });
-/* Color de la interfaz: cambia el único acento interactivo (y, con él, el
-   tono de la cuchara) sin tocar Verde Musgo ni Terracota Templada, que son
-   estado y deben seguir distinguiéndose del acento pase lo que pase — La
-   Regla del Acento Único no dice qué color es el acento, solo que sea uno
-   solo. En Alto contraste se suspende: ese modo existe para garantizar
-   contraste, y un color a mano podría romper justo esa garantía. */
+/* Color de la interfaz: retiñe fondo, superficies, bordes, acento y cuchara
+   a partir de un único color, en las mismas proporciones que ya tenía la
+   paleta rosa de fábrica (mezclas con blanco calculadas sobre los tokens
+   originales) — así que sigue siendo la misma jerarquía de superficies, solo
+   que con otro tinte. Verde Musgo y Terracota Templada no se tocan: son
+   estado, no marca, y deben seguir distinguiéndose del acento pase lo que
+   pase (La Regla del Acento Único no dice qué color es el acento, solo que
+   sea uno solo). En Alto contraste se suspende: ese modo existe para
+   garantizar contraste, y un color a mano podría romper justo esa garantía. */
 function relLuminance(hex){
   const n = parseInt(hex.slice(1), 16);
   const f = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
@@ -2551,23 +2554,58 @@ function contrastRatio(hexA, hexB){
   const [hi, lo] = a > b ? [a,b] : [b,a];
   return (hi + 0.05) / (lo + 0.05);
 }
+/* Resuelve cualquier valor CSS de color (incluido un color-mix()) al hex real
+   que pinta el navegador, para poder calcular contraste sobre él o mandarlo
+   al meta theme-color, que no admite color-mix(). */
+function resolveToHex(cssColor){
+  const probe = document.createElement('div');
+  probe.style.color = cssColor;
+  document.body.appendChild(probe);
+  const raw = getComputedStyle(probe).color;
+  document.body.removeChild(probe);
+  /* Chrome resuelve color-mix() como color(srgb r g b), con r/g/b entre 0 y 1
+     — no como rgb(r, g, b) en enteros 0-255. Hay que distinguir los dos
+     formatos o el redondeo sale mal (una fracción como "0.97" se leería como
+     los enteros 0 y 97). */
+  const srgb = raw.match(/^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+  const rgb = srgb ? srgb.slice(1,4).map(v => Math.round(parseFloat(v) * 255))
+    : raw.match(/[\d.]+/g).map(Number);
+  return '#' + rgb.slice(0,3).map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join('');
+}
 function applyCustomColor(){
   const root = document.documentElement.style;
   const hex = state.settings.customColor;
   const infoRow = document.getElementById('colorInfoRow');
   document.getElementById('customColorPick').value = hex || '#9E5266';
+  const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line'];
   if(!hex || state.settings.contrast === 'alto'){
-    root.removeProperty('--accent'); root.removeProperty('--spoon');
+    props.forEach(p => root.removeProperty(p));
     infoRow.hidden = true;
+    document.querySelector('meta[name=theme-color]')
+      .setAttribute('content', THEME_COLOR[state.settings.contrast === 'alto' ? 'alto' : 'normal']);
     return;
   }
+  const mix = pct => `color-mix(in srgb, ${hex} ${pct}%, white)`;
   root.setProperty('--accent', hex);
-  root.setProperty('--spoon', `color-mix(in srgb, ${hex} 60%, white)`);
-  const ratio = contrastRatio(hex, '#FFF8F9');
+  root.setProperty('--spoon', mix(78));
+  root.setProperty('--line', mix(79));
+  root.setProperty('--surface-2', mix(24));
+  root.setProperty('--bg', mix(6));
+  root.setProperty('--surface', mix(3));
+  const bgHex = resolveToHex(mix(6));
+  document.querySelector('meta[name=theme-color]').setAttribute('content', bgHex);
+  const surfaceHex = resolveToHex(mix(3));
+  const lineHex = resolveToHex(mix(79));
+  const textRatio = contrastRatio(hex, surfaceHex);
+  const borderRatio = contrastRatio(lineHex, surfaceHex);
   infoRow.hidden = false;
-  document.getElementById('colorHint').textContent = ratio >= 4.5
-    ? `Contraste correcto (${ratio.toFixed(1)}:1) sobre el fondo claro.`
-    : `Contraste bajo (${ratio.toFixed(1)}:1) sobre el fondo claro — el texto puede costar de leer. Se recomienda al menos 4,5:1.`;
+  const textOK = textRatio >= 4.5, borderOK = borderRatio >= 3;
+  document.getElementById('colorHint').textContent = textOK && borderOK
+    ? `Contraste correcto: texto ${textRatio.toFixed(1)}:1, bordes ${borderRatio.toFixed(1)}:1.`
+    : `Contraste bajo: ${[
+        !textOK ? `texto ${textRatio.toFixed(1)}:1 (se recomienda 4,5:1)` : null,
+        !borderOK ? `bordes ${borderRatio.toFixed(1)}:1 (se recomienda 3:1)` : null,
+      ].filter(Boolean).join(' y ')}.`;
 }
 document.getElementById('customColorPick').addEventListener('input', e => {
   state.settings.customColor = e.target.value;
