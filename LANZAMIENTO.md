@@ -46,23 +46,34 @@ una captura del arranque en navegador. **Queda probarlo en un dispositivo de ver
 montar Capacitor: que `Capacitor.registerPlugin('Filesystem')` funcione sin empaquetador y
 que el archivo aparezca donde se espera.
 
-### 1.2 "Cucharas" no se explica en ningún sitio, y la teoría no tiene crédito
+### 1.2 "Cucharas" no se explica en ningún sitio, y la teoría no tiene crédito — hecho el 2026-09-17
 
-Quien abre la app por primera vez ve "¿Con cuántas cucharas te levantas?" sin contexto
-previo. Va contra el principio 2 del propio proyecto (nada de metáforas sin explicar).
-Además, ni Miserandino ni Toudal/Attwood aparecen en el código: usar vocabulario de la
+Quien abre la app por primera vez veía "¿Con cuántas cucharas te levantas?" sin contexto
+previo. Iba contra el principio 2 del propio proyecto (nada de metáforas sin explicar).
+Además, ni Miserandino ni Toudal/Attwood aparecían en el código: usar vocabulario de la
 comunidad en un producto público sin dar crédito es justo lo que destruye la confianza
 (N10, editorial).
 
-Arreglo: una pantalla que salga solo la primera vez, antes del check-in, saltable, con un
-botón "Entendido", guardando `state.settings.introSeen`. Más una fila "Acerca de" en
-Ajustes con los créditos.
+Arreglo: una bienvenida de 7 tarjetas (`dlgIntro`, `index.html`), una idea por paso, en
+lenguaje literal. La primera explica qué es una cuchara y da el crédito pedido; el resto
+recorre check-in, tareas, pico sensorial, calendario, check-out y ajustes — evitando un
+volcado de una sola pantalla con "todo lo que tiene la app". Saltable en cualquier paso
+("Saltar" siempre visible) y recuperable después desde Ajustes → Ayuda → "Cómo funciona
+la app", así saltarla no pierde nada para siempre. Guarda `state.settings.introSeen`.
+Quien ya tenía historial antes de que existiera esta pantalla no se la encuentra de
+sorpresa: solo se muestra sin pedirlo a quien instala la app de cero (`state.days` vacío
+al arrancar por primera vez tras la actualización). Fila "Acerca de" añadida en Ajustes
+con los créditos, aparte de la bienvenida.
 
-Texto propuesto:
+Texto de la primera tarjeta:
 
 > Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas
 > gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría
-> de las cucharas) y de Maja Toudal y Tony Attwood (*Energy Accounting*).
+> de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).
+
+Verificado con Chrome headless: primer arranque (7 pasos → check-in), usuario con
+historial (no la ve) y repaso desde Ajustes (no reabre el check-in ni deja diálogos
+superpuestos).
 
 ### 1.3 La fase del ciclo se puede leer como predicción de fertilidad
 
@@ -188,6 +199,7 @@ secundaria para distribución directa: instalar una PWA en iOS lleva varios paso
 evidentes y eso es una barrera real para este público.
 
 - [x] Guardado nativo en archivo (§1.1) — escrito, pendiente de probar en dispositivo.
+- [x] Bienvenida con crédito a la teoría de las cucharas (§1.2).
 - [ ] Exportar con los plugins Filesystem + Share: en iOS `<a download>` con blob no
       funciona dentro de la app envuelta. El archivo aún se llama `cucharas-…json`.
 - [ ] Sustituir `confirm`, `alert` y `prompt` por hojas propias (§2.3).
