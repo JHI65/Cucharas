@@ -166,18 +166,12 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .arow .chip{padding:7px 11px;font-size:14px}
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
-.scale{display:flex;gap:7px}
-/* La casilla no lleva texto: cinco palabras por escala obligaban a leer y
-   comparar cinco opciones cada noche. La magnitud se lee por forma (barra que
-   crece) y la palabra de lo marcado se escribe una sola vez, debajo — el mismo
-   patrón que el check-in matinal, donde el valor va acompañado de una palabra.
-   Cada botón conserva su palabra completa en aria-label. */
-.scale button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);display:flex;align-items:flex-end;justify-content:center;min-height:52px}
-.scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
-/* Rosa Cuchara: en este sistema es el color de "cantidad" (medidor, marcas de
-   carga del calendario), no el de "interactivo", que es Ciruela. */
-.ramp{display:block;width:12px;border-radius:3px;background:var(--spoon)}
-.scale button[aria-pressed="true"] .ramp{background:#FFF8F9}
+/* Deslizador en vez de cinco botones o una rampa de botones: el propio
+   .slider ya existe (lo usa el check-in matinal) y su relleno creciente en
+   Rosa Cuchara es la misma señal de "cantidad" sin añadir un componente
+   nuevo. Solo se anclan por palabra los dos extremos — el valor marcado se
+   escribe una sola vez, debajo, en vez de forzar a leer cinco etiquetas. */
+.scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
 .scale-out{margin:7px 0 0;font-size:14px;color:var(--ink-soft)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
 .card h2,.card h3{margin:0 0 9px;font-size:16px}
@@ -560,13 +554,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         </div>
       </div>
       <div class="field" id="cycIntField" hidden>
-        <label>Intensidad del sangrado</label>
-        <div class="scale" id="cycIntensity"></div>
+        <label for="cycIntensity">Intensidad del sangrado</label>
+        <input type="range" class="slider" id="cycIntensity" min="1" max="5" step="1" value="3">
+        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
         <p class="scale-out" id="cycIntensityOut"></p>
       </div>
       <div class="field" style="margin-bottom:0">
-        <label>Dolor físico</label>
-        <div class="scale" id="cycPain"></div>
+        <label for="cycPain">Dolor físico</label>
+        <input type="range" class="slider" id="cycPain" min="1" max="5" step="1" value="1">
+        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
         <p class="scale-out" id="cycPainOut"></p>
       </div>
     </div>
@@ -812,13 +808,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <h2>Check-out de hoy</h2>
     <p class="sub">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
     <div class="field">
-      <label>¿Cuánta capacidad te queda ahora?</label>
-      <div class="scale" id="coEnergy"></div>
+      <label for="coEnergy">¿Cuánta capacidad te queda ahora?</label>
+      <input type="range" class="slider" id="coEnergy" min="1" max="5" step="1" value="3">
+      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
       <p class="scale-out" id="coEnergyOut"></p>
     </div>
     <div class="field">
-      <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
-      <div class="scale" id="coSensory"></div>
+      <label for="coSensory">¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
+      <input type="range" class="slider" id="coSensory" min="1" max="5" step="1" value="3">
+      <div class="scale-lab"><span>Nada</span><span>Todo</span></div>
       <p class="scale-out" id="coSensoryOut"></p>
     </div>
     <div class="field">
@@ -1412,13 +1410,12 @@ const SCALE_LABELS = {
   cycPain: ['Ninguno','Leve','Moderado','Fuerte','Mucho'],
   cycIntensity: ['Muy leve','Leve','Moderado','Fuerte','Muy fuerte'],
 };
-function paintScale(id, val){
+function syncScale(id, val){
   const labels = SCALE_LABELS[id];
-  document.getElementById(id).innerHTML = [1,2,3,4,5].map((v,i) =>
-    `<button data-v="${v}" aria-pressed="${v === val}" aria-label="${labels[i]}"
-      ><span class="ramp" style="height:${8 + i*6}px"></span></button>`).join('');
-  /* Mientras no hay nada marcado se enuncian los dos extremos, para que la
-     rampa no quede sin explicar en su primer uso. */
+  /* Un slider siempre enseña una posición, así que sin respuesta se apoya en
+     el extremo mínimo en vez de un valor medio — lo menos parecido a haber
+     contestado "moderado" sin querer. */
+  document.getElementById(id).value = val ?? 1;
   const out = document.getElementById(id + 'Out');
   if(out) out.textContent = val ? labels[val-1] : `${labels[0]} … ${labels[4]}`;
 }
@@ -1436,8 +1433,8 @@ function renderCycle(){
   document.querySelectorAll('#cycBleed .chip').forEach(c =>
     c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
   document.getElementById('cycIntField').hidden = !bleeding;
-  paintScale('cycIntensity', log ? log.bleedingIntensity : null);
-  paintScale('cycPain', log ? log.pain : null);
+  syncScale('cycIntensity', log ? log.bleedingIntensity : null);
+  syncScale('cycPain', log ? log.pain : null);
   renderCyclePrediction();
   renderCyclePattern();
 }
@@ -2118,13 +2115,13 @@ document.getElementById('hClose').addEventListener('click', () => dlgHist.close(
 const dlgCheckout = document.getElementById('dlgCheckout');
 let coEnergy = 3, coSensory = 3;
 function coSync(){
-  paintScale('coEnergy', coEnergy); paintScale('coSensory', coSensory);
+  syncScale('coEnergy', coEnergy); syncScale('coSensory', coSensory);
 }
-document.getElementById('coEnergy').addEventListener('click', e => {
-  const b = e.target.closest('[data-v]'); if(!b) return; coEnergy = +b.dataset.v; coSync();
+document.getElementById('coEnergy').addEventListener('input', e => {
+  coEnergy = +e.target.value; coSync();
 });
-document.getElementById('coSensory').addEventListener('click', e => {
-  const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
+document.getElementById('coSensory').addEventListener('input', e => {
+  coSensory = +e.target.value; coSync();
 });
 document.getElementById('btnCheckout').addEventListener('click', () => {
   const co = day().checkout;
@@ -2324,16 +2321,12 @@ document.getElementById('cycBleed').addEventListener('click', e => {
   if(!l.bleeding) l.bleedingIntensity = null;
   save(); renderAll();
 });
-document.getElementById('cycIntensity').addEventListener('click', e => {
-  const b = e.target.closest('[data-v]'); if(!b) return;
-  const l = todayCycleLog();
-  l.bleedingIntensity = l.bleedingIntensity === +b.dataset.v ? null : +b.dataset.v;
+document.getElementById('cycIntensity').addEventListener('input', e => {
+  todayCycleLog().bleedingIntensity = +e.target.value;
   save(); renderCycle();
 });
-document.getElementById('cycPain').addEventListener('click', e => {
-  const b = e.target.closest('[data-v]'); if(!b) return;
-  const l = todayCycleLog();
-  l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
+document.getElementById('cycPain').addEventListener('input', e => {
+  todayCycleLog().pain = +e.target.value;
   save(); renderCycle();
 });
 
