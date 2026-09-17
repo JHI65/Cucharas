@@ -167,11 +167,18 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
 .scale{display:flex;gap:7px}
-/* 15px (paso "Control" existente) en vez del Body de 17px: las etiquetas de
-   magnitud son más largas que un dígito y este tamaño reduce el salto de
-   línea sin introducir un paso nuevo en la escala tipográfica. */
-.scale button{flex:1;padding:13px 4px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:15px;text-align:center;line-height:1.2}
+/* La casilla no lleva texto: cinco palabras por escala obligaban a leer y
+   comparar cinco opciones cada noche. La magnitud se lee por forma (barra que
+   crece) y la palabra de lo marcado se escribe una sola vez, debajo — el mismo
+   patrón que el check-in matinal, donde el valor va acompañado de una palabra.
+   Cada botón conserva su palabra completa en aria-label. */
+.scale button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);display:flex;align-items:flex-end;justify-content:center;min-height:52px}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+/* Rosa Cuchara: en este sistema es el color de "cantidad" (medidor, marcas de
+   carga del calendario), no el de "interactivo", que es Ciruela. */
+.ramp{display:block;width:12px;border-radius:3px;background:var(--spoon)}
+.scale button[aria-pressed="true"] .ramp{background:#FFF8F9}
+.scale-out{margin:7px 0 0;font-size:14px;color:var(--ink-soft)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
 .card h2,.card h3{margin:0 0 9px;font-size:16px}
 .card p{margin:0 0 7px;color:var(--ink-soft);font-size:14px}
@@ -555,10 +562,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div class="field" id="cycIntField" hidden>
         <label>Intensidad del sangrado</label>
         <div class="scale" id="cycIntensity"></div>
+        <p class="scale-out" id="cycIntensityOut"></p>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>Dolor físico</label>
         <div class="scale" id="cycPain"></div>
+        <p class="scale-out" id="cycPainOut"></p>
       </div>
     </div>
 
@@ -805,10 +814,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="field">
       <label>¿Cuánta capacidad te queda ahora?</label>
       <div class="scale" id="coEnergy"></div>
+      <p class="scale-out" id="coEnergyOut"></p>
     </div>
     <div class="field">
       <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
       <div class="scale" id="coSensory"></div>
+      <p class="scale-out" id="coSensoryOut"></p>
     </div>
     <div class="field">
       <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
@@ -1403,8 +1414,13 @@ const SCALE_LABELS = {
 };
 function paintScale(id, val){
   const labels = SCALE_LABELS[id];
-  document.getElementById(id).innerHTML = [1,2,3,4,5]
-    .map((v,i) => `<button data-v="${v}" aria-pressed="${v === val}">${labels[i]}</button>`).join('');
+  document.getElementById(id).innerHTML = [1,2,3,4,5].map((v,i) =>
+    `<button data-v="${v}" aria-pressed="${v === val}" aria-label="${labels[i]}"
+      ><span class="ramp" style="height:${8 + i*6}px"></span></button>`).join('');
+  /* Mientras no hay nada marcado se enuncian los dos extremos, para que la
+     rampa no quede sin explicar en su primer uso. */
+  const out = document.getElementById(id + 'Out');
+  if(out) out.textContent = val ? labels[val-1] : `${labels[0]} … ${labels[4]}`;
 }
 function renderCycle(){
   if(!state.cycleEnabled) return;
