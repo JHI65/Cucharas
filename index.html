@@ -370,6 +370,19 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .slider{width:100%;margin:8px 0 2px;accent-color:var(--spoon)}
 .bigcount{text-align:center;font-size:32px;font-weight:700;margin:4px 0 0;font-variant-numeric:tabular-nums}
 .bigcount small{display:block;font-size:14px;font-weight:400;color:var(--ink-soft)}
+/* El conteo de respiración vive dentro de una tarjeta cálida (Rosa Niebla,
+   el mismo tono que ya usa el panel de ajuste de tarea) en vez de flotar
+   suelto sobre el fondo: un número frío en negro sobre blanco se lee como
+   cronómetro; aquí lleva el color de la cuchara, cálido, y sitio de sobra
+   alrededor. Sigue siendo estático — nada se anima ni se desplaza. */
+.breath-card{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:30px 18px;
+  margin:16px 0 4px;
+}
+.breath-num{color:var(--spoon);margin:0}
 
 /* ==========================================================================
    Rediseño squircle — 2026-09-16
@@ -382,7 +395,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 /* Superelipse en toda la geometría de contenedor. Donde el navegador no conoce
    corner-shape la propiedad se ignora y queda el radio circular de siempre:
    no hay degradación funcional, solo una esquina menos. */
-.meter,.task,.adjust,.card,.empty,.add,.closer button,.lib,.day,.group,
+.meter,.task,.adjust,.card,.breath-card,.empty,.add,.closer button,.lib,.day,.group,
 .cell,.btn,.scale button,.stepper button,.cal-nav button,.bigrow button,
 .mini,.ocgrid input,.field input[type=text],.field input[type=time],
 textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
@@ -856,7 +869,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div id="peakBreath" hidden>
       <h2 id="peakPhase">Inhala</h2>
-      <p class="bigcount" id="peakCount" style="margin:4px 0 18px">4</p>
+      <div class="breath-card">
+        <p class="bigcount breath-num" id="peakCount">4</p>
+      </div>
       <p class="sub" id="peakBreathSub">Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.</p>
       <div class="bigrow"><button id="peakStop2">Ya está, gracias</button></div>
     </div>
