@@ -512,6 +512,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
           <span class="count" id="overCount"></span>
         </div>
         <div class="spoons over" id="overRow" role="img"></div>
+        <button class="linkbtn" id="btnUndoPeak" style="margin-top:9px" hidden>Deshacer el último pico sensorial</button>
       </div>
     </div>
     <button class="linkbtn" id="btnPeak" style="margin-top:9px">He tenido un pico sensorial ahora</button>
@@ -1160,6 +1161,9 @@ function renderMeter(){
     const row = document.getElementById('overRow');
     row.innerHTML = spoonRowHTML(n, n);
     row.setAttribute('aria-label', `${fmtN(n)} cucharas de sobrestimulación`);
+    /* Solo deshace un pico marcado a mano, nunca la sobrestimulación de
+       check-out (esa se corrige rehaciendo el check-out, no aquí). */
+    document.getElementById('btnUndoPeak').hidden = !(d.extras || []).some(e => e.type === 'pico-sensorial');
   }else{
     overBlock.hidden = true;
   }
@@ -1921,6 +1925,16 @@ document.getElementById('btnPeak').addEventListener('click', () => {
   d.extras.push({ type:'pico-sensorial', coste:-Math.abs(state.settings.peakCost) });
   save(); renderAll();
   if(!state.settings.peakPromptOff) openPeakAsk();
+});
+/* Por si se ha tocado sin querer: quita el pico marcado más recientemente,
+   nunca la sobrestimulación de check-out. Se puede tocar varias veces
+   seguidas para deshacer más de uno. */
+document.getElementById('btnUndoPeak').addEventListener('click', () => {
+  const d = day();
+  const idx = (d.extras || []).map(e => e.type).lastIndexOf('pico-sensorial');
+  if(idx === -1) return;
+  d.extras.splice(idx, 1);
+  save(); renderAll();
 });
 
 /* ---------- pico sensorial: ¿descanso? + espacio de calma ---------- */
