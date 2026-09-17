@@ -833,6 +833,30 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<!-- ===== Pico sensorial: ¿descanso? + ejercicio ===== -->
+<dialog id="dlgPeak">
+  <div class="sheet">
+    <div id="peakAsk">
+      <h2>¿Quieres tomar un descanso?</h2>
+      <p class="sub">Un minuto respirando ayuda a bajar la activación del cuerpo cuando hay demasiado ruido, luz o gente de golpe.</p>
+      <label class="row" style="cursor:pointer">
+        <div><strong>No preguntar más</strong><p>La próxima vez que apuntes un pico, no se te volverá a preguntar.</p></div>
+        <input type="checkbox" id="peakDontAsk" aria-label="No volver a preguntar tras un pico sensorial" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+      <div class="bigrow">
+        <button id="peakNo">No</button>
+        <button class="primary" id="peakYes">Sí</button>
+      </div>
+    </div>
+    <div id="peakBreath" hidden>
+      <h2 id="peakPhase">Inhala</h2>
+      <p class="bigcount" id="peakCount" style="margin:4px 0 18px">4</p>
+      <p class="sub" id="peakBreathSub">Sigue el número a tu ritmo. Puedes parar cuando quieras.</p>
+      <div class="bigrow"><button id="peakStop">Ya está, gracias</button></div>
+    </div>
+  </div>
+</dialog>
+
 <!-- ===== Días tipo ===== -->
 <dialog id="dlgTpl">
   <div class="sheet">
@@ -1830,19 +1854,11 @@ function expandDates(startKey){
   return out.length ? out : [startKey];
 }
 
-function openTaskSheet(dateKey, prefillName){
+function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
-  tTime.value = '';
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
-  if(prefillName){
-    const l = learned(prefillName);
-    tName.value = prefillName;
-    tKind = (l && l.suggest < 0) ? 'recarga' : 'gasto';
-    tCost = l ? Math.abs(l.suggest) : 2;
-  }else{
-    tName.value = ''; tCost = 2; tKind = 'gasto';
-  }
   document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
     ? 'Elige de tu lista o escribe una nueva.'
@@ -1876,15 +1892,77 @@ function openTaskEdit(taskId){
   tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
-/* Pico sensorial: resta al instante, sin preguntar nada, y ofrece apuntar un
-   descanso sensorial a continuación — se puede cancelar, no se fuerza. */
+/* Pico sensorial: resta al instante, sin preguntar nada. Después, si no se ha
+   desactivado, se ofrece —nunca se fuerza— un descanso de respiración. */
 document.getElementById('btnPeak').addEventListener('click', () => {
   const d = day();
   d.extras = d.extras || [];
   d.extras.push({ type:'pico-sensorial', coste:-Math.abs(state.settings.peakCost) });
   save(); renderAll();
-  openTaskSheet(todayKey(), 'Descanso sensorial');
+  if(!state.settings.peakPromptOff) openPeakAsk();
 });
+
+/* ---------- pico sensorial: ¿descanso? + respiración ---------- */
+const dlgPeak = document.getElementById('dlgPeak');
+const peakAskView = document.getElementById('peakAsk');
+const peakBreathView = document.getElementById('peakBreath');
+let peakTimer = null;
+function closePeak(){
+  clearInterval(peakTimer); peakTimer = null;
+  dlgPeak.close();
+}
+function openPeakAsk(){
+  clearInterval(peakTimer); peakTimer = null;
+  peakAskView.hidden = false;
+  peakBreathView.hidden = true;
+  document.getElementById('peakDontAsk').checked = false;
+  openDialog(dlgPeak);
+}
+document.getElementById('peakNo').addEventListener('click', () => {
+  if(document.getElementById('peakDontAsk').checked){ state.settings.peakPromptOff = true; save(); }
+  closePeak();
+});
+document.getElementById('peakStop').addEventListener('click', closePeak);
+/* Inhala 4 / exhala 6: la exhalación más larga es lo que baja la activación
+   del cuerpo (respuesta parasimpática), no hace falta retener el aire. Nada
+   de "fíjate en lo que te rodea" — con un pico sensorial el problema ya es
+   demasiada entrada sensorial, así que no se pide atender más a ella; basta
+   con seguir un número. El número cambia de golpe, como un cronómetro, nunca
+   se anima ni suena nada, y se puede parar en cualquier momento. */
+const PEAK_PHASES = [['Inhala',4], ['Exhala',6]];
+const PEAK_ROUNDS = 4;
+document.getElementById('peakYes').addEventListener('click', () => {
+  if(document.getElementById('peakDontAsk').checked){ state.settings.peakPromptOff = true; save(); }
+  peakAskView.hidden = true;
+  peakBreathView.hidden = false;
+  let round = 0, phaseIdx = 0, n = PEAK_PHASES[0][1];
+  const phaseEl = document.getElementById('peakPhase');
+  const countEl = document.getElementById('peakCount');
+  const subEl = document.getElementById('peakBreathSub');
+  subEl.textContent = 'Sigue el número a tu ritmo. Puedes parar cuando quieras.';
+  const paint = () => { phaseEl.textContent = PEAK_PHASES[phaseIdx][0]; countEl.textContent = n; };
+  paint();
+  clearInterval(peakTimer);
+  peakTimer = setInterval(() => {
+    n--;
+    if(n <= 0){
+      phaseIdx++;
+      if(phaseIdx >= PEAK_PHASES.length){
+        phaseIdx = 0; round++;
+        if(round >= PEAK_ROUNDS){
+          clearInterval(peakTimer); peakTimer = null;
+          phaseEl.textContent = 'Ya está';
+          countEl.textContent = '';
+          subEl.textContent = 'Puedes cerrar cuando quieras.';
+          return;
+        }
+      }
+      n = PEAK_PHASES[phaseIdx][1];
+    }
+    paint();
+  }, 1000);
+});
+
 const dlgWhyMargin = document.getElementById('dlgWhyMargin');
 /* la línea del desglose se reescribe en cada render, así que el enlace se
    escucha desde el párrafo, que sí se queda */
@@ -2397,6 +2475,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     if(!state.settings) state.settings = { max:12 };
     if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
     if(state.settings.peakCost == null) state.settings.peakCost = PEAK_COST_DEFAULT;
+    if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
     ensureFinanzas(); ensureCycle();
     await save(); applyContrast(); applyCycleUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
@@ -2406,10 +2485,11 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const overCost = state.settings.overCost;
   const peakCost = state.settings.peakCost;
+  const peakPromptOff = state.settings.peakPromptOff;
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost, peakCost},
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost, peakCost, peakPromptOff},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[] };
   ensureFinanzas(); ensureCycle();
   save(); applyCycleUI(); renderAll();
@@ -2428,6 +2508,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgLibList', 'libListClose'],
   ['dlgWhyMargin', 'whyMarginClose'],
   ['dlgCheckout', 'coCancel'],
+  ['dlgPeak', 'peakNo'],
   ['dlgTpl', 'tplClose'],
   ['dlgDay', 'dClose'],
   ['dlgGasto', 'gCancel'],
@@ -2448,6 +2529,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(!state.settings) state.settings = { max:12 };
   if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
   if(state.settings.peakCost == null) state.settings.peakCost = PEAK_COST_DEFAULT;
+  if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
   if(!state.templates) state.templates = [];
   ensureFinanzas(); ensureCycle();
   applyContrast(); applyCycleUI();
