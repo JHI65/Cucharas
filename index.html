@@ -378,6 +378,27 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   border-radius:999px;padding:9px 14px;font-size:15px;
 }
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+/* ---- Guía del primer arranque ----
+   Bocadillo anclado al elemento del que habla. Sin animación ni
+   desplazamiento suave: el recorrido salta de sitio, no viaja. */
+.tour-block{position:fixed;inset:0;z-index:60}
+.tour-spot{
+  position:fixed;z-index:61;pointer-events:none;
+  border:2px solid var(--accent);border-radius:var(--r-block);
+  box-shadow:0 0 0 9999px rgba(75,58,63,.55);
+}
+.tour-spot.blank{border-color:transparent;border-radius:0}
+.tour-bubble{
+  position:fixed;z-index:62;
+  width:calc(100% - 28px);max-width:330px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:var(--pad);
+  box-shadow:0 8px 28px rgba(75,58,63,.16);
+}
+.tour-bubble h2{margin:0 0 4px;font-size:19px}
+.tour-bubble p.sub{margin:0 0 14px;font-size:15px}
+.tour-bubble p.tour-step{margin:0 0 2px;font-size:13px}
+:root[data-contrast="alto"] .tour-spot{box-shadow:0 0 0 9999px rgba(30,20,24,.72)}
 .bigrow{display:flex;gap:10px;margin-top:6px}
 .bigrow button{flex:1;padding:15px;border-radius:var(--r-block);border:1px solid var(--line);background:var(--surface)}
 .bigrow button.primary{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
@@ -746,19 +767,22 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>Ajustes</button>
 </nav>
 
-<!-- ===== Bienvenida: una idea por paso, saltable en cualquier momento y
-     recuperable después desde Ajustes ("Cómo funciona la app") ===== -->
-<dialog id="dlgIntro">
-  <div class="sheet">
-    <p class="sub" id="introStep"></p>
-    <h2 id="introTitle"></h2>
-    <p class="sub" id="introBody"></p>
+<!-- ===== Guía del primer arranque: cada paso señala el elemento del que
+     habla. Saltable en cualquier momento y recuperable después desde
+     Ajustes ("Cómo funciona la app"). ===== -->
+<div id="tour" hidden>
+  <div class="tour-block"></div>
+  <div class="tour-spot" id="tourSpot" hidden></div>
+  <div class="tour-bubble" id="tourBubble" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+    <p class="sub tour-step" id="tourStep"></p>
+    <h2 id="tourTitle"></h2>
+    <p class="sub" id="tourBody"></p>
     <div class="bigrow">
-      <button id="introSkip">Saltar</button>
-      <button class="primary" id="introNext">Siguiente</button>
+      <button id="tourSkip">Saltar</button>
+      <button class="primary" id="tourNext">Siguiente</button>
     </div>
   </div>
-</dialog>
+</div>
 
 <!-- ===== Check-in ===== -->
 <dialog id="dlgCheckin">
@@ -1902,47 +1926,113 @@ function openDialog(dlg){
 }
 
 /* ---------- check-in ---------- */
-/* ---------- bienvenida ---------- */
-// Una idea por tarjeta, en lenguaje literal, sin captura de pantalla que
-// pueda quedar desfasada. Saltable en cualquier paso; queda accesible
-// después desde Ajustes, así que saltarla no pierde nada para siempre.
-const INTRO_STEPS = [
-  { title:'Bienvenida a Spoony', body:'Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).' },
-  { title:'Por la mañana', body:'Al abrir la app se te pregunta cuántas cucharas tienes hoy. Puedes cambiarlo durante el día si hace falta, o tocar "Ahora no" para saltarlo.' },
-  { title:'Las tareas', body:'Añade lo que vas a hacer hoy y cuánto crees que te va a costar. Al marcarla puedes corregir lo que costó de verdad: la app aprende de eso.' },
-  { title:'Pico sensorial', body:'El botón "He tenido un pico sensorial ahora" resta cucharas de golpe y te ofrece un espacio de calma, sin preguntas ni cronómetro.' },
-  { title:'Calendario', body:'Muestra la carga de cada día del mes y qué patrones se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.' },
-  { title:'Check-out de la noche', body:'Dos preguntas cortas sobre cuánta capacidad y tolerancia sensorial te quedan. Ayuda a la app a afinar sus cálculos.' },
-  { title:'Ajustes', body:'Cambia el color, el contraste, y activa Ciclo o Finanzas si te sirven — vienen apagados por defecto. Ahí también exportas una copia de tus datos.' },
+/* ---------- guía del primer arranque ----------
+   Cada paso señala el elemento del que habla, para que además de qué es
+   una cuchara quede claro dónde está cada cosa. Una idea por paso, en
+   lenguaje literal. Saltable en cualquier momento; queda accesible después
+   desde Ajustes, así que saltarla no pierde nada para siempre. */
+const TOUR_STEPS = [
+  { sel:null, title:'Bienvenida a Spoony', body:'Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).' },
+  { sel:'.meter', title:'Las cucharas de hoy', body:'Aquí ves cuántas te quedan. Al abrir la app se te pregunta con cuántas te levantas; puedes tocar este recuadro para cambiarlo en cualquier momento del día.' },
+  { sel:'#btnPeak', title:'He tenido un pico sensorial ahora', body:'Este botón resta cucharas de golpe cuando el ruido, la luz o la gente te pasan por encima, y te ofrece un espacio de calma. Sin preguntas ni cronómetro.' },
+  { sel:'#btnAddTask', title:'Las tareas del día', body:'Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcarla puedes corregir lo que costó de verdad: la app aprende de eso.' },
+  { sel:'#btnCheckout', title:'Cerrar el día', body:'Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
+  { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.' },
+  { sel:'#tabs [data-go="set"]', title:'Ajustes', body:'Color, contraste y los módulos de Ciclo y Finanzas, que vienen apagados. Aquí también exportas una copia de tus datos y puedes volver a ver esta guía.' },
 ];
-let introIdx = 0;
-let introReplay = false;   // desde Ajustes: al cerrar, no debe reabrir el check-in
-function renderIntroStep(){
-  const s = INTRO_STEPS[introIdx];
-  document.getElementById('introStep').textContent = `Paso ${introIdx+1} de ${INTRO_STEPS.length}`;
-  document.getElementById('introTitle').textContent = s.title;
-  document.getElementById('introBody').textContent = s.body;
-  document.getElementById('introNext').textContent = introIdx === INTRO_STEPS.length - 1 ? 'Empezar' : 'Siguiente';
+let tourIdx = 0, tourSteps = [], tourReplay = false;
+
+function placeTour(){
+  const step = tourSteps[tourIdx];
+  const spot = document.getElementById('tourSpot');
+  const bubble = document.getElementById('tourBubble');
+  const el = step.sel ? document.querySelector(step.sel) : null;
+  const M = 8, G = 14;   // aire alrededor del elemento y margen con el borde
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+  if(!el){
+    // Paso sin ancla: bocadillo centrado y foco de tamaño cero, para que la
+    // atenuación siga cubriendo la pantalla. Si no, el fondo parece usable
+    // cuando en realidad no responde.
+    spot.hidden = false;
+    spot.classList.add('blank');
+    spot.style.left = Math.round(vw/2) + 'px';
+    spot.style.top  = Math.round(vh/2) + 'px';
+    spot.style.width = spot.style.height = '0px';
+    bubble.style.left = Math.round((vw - bw) / 2) + 'px';
+    bubble.style.top  = Math.round((vh - bh) / 2) + 'px';
+    return;
+  }
+  const r = el.getBoundingClientRect();
+  spot.hidden = false;
+  spot.classList.remove('blank');
+  spot.style.left   = (r.left - M) + 'px';
+  spot.style.top    = (r.top - M) + 'px';
+  spot.style.width  = (r.width + M*2) + 'px';
+  spot.style.height = (r.height + M*2) + 'px';
+  // Debajo del elemento si cabe; si no, encima. El bocadillo nunca tapa
+  // aquello de lo que habla.
+  const below = vh - (r.bottom + M) - G;
+  const top = bh <= below ? r.bottom + M + G/2 : Math.max(G, r.top - M - G/2 - bh);
+  bubble.style.top  = Math.round(Math.min(top, vh - bh - G)) + 'px';
+  bubble.style.left = Math.round(Math.max(G, Math.min(r.left + r.width/2 - bw/2, vw - bw - G))) + 'px';
 }
-function openIntro(replay){
-  introIdx = 0;
-  introReplay = !!replay;
-  document.getElementById('introSkip').textContent = introReplay ? 'Cerrar' : 'Saltar';
-  renderIntroStep();
-  openDialog(document.getElementById('dlgIntro'));
+
+function renderTourStep(){
+  const step = tourSteps[tourIdx];
+  document.getElementById('tourStep').textContent = `Paso ${tourIdx+1} de ${tourSteps.length}`;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourBody').textContent = step.body;
+  document.getElementById('tourNext').textContent = tourIdx === tourSteps.length - 1 ? 'Empezar' : 'Siguiente';
+  // Sin desplazamiento suave: un movimiento largo en pantalla es un evento
+  // sensorial. Salta directo y solo si el elemento no se ve entero.
+  const el = step.sel ? document.querySelector(step.sel) : null;
+  if(el){
+    const r = el.getBoundingClientRect();
+    if(r.top < 60 || r.bottom > window.innerHeight - 120) el.scrollIntoView({block:'center'});
+  }
+  placeTour();
+  document.getElementById('tourNext').focus();
 }
-function closeIntro(){
+
+function startTour(replay){
+  tourReplay = !!replay;
+  // La guía recorre la pantalla de Hoy: si se abre desde Ajustes, vuelve ahí.
+  const hoy = document.querySelector('#tabs [data-go="hoy"]');
+  if(currentTab !== 'hoy') hoy.click();
+  // Un paso cuyo elemento no existe o está oculto (pestañas de módulos
+  // apagados) se cae del recorrido en vez de señalar al vacío.
+  tourSteps = TOUR_STEPS.filter(s => {
+    if(!s.sel) return true;
+    const el = document.querySelector(s.sel);
+    return el && el.getClientRects().length > 0;
+  });
+  if(!tourSteps.length) return endTour();
+  tourIdx = 0;
+  document.getElementById('tourSkip').textContent = tourReplay ? 'Cerrar' : 'Saltar';
+  document.getElementById('tour').hidden = false;
+  renderTourStep();
+}
+
+function endTour(){
   state.settings.introSeen = true;
   save();
-  document.getElementById('dlgIntro').close();
-  if(!introReplay && day().budget == null) openCheckin();
+  document.getElementById('tour').hidden = true;
+  if(!tourReplay && day().budget == null) openCheckin();
 }
-document.getElementById('introSkip').addEventListener('click', closeIntro);
-document.getElementById('introNext').addEventListener('click', () => {
-  if(introIdx < INTRO_STEPS.length - 1){ introIdx++; renderIntroStep(); }
-  else closeIntro();
+
+document.getElementById('tourSkip').addEventListener('click', endTour);
+document.getElementById('tourNext').addEventListener('click', () => {
+  if(tourIdx < tourSteps.length - 1){ tourIdx++; renderTourStep(); }
+  else endTour();
 });
-document.getElementById('btnIntroReplay').addEventListener('click', () => openIntro(true));
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && !document.getElementById('tour').hidden){ e.preventDefault(); endTour(); }
+});
+['resize','scroll'].forEach(ev => window.addEventListener(ev, () => {
+  if(!document.getElementById('tour').hidden) placeTour();
+}, {passive:true}));
+document.getElementById('btnIntroReplay').addEventListener('click', () => startTour(true));
 
 const dlgCheckin = document.getElementById('dlgCheckin');
 const ciRange = document.getElementById('ciRange');
@@ -2875,7 +2965,6 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgGasto', 'gCancel'],
   ['dlgHist', 'hClose'],
   ['dlgCheckin', 'ciSkip'],
-  ['dlgIntro', 'introSkip'],
 ].forEach(([dlgId, btnId]) => {
   document.getElementById(dlgId).addEventListener('click', e => {
     if(e.target.id === dlgId) document.getElementById(btnId).click();
@@ -2904,7 +2993,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.
   day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
   renderAll();
-  if(!state.settings.introSeen) openIntro();
+  if(!state.settings.introSeen) startTour(false);
   else if(day().budget == null) openCheckin();
 })();
 </script>

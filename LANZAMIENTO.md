@@ -54,26 +54,33 @@ Además, ni Miserandino ni Toudal/Attwood aparecían en el código: usar vocabul
 comunidad en un producto público sin dar crédito es justo lo que destruye la confianza
 (N10, editorial).
 
-Arreglo: una bienvenida de 7 tarjetas (`dlgIntro`, `index.html`), una idea por paso, en
-lenguaje literal. La primera explica qué es una cuchara y da el crédito pedido; el resto
-recorre check-in, tareas, pico sensorial, calendario, check-out y ajustes — evitando un
-volcado de una sola pantalla con "todo lo que tiene la app". Saltable en cualquier paso
-("Saltar" siempre visible) y recuperable después desde Ajustes → Ayuda → "Cómo funciona
-la app", así saltarla no pierde nada para siempre. Guarda `state.settings.introSeen`.
-Quien ya tenía historial antes de que existiera esta pantalla no se la encuentra de
+Arreglo: una guía de 7 pasos (`#tour`, `TOUR_STEPS` en `index.html`) donde cada paso
+señala el elemento del que habla con un foco y un bocadillo anclado — así queda claro no
+solo qué es una cuchara sino dónde está cada cosa. El paso 1 no tiene ancla (explica el
+concepto y da el crédito pedido); los demás señalan el medidor, "He tenido un pico
+sensorial ahora", "Añadir tarea", "Check-out de hoy" y las pestañas de Calendario y
+Ajustes. Una idea por paso, en lenguaje literal, sin animación ni desplazamiento suave:
+el recorrido salta de sitio y solo cuando el elemento no se ve entero. Saltable en
+cualquier paso ("Saltar" siempre visible, Escape también) y recuperable después desde
+Ajustes → Ayuda → "Cómo funciona la app", así saltarla no pierde nada para siempre.
+Guarda `state.settings.introSeen`. Un paso cuyo elemento esté oculto se cae del recorrido
+en vez de señalar al vacío.
+
+Quien ya tenía historial antes de que existiera esta guía no se la encuentra de
 sorpresa: solo se muestra sin pedirlo a quien instala la app de cero (`state.days` vacío
 al arrancar por primera vez tras la actualización). Fila "Acerca de" añadida en Ajustes
-con los créditos, aparte de la bienvenida.
+con los créditos, aparte de la guía.
 
-Texto de la primera tarjeta:
+Texto del primer paso:
 
 > Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas
 > gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría
 > de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).
 
 Verificado con Chrome headless: primer arranque (7 pasos → check-in), usuario con
-historial (no la ve) y repaso desde Ajustes (no reabre el check-in ni deja diálogos
-superpuestos).
+historial (no la ve), repaso desde Ajustes (vuelve a Hoy, no reabre el check-in) y una
+pasada con `window.onerror` enganchado, sin errores. La atenuación cubre la pantalla
+también en el paso sin ancla, para que el fondo no parezca usable cuando no responde.
 
 ### 1.3 La fase del ciclo se puede leer como predicción de fertilidad
 
