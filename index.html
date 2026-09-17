@@ -1661,6 +1661,27 @@ function patternsChart(keys){
   </svg>`;
 }
 
+/* Patrón de picos: no un gráfico nuevo, sino la misma pregunta que ya
+   contestan los demás insights de esta tarjeta — ¿el día después de un pico
+   sensorial se despierta distinto? — comparado contra la propia media
+   reciente del usuario, nunca contra un ideal externo. Necesita un mínimo de
+   casos para no sacar una conclusión de uno o dos días sueltos; si no llegan,
+   no dice nada, igual que "flat"/"rising" ya hacen en silencio. */
+const NEED_PEAKS = 5;
+function peakNextDayInsight(){
+  const typical = typicalBudget();
+  const diffs = Object.keys(state.days).sort().reduce((acc, k) => {
+    const hadPeak = (state.days[k].extras || []).some(e => e.type === 'pico-sensorial');
+    if(!hadPeak) return acc;
+    const next = state.days[shiftKey(k, 1)];
+    if(next && next.budget != null) acc.push(next.budget - typical);
+    return acc;
+  }, []);
+  if(diffs.length < NEED_PEAKS) return null;
+  const avgDiff = Math.round((diffs.reduce((a,b)=>a+b,0)/diffs.length) * 10) / 10;
+  return { n:diffs.length, avgDiff };
+}
+
 function renderPatterns(){
   const el = document.getElementById('patterns');
   const keys = Object.keys(state.days).sort().filter(k => state.days[k].checkout);
@@ -1691,6 +1712,15 @@ function renderPatterns(){
   </div>`;
   if(flat) out += '<p class="insight">Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
   if(rising.length) out += `<p class="insight">Tardas más que antes en recuperarte de: ${esc(rising.join(', '))}.</p>`;
+  const peaks = peakNextDayInsight();
+  if(peaks){
+    const d = peaks.avgDiff;
+    const cuch = n => Math.abs(n) === 1 ? 'cuchara' : 'cucharas';
+    const frase = d <= -0.5 ? `sueles empezar con ${fmtN(Math.abs(d))} ${cuch(d)} menos que tu media`
+      : d >= 0.5 ? `sueles empezar con ${fmtN(d)} ${cuch(d)} más que tu media`
+      : 'no se nota una diferencia clara con tu media';
+    out += `<p class="insight">Los días después de un pico sensorial (${peaks.n} caso${peaks.n===1?'':'s'}), ${frase}.</p>`;
+  }
   el.innerHTML = out;
 }
 
