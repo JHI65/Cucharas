@@ -833,12 +833,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
-<!-- ===== Pico sensorial: ¿descanso? + ejercicio ===== -->
+<!-- ===== Pico sensorial: ¿descanso? + espacio de calma ===== -->
 <dialog id="dlgPeak">
   <div class="sheet">
     <div id="peakAsk">
       <h2>¿Quieres tomar un descanso?</h2>
-      <p class="sub">Un minuto respirando ayuda a bajar la activación del cuerpo cuando hay demasiado ruido, luz o gente de golpe.</p>
+      <p class="sub">Parar un momento, a tu manera, puede ayudar a bajar la activación del cuerpo.</p>
       <label class="row" style="cursor:pointer">
         <div><strong>No preguntar más</strong><p>La próxima vez que apuntes un pico, no se te volverá a preguntar.</p></div>
         <input type="checkbox" id="peakDontAsk" aria-label="No volver a preguntar tras un pico sensorial" style="flex:0 0 auto;width:20px;height:20px">
@@ -848,11 +848,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="primary" id="peakYes">Sí</button>
       </div>
     </div>
+    <div id="peakCalm" hidden>
+      <h2>Tómate el tiempo que necesites</h2>
+      <p class="sub">Nada que seguir ni que contar. Cierra cuando estés listo.</p>
+      <div class="bigrow"><button id="peakStop">Ya está, gracias</button></div>
+      <button class="linkbtn" id="peakWantBreath" style="margin-top:14px">Seguir un conteo de respiración (opcional)</button>
+    </div>
     <div id="peakBreath" hidden>
       <h2 id="peakPhase">Inhala</h2>
       <p class="bigcount" id="peakCount" style="margin:4px 0 18px">4</p>
-      <p class="sub" id="peakBreathSub">Sigue el número a tu ritmo. Puedes parar cuando quieras.</p>
-      <div class="bigrow"><button id="peakStop">Ya está, gracias</button></div>
+      <p class="sub" id="peakBreathSub">Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.</p>
+      <div class="bigrow"><button id="peakStop2">Ya está, gracias</button></div>
     </div>
   </div>
 </dialog>
@@ -1902,9 +1908,18 @@ document.getElementById('btnPeak').addEventListener('click', () => {
   if(!state.settings.peakPromptOff) openPeakAsk();
 });
 
-/* ---------- pico sensorial: ¿descanso? + respiración ---------- */
+/* ---------- pico sensorial: ¿descanso? + espacio de calma ---------- */
+/* No hay "el" ejercicio que funcione para todo el mundo (tantas soluciones
+   como personas autistas): seguir un conteo de respiración exige notar y
+   ajustar el propio cuerpo en tiempo real, justo lo que la interocepción
+   atípica o la alexitimia pueden hacer difícil, y para un perfil con
+   evitación de demandas hasta una cuenta atrás puede leerse como una orden.
+   Por eso el paso por defecto no pide nada — ni contar, ni seguir un ritmo,
+   ni fijarse en el entorno —, y el conteo queda como opción aparte para quien
+   sí le funcione. */
 const dlgPeak = document.getElementById('dlgPeak');
 const peakAskView = document.getElementById('peakAsk');
+const peakCalmView = document.getElementById('peakCalm');
 const peakBreathView = document.getElementById('peakBreath');
 let peakTimer = null;
 function closePeak(){
@@ -1914,6 +1929,7 @@ function closePeak(){
 function openPeakAsk(){
   clearInterval(peakTimer); peakTimer = null;
   peakAskView.hidden = false;
+  peakCalmView.hidden = true;
   peakBreathView.hidden = true;
   document.getElementById('peakDontAsk').checked = false;
   openDialog(dlgPeak);
@@ -1922,24 +1938,27 @@ document.getElementById('peakNo').addEventListener('click', () => {
   if(document.getElementById('peakDontAsk').checked){ state.settings.peakPromptOff = true; save(); }
   closePeak();
 });
-document.getElementById('peakStop').addEventListener('click', closePeak);
-/* Inhala 4 / exhala 6: la exhalación más larga es lo que baja la activación
-   del cuerpo (respuesta parasimpática), no hace falta retener el aire. Nada
-   de "fíjate en lo que te rodea" — con un pico sensorial el problema ya es
-   demasiada entrada sensorial, así que no se pide atender más a ella; basta
-   con seguir un número. El número cambia de golpe, como un cronómetro, nunca
-   se anima ni suena nada, y se puede parar en cualquier momento. */
-const PEAK_PHASES = [['Inhala',4], ['Exhala',6]];
-const PEAK_ROUNDS = 4;
 document.getElementById('peakYes').addEventListener('click', () => {
   if(document.getElementById('peakDontAsk').checked){ state.settings.peakPromptOff = true; save(); }
   peakAskView.hidden = true;
+  peakCalmView.hidden = false;
+});
+document.getElementById('peakStop').addEventListener('click', closePeak);
+document.getElementById('peakStop2').addEventListener('click', closePeak);
+/* Inhala 4 / exhala 6: la exhalación más larga es lo que baja la activación
+   del cuerpo (respuesta parasimpática). El número cambia de golpe, como un
+   cronómetro, nunca se anima ni suena nada, y se puede parar cuando quieras.
+   Solo se llega aquí si se pide expresamente — nunca es el paso por defecto. */
+const PEAK_PHASES = [['Inhala',4], ['Exhala',6]];
+const PEAK_ROUNDS = 4;
+document.getElementById('peakWantBreath').addEventListener('click', () => {
+  peakCalmView.hidden = true;
   peakBreathView.hidden = false;
   let round = 0, phaseIdx = 0, n = PEAK_PHASES[0][1];
   const phaseEl = document.getElementById('peakPhase');
   const countEl = document.getElementById('peakCount');
   const subEl = document.getElementById('peakBreathSub');
-  subEl.textContent = 'Sigue el número a tu ritmo. Puedes parar cuando quieras.';
+  subEl.textContent = 'Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.';
   const paint = () => { phaseEl.textContent = PEAK_PHASES[phaseIdx][0]; countEl.textContent = n; };
   paint();
   clearInterval(peakTimer);
