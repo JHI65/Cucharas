@@ -501,6 +501,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="spoons over" id="overRow" role="img"></div>
       </div>
     </div>
+    <button class="linkbtn" id="btnPeak" style="margin-top:9px">He tenido un pico sensorial ahora</button>
 
     <div class="sectionhead">
       <h2>Tareas</h2>
@@ -617,6 +618,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button id="maxPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
     </div>
+    <div class="row">
+      <div><strong>Coste de un pico sensorial</strong><p>Cuántas cucharas resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.</p></div>
+      <div class="stepper">
+        <button id="peakMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <output id="peakOut"></output>
+        <button id="peakPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+      </div>
+    </div>
     <div class="ocrow">
       <strong>Coste de la sobrestimulación</strong>
       <p>Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
@@ -703,6 +712,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div><strong>Hoy no necesito el margen</strong><p>Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.</p></div>
       <input type="checkbox" id="ciMarginOff" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
     </label>
+    <p class="lib-note" id="ciYesterday" hidden style="margin:2px 0 14px"></p>
     <div class="bigrow"><button id="ciSkip">Ahora no</button><button class="primary" id="ciSave">Empezar el día</button></div>
   </div>
 </dialog>
@@ -940,7 +950,8 @@ const SEED = [
   {name:'Descanso sensorial', est:-1, samples:[]}
 ];
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT} },
+const PEAK_COST_DEFAULT = 2;
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCost:PEAK_COST_DEFAULT },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null },
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
@@ -1050,7 +1061,11 @@ function renderMeter(){
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
   const gasto = done.filter(v=>v>0).reduce((a,b)=>a+b, 0);
   const recarga = -done.filter(v=>v<0).reduce((a,b)=>a+b, 0);
-  const left = budget - gasto + recarga - marginAmount;
+  /* Picos sensoriales y sobrestimulación de check-out ya restan cucharas de
+     verdad (antes solo se mostraban, sin afectar al recuento). coste llega en
+     negativo, así que sumarlo directamente es restar. */
+  const extras = (d.extras || []).reduce((a,e)=>a+(e.coste||0), 0);
+  const left = budget - gasto + recarga - marginAmount + extras;
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
@@ -1089,10 +1104,12 @@ function renderMeter(){
   document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
   document.getElementById('closerHint').hidden = !!co;
 
-  const overEntry = (d.extras || []).find(x => x.type === 'sobrestimulacion');
+  /* Suma de todos los extras del día: picos sensoriales sueltos durante el
+     día y, si no hubo ninguno, la sobrestimulación que añade el check-out. */
+  const overTotal = -(d.extras || []).reduce((a,e)=>a+(e.coste||0), 0);
   const overBlock = document.getElementById('overBlock');
-  if(overEntry && overEntry.coste){
-    const n = Math.abs(overEntry.coste);
+  if(overTotal){
+    const n = overTotal;
     overBlock.hidden = false;
     document.getElementById('overCount').textContent = `-${fmtN(n)}`;
     const row = document.getElementById('overRow');
@@ -1540,7 +1557,12 @@ function typicalBudget(){
 function dayLoad(k){
   const d = state.days[k]; if(!d) return { planned:0, spent:0, has:false };
   const planned = d.tasks.reduce((a,t)=>a+(t.real ?? t.est), 0);
-  const spent = d.tasks.filter(t=>t.done).reduce((a,t)=>a+(t.real ?? t.est), 0);
+  /* d.extras guarda picos sensoriales y la sobrestimulación de check-out con
+     coste en negativo (igual que OVERCOST_DEFAULT); se cuentan como gasto
+     real para que un día sensorialmente caro pese en el historial y en la
+     media, no solo en el aviso de esa misma noche. */
+  const extrasSpent = -(d.extras || []).reduce((a,e)=>a+(e.coste||0), 0);
+  const spent = d.tasks.filter(t=>t.done).reduce((a,t)=>a+(t.real ?? t.est), 0) + extrasSpent;
   return { planned, spent, has:d.tasks.length > 0 || !!d.note };
 }
 
@@ -1658,6 +1680,7 @@ function renderOverCost(){
 }
 function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin(); renderCycle();
   document.getElementById('maxOut').textContent = state.settings.max;
+  document.getElementById('peakOut').textContent = state.settings.peakCost;
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 
@@ -1705,6 +1728,13 @@ function openCheckin(){
   const marginRow = document.getElementById('ciMarginRow');
   marginRow.hidden = !precautionReason(todayKey());
   document.getElementById('ciMarginOff').checked = !!day().marginOff;
+  /* Contexto de ayer, no una pregunta: el pico ya se cobró cuando pasó, esto
+     solo ayuda a planificar hoy sabiendo cómo vino la sobrecarga de ayer. */
+  const yEl = document.getElementById('ciYesterday');
+  const yDay = state.days[shiftKey(todayKey(), -1)];
+  const yPeaks = yDay ? (yDay.extras || []).filter(e => e.type === 'pico-sensorial').length : 0;
+  yEl.hidden = !yPeaks;
+  if(yPeaks) yEl.textContent = `Ayer registraste ${yPeaks} pico${yPeaks===1?'':'s'} sensorial${yPeaks===1?'':'es'}.`;
   openDialog(dlgCheckin);
 }
 document.getElementById('ciPresets').addEventListener('click', e => {
@@ -1800,11 +1830,19 @@ function expandDates(startKey){
   return out.length ? out : [startKey];
 }
 
-function openTaskSheet(dateKey){
+function openTaskSheet(dateKey, prefillName){
   editingTask = null;
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = '';
+  tTime.value = '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  if(prefillName){
+    const l = learned(prefillName);
+    tName.value = prefillName;
+    tKind = (l && l.suggest < 0) ? 'recarga' : 'gasto';
+    tCost = l ? Math.abs(l.suggest) : 2;
+  }else{
+    tName.value = ''; tCost = 2; tKind = 'gasto';
+  }
   document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
     ? 'Elige de tu lista o escribe una nueva.'
@@ -1838,6 +1876,15 @@ function openTaskEdit(taskId){
   tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
+/* Pico sensorial: resta al instante, sin preguntar nada, y ofrece apuntar un
+   descanso sensorial a continuación — se puede cancelar, no se fuerza. */
+document.getElementById('btnPeak').addEventListener('click', () => {
+  const d = day();
+  d.extras = d.extras || [];
+  d.extras.push({ type:'pico-sensorial', coste:-Math.abs(state.settings.peakCost) });
+  save(); renderAll();
+  openTaskSheet(todayKey(), 'Descanso sensorial');
+});
 const dlgWhyMargin = document.getElementById('dlgWhyMargin');
 /* la línea del desglose se reescribe en cada render, así que el enlace se
    escucha desde el párrafo, que sí se queda */
@@ -2116,8 +2163,13 @@ document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.
 document.getElementById('coSave').addEventListener('click', () => {
   const d = day();
   d.checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
-  const coste = state.settings.overCost[coSensory] ?? 0;
   d.extras = (d.extras || []).filter(x => x.type !== 'sobrestimulacion');
+  /* Si ya se apuntó algún pico sensorial durante el día, ese es el coste real
+     y la puntuación de la noche no vuelve a cobrarlo aparte: sería la misma
+     sobrecarga contada dos veces. Solo se cobra por la puntuación cuando no
+     hubo ningún pico que ya lo hiciera. */
+  const yaHuboPico = d.extras.some(x => x.type === 'pico-sensorial');
+  const coste = yaHuboPico ? 0 : (state.settings.overCost[coSensory] ?? 0);
   if(coste) d.extras.push({ type:'sobrestimulacion', coste });
   save(); dlgCheckout.close(); renderAll();
 });
@@ -2248,6 +2300,12 @@ document.getElementById('maxMinus').addEventListener('click', () => {
 document.getElementById('maxPlus').addEventListener('click', () => {
   state.settings.max = Math.min(24, state.settings.max+1); save(); renderAll();
 });
+document.getElementById('peakMinus').addEventListener('click', () => {
+  state.settings.peakCost = Math.max(0, state.settings.peakCost-1); save(); renderAll();
+});
+document.getElementById('peakPlus').addEventListener('click', () => {
+  state.settings.peakCost = Math.min(10, state.settings.peakCost+1); save(); renderAll();
+});
 const THEME_COLOR = { normal:'#FBF2F3', alto:'#FFF7F8' };
 function applyContrast(){
   const v = state.settings.contrast === 'alto' ? 'alto' : 'normal';
@@ -2338,6 +2396,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     state = parsed;
     if(!state.settings) state.settings = { max:12 };
     if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
+    if(state.settings.peakCost == null) state.settings.peakCost = PEAK_COST_DEFAULT;
     ensureFinanzas(); ensureCycle();
     await save(); applyContrast(); applyCycleUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
@@ -2346,10 +2405,11 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const overCost = state.settings.overCost;
+  const peakCost = state.settings.peakCost;
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost},
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, overCost, peakCost},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[] };
   ensureFinanzas(); ensureCycle();
   save(); applyCycleUI(); renderAll();
@@ -2387,6 +2447,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   state.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!state.settings) state.settings = { max:12 };
   if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
+  if(state.settings.peakCost == null) state.settings.peakCost = PEAK_COST_DEFAULT;
   if(!state.templates) state.templates = [];
   ensureFinanzas(); ensureCycle();
   applyContrast(); applyCycleUI();
