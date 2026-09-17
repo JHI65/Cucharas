@@ -308,11 +308,13 @@ textarea{
 .ocgrid{display:flex;gap:8px}
 .ocgrid label{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:13px;color:var(--ink-soft)}
 .ocgrid input{width:100%;text-align:center;padding:9px 2px;border:1px solid var(--line);border-radius:11px;background:var(--surface);font-variant-numeric:tabular-nums}
-/* Muestras fijas en vez del selector nativo: así nadie llega, sin querer,
-   a un blanco o un tono tan claro que el texto deja de leerse encima. */
-.swatches{display:flex;flex-wrap:wrap;gap:10px;padding:2px 0 4px}
-.swatch{width:38px;height:38px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer}
-.swatch[aria-pressed="true"]{border-color:var(--surface);box-shadow:0 0 0 2px var(--ink)}
+/* El selector nativo del sistema, solo redimensionado y con el mismo borde
+   que el resto de controles — nada de recrearlo a mano. */
+input[type=color]{
+  flex:0 0 auto;width:42px;height:42px;padding:2px;
+  border:1px solid var(--line);border-radius:var(--r-cell);
+  background:var(--surface);cursor:pointer;
+}
 
 /* ---- Tab bar ---- */
 .tabs{
@@ -690,9 +692,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
       </div>
     </div>
-    <div class="row" style="flex-direction:column;align-items:stretch;gap:10px">
+    <div class="row">
       <div><strong>Color de la interfaz</strong><p>Cambia el rosa de fábrica por el tono que prefieras.</p></div>
-      <div class="swatches" id="customColorSwatches" role="group" aria-label="Elegir color de la interfaz"></div>
+      <input type="color" id="customColorPick" value="#9E5266" aria-label="Elegir color de la interfaz">
     </div>
     <div class="row" id="colorInfoRow" hidden>
       <div><p id="colorHint" style="margin:0"></p></div>
@@ -2582,39 +2584,11 @@ const CUSTOM_MIX = {
   normal: { spoon:78, line:79, surface2:24, bg:6, surface:3 },
   alto:   { spoon:89, line:65, surface2:27, bg:3, surface:0 },
 };
-/* Muestras fijas, no el selector de color del sistema: así nadie acaba,
-   sin querer, con un blanco o un tono tan claro que el texto encima deja
-   de leerse. Solo tonos pastel apagados y oscuros, incluidos negro y gris. */
-const COLOR_PRESETS = [
-  { hex:'#9E5266', name:'Rosa vino' },
-  { hex:'#7A4B8C', name:'Ciruela' },
-  { hex:'#3D5A80', name:'Azul acero' },
-  { hex:'#4A6B3D', name:'Verde oliva' },
-  { hex:'#8C6239', name:'Marrón tostado' },
-  { hex:'#4B3F72', name:'Índigo' },
-  { hex:'#5C3D5C', name:'Berenjena' },
-  { hex:'#1F3A5F', name:'Azul marino' },
-  { hex:'#2E2E2E', name:'Gris carbón' },
-  { hex:'#595959', name:'Gris medio' },
-  { hex:'#000000', name:'Negro' },
-];
-(function buildColorSwatches(){
-  const box = document.getElementById('customColorSwatches');
-  box.innerHTML = COLOR_PRESETS.map(c =>
-    `<button type="button" class="swatch" data-color="${c.hex}" style="background:${c.hex}" aria-label="${c.name}" aria-pressed="false"></button>`
-  ).join('');
-  box.addEventListener('click', e => {
-    const b = e.target.closest('.swatch'); if(!b) return;
-    state.settings.customColor = b.dataset.color;
-    applyCustomColor(); save();
-  });
-})();
 function applyCustomColor(){
   const root = document.documentElement.style;
   const hex = state.settings.customColor;
   const infoRow = document.getElementById('colorInfoRow');
-  document.querySelectorAll('#customColorSwatches .swatch').forEach(b =>
-    b.setAttribute('aria-pressed', String(!!hex && b.dataset.color.toLowerCase() === hex.toLowerCase())));
+  document.getElementById('customColorPick').value = hex || '#9E5266';
   const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line'];
   if(!hex){
     props.forEach(p => root.removeProperty(p));
@@ -2648,6 +2622,10 @@ function applyCustomColor(){
     ? ''
     : 'Este color puede costar de leer. Prueba otro más oscuro o más saturado.';
 }
+document.getElementById('customColorPick').addEventListener('input', e => {
+  state.settings.customColor = e.target.value;
+  applyCustomColor(); save();
+});
 document.getElementById('btnColorReset').addEventListener('click', () => {
   state.settings.customColor = null;
   applyCustomColor(); save();
