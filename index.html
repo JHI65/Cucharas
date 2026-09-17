@@ -726,8 +726,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <input type="checkbox" id="ciMarginOff" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
     </label>
     <p class="lib-note" id="ciYesterday" hidden style="margin:2px 0 14px"></p>
-    <p class="lib-note" id="ciPeakInfo" hidden style="margin:2px 0 4px"></p>
-    <button class="linkbtn" id="btnUndoPeak" style="margin-bottom:14px" hidden>Deshacer el último pico sensorial</button>
+    <div class="row" id="ciPeakRow" hidden>
+      <div><strong id="ciPeakInfo"></strong><p>Por si ha sido sin querer.</p></div>
+      <button class="btn" id="btnUndoPeak">Deshacer</button>
+    </div>
     <div class="bigrow"><button id="ciSkip">Ahora no</button><button class="primary" id="ciSave">Empezar el día</button></div>
   </div>
 </dialog>
@@ -1807,11 +1809,10 @@ ciRange.addEventListener('input', ciSync);
    descriptiva, no pregunta — igual que el contexto de ayer. */
 function refreshPeakInfo(){
   const picos = (day().extras || []).filter(e => e.type === 'pico-sensorial').length;
-  const info = document.getElementById('ciPeakInfo');
-  const undoBtn = document.getElementById('btnUndoPeak');
-  info.hidden = !picos;
-  undoBtn.hidden = !picos;
-  if(picos) info.textContent = `Hoy llevas ${picos} pico${picos===1?'':'s'} sensorial${picos===1?'':'es'} apuntado${picos===1?'':'s'}.`;
+  const row = document.getElementById('ciPeakRow');
+  row.hidden = !picos;
+  if(picos) document.getElementById('ciPeakInfo').textContent =
+    `${picos} pico${picos===1?'':'s'} sensorial${picos===1?'':'es'} apuntado${picos===1?'':'s'} hoy`;
 }
 function openCheckin(){
   ciRange.max = state.settings.max;
