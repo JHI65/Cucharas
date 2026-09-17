@@ -167,9 +167,11 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
 .scale{display:flex;gap:7px}
-.scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:17px}
+/* 15px (paso "Control" existente) en vez del Body de 17px: las etiquetas de
+   magnitud son más largas que un dígito y este tamaño reduce el salto de
+   línea sin introducir un paso nuevo en la escala tipográfica. */
+.scale button{flex:1;padding:13px 4px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:15px;text-align:center;line-height:1.2}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
-.scale-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);margin-top:6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-top:18px}
 .card h2,.card h3{margin:0 0 9px;font-size:16px}
 .card p{margin:0 0 7px;color:var(--ink-soft);font-size:14px}
@@ -553,12 +555,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div class="field" id="cycIntField" hidden>
         <label>Intensidad del sangrado</label>
         <div class="scale" id="cycIntensity"></div>
-        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
       </div>
       <div class="field" style="margin-bottom:0">
         <label>Dolor físico</label>
         <div class="scale" id="cycPain"></div>
-        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
       </div>
     </div>
 
@@ -805,12 +805,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="field">
       <label>¿Cuánta capacidad te queda ahora?</label>
       <div class="scale" id="coEnergy"></div>
-      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
     </div>
     <div class="field">
       <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
       <div class="scale" id="coSensory"></div>
-      <div class="scale-lab"><span>Nada</span><span>Todo llevadero</span></div>
     </div>
     <div class="field">
       <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
@@ -1393,9 +1391,20 @@ function cyclePhase(dayNum, avgLen, bleedDays){
   if(dayNum < ovu) return 'Folicular';
   return 'Lútea';
 }
+/* Etiquetas de magnitud en vez de dígitos: un "1" o un "5" en una escala de
+   autoevaluación se lee como nota escolar (mal/bien), no como posición en un
+   rango. La palabra concreta es igual de literal para la alexitimia y no
+   arrastra ese juicio de valor. El dato interno sigue siendo 1-5. */
+const SCALE_LABELS = {
+  coEnergy: ['Ninguna','Poca','Media','Bastante','De sobra'],
+  coSensory: ['Nada','Poco','Algo','Bastante','Todo llevadero'],
+  cycPain: ['Ninguno','Leve','Moderado','Fuerte','Mucho'],
+  cycIntensity: ['Muy leve','Leve','Moderado','Fuerte','Muy fuerte'],
+};
 function paintScale(id, val){
+  const labels = SCALE_LABELS[id];
   document.getElementById(id).innerHTML = [1,2,3,4,5]
-    .map(v => `<button data-v="${v}" aria-pressed="${v === val}">${v}</button>`).join('');
+    .map((v,i) => `<button data-v="${v}" aria-pressed="${v === val}">${labels[i]}</button>`).join('');
 }
 function renderCycle(){
   if(!state.cycleEnabled) return;
@@ -2093,11 +2102,7 @@ document.getElementById('hClose').addEventListener('click', () => dlgHist.close(
 const dlgCheckout = document.getElementById('dlgCheckout');
 let coEnergy = 3, coSensory = 3;
 function coSync(){
-  const paint = (id, val) => {
-    document.getElementById(id).innerHTML = [1,2,3,4,5]
-      .map(v => `<button data-v="${v}" aria-pressed="${v===val}">${v}</button>`).join('');
-  };
-  paint('coEnergy', coEnergy); paint('coSensory', coSensory);
+  paintScale('coEnergy', coEnergy); paintScale('coSensory', coSensory);
 }
 document.getElementById('coEnergy').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return; coEnergy = +b.dataset.v; coSync();
