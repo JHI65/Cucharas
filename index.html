@@ -215,6 +215,13 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 }
 .closer.done button{color:var(--ink-soft)}
 .closer p{margin:9px 2px 0;font-size:14px;color:var(--ink-soft)}
+/* Mismo lenguaje que .closer button (botón de bloque, borde sólido, texto
+   Ciruela): una acción de un toque, no un enlace de texto suelto. */
+.peak-btn{
+  display:block;width:100%;margin-top:14px;padding:16px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-block);color:var(--accent);font-size:16px;
+}
 
 /* ---- Library ---- */
 .lib{
@@ -395,7 +402,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 /* Superelipse en toda la geometría de contenedor. Donde el navegador no conoce
    corner-shape la propiedad se ignora y queda el radio circular de siempre:
    no hay degradación funcional, solo una esquina menos. */
-.meter,.task,.adjust,.card,.breath-card,.empty,.add,.closer button,.lib,.day,.group,
+.meter,.task,.adjust,.card,.breath-card,.empty,.add,.closer button,.peak-btn,.lib,.day,.group,
 .cell,.btn,.scale button,.stepper button,.cal-nav button,.bigrow button,
 .mini,.ocgrid input,.field input[type=text],.field input[type=time],
 textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
@@ -514,7 +521,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="spoons over" id="overRow" role="img"></div>
       </div>
     </div>
-    <button class="linkbtn" id="btnPeak" style="margin-top:9px">He tenido un pico sensorial ahora</button>
+    <button class="peak-btn" id="btnPeak">He tenido un pico sensorial ahora</button>
 
     <div class="sectionhead">
       <h2>Tareas</h2>
