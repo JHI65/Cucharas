@@ -1695,7 +1695,7 @@ function openCheckin(){
   ciRange.value = day().budget ?? Math.round(state.settings.max * 0.65);
   ciSync();
   const presets = [
-    ['Agotado', Math.max(1, Math.round(state.settings.max*0.25))],
+    ['Sin energía', Math.max(1, Math.round(state.settings.max*0.25))],
     ['Justo', Math.round(state.settings.max*0.5)],
     ['Bien', Math.round(state.settings.max*0.8)],
     ['De sobra', state.settings.max]
