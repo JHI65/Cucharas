@@ -10,34 +10,41 @@ publicación son tres bloqueantes y una lista de arreglos que se notarían en el
 diario. Estimación: 1–2 semanas de trabajo más una beta con personas autistas.
 
 Orden recomendado: **persistencia → primer arranque → resto de arreglos → beta → tienda.**
+La persistencia (§1.1) está hecha; queda probarla en un dispositivo real.
 
 ---
 
 ## 1. Bloqueantes
 
-### 1.1 El historial se puede perder entero
+### 1.1 El historial se puede perder entero — hecho el 2026-09-17
 
-Todo vive en `localStorage`. Tanto en una PWA como dentro de una app envuelta con
+Todo vivía en `localStorage`. Tanto en una PWA como dentro de una app envuelta con
 Capacitor, el sistema puede borrar ese almacenamiento; en iOS basta con quitar el icono.
 Lo que da valor a la app (Patrones, "sueles gastar X") necesita semanas de datos
 acumulados, así que perderlos rompe la promesa central.
 
-El objeto `store` (`index.html:1000`) ya es el punto exacto donde enchufar un guardado
-nativo en archivo:
+Escrito en el objeto `store` (`index.html:998`). Dentro de la app nativa los datos van a
+un archivo, `spoony.json` en `Directory.Data` (en iOS la carpeta Documents de la app, en
+Android la de archivos internos: sobrevive a las actualizaciones, se borra al
+desinstalar). Fuera de la app nativa no cambia nada: `window.storage` dentro de Claude,
+`localStorage` en el navegador.
 
-```js
-const FS = window.Capacitor?.isNativePlatform?.() ? Capacitor.registerPlugin('Filesystem') : null;
+- El plugin se resuelve la primera vez que se usa, no al cargar el script, porque el
+  puente nativo puede no estar listo todavía.
+- Primer arranque en nativo: si no hay archivo, se copia lo que hubiera en `localStorage`
+  y se escribe el archivo ya, sin esperar al primer cambio.
+- Manda el archivo. `localStorage` queda solo como copia de rescate.
+- Si el archivo no se puede leer como JSON, se guarda aparte como `spoony-danado.json`
+  antes de que el primer guardado lo pise.
+- Las escrituras van en cola y se agrupan: `writeFile` es asíncrono y `save()` se llama
+  muchas veces seguidas; sin cola, dos escrituras pueden solaparse y dejar en el archivo
+  un estado viejo.
 
-// get():
-// if(FS){ try{ const r = await FS.readFile({path:'spoony.json', directory:'DATA', encoding:'utf8'}); return JSON.parse(r.data); }catch(e){ return null; } }
-
-// set():
-// if(FS){ await FS.writeFile({path:'spoony.json', directory:'DATA', encoding:'utf8', data:s}); return; }
-```
-
-Pendiente de verificar al integrarlo: el acceso al plugin sin empaquetador
-(`Capacitor.registerPlugin`) y el nombre del directorio. La primera vez que arranque en
-nativo hay que copiar lo que ya hubiera en `localStorage`.
+Verificado ejecutando el bloque real contra un Capacitor falso (13 casos: navegador,
+primer arranque, arranques siguientes, archivo ilegible, vacío, guardados seguidos) y con
+una captura del arranque en navegador. **Queda probarlo en un dispositivo de verdad** al
+montar Capacitor: que `Capacitor.registerPlugin('Filesystem')` funcione sin empaquetador y
+que el archivo aparezca donde se espera.
 
 ### 1.2 "Cucharas" no se explica en ningún sitio, y la teoría no tiene crédito
 
@@ -180,7 +187,7 @@ lo que se añade es la capa nativa. La PWA (manifest + service worker) queda com
 secundaria para distribución directa: instalar una PWA en iOS lleva varios pasos poco
 evidentes y eso es una barrera real para este público.
 
-- [ ] Guardado nativo en archivo (§1.1).
+- [x] Guardado nativo en archivo (§1.1) — escrito, pendiente de probar en dispositivo.
 - [ ] Exportar con los plugins Filesystem + Share: en iOS `<a download>` con blob no
       funciona dentro de la app envuelta. El archivo aún se llama `cucharas-…json`.
 - [ ] Sustituir `confirm`, `alert` y `prompt` por hojas propias (§2.3).

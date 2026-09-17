@@ -995,18 +995,78 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </dialog>
 
 <script>
-/* ---------- storage: window.storage inside Claude, localStorage standalone ---------- */
+/* ---------- storage ----------
+   En el navegador: window.storage dentro de Claude, localStorage fuera.
+   Dentro de la app nativa (Capacitor): un archivo. El sistema puede vaciar
+   localStorage sin avisar —en iOS basta con quitar el icono— y el historial
+   acumulado es justo lo que da valor a Patrones, así que ahí no vale.
+   La primera vez que arranca en nativo se copia lo que hubiera en localStorage. */
 const KEY = 'cucharas:data';
+const FILE = 'spoony.json';
+/* Directory.Data: en iOS es la carpeta Documents de la app y en Android la de
+   archivos internos. Sobrevive a las actualizaciones; se borra al desinstalar. */
+const FILE_DIR = 'DATA';
+
+let _fs;   // se resuelve la primera vez, no al cargar: el puente nativo puede no estar aún
+const nativeFS = () => {
+  if(_fs === undefined){
+    try{ _fs = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.registerPlugin('Filesystem') : null; }
+    catch(e){ _fs = null; }
+  }
+  return _fs;
+};
+
+const readLocal = () => { try{ return localStorage.getItem(KEY); }catch(e){ return null; } };
+
+/* Escrituras en cola: writeFile es asíncrono y save() se llama muchas veces
+   seguidas. Sin cola, dos escrituras pueden solaparse y dejar en el archivo un
+   estado viejo. Solo se escribe lo último pendiente. */
+let writeChain = Promise.resolve(), pendingWrite = null;
+const queueWrite = s => {
+  pendingWrite = s;
+  writeChain = writeChain.then(async () => {
+    const data = pendingWrite;
+    if(data === null) return;
+    pendingWrite = null;
+    try{
+      await nativeFS().writeFile({ path:FILE, directory:FILE_DIR, encoding:'utf8', data });
+      try{ localStorage.setItem(KEY, data); }catch(e){}   // copia de rescate, no es la fuente
+    }catch(e){ console.error('No se pudo guardar', e); }
+  });
+  return writeChain;
+};
+
 const store = {
   async get(){
+    const fs = nativeFS();
+    if(fs){
+      let raw = null;
+      try{ raw = (await fs.readFile({ path:FILE, directory:FILE_DIR, encoding:'utf8' })).data; }
+      catch(e){ raw = null; }   // todavía no existe el archivo
+      if(raw != null){
+        try{ return JSON.parse(raw); }
+        catch(e){
+          // Archivo ilegible: se aparta antes de que el primer guardado lo pise.
+          try{ await fs.writeFile({ path:'spoony-danado.json', directory:FILE_DIR, encoding:'utf8', data:raw }); }catch(e2){}
+        }
+      }
+      const local = readLocal();   // primer arranque en nativo, o archivo perdido
+      if(!local) return null;
+      let parsed = null;
+      try{ parsed = JSON.parse(local); }catch(e){ return null; }
+      await queueWrite(local);     // deja el archivo creado ya, sin esperar al primer cambio
+      return parsed;
+    }
     try{
       if(window.storage){ const r = await window.storage.get(KEY, false); return r ? JSON.parse(r.value) : null; }
-      const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null;
+      const raw = readLocal(); return raw ? JSON.parse(raw) : null;
     }catch(e){ return null; }
   },
   async set(v){
+    let s;
+    try{ s = JSON.stringify(v); }catch(e){ console.error('No se pudo guardar', e); return; }
+    if(nativeFS()) return queueWrite(s);
     try{
-      const s = JSON.stringify(v);
       if(window.storage){ await window.storage.set(KEY, s, false); return; }
       localStorage.setItem(KEY, s);
     }catch(e){ console.error('No se pudo guardar', e); }
