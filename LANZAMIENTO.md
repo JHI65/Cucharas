@@ -235,8 +235,12 @@ cambiar a `${esc(t.time)}` y `${fmtN(+(t.real ?? t.est) || 0)}`.
 - `PRODUCT.md` y `brief-cucharas.md` describen la pestaña "Cucharas" (ya no existe; la
   calculadora es una hoja desde Hoy), un check-in que bloquea (ya no bloquea) y no
   mencionan Finanzas. Actualizar antes de escribir la ficha de tienda a partir de ellos.
-- Línea de "Última copia: hace N días" en Ajustes, sin notificaciones ni insistencia:
-  reduce el riesgo de pérdida total sin montar servidor.
+- ~~Línea de "Última copia: hace N días" en Ajustes~~ — hecho el 2026-09-20. Sin
+  notificaciones ni insistencia: `renderExportInfo()` (`index.html`) lee
+  `state.settings.lastExportKey`, que se escribe al pulsar Exportar. Reduce el riesgo de
+  perderlo todo si el móvil se rompe o lo roban, sin montar servidor ni cuenta — se evaluó
+  y descartó una sincronización con Firebase/cuenta de Google por ese mismo motivo: rompía
+  la ficha de privacidad "Datos no recopilados" que es el argumento de venta actual.
 
 ---
 

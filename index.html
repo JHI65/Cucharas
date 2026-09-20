@@ -757,7 +757,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="libsec">Tus datos</p>
     <div class="group">
     <div class="row">
-      <div><strong>Copia de seguridad</strong><p>Descarga un archivo con todo tu historial.</p></div>
+      <div><strong>Copia de seguridad</strong><p>Descarga un archivo con todo tu historial.</p><p id="exportInfo"></p></div>
       <button class="btn" id="btnExport">Exportar</button>
     </div>
     <div class="row">
@@ -1946,9 +1946,20 @@ function renderOverCost(){
     `<label>${v}<input type="number" step="1" inputmode="numeric" data-oc="${v}" value="${state.settings.overCost[v]}"></label>`
   ).join('');
 }
+/* Recordatorio de copia de seguridad: sin notificaciones ni insistencia,
+   solo lo que se lee al entrar en Ajustes. Reduce el riesgo de perderlo
+   todo si el móvil se rompe o lo roban, sin montar servidor ni cuenta. */
+function renderExportInfo(){
+  const el = document.getElementById('exportInfo');
+  const k = state.settings.lastExportKey;
+  if(k == null){ el.textContent = 'Todavía no has hecho ninguna copia.'; return; }
+  const n = daysBetween(k, todayKey());
+  el.textContent = n <= 0 ? 'Última copia: hoy.' : `Última copia: hace ${n} día${n===1?'':'s'}.`;
+}
 function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin(); renderCycle();
   document.getElementById('maxOut').textContent = state.settings.max;
   document.getElementById('peakOut').textContent = state.settings.peakCostPercent + '%';
+  renderExportInfo();
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 
@@ -3045,6 +3056,8 @@ document.getElementById('btnExport').addEventListener('click', () => {
   a.href = URL.createObjectURL(blob);
   a.download = `cucharas-${todayKey()}.json`;
   a.click(); URL.revokeObjectURL(a.href);
+  state.settings.lastExportKey = todayKey();
+  save(); renderExportInfo();
 });
 document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileIn').click());
 document.getElementById('fileIn').addEventListener('change', async e => {
