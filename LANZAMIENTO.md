@@ -83,19 +83,25 @@ historial (no la ve), repaso desde Ajustes (vuelve a Hoy, no reabre el check-in)
 pasada con `window.onerror` enganchado, sin errores. La atenuación cubre la pantalla
 también en el paso sin ancla, para que el fondo no parezca usable cuando no responde.
 
-### 1.3 La fase del ciclo se puede leer como predicción de fertilidad
+### 1.3 La fase del ciclo se puede leer como predicción de fertilidad — hecho el 2026-09-20
 
-`renderCycle()` muestra "Fase estimada: Ovulación" a partir de un cálculo de calendario,
-sin ninguna advertencia. Alguien podría fiarse de ella para evitar un embarazo. Además,
-las tiendas revisan con lupa las apps que tocan datos de salud.
+`renderCycle()` mostraba "Fase estimada: Ovulación" a partir de un cálculo de calendario,
+sin ninguna advertencia junto a la etiqueta. El único aviso vivía en el tour de Ciclo
+(`CICLO_TOUR_STEPS`), que se ve una vez y es saltable, así que quien volvía a la pestaña
+más adelante veía "Ovulación" desnudo. Las tiendas además revisan con lupa las apps que
+tocan datos de salud.
 
-Arreglo, en `renderCyclePrediction()` (`index.html:1565`):
+Arreglo: aviso fijo junto al encabezado (`#cycleFaseAviso`, `index.html:591`), visible
+cada vez que hay un día de ciclo calculado (mismo criterio que la propia etiqueta de
+fase: `dayNum != null`), no solo en el onboarding.
 
 ```js
-<p>No sirve para evitar ni para buscar un embarazo.</p>
+document.getElementById('cycleFaseAviso').hidden = dayNum == null;
 ```
 
-Alternativa: quitar la etiqueta de fase y dejar solo el día del ciclo.
+```html
+<p class="legend" id="cycleFaseAviso" hidden>No sirve para evitar ni para buscar un embarazo.</p>
+```
 
 ---
 

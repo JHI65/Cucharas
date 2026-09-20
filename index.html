@@ -588,6 +588,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <header class="top">
       <h1 class="title">Ciclo</h1>
       <p class="sub" id="cycleHead"></p>
+      <p class="legend" id="cycleFaseAviso" hidden>No sirve para evitar ni para buscar un embarazo.</p>
     </header>
 
     <div class="card">
@@ -1652,6 +1653,7 @@ function renderCycle(){
   head.textContent = dayNum == null
     ? 'Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.'
     : `Día ${dayNum} del ciclo — Fase estimada: ${cyclePhase(dayNum, effectiveCycleLength(), bleedRunFrom(lastStartOn(k)))}`;
+  document.getElementById('cycleFaseAviso').hidden = dayNum == null;
 
   const log = cycleLog(k);
   const bleeding = log ? log.bleeding : null;
