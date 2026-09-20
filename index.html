@@ -2704,12 +2704,12 @@ function openLib(item){
   libEditing = item;
   lName.value = item ? item.name : '';
   lKind = item && item.est < 0 ? 'recarga' : 'gasto';
-  lCost = item ? Math.abs(item.est) : 2;
+  lCost = item ? Math.round(Math.abs(item.est)) : 2;
   document.getElementById('lTitle').textContent = item ? 'Editar actividad' : 'Nueva actividad';
   const st = item ? learned(item.name) : null;
   document.getElementById('lSub').textContent = (st && st.avg != null)
     ? `De media son ${fmtN(Math.abs(st.avg))} en ${st.n} registros. Si pones un valor a mano, se usará ese.`
-    : 'Sube o baja de media en media cuchara.';
+    : 'Sube o baja de una cuchara en una.';
   document.getElementById('lDelete').hidden = !item;
   document.getElementById('lReset').hidden = !(st && st.n);
   lSync(); openDialog(dlgLib);
@@ -2719,8 +2719,8 @@ document.getElementById('libList').addEventListener('click', e => {
   const b = e.target.closest('[data-lib]'); if(!b) return;
   openLib(state.library.find(l => l.id === b.dataset.lib));
 });
-document.getElementById('lMinus').addEventListener('click', () => { lCost = Math.max(0, lCost-0.5); lSync(); });
-document.getElementById('lPlus').addEventListener('click', () => { lCost = Math.min(12, lCost+0.5); lSync(); });
+document.getElementById('lMinus').addEventListener('click', () => { lCost = Math.max(0, lCost-1); lSync(); });
+document.getElementById('lPlus').addEventListener('click', () => { lCost = Math.min(12, lCost+1); lSync(); });
 document.getElementById('lCancel').addEventListener('click', () => dlgLib.close());
 document.getElementById('lReset').addEventListener('click', () => {
   if(libEditing){ libEditing.samples = []; save(); renderAll(); openLib(libEditing); }
