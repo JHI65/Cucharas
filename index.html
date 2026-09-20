@@ -376,6 +376,18 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   width:100%;max-width:100%;min-width:0;padding:13px;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--r-control);
 }
+/* Mientras conserva su apariencia nativa, WebKit da a input[type=time] un
+   ancho intrínseco propio y se salta width:100%: el campo se desbordaba de
+   la hoja. Quitando la apariencia nativa (el selector de hora sigue
+   abriéndose al tocarlo) y neutralizando el margen del valor interno, el
+   campo ya se encoge hasta el ancho de su columna. */
+.field input[type=time]{
+  -webkit-appearance:none;appearance:none;
+  font:inherit;line-height:1.5;min-height:52px;
+}
+.field input[type=time]::-webkit-date-and-time-value{
+  text-align:left;margin:0;min-width:0;
+}
 .task-time{color:var(--ink-soft)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 .chip{
