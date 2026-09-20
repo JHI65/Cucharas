@@ -807,6 +807,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="sub tour-step" id="tourStep"></p>
     <h2 id="tourTitle"></h2>
     <p class="sub" id="tourBody"></p>
+    <p class="sub" id="tourToggleLabel" hidden style="margin-bottom:6px"><strong>¿Lo activamos ahora?</strong></p>
     <div class="chips" id="tourToggle" role="group" aria-label="Activar este módulo" hidden style="margin-bottom:14px">
       <button class="chip" data-tv="on" aria-pressed="false">Activar</button>
       <button class="chip" data-tv="off" aria-pressed="true">Dejar apagado</button>
@@ -2063,7 +2064,7 @@ const TOUR_STEPS = [
   { sel:null, title:'Qué es una cuchara', body:'Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).' },
   { sel:'.meter', title:'Las cucharas de hoy', body:'Aquí ves cuántas te quedan. Al abrir la app se te pregunta con cuántas te levantas; puedes tocar este recuadro para cambiarlo en cualquier momento del día.' },
   { sel:'#btnPeak', title:'He tenido un pico sensorial ahora', body:'Este botón resta cucharas de golpe cuando el ruido, la luz o la gente te pasan por encima, y te ofrece un espacio de calma. Sin preguntas ni cronómetro.' },
-  { sel:'#btnAddTask', title:'Las tareas del día', body:'Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcarla puedes corregir lo que costó de verdad: la app aprende de eso.' },
+  { sel:'#btnAddTask', title:'Las tareas del día', body:'Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcar la tarea como finalizada puedes corregir lo que costó de verdad: la app aprende de eso.' },
   { sel:'#btnTpl', title:'Días tipo', body:'Para los días que se repiten. Guardas las tareas de un día con un nombre —"lunes de trabajo", "día de médico"— y luego las vuelcas de una vez en otro día, en lugar de apuntarlas una a una.' },
   { sel:'#btnLib', title:'Editar cuánto cuesta cada actividad', body:'Tu lista de actividades con lo que te cuesta cada una, para no decidirlo de cero cada vez. Cuando corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.' },
   { sel:'#btnCheckout', title:'Cerrar el día', body:'Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
@@ -2140,6 +2141,7 @@ function renderTourStep(){
   document.getElementById('tourNext').textContent = tourIdx === tourSteps.length - 1 ? 'Empezar' : 'Siguiente';
   const toggle = document.getElementById('tourToggle');
   toggle.hidden = !step.toggleKey;
+  document.getElementById('tourToggleLabel').hidden = !step.toggleKey;
   if(step.toggleKey){
     const on = !!state[step.toggleKey];
     toggle.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String((c.dataset.tv === 'on') === on)));
