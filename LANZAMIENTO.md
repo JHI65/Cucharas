@@ -121,11 +121,28 @@ resultado hacia "no se nota diferencia". Un día sin respuesta no es un dato (pr
 if(next && next.budget != null && !next.budgetUnanswered) acc.push(next.budget - typical);
 ```
 
-### 2.2 A medianoche la app muestra el día equivocado
+### 2.2 A medianoche la app muestra el día equivocado — hecho el 2026-09-20
 
-`#todayDate` solo se rellena al arrancar (`index.html:2770`) y nada escucha
-`visibilitychange`. En un móvil la app vuelve del segundo plano sin reiniciarse: la fecha
-dice ayer, las tareas ya son de hoy y el check-in no aparece.
+`#todayDate` solo se rellenaba al arrancar y nada escuchaba `visibilitychange`. En un
+móvil la app vuelve del segundo plano sin reiniciarse: la fecha decía ayer, las tareas ya
+eran de hoy y el check-in no aparecía.
+
+Decisión al resolverlo: el corte de día no es medianoche sino **las 04:00**. Quien se
+acuesta tarde sigue viendo "hoy" el día que empezó — a las 00:30 no le conviene un check-in
+en blanco ni un medidor a cero — y solo a partir de las 04:00 se considera que ha empezado
+un día nuevo. Cambiado en `todayKey()` (`index.html:1171`), de donde cuelga toda la app
+(tareas, check-in, patrones, ciclo), no solo el encabezado:
+
+```js
+const todayKey = () => {
+  const d = new Date();
+  if(d.getHours() < 4) d.setDate(d.getDate() - 1);
+  return localDateKey(d);
+};
+```
+
+Y el aviso de que el día cambió mientras la app estaba en segundo plano
+(`index.html:3106`), con el mismo criterio de corte al venir de `todayKey()`:
 
 ```js
 let bootDay = todayKey();

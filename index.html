@@ -1168,7 +1168,13 @@ const localDateKey = d => {
   const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 };
-const todayKey = () => localDateKey(new Date());
+// El día no cambia a medianoche sino a las 04:00: quien se acuesta tarde
+// sigue viendo "hoy" el día que empezó, no uno nuevo con cero cucharas.
+const todayKey = () => {
+  const d = new Date();
+  if(d.getHours() < 4) d.setDate(d.getDate() - 1);
+  return localDateKey(d);
+};
 const fmtDate = k => {
   const d = new Date(k+'T12:00:00');
   return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
@@ -3095,6 +3101,20 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   document.getElementById(dlgId).addEventListener('click', e => {
     if(e.target.id === dlgId) document.getElementById(btnId).click();
   });
+});
+
+// En el móvil la app vuelve de segundo plano sin reiniciarse, así que sin
+// esto seguiría mostrando el día con el que arrancó aunque ya hayan dado
+// las 04:00 (mismo criterio de corte que todayKey()).
+let bootDay = todayKey();
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden || todayKey() === bootDay) return;
+  bootDay = todayKey();
+  document.getElementById('todayDate').textContent = fmtDate(bootDay);
+  collapsedTasks.clear();
+  day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
+  renderAll();
+  if(day().budget == null) openCheckin();
 });
 
 /* ---------- boot ---------- */
