@@ -157,16 +157,36 @@ document.addEventListener('visibilitychange', () => {
 });
 ```
 
-### 2.3 `confirm`, `alert` y `prompt` nativos
+### 2.3 `confirm`, `alert` y `prompt` nativos — hecho el 2026-09-20
 
-- Al borrar una serie (`index.html:2119` y `2496`), "Cancelar" significa "bórrala solo de
-  este día": un toque por error borra algo. El mapeo no es literal.
-- `prompt()` para el nombre del día tipo (`index.html:2440`) puede fallar o no aparecer
-  dentro de una app envuelta.
-- Son ventanas del sistema, ajenas al resto del diseño.
+- Al borrar una tarea que se repite (`renderTasks` y `renderDaySheet`), "Cancelar" en el
+  `confirm()` significaba "bórrala solo de este día": un toque por error borraba algo. El
+  mapeo no era literal.
+- `prompt()` para el nombre del día tipo podía fallar o no aparecer dentro de una app
+  envuelta.
+- Son ventanas del sistema, ajenas al resto del diseño (sin los ajustes de tamaño de
+  texto, alto contraste o color que sí tiene el resto de Spoony).
 
-Arreglo: hojas propias. Para la serie, tres botones — "Solo este día", "Todos los días de
-la serie", "Cancelar". Para el día tipo, un campo de texto.
+Arreglo: dos hojas propias, con el mismo componente `<dialog>` que ya usa el resto de la
+app.
+
+- `#dlgDeleteSeries` (`index.html`, junto a `#dlgTask`): tres botones reales — "Solo este
+  día", "Todos los días de la serie", "Cancelar" — en vez de forzar ese significado dentro
+  del texto de un `confirm()` de dos botones. `askDeleteTask(t, then)` la abre solo si la
+  tarea pertenece a una serie; si no, borra directo sin preguntar, igual que antes.
+  `removeSeriesEverywhere(seriesKey)` queda como única implementación del borrado en serie,
+  usada por los dos sitios que antes duplicaban esa lógica.
+- `#dlgTplName`: un campo de texto en vez de `prompt()`, con Guardar/Cancelar.
+
+Nota de alcance: quedan tres `confirm()` sencillos sin tocar (quitar actividad de la
+calculadora, borrar gasto, borrar todo el historial) porque su mapeo Aceptar/Cancelar es
+literal — no son el bug que describe este punto.
+
+Verificado: comprobación de sintaxis de todo el script con `node --check` y que los ids
+nuevos (`dlgDeleteSeries`, `delOnlyDay`, `delAllSeries`, `delSeriesCancel`, `dlgTplName`,
+`tplNameInput`, `tplNameCancel`, `tplNameSave`) no colisionan con ninguno existente. **No
+probado en navegador** — la extensión Claude in Chrome no estaba disponible en esta
+sesión; conviene abrir la app y probar ambos flujos antes de darlo por cerrado del todo.
 
 ### 2.4 No hay tamaño de texto ni modo oscuro
 

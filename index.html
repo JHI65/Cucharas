@@ -885,6 +885,19 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<!-- ===== Borrar tarea que se repite ===== -->
+<dialog id="dlgDeleteSeries">
+  <div class="sheet">
+    <h2>Esta tarea se repite en más días</h2>
+    <p class="sub">¿Qué quieres borrar?</p>
+    <div class="bigrow" style="flex-direction:column">
+      <button class="warn" id="delOnlyDay">Solo este día</button>
+      <button class="warn" id="delAllSeries">Todos los días de la serie</button>
+      <button id="delSeriesCancel">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
 <!-- ===== Actividad de la calculadora ===== -->
 <dialog id="dlgLib">
   <div class="sheet">
@@ -985,6 +998,21 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div id="tplList"></div>
     <button class="add" id="tplSaveDay">Guardar este día como día tipo</button>
     <div class="bigrow"><button id="tplClose">Cerrar</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Nombre del día tipo ===== -->
+<dialog id="dlgTplName">
+  <div class="sheet">
+    <h2>¿Cómo llamamos a este día tipo?</h2>
+    <div class="field">
+      <label for="tplNameInput">Nombre</label>
+      <input type="text" id="tplNameInput" placeholder="Día de trabajo">
+    </div>
+    <div class="bigrow">
+      <button id="tplNameCancel">Cancelar</button>
+      <button class="primary" id="tplNameSave">Guardar</button>
+    </div>
   </div>
 </dialog>
 
@@ -1985,6 +2013,35 @@ function openDialog(dlg){
   if(sheet){ sheet.setAttribute('tabindex','-1'); sheet.focus({preventScroll:true}); }
 }
 
+function removeSeriesEverywhere(seriesKey){
+  Object.keys(state.days).forEach(k => {
+    state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === seriesKey && !x.done));
+  });
+}
+/* Hoja propia en vez de confirm(): un confirm() de dos botones no puede dar
+   tres respuestas reales ("solo hoy" / "toda la serie" / "no borrar nada")
+   sin forzar el texto, y ahí "Cancelar" pasaba a significar "bórrala solo
+   de hoy" — quien cancelaba por reflejo borraba algo igualmente. */
+const dlgDeleteSeries = document.getElementById('dlgDeleteSeries');
+let deleteTaskThen = null;
+function askDeleteTask(t, then){
+  if(t && t.series){
+    deleteTaskThen = then;
+    openDialog(dlgDeleteSeries);
+  }else{
+    then('day');
+  }
+}
+document.getElementById('delOnlyDay').addEventListener('click', () => {
+  dlgDeleteSeries.close(); const fn = deleteTaskThen; deleteTaskThen = null; fn && fn('day');
+});
+document.getElementById('delAllSeries').addEventListener('click', () => {
+  dlgDeleteSeries.close(); const fn = deleteTaskThen; deleteTaskThen = null; fn && fn('series');
+});
+document.getElementById('delSeriesCancel').addEventListener('click', () => {
+  dlgDeleteSeries.close(); deleteTaskThen = null;
+});
+
 /* ---------- check-in ---------- */
 /* ---------- guía del primer arranque ----------
    Cada paso señala el elemento del que habla, para que además de qué es
@@ -2455,14 +2512,11 @@ document.getElementById('tDelete').addEventListener('click', () => {
   if(!editingTask) return;
   const d = day(taskDate);
   const t = d.tasks.find(x => x.id === editingTask);
-  if(t && t.series && confirm('Esta tarea se repite en más días. ¿Quitarla de todos?\n\nAceptar: la quita de toda la serie.\nCancelar: solo de este día.')){
-    Object.keys(state.days).forEach(k => {
-      state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === t.series && !x.done));
-    });
-  }else{
-    d.tasks = d.tasks.filter(x => x.id !== editingTask);
-  }
-  save(); dlgTask.close(); renderAll();
+  askDeleteTask(t, which => {
+    if(which === 'series') removeSeriesEverywhere(t.series);
+    else d.tasks = d.tasks.filter(x => x.id !== editingTask);
+    save(); dlgTask.close(); renderAll();
+  });
 });
 tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
@@ -2773,12 +2827,24 @@ document.getElementById('tplList').addEventListener('click', e => {
     save(); renderTplList();
   }
 });
+const dlgTplName = document.getElementById('dlgTplName');
+const tplNameInput = document.getElementById('tplNameInput');
+let pendingTplItems = null;
 document.getElementById('tplSaveDay').addEventListener('click', () => {
   const items = day(tplTarget).tasks.map(t => ({ name:t.name, est:t.est }));
   if(!items.length){ alert('Ese día no tiene tareas que guardar.'); return; }
-  const name = prompt('¿Cómo llamamos a este día tipo?', 'Día de trabajo');
-  if(!name || !name.trim()) return;
-  state.templates.push({ id:uid(), name:name.trim(), items });
+  pendingTplItems = items;
+  tplNameInput.value = 'Día de trabajo';
+  openDialog(dlgTplName);
+  tplNameInput.select();
+});
+document.getElementById('tplNameCancel').addEventListener('click', () => { dlgTplName.close(); pendingTplItems = null; });
+document.getElementById('tplNameSave').addEventListener('click', () => {
+  const name = tplNameInput.value.trim();
+  if(!name){ tplNameInput.focus(); return; }
+  state.templates.push({ id:uid(), name, items:pendingTplItems });
+  pendingTplItems = null;
+  dlgTplName.close();
   save(); renderTplList();
 });
 
@@ -2832,14 +2898,11 @@ document.getElementById('dTasks').addEventListener('click', e => {
   const b = e.target.closest('[data-del]'); if(!b) return;
   const d = day(selectedDay);
   const t = d.tasks.find(x => x.id === b.dataset.del);
-  if(t && t.series && confirm('Esta tarea se repite en más días. ¿Quitarla de todos?\n\nAceptar: la quita de toda la serie.\nCancelar: solo de este día.')){
-    Object.keys(state.days).forEach(k => {
-      state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === t.series && !x.done));
-    });
-  }else{
-    d.tasks = d.tasks.filter(x => x.id !== b.dataset.del);
-  }
-  save(); renderDaySheet(); renderAll();
+  askDeleteTask(t, which => {
+    if(which === 'series') removeSeriesEverywhere(t.series);
+    else d.tasks = d.tasks.filter(x => x.id !== b.dataset.del);
+    save(); renderDaySheet(); renderAll();
+  });
 });
 let noteTimer;
 document.getElementById('dNote').addEventListener('input', e => {
@@ -3096,12 +3159,14 @@ document.getElementById('btnWipe').addEventListener('click', () => {
    ("Ahora no"), así que toca fuera cierra igual que ese botón. */
 [
   ['dlgTask', 'tCancel'],
+  ['dlgDeleteSeries', 'delSeriesCancel'],
   ['dlgLib', 'lCancel'],
   ['dlgLibList', 'libListClose'],
   ['dlgWhyMargin', 'whyMarginClose'],
   ['dlgCheckout', 'coCancel'],
   ['dlgPeak', 'peakNo'],
   ['dlgTpl', 'tplClose'],
+  ['dlgTplName', 'tplNameCancel'],
   ['dlgDay', 'dClose'],
   ['dlgGasto', 'gCancel'],
   ['dlgHist', 'hClose'],
