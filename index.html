@@ -871,6 +871,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label for="tTime">A qué hora (opcional)</label>
       <input type="time" id="tTime">
     </div>
+    <div class="field">
+      <label for="tTimeEnd">Hasta qué hora (opcional)</label>
+      <input type="time" id="tTimeEnd">
+    </div>
     <div class="field" id="repField">
       <label>Repetir</label>
       <div class="chips" id="repMode">
@@ -1386,7 +1390,7 @@ function renderTasks(){
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(`sueles gastar ${fmtN(l.avg)}`);
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
     const isOpen = t.done && !collapsedTasks.has(t.id);
-    const timeTag = t.time ? `<span class="task-time">${esc(t.time)}</span> ` : '';
+    const timeTag = t.time ? `<span class="task-time">${esc(fmtTaskTime(t))}</span> ` : '';
     const body = t.done
       ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
@@ -2004,6 +2008,7 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
   renderExportInfo();
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtTaskTime = t => t.time ? (t.timeEnd ? `${t.time}–${t.timeEnd}` : t.time) : '';
 
 /* ---------- tabs ---------- */
 /* Una tarjeta de tarea que devuelve cucharas se queda abierta con el ajuste
@@ -2309,6 +2314,7 @@ const dlgTask = document.getElementById('dlgTask');
 const tName = document.getElementById('tName');
 const tCostOut = document.getElementById('tCost');
 const tTime = document.getElementById('tTime');
+const tTimeEnd = document.getElementById('tTimeEnd');
 const tSave = document.getElementById('tSave');
 let tCost = 2, tKind = 'gasto';
 let taskDate = todayKey();
@@ -2381,7 +2387,7 @@ function expandDates(startKey){
 function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = '';
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
@@ -2405,6 +2411,7 @@ function openTaskEdit(taskId){
   tKind = t.est < 0 ? 'recarga' : 'gasto';
   tCost = Math.abs(t.est);
   tTime.value = t.time || '';
+  tTimeEnd.value = t.timeEnd || '';
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.querySelector('#dlgTask h2').textContent = 'Editar tarea';
   document.querySelector('#dlgTask .sub').textContent = 'Cambia lo que haga falta.';
@@ -2550,16 +2557,17 @@ tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
   const est = tKind === 'recarga' ? -tCost : tCost;
   const time = tTime.value || null;
+  const timeEnd = tTimeEnd.value || null;
   if(editingTask){
     const t = day().tasks.find(x => x.id === editingTask);
-    if(t){ t.name = name; t.est = est; t.time = time; }
+    if(t){ t.name = name; t.est = est; t.time = time; t.timeEnd = timeEnd; }
     record(name, est, null);
     save(); dlgTask.close(); renderAll();
     return;
   }
   const dates = expandDates(taskDate);
   const series = dates.length > 1 ? uid() : null;
-  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null, time }));
+  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null, time, timeEnd }));
   record(name, est, null);
   save(); dlgTask.close(); renderAll();
   if(dlgDay.open) renderDaySheet();
@@ -2907,7 +2915,7 @@ function renderDaySheet(){
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
-        <span>${t.time?`${esc(t.time)} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
+        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
         <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
           <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
