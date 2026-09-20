@@ -2192,6 +2192,7 @@ function endTour(){
   state.settings[tourSeenKey] = true;
   save();
   document.getElementById('tour').hidden = true;
+  if(tourIsMain && currentTab !== 'hoy') document.querySelector('#tabs [data-go="hoy"]').click();
   if(tourIsMain && !tourReplay && day().budget == null) openCheckin();
 }
 
