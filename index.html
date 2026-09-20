@@ -2003,8 +2003,20 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 
 /* ---------- tabs ---------- */
+/* Una tarjeta de tarea que devuelve cucharas se queda abierta con el ajuste
+   a la vista, pero si el valor por defecto ya está bien nada la cierra por
+   sí sola. En vez de un temporizador (que podría cerrarla mientras alguien
+   todavía la está leyendo), se pliega al cambiar de pestaña o de app. */
+function collapseOpenTasks(){
+  day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden && currentTab === 'hoy'){ collapseOpenTasks(); renderTasks(); }
+});
+
 document.getElementById('tabs').addEventListener('click', e => {
   const b = e.target.closest('button[data-go]'); if(!b) return;
+  if(currentTab === 'hoy' && b.dataset.go !== 'hoy') collapseOpenTasks();
   currentTab = b.dataset.go;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.getElementById('s-' + currentTab).classList.add('on');
