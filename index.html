@@ -28,6 +28,7 @@
   --r-nav:26px;         /* barra de pestañas flotante */
   --glass:rgba(255,248,249,.70);
   --pad:18px;
+  --text-scale:1;
 }
 :root[data-contrast="alto"]{
   --bg:#FFF7F8;
@@ -66,6 +67,7 @@ input,select,textarea{font:inherit;color:inherit}
 *:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
 .ic{width:18px;height:18px;display:block;flex:0 0 auto}
 
+.app,dialog,.tabs{zoom:var(--text-scale,1)}
 .app{max-width:520px;margin:0 auto;padding:0 var(--pad) calc(104px + env(safe-area-inset-bottom))}
 .screen{display:none}
 .screen.on{display:block}
@@ -718,6 +720,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
     <p class="libsec">Cómo se ve</p>
     <div class="group">
+    <div class="row">
+      <div><strong>Tamaño del texto</strong><p>Sube el tamaño si te cuesta leer el texto normal.</p></div>
+      <div class="chips" id="textScalePick" role="group" aria-label="Tamaño del texto">
+        <button class="chip" data-scale="1" aria-pressed="true">Normal</button>
+        <button class="chip" data-scale="1.15" aria-pressed="false">Grande</button>
+        <button class="chip" data-scale="1.3" aria-pressed="false">Muy grande</button>
+      </div>
+    </div>
     <div class="row">
       <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
       <div class="chips" id="contrastPick" role="group" aria-label="Contraste">
@@ -2924,6 +2934,19 @@ document.getElementById('peakMinus').addEventListener('click', () => {
 document.getElementById('peakPlus').addEventListener('click', () => {
   state.settings.peakCostPercent = Math.min(50, state.settings.peakCostPercent+5); save(); renderAll();
 });
+/* zoom (no line-height/rem) porque hay que escalar de golpe hojas, barra de
+   pestañas fija y el resto sin reescribir cada tamaño fijo en px del CSS. */
+function applyTextScale(){
+  const v = [1, 1.15, 1.3].includes(state.settings.textScale) ? state.settings.textScale : 1;
+  document.documentElement.style.setProperty('--text-scale', v);
+  document.querySelectorAll('#textScalePick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', +c.dataset.scale === v));
+}
+document.getElementById('textScalePick').addEventListener('click', e => {
+  const b = e.target.closest('[data-scale]'); if(!b) return;
+  state.settings.textScale = +b.dataset.scale;
+  applyTextScale(); save();
+});
 const THEME_COLOR = { normal:'#FBF2F3', alto:'#FFF7F8' };
 function applyContrast(){
   const v = state.settings.contrast === 'alto' ? 'alto' : 'normal';
@@ -3130,7 +3153,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     if(!parsed.days) throw new Error('formato');
     state = normalize(parsed);
     ensureFinanzas(); ensureCycle();
-    await save(); applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
+    await save(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
@@ -3215,7 +3238,7 @@ function normalize(s){
   if(loaded) state = loaded;
   normalize(state);
   ensureFinanzas(); ensureCycle();
-  applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI();
+  applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.

@@ -188,20 +188,31 @@ nuevos (`dlgDeleteSeries`, `delOnlyDay`, `delAllSeries`, `delSeriesCancel`, `dlg
 probado en navegador** — la extensión Claude in Chrome no estaba disponible en esta
 sesión; conviene abrir la app y probar ambos flujos antes de darlo por cerrado del todo.
 
-### 2.4 No hay tamaño de texto ni modo oscuro
+### 2.4 No hay tamaño de texto ni modo oscuro — tamaño de texto hecho el 2026-09-20
 
-Los tamaños están fijos en px y la app declara `color-scheme: light only`. El zoom queda
-desactivado por decisión tomada y no se reabre, pero sumado a lo anterior una persona con
-baja visión o fotofobia no tiene ninguna salida (principio 4 / P3).
+Los tamaños están fijos en px y la app declara `color-scheme: light only`. El zoom del
+navegador queda desactivado por decisión tomada y no se reabre, pero sumado a lo anterior
+una persona con baja visión o fotofobia no tenía ninguna salida (principio 4 / P3).
 
-Mínimo para la v1, un ajuste "Tamaño del texto":
+Hecho, mínimo para la v1: ajuste "Tamaño del texto" en Ajustes → Cómo se ve, tres pasos
+(Normal / Grande ×1,15 / Muy grande ×1,3), junto al de Contraste:
 
 ```css
 .app, dialog, .tabs{ zoom: var(--text-scale, 1); }
 ```
 
-Hay que probarlo con la barra de pestañas fija y con las hojas. El modo oscuro puede
-esperar a la v1.1 (implica una tercera variante de tokens, no solo invertir).
+`applyTextScale()` (`index.html`) escribe `--text-scale` en `:root` y marca el chip activo;
+se llama desde `init()`, desde importar y al cambiar el ajuste. Mismo motivo que el propio
+arreglo de la auditoría: `zoom` escala de golpe hojas, barra de pestañas fija y el resto
+del CSS con tamaños en px, sin reescribir cada uno a rem.
+
+**No probado en navegador** — la extensión Claude in Chrome no estaba disponible en esta
+sesión. `zoom` en un elemento con `position:fixed` (la barra de pestañas) o `width:100%`
+(las hojas) puede comportarse de forma distinta a lo esperado; conviene probarlo bien en
+los tres pasos antes de darlo por cerrado, tal y como ya avisaba este mismo punto.
+
+El modo oscuro sigue pendiente, para la v1.1 (implica una tercera variante de tokens, no
+solo invertir).
 
 ### 2.5 Finanzas es una pestaña fija ajena al modelo de energía — hecho el 2026-09-17
 
