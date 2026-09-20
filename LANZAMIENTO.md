@@ -217,15 +217,30 @@ que no vuelve a abrirse al revisitar la pestaña, botones de repaso en Ajustes, 
 carga con datos de ciclo/finanzas ya existentes (ninguna guía se abre sola). Sin errores
 de JavaScript.
 
-### 2.6 Importar no valida el archivo
+### 2.6 Importar no valida el archivo — hecho el 2026-09-20
 
-La importación (`index.html:2702`) sustituye el estado entero sin repetir las reparaciones
-que hace `init()`: un archivo sin `library` rompe el render. Además `t.time` y `t.est`
-entran en el HTML sin escapar (`1210`, `2477`, `2478`), así que un archivo manipulado
-podría ejecutar código — algo que pesa más dentro de una app nativa con plugins.
+La importación sustituía el estado entero sin repetir las reparaciones que hacía
+`init()`: un archivo sin `library` o `templates` (de una versión vieja, o tocado a mano)
+rompía el render. Además `t.time` entraba en el HTML sin escapar en dos sitios
+(`renderTasks`, `renderDaySheet`) y `t.real ?? t.est` se interpolaba directo sin pasar por
+`fmtN`, así que un archivo manipulado podía ejecutar código — algo que pesa más dentro de
+una app nativa con plugins.
 
-Arreglo: extraer a `normalize(state)` lo que hace `init()` y llamarlo en los dos sitios;
-cambiar a `${esc(t.time)}` y `${fmtN(+(t.real ?? t.est) || 0)}`.
+Arreglo: extraída a `normalize(state)` (`index.html:3129`) toda la reparación que antes
+solo vivía en `init()` (library con sus ids, settings con sus defaults, templates,
+introSeen); ahora la llaman tanto `init()` como el handler de importar. Y en los dos
+sitios donde se pintaba una tarea:
+
+```js
+const timeTag = t.time ? `<span class="task-time">${esc(t.time)}</span> ` : '';
+// ...
+<span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
+```
+
+Verificado con Node: `esc()` neutraliza un `t.time` con `<img onerror=...>`, y
+`fmtN(+(t.real ?? t.est) || 0)` reduce un `t.est` no numérico a `0` en vez de imprimirlo
+tal cual; `normalize()` repara un archivo mínimo (`{ days: {...} }` sin `library` ni
+`templates`) sin lanzar error.
 
 ---
 

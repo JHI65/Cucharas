@@ -1346,7 +1346,7 @@ function renderTasks(){
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(`sueles gastar ${fmtN(l.avg)}`);
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
     const isOpen = t.done && !collapsedTasks.has(t.id);
-    const timeTag = t.time ? `<span class="task-time">${t.time}</span> ` : '';
+    const timeTag = t.time ? `<span class="task-time">${esc(t.time)}</span> ` : '';
     const body = t.done
       ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
@@ -2813,8 +2813,8 @@ function renderDaySheet(){
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
-        <span>${t.time?`${t.time} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
-        <span class="cost">${t.real ?? t.est}
+        <span>${t.time?`${esc(t.time)} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
+        <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
           <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
         </span>
@@ -3065,11 +3065,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
   try{
     const parsed = JSON.parse(await f.text());
     if(!parsed.days) throw new Error('formato');
-    state = parsed;
-    if(!state.settings) state.settings = { max:12 };
-    if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
-    if(state.settings.peakCostPercent == null) state.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
-    if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
+    state = normalize(parsed);
     ensureFinanzas(); ensureCycle();
     await save(); applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
   }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
@@ -3130,21 +3126,29 @@ document.addEventListener('visibilitychange', () => {
   if(day().budget == null) openCheckin();
 });
 
+// Repara la forma del estado, venga de store.get() al arrancar o de un
+// archivo importado: sin esto, un backup de otra versión o manipulado a
+// mano puede faltarle 'library' o 'templates' y romper el render entero.
+function normalize(s){
+  if(!s.library || !s.library.length) s.library = SEED.map(x=>({...x,samples:[]}));
+  s.library.forEach(l => { if(!l.id) l.id = uid(); });
+  if(!s.settings) s.settings = { max:12 };
+  if(!s.settings.overCost) s.settings.overCost = {...OVERCOST_DEFAULT};
+  if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
+  if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
+  // Quien ya tenía historial antes de que existiera esta pantalla no debe
+  // encontrársela de sorpresa (predictibilidad): solo se muestra sin pedirlo
+  // a quien instala la app de cero (o restaura un backup con días ya apuntados).
+  if(s.settings.introSeen == null) s.settings.introSeen = Object.keys(s.days).length > 0;
+  if(!s.templates) s.templates = [];
+  return s;
+}
+
 /* ---------- boot ---------- */
 (async function init(){
   const loaded = await store.get();
   if(loaded) state = loaded;
-  if(!state.library || !state.library.length) state.library = SEED.map(s=>({...s,samples:[]}));
-  state.library.forEach(l => { if(!l.id) l.id = uid(); });
-  if(!state.settings) state.settings = { max:12 };
-  if(!state.settings.overCost) state.settings.overCost = {...OVERCOST_DEFAULT};
-  if(state.settings.peakCostPercent == null) state.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
-  if(state.settings.peakPromptOff == null) state.settings.peakPromptOff = false;
-  // Quien ya tenía historial antes de que existiera esta pantalla no debe
-  // encontrársela de sorpresa (predictibilidad): solo se muestra sin pedirlo
-  // a quien instala la app de cero.
-  if(state.settings.introSeen == null) state.settings.introSeen = Object.keys(state.days).length > 0;
-  if(!state.templates) state.templates = [];
+  normalize(state);
   ensureFinanzas(); ensureCycle();
   applyContrast(); applyCustomColor(); applyCycleUI(); applyFinUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
