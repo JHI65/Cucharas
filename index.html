@@ -48,10 +48,13 @@
 html,body{
   margin:0;padding:0;min-height:100%;background:var(--bg);color-scheme:light;
   accent-color:var(--accent);
-  scrollbar-color:var(--line) transparent;
-  scrollbar-width:thin;
+  scrollbar-width:none;
   overflow-x:hidden;
 }
+/* Barra de scroll invisible en toda la app, para que se sienta nativa: en
+   iOS no hace falta (el indicador del sistema ya se oculta solo), pero en
+   Chrome/desktop scrollbar-width:none no basta y deja la marca de siempre. */
+::-webkit-scrollbar{display:none}
 body{
   color:var(--ink);
   font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
