@@ -50,6 +50,7 @@ html,body{
   accent-color:var(--accent);
   scrollbar-color:var(--line) transparent;
   scrollbar-width:thin;
+  overflow-x:hidden;
 }
 body{
   color:var(--ink);
@@ -370,7 +371,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .field{margin-bottom:16px}
 .field label{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:6px}
 .field input[type=text],.field input[type=time]{
-  width:100%;padding:13px;background:var(--surface);
+  width:100%;max-width:100%;min-width:0;padding:13px;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--r-control);
 }
 .task-time{color:var(--ink-soft)}
