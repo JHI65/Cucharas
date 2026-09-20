@@ -1231,10 +1231,19 @@ const localDateKey = d => {
 };
 // El día no cambia a medianoche sino a las 04:00: quien se acuesta tarde
 // sigue viendo "hoy" el día que empezó, no uno nuevo con cero cucharas.
+const DAY_START_HOUR = 4;
 const todayKey = () => {
   const d = new Date();
-  if(d.getHours() < 4) d.setDate(d.getDate() - 1);
+  if(d.getHours() < DAY_START_HOUR) d.setDate(d.getDate() - 1);
   return localDateKey(d);
+};
+/* Minutos desde que "empieza" el día (las 04:00), no desde medianoche: así
+   una tarea de madrugada (23:00 -> 01:00) compara bien, porque para la app
+   la 01:00 sigue siendo parte del mismo día que empezó a las 04:00. */
+const logicalMinutes = hhmm => {
+  const [h, m] = hhmm.split(':').map(Number);
+  const shifted = h*60 + m - DAY_START_HOUR*60;
+  return shifted < 0 ? shifted + 1440 : shifted;
 };
 const fmtDate = k => {
   const d = new Date(k+'T12:00:00');
@@ -2336,12 +2345,12 @@ const tSave = document.getElementById('tSave');
 let tCost = 2, tKind = 'gasto';
 let taskDate = todayKey();
 let editingTask = null;
-/* Las horas vienen del input en formato HH:MM con cero delante, así que
-   compararlas como texto ya las ordena bien. Una tarea que cruza la
-   medianoche no se puede apuntar de una pieza: se parte en dos. */
-const badTimeRange = () => !!(tTime.value && tTimeEnd.value && tTimeEnd.value < tTime.value);
+/* No se comparan como texto porque para la app el día no cambia a
+   medianoche: una tarea de 23:00 a 01:00 es válida (termina en la
+   madrugada del mismo día lógico), y solo se bloquea si de verdad
+   termina antes de empezar dentro de ese mismo día. */
+const badTimeRange = () => !!(tTime.value && tTimeEnd.value && logicalMinutes(tTimeEnd.value) < logicalMinutes(tTime.value));
 function tTimeSync(){
-  tTimeEnd.min = tTime.value || '';
   const bad = badTimeRange();
   document.getElementById('tTimeMsg').hidden = !bad;
   tTimeEnd.setAttribute('aria-invalid', bad);
