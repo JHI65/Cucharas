@@ -883,14 +883,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div class="field-row">
       <div class="field">
-        <label for="tTime">Desde (opcional)</label>
+        <label for="tTime">Hora inicio</label>
         <input type="time" id="tTime">
       </div>
       <div class="field">
-        <label for="tTimeEnd">Hasta (opcional)</label>
-        <input type="time" id="tTimeEnd">
+        <label for="tTimeEnd">Hora fin</label>
+        <input type="time" id="tTimeEnd" aria-describedby="tTimeMsg">
       </div>
     </div>
+    <p class="notice" id="tTimeMsg" role="status" hidden style="margin:0 0 16px">La hora de fin no puede ser anterior a la de inicio.</p>
     <div class="field" id="repField">
       <label>Repetir</label>
       <div class="chips" id="repMode">
@@ -2335,6 +2336,18 @@ const tSave = document.getElementById('tSave');
 let tCost = 2, tKind = 'gasto';
 let taskDate = todayKey();
 let editingTask = null;
+/* Las horas vienen del input en formato HH:MM con cero delante, así que
+   compararlas como texto ya las ordena bien. Una tarea que cruza la
+   medianoche no se puede apuntar de una pieza: se parte en dos. */
+const badTimeRange = () => !!(tTime.value && tTimeEnd.value && tTimeEnd.value < tTime.value);
+function tTimeSync(){
+  tTimeEnd.min = tTime.value || '';
+  const bad = badTimeRange();
+  document.getElementById('tTimeMsg').hidden = !bad;
+  tTimeEnd.setAttribute('aria-invalid', bad);
+}
+tTime.addEventListener('input', tTimeSync);
+tTimeEnd.addEventListener('input', tTimeSync);
 function tSync(){
   tCostOut.textContent = fmtN(tCost);
   document.querySelectorAll('#tKind .chip').forEach(c =>
@@ -2403,7 +2416,7 @@ function expandDates(startKey){
 function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = '';
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
@@ -2428,6 +2441,7 @@ function openTaskEdit(taskId){
   tCost = Math.abs(t.est);
   tTime.value = t.time || '';
   tTimeEnd.value = t.timeEnd || '';
+  tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.querySelector('#dlgTask h2').textContent = 'Editar tarea';
   document.querySelector('#dlgTask .sub').textContent = 'Cambia lo que haga falta.';
@@ -2571,6 +2585,7 @@ document.getElementById('tDelete').addEventListener('click', () => {
 });
 tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
+  if(badTimeRange()){ tTimeSync(); tTimeEnd.focus(); return; }
   const est = tKind === 'recarga' ? -tCost : tCost;
   const time = tTime.value || null;
   const timeEnd = tTimeEnd.value || null;
