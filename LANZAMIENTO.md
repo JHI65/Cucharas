@@ -107,17 +107,18 @@ document.getElementById('cycleFaseAviso').hidden = dayNum == null;
 
 ## 2. Importantes
 
-### 2.1 Los check-in saltados cuentan como respuestas
+### 2.1 Los check-in saltados cuentan como respuestas — hecho el 2026-09-20
 
-`budgetUnanswered` se escribe (`index.html:1878`) pero no se lee nunca. `typicalBudget()`
-promedia días no contestados, y el patrón de picos compara contra ellos, lo que empuja el
-resultado hacia "no se nota diferencia". Un día sin respuesta no es un dato (principio 6).
+`budgetUnanswered` se escribía (`index.html:2206`, botón "Ahora no") pero no se leía en
+ningún sitio. `typicalBudget()` promediaba días no contestados, y el patrón de picos
+comparaba contra ellos, lo que empujaba el resultado hacia "no se nota diferencia". Un día
+sin respuesta no es un dato (principio 6).
 
 ```js
-// typicalBudget (1634)
+// typicalBudget (1789)
 .map(k => state.days[k]).filter(d => d.budget != null && !d.budgetUnanswered).map(d => d.budget);
 
-// peakNextDayInsight (1701)
+// peakNextDayInsight (1856)
 if(next && next.budget != null && !next.budgetUnanswered) acc.push(next.budget - typical);
 ```
 

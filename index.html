@@ -1788,7 +1788,7 @@ document.getElementById('cyclePattern').addEventListener('click', e => {
 /* typical budget: what a normal day has looked like lately */
 function typicalBudget(){
   const b = Object.keys(state.days).sort().slice(-7)
-    .map(k => state.days[k].budget).filter(v => v != null);
+    .map(k => state.days[k]).filter(d => d.budget != null && !d.budgetUnanswered).map(d => d.budget);
   if(!b.length) return Math.round(state.settings.max * 0.65);
   return Math.round(b.reduce((a,c)=>a+c,0) / b.length);
 }
@@ -1853,7 +1853,7 @@ function peakNextDayInsight(){
     const hadPeak = (state.days[k].extras || []).some(e => e.type === 'pico-sensorial');
     if(!hadPeak) return acc;
     const next = state.days[shiftKey(k, 1)];
-    if(next && next.budget != null) acc.push(next.budget - typical);
+    if(next && next.budget != null && !next.budgetUnanswered) acc.push(next.budget - typical);
     return acc;
   }, []);
   if(diffs.length < NEED_PEAKS) return null;
