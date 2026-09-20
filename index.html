@@ -602,15 +602,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
           <button class="chip" data-bleed="no" aria-pressed="false">No</button>
         </div>
       </div>
+      <div class="field">
+        <label>Dolor físico</label>
+        <div class="scale" id="cycPain"></div>
+        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
+      </div>
       <div class="field" id="cycIntField" hidden>
         <label>Intensidad del sangrado</label>
         <div class="scale" id="cycIntensity"></div>
         <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>Dolor físico</label>
-        <div class="scale" id="cycPain"></div>
-        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
       </div>
     </div>
 
@@ -1704,7 +1704,9 @@ function renderCycle(){
   const bleeding = log ? log.bleeding : null;
   document.querySelectorAll('#cycBleed .chip').forEach(c =>
     c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
-  document.getElementById('cycIntField').hidden = !bleeding;
+  const cycIntField = document.getElementById('cycIntField');
+  cycIntField.hidden = !bleeding;
+  document.getElementById('cycPain').closest('.field').style.marginBottom = bleeding ? '' : '0';
   paintScale('cycIntensity', log ? log.bleedingIntensity : null);
   paintScale('cycPain', log ? log.pain : null);
   renderCyclePrediction();
