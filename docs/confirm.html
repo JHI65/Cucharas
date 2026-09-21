@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Spoony</title>
+<style>
+  :root{
+    --bg:#FBF2F3; --surface:#FFF8F9; --line:#AD7C88;
+    --ink:#4B3A3F; --ink-soft:#7A6167; --accent:#9E5266;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg)}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    color:var(--ink); display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding:24px;
+  }
+  .card{
+    max-width:420px; width:100%; background:var(--surface);
+    border:1px solid var(--line); border-radius:20px; padding:28px 24px;
+    text-align:center;
+  }
+  h1{font-size:22px; margin:0 0 12px}
+  p{font-size:16px; line-height:1.5; color:var(--ink-soft); margin:0 0 8px}
+  .tag{font-size:14px; color:var(--ink-soft); margin-top:22px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Un momento…</h1>
+    <p id="body">Comprobando el enlace.</p>
+    <p class="tag">Spoony</p>
+  </div>
+  <script>
+    /* Este enlace lo abre el correo de Supabase (confirmar cuenta, o más
+       adelante recuperar contraseña). Esta página no hace nada con la
+       sesión que llega en la URL: la app nativa guarda su propia sesión por
+       separado en cada móvil, así que aquí solo hace falta decir qué ha
+       pasado y mandar a la persona de vuelta a Spoony. Sin JS externo ni
+       compilación, igual que el resto del proyecto. */
+    const p = new URLSearchParams(location.hash.slice(1));
+    const title = document.getElementById('title');
+    const body = document.getElementById('body');
+    if(p.get('error')){
+      title.textContent = 'Ese enlace ya no vale';
+      body.textContent = p.get('error_code') === 'otp_expired'
+        ? 'Ha caducado. Vuelve a Spoony e inténtalo otra vez desde "Tu cuenta".'
+        : 'Vuelve a Spoony e inténtalo otra vez desde "Tu cuenta".';
+    }else if(p.get('type') === 'recovery'){
+      title.textContent = 'Enlace confirmado';
+      body.textContent = 'Vuelve a Spoony para poner una contraseña nueva.';
+    }else if(p.get('access_token')){
+      title.textContent = 'Cuenta confirmada';
+      body.textContent = 'Ya puedes cerrar esto y entrar en Spoony con tu correo y tu contraseña.';
+    }else{
+      title.textContent = 'Spoony';
+      body.textContent = 'Puedes cerrar esta página y volver a la app.';
+    }
+  </script>
+</body>
+</html>
