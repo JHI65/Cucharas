@@ -90,10 +90,21 @@ servidor.
 - [x] Contraseña incorrecta: mensaje literal.
 - [x] Borrar la cuenta: se va la cuenta y la fila; lo del móvil se queda.
 
-**Pendiente con el proyecto real**: que las respuestas de Supabase sean las que imita el
-servidor falso (formato de errores, `return=representation`, la función
-`delete_my_account`, el `refresh_token`). Ya nos engañó un simulacro una vez, con
-`registerPlugin`.
+**Comprobado el mismo día contra el proyecto real** (`fcmrwfpekzgtsgktyvwk`, Frankfurt),
+con una cuenta de prueba en un buzón público (mailinator), confirmada siguiendo el enlace
+del correo de verdad: crear cuenta, iniciar sesión, subir un cambio local (`version` subió
+sola de 1 a 2 por el trigger), RLS bloqueando sin token y dejando pasar con el suyo, y
+`delete_my_account` borrando la cuenta y la fila (comprobado con el mismo token después:
+ya no ve nada). Las claves reales ya están en `index.html`.
+
+**"Confirm email" está activado en el proyecto**, no desactivado como recomendaba este
+documento para la beta. El enlace de confirmación redirige a `http://localhost:3000`
+porque el **Site URL** de Authentication → URL Configuration sigue en su valor de
+fábrica. Dos formas de arreglarlo, sin decidir todavía cuál:
+1. Desactivar "Confirm email" (Authentication → Sign In / Providers → Email): quien crea
+   la cuenta entra directamente, sin correo de por medio. Más simple para la beta.
+2. Dejarlo activado y poner un Site URL real (aunque sea una página en blanco de
+   `spoony.app` o similar) para que el enlace del correo no rompa.
 
 **Pendiente de construir**: recuperar la contraseña (hoy, quien la olvida conserva los
 datos del móvil pero pierde el acceso a la nube) y Android en emulador.

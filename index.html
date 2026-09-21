@@ -1412,8 +1412,8 @@ const day = (k=todayKey()) => {
      móvil entretanto.
 
    Será de pago más adelante: syncAllowed() es el único sitio donde decidirlo. */
-const SUPABASE_URL = '';        // p. ej. 'https://abcdefgh.supabase.co'
-const SUPABASE_ANON_KEY = '';   // clave pública "anon": la protección la ponen las políticas RLS de supabase/schema.sql
+const SUPABASE_URL = 'https://fcmrwfpekzgtsgktyvwk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjbXJ3ZnBla3pndHNna3R5dndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDMxMzIsImV4cCI6MjEwNTU3OTEzMn0.o_Z43sKGLCqjXvbTQFjY9PiiYmwITM5mG4bvOPhQkg0';   // clave pública "anon": la protección la ponen las políticas RLS de supabase/schema.sql
 const syncAllowed = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);   // aquí irá la comprobación de la suscripción
 const AUTH_KEY = 'spoony:auth';
 
