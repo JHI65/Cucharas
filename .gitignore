@@ -1,0 +1,13 @@
+# Dependencias de la carcasa nativa. El código de la app sigue siendo
+# index.html, sin compilación: esto es solo lo que necesita Capacitor.
+node_modules/
+
+# Copia generada de index.html que Capacitor mete en los proyectos nativos.
+# Se regenera con `npm run prep`; la fuente única sigue siendo ./index.html.
+www/
+
+# Capturas y pruebas sueltas de trabajo, no forman parte de la app.
+_scratch/
+
+# macOS
+.DS_Store

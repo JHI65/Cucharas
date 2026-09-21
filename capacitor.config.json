@@ -1,0 +1,14 @@
+{
+  "appId": "com.spoony.app",
+  "appName": "Spoony",
+  "webDir": "www",
+  "backgroundColor": "#FBF2F3",
+  "android": {
+    "backgroundColor": "#FBF2F3"
+  },
+  "ios": {
+    "backgroundColor": "#FBF2F3",
+    "contentInset": "never",
+    "limitsNavigationsToAppBoundDomains": true
+  }
+}

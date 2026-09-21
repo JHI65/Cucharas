@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Spoony</string>
+    <string name="title_activity_main">Spoony</string>
+    <string name="package_name">com.spoony.app</string>
+    <string name="custom_url_scheme">com.spoony.app</string>
+</resources>
