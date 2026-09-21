@@ -334,7 +334,7 @@ tal cual; `normalize()` repara un archivo mínimo (`{ days: {...} }` sin `librar
   notificaciones ni insistencia: `renderExportInfo()` (`index.html`) lee
   `state.settings.lastExportKey`, que se escribe al pulsar Exportar. Reduce el riesgo de
   perderlo todo si el móvil se rompe o lo roban, sin montar servidor ni cuenta — se evaluó
-  y descartó una sincronización con Firebase/cuenta de Google por ese mismo motivo: rompía
+  y descartó una sincronización con Firebase/cuenta de Google por ese mismo motivo (decisión revisada el 2026-09-21: cuenta opcional con Supabase, ver `SUPABASE.md`): rompía
   la ficha de privacidad "Datos no recopilados" que es el argumento de venta actual.
 
 ---
@@ -356,9 +356,10 @@ evidentes y eso es una barrera real para este público.
 - [ ] Sustituir `confirm`, `alert` y `prompt` por hojas propias (§2.3).
 - [ ] Política de privacidad en una URL pública: la piden las dos tiendas aunque no se
       recoja nada.
-- [ ] Ficha de privacidad de Apple: "Datos no recopilados". Formulario de seguridad de
-      datos de Google Play: nada recopilado. **No añadir SDKs de analítica ni de informes
-      de fallos** — ese "no recogemos nada" es el mejor argumento del producto.
+- [ ] Ficha de privacidad de Apple y formulario de Google Play. **Cambió el 2026-09-21**:
+      con la cuenta opcional ya no es "Datos no recopilados". Qué se recoge, y solo si la
+      persona crea cuenta, está en `SUPABASE.md`. Sigue valiendo: sin SDKs de analítica ni
+      de informes de fallos.
 - [ ] Cuestionario de datos de salud: rellenarlo con cuidado por el módulo de Ciclo.
 - [ ] Icono de 1024×1024. El actual es un PNG de 180px incrustado en el HTML.
 - [ ] Buscar "Spoony" en ambas tiendas y en OEPM/EUIPO antes de invertir en la ficha.

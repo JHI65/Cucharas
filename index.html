@@ -407,7 +407,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .field-row{display:flex;gap:10px;margin-bottom:16px}
 .field-row .field{flex:1;min-width:0;margin-bottom:0}
 .field label{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:6px}
-.field input[type=text],.field input[type=time]{
+.field input[type=text],.field input[type=password],.field input[type=time]{
   width:100%;max-width:100%;min-width:0;padding:13px;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--r-control);
 }
@@ -707,7 +707,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <section class="screen" id="s-set">
     <header class="top">
       <h1 class="title">Ajustes</h1>
-      <p class="sub">Tus datos no salen del teléfono</p>
+      <p class="sub" id="privacyLine">Tus datos no salen del teléfono</p>
     </header>
     <p class="libsec">Tus cucharas</p>
     <div class="group">
@@ -820,10 +820,36 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     </div>
 
+    <div id="accountGroup" hidden>
+    <p class="libsec">Tu cuenta (opcional)</p>
+    <div class="group">
+    <div class="row" id="accOutRow">
+      <div><strong>Copia en la nube</strong><p>Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.</p><p class="notice" id="accOutMsg" hidden></p></div>
+      <button class="btn" id="btnAccOpen">Entrar</button>
+    </div>
+    <div class="row" id="accInRow" hidden>
+      <div><strong id="accEmail"></strong><p id="accStatus"></p></div>
+      <button class="btn" id="btnSyncNow">Sincronizar</button>
+    </div>
+    <div class="row" id="accDecideRow" hidden>
+      <div><strong>Falta elegir qué datos guardar</strong><p>Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.</p></div>
+      <button class="btn" id="btnSyncDecide">Elegir</button>
+    </div>
+    <div class="row" id="accLogoutRow" hidden>
+      <div><strong>Cerrar sesión</strong><p>Tus datos se quedan en este móvil.</p></div>
+      <button class="btn" id="btnLogout">Cerrar</button>
+    </div>
+    <div class="row" id="accDeleteRow" hidden>
+      <div><strong>Borrar mi cuenta</strong><p>Borra la cuenta y la copia en la nube. Lo que hay en este móvil se queda.</p></div>
+      <button class="btn warn" id="btnAccDelete">Borrar</button>
+    </div>
+    </div>
+    </div>
+
     <p class="libsec">Tus datos</p>
     <div class="group">
     <div class="row">
-      <div><strong>Copia de seguridad</strong><p>Descarga un archivo con todo tu historial.</p><p id="exportInfo"></p></div>
+      <div><strong>Copia de seguridad</strong><p>Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.</p><p id="exportInfo"></p></div>
       <button class="btn" id="btnExport">Exportar</button>
     </div>
     <div class="row">
@@ -1155,6 +1181,43 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<!-- ===== Cuenta ===== -->
+<dialog id="dlgAccount">
+  <div class="sheet">
+    <h2>Tu cuenta</h2>
+    <p class="sub">Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.</p>
+    <div class="field">
+      <label for="accEmailIn">Correo</label>
+      <input type="text" id="accEmailIn" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="accPassIn">Contraseña</label>
+      <input type="password" id="accPassIn" autocomplete="current-password">
+    </div>
+    <p class="notice" id="accMsg" role="status" hidden style="margin:0 0 16px"></p>
+    <div class="bigrow">
+      <button id="accSignUp">Crear cuenta</button>
+      <button class="primary" id="accSignIn">Entrar</button>
+    </div>
+    <div class="bigrow"><button id="accCancel">Cancelar</button></div>
+  </div>
+</dialog>
+
+<!-- ===== Datos distintos en el móvil y en la cuenta ===== -->
+<dialog id="dlgSyncConflict">
+  <div class="sheet">
+    <h2>Hay datos distintos en este móvil y en tu cuenta</h2>
+    <p class="sub">Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.</p>
+    <div class="card" style="margin-top:0"><h3>En este móvil</h3><p id="scLocal"></p></div>
+    <div class="card"><h3>En tu cuenta</h3><p id="scRemote"></p></div>
+    <div class="bigrow" style="flex-direction:column;margin-top:18px">
+      <button class="primary" id="scKeepLocal">Guardar los de este móvil</button>
+      <button id="scKeepRemote">Guardar los de la cuenta</button>
+      <button id="scLater">Decidir más tarde</button>
+    </div>
+  </div>
+</dialog>
+
 <dialog id="dlgDay">
   <div class="sheet">
     <h2 id="dTitle"></h2>
@@ -1333,7 +1396,239 @@ const day = (k=todayKey()) => {
   if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'', extras:[] };
   return state.days[k];
 };
-const save = () => store.set(state);
+/* ---------- cuenta y copia en la nube (opcional) ----------
+   La app funciona igual sin cuenta: guarda en el móvil y ya está. Con cuenta,
+   el estado entero se sube a Supabase y se baja en otros móviles. Se habla con
+   su API REST por fetch, sin la librería de Supabase: así la app sigue siendo
+   un único index.html, no depende de un CDN para arrancar y funciona sin red.
+
+   Reglas:
+   - Manda el móvil. La nube es una copia: sin conexión todo sigue igual y los
+     cambios se suben cuando vuelve.
+   - Nunca se sustituyen datos en silencio. Si este móvil y la cuenta tienen
+     cambios distintos, se pregunta cuáles guardar.
+   - La versión la pone la base de datos. Se sube con la condición "si la
+     versión sigue siendo la que vi", para no pisar lo que haya subido otro
+     móvil entretanto.
+
+   Será de pago más adelante: syncAllowed() es el único sitio donde decidirlo. */
+const SUPABASE_URL = '';        // p. ej. 'https://abcdefgh.supabase.co'
+const SUPABASE_ANON_KEY = '';   // clave pública "anon": la protección la ponen las políticas RLS de supabase/schema.sql
+const syncAllowed = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);   // aquí irá la comprobación de la suscripción
+const AUTH_KEY = 'spoony:auth';
+
+/* La sesión va en localStorage, no en el archivo de datos: así nunca viaja en
+   una copia exportada. Si iOS vacía localStorage, lo único que pasa es que hay
+   que volver a entrar; los datos siguen en el archivo. */
+let auth = (() => { try{ return JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){ return null; } })();
+const saveAuth = a => {
+  auth = a;
+  try{ a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); }catch(e){}
+};
+
+let changeSeq = 0, pushTimer = null, syncBusy = false, syncStatus = '', pendingRemote = null;
+
+/* state.sync = { userId, version, dirty, paused } vive en el archivo local
+   (tiene que sobrevivir a cerrar la app) pero nunca se sube ni se exporta. */
+function markChanged(){
+  if(!state.sync) return;
+  state.sync.dirty = true;
+  changeSeq++;
+  if(auth && syncAllowed()){ clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+}
+const save = () => { markChanged(); return store.set(state); };
+const persist = () => store.set(state);   // sin contar como cambio: para lo que llega de la nube
+const cloudData = () => { const { sync, ...rest } = state; return rest; };
+
+class NetError extends Error {}
+async function api(path, { method = 'GET', body, token, headers = {} } = {}){
+  let r;
+  try{
+    r = await fetch(SUPABASE_URL + path, {
+      method,
+      headers: { apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}), ...headers },
+      body: body == null ? undefined : JSON.stringify(body)
+    });
+  }catch(e){ throw new NetError('sin conexión'); }
+  const text = await r.text();
+  let json = null; try{ json = text ? JSON.parse(text) : null; }catch(e){}
+  if(!r.ok){
+    const err = new Error((json && (json.msg || json.message || json.error_description)) || ('HTTP ' + r.status));
+    err.status = r.status; err.code = json && (json.error_code || json.code);
+    throw err;
+  }
+  return json;
+}
+
+function storeSession(j){
+  saveAuth({
+    access_token: j.access_token, refresh_token: j.refresh_token,
+    expires_at: j.expires_at || Math.floor(Date.now()/1000) + (j.expires_in || 3600),
+    user: { id: j.user.id, email: j.user.email }
+  });
+}
+let refreshing = null;
+async function accessToken(){
+  if(!auth) throw new Error('sin sesión');
+  if(auth.expires_at * 1000 - Date.now() > 60000) return auth.access_token;
+  // Una sola renovación a la vez: el refresh_token se gasta al usarlo.
+  refreshing = refreshing || (async () => {
+    try{
+      storeSession(await api('/auth/v1/token?grant_type=refresh_token', { method:'POST', body:{ refresh_token: auth.refresh_token } }));
+    }catch(e){
+      if(!(e instanceof NetError)) signOutLocal('Tu sesión ha caducado. Vuelve a entrar para seguir con la copia en la nube.');
+      throw e;
+    }finally{ refreshing = null; }
+  })();
+  await refreshing;
+  return auth.access_token;
+}
+
+/* ¿Hay algo apuntado de verdad? Un día con presupuesto puesto por "Ahora no"
+   no cuenta: es lo que la app rellena sola. */
+function hasData(s){
+  const days = Object.values(s.days || {});
+  return days.some(d => (d.tasks || []).length || d.checkout || (d.budget != null && !d.budgetUnanswered) || (d.note || '').trim())
+    || (s.cycleLogs || []).length > 0
+    || !!(s.finanzas && ((s.finanzas.gastosFijos || []).length || (s.finanzas.gastosVariables || []).length));
+}
+function summarize(s){
+  const keys = Object.keys(s.days || {}).filter(k => {
+    const d = s.days[k] || {};
+    return (d.tasks || []).length || d.checkout || (d.budget != null && !d.budgetUnanswered);
+  }).sort();
+  if(!keys.length) return 'Nada apuntado todavía.';
+  const tasks = keys.reduce((a, k) => a + ((s.days[k].tasks || []).length), 0);
+  return `${keys.length} día${keys.length === 1 ? '' : 's'} con datos y ${tasks} tarea${tasks === 1 ? '' : 's'}. El último, el ${fmtDate(keys[keys.length - 1])}.`;
+}
+// Comparación que no depende del orden de las claves (jsonb las reordena).
+const canon = v => Array.isArray(v) ? '[' + v.map(canon).join(',') + ']'
+  : (v && typeof v === 'object') ? '{' + Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}'
+  : JSON.stringify(v);
+
+async function getRemote(){
+  const t = await accessToken();
+  const rows = await api(`/rest/v1/spoony_state?select=data,version&user_id=eq.${auth.user.id}`, { token: t });
+  return (rows && rows[0]) || null;
+}
+function afterPush(version, seq){
+  state.sync.version = version;
+  state.sync.dirty = changeSeq !== seq;   // si hubo cambios mientras subía, siguen pendientes
+  persist();
+  if(state.sync.dirty){ clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+}
+async function insertRemote(){
+  const t = await accessToken(), seq = changeSeq;
+  const rows = await api('/rest/v1/spoony_state', { method:'POST', token:t,
+    headers:{ Prefer:'return=representation' }, body:{ user_id: auth.user.id, data: cloudData() } });
+  afterPush(rows[0].version, seq);
+}
+async function pushRemote(expectedVersion){
+  const t = await accessToken(), seq = changeSeq;
+  const rows = await api(`/rest/v1/spoony_state?user_id=eq.${auth.user.id}&version=eq.${expectedVersion}`, { method:'PATCH', token:t,
+    headers:{ Prefer:'return=representation' }, body:{ data: cloudData() } });
+  if(!rows || !rows.length) return false;   // otro móvil subió algo entretanto
+  afterPush(rows[0].version, seq);
+  return true;
+}
+/* Sustituir lo local por lo de la nube, sin dejarlo a medias: si pintar falla,
+   se vuelve atrás y el archivo no se toca (mismo criterio que importar). */
+function applyRemote(remote){
+  const prev = state;
+  try{
+    state = normalize(remote.data || {});
+    ensureFinanzas(); ensureCycle();
+    state.sync = { ...prev.sync, version: remote.version, dirty: false, paused: false };
+    // Igual que al arrancar: las tareas ya hechas llegan plegadas.
+    collapsedTasks.clear();
+    day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
+    applyAll();
+    persist();
+  }catch(e){
+    state = prev;
+    try{ applyAll(); }catch(e2){}
+    throw e;
+  }
+}
+function syncConflict(remote){
+  pendingRemote = remote;
+  state.sync.paused = true;
+  persist();
+  setSyncStatus('paused');
+  openConflictSheet();
+}
+async function syncNow(){
+  if(!syncAllowed() || !auth || !state.sync || syncBusy) return;
+  if(state.sync.paused){ setSyncStatus('paused'); return; }
+  syncBusy = true; setSyncStatus('busy');
+  try{
+    const remote = await getRemote();
+    const s = state.sync;
+    if(!remote){
+      await insertRemote();
+    }else if(remote.version === s.version){
+      if(s.dirty && !(await pushRemote(s.version))){
+        const fresh = await getRemote();
+        if(fresh) return syncConflict(fresh);
+        await insertRemote();
+      }
+    }else if(canon(cloudData()) === canon(remote.data)){
+      s.version = remote.version; s.dirty = false; persist();   // mismo contenido: nada que decidir
+    }else if(!s.dirty){
+      applyRemote(remote);
+    }else{
+      return syncConflict(remote);
+    }
+    setSyncStatus('ok');
+  }catch(e){
+    if(!(e instanceof NetError)) console.error('Sincronización', e);
+    setSyncStatus(e instanceof NetError ? 'offline' : 'error');
+  }finally{ syncBusy = false; }
+}
+function startSyncForUser(){
+  if(!state.sync || state.sync.userId !== auth.user.id){
+    // Primera vez con esta cuenta en este móvil: lo de aquí solo cuenta como
+    // cambio pendiente si de verdad hay algo apuntado.
+    state.sync = { userId: auth.user.id, version: null, dirty: hasData(state), paused: false };
+    persist();
+  }
+  renderAccount();
+  syncNow();
+}
+function signOutLocal(msg){
+  saveAuth(null);
+  clearTimeout(pushTimer);
+  syncStatus = ''; pendingRemote = null;
+  const m = document.getElementById('accOutMsg');
+  m.textContent = msg || ''; m.hidden = !msg;
+  renderAccount();
+}
+
+function setSyncStatus(st){ syncStatus = st; renderAccount(); }
+function syncStatusText(){
+  const s = state.sync || {};
+  if(s.paused) return 'Sin sincronizar hasta que elijas qué datos guardar.';
+  if(syncStatus === 'busy') return 'Sincronizando…';
+  if(syncStatus === 'offline') return s.dirty ? 'Sin conexión. Los cambios se subirán cuando vuelva.' : 'Sin conexión.';
+  if(syncStatus === 'error') return 'No se pudo sincronizar. Se volverá a intentar.';
+  if(s.dirty) return 'Hay cambios pendientes de subir.';
+  return 'Tus datos están también en la nube.';
+}
+function renderAccount(){
+  const on = syncAllowed(), inside = on && !!auth;
+  document.getElementById('accountGroup').hidden = !on;
+  document.getElementById('privacyLine').textContent = inside
+    ? 'Tus datos se guardan en este teléfono y en tu cuenta'
+    : 'Tus datos no salen del teléfono';
+  if(!on) return;
+  document.getElementById('accOutRow').hidden = inside;
+  ['accInRow', 'accLogoutRow', 'accDeleteRow'].forEach(id => document.getElementById(id).hidden = !inside);
+  document.getElementById('accDecideRow').hidden = !(inside && state.sync && state.sync.paused);
+  if(!inside) return;
+  document.getElementById('accEmail').textContent = auth.user.email;
+  document.getElementById('accStatus').textContent = syncStatusText();
+}
 
 /* learned cost: manual estimate blended with the last real costs */
 const RECOV = [[0,'Nada'],[15,'15 min'],[30,'30 min'],[60,'1 h'],[120,'2 h'],[300,'Media tarde'],[1440,'Al día siguiente']];
@@ -2106,6 +2401,7 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
   document.getElementById('peakOut').textContent = state.settings.peakCostPercent + '%';
   document.getElementById('dayStartHourInput').value = state.settings.dayStartHour;
   renderExportInfo();
+  renderAccount();
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const fmtTaskTime = t => t.time ? (t.timeEnd ? `${t.time}–${t.timeEnd}` : t.time) : '';
@@ -2180,7 +2476,7 @@ document.getElementById('delSeriesCancel').addEventListener('click', () => {
    lenguaje literal. Saltable en cualquier momento; queda accesible después
    desde Ajustes, así que saltarla no pierde nada para siempre. */
 const TOUR_STEPS = [
-  { sel:null, title:'Qué es Spoony', body:'Una app para organizar el día por la energía que tienes, no por las horas que quedan. Apuntas lo que vas a hacer y lo que te cuesta, y con el tiempo te enseña patrones de tu propio gasto. Tus datos no salen del teléfono.' },
+  { sel:null, title:'Qué es Spoony', body:'Una app para organizar el día por la energía que tienes, no por las horas que quedan. Apuntas lo que vas a hacer y lo que te cuesta, y con el tiempo te enseña patrones de tu propio gasto. Sin cuenta, tus datos no salen del teléfono.' },
   { sel:null, title:'Qué es una cuchara', body:'Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).' },
   { sel:'.meter', title:'Las cucharas de hoy', body:'Aquí ves cuántas te quedan. Al abrir la app se te pregunta con cuántas te levantas; puedes tocar este recuadro para cambiarlo en cualquier momento del día.' },
   { sel:'#btnPeak', title:'He tenido un pico sensorial ahora', body:'Este botón resta cucharas de golpe cuando el ruido, la luz o la gente te pasan por encima, y te ofrece un espacio de calma. Sin preguntas ni cronómetro.' },
@@ -3329,7 +3625,7 @@ document.getElementById('overCostGrid').addEventListener('change', e => {
    compartir del sistema, que es la que deja guardarlo en Archivos, mandarlo
    por correo o a donde sea. En navegador sigue siendo la descarga de antes. */
 document.getElementById('btnExport').addEventListener('click', async () => {
-  const data = JSON.stringify(state, null, 2);
+  const data = JSON.stringify(cloudData(), null, 2);
   const name = `spoony-${todayKey()}.json`;
   const fs = nativeFS(), share = nativeShare();
   if(fs && share){
@@ -3367,23 +3663,30 @@ document.getElementById('btnImport').addEventListener('click', () => document.ge
 document.getElementById('fileIn').addEventListener('change', async e => {
   const f = e.target.files[0]; if(!f) return;
   const previous = state;
-  const paintAll = () => { applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); };
   try{
     const parsed = JSON.parse(await f.text());
     if(!parsed || typeof parsed.days !== 'object' || parsed.days === null || Array.isArray(parsed.days)) throw new Error('formato');
+    delete parsed.sync;
     state = normalize(parsed);
     ensureFinanzas(); ensureCycle();
-    paintAll();
+    // La cuenta es de este móvil, no del archivo: se conserva, y lo importado
+    // cuenta como cambio y se sube.
+    if(previous.sync) state.sync = { ...previous.sync };
+    applyAll();
     await save();
   }catch(err){
     state = previous;
-    try{ paintAll(); }catch(e2){ console.error('No se pudo volver a pintar', e2); }
+    try{ applyAll(); }catch(e2){ console.error('No se pudo volver a pintar', e2); }
     alert('Ese archivo no es una copia de Spoony. No se ha cambiado nada.');
   }
   e.target.value = '';   // sin esto, elegir el mismo archivo otra vez no dispara change
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
-  if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
+  const inCloud = !!(auth && syncAllowed());
+  if(!confirm(inCloud
+    ? 'Se borra todo el historial, en este móvil y en tu cuenta. No se puede deshacer.'
+    : 'Se borra todo el historial. No se puede deshacer.')) return;
+  const prevSync = state.sync;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const customColor = state.settings.customColor;
   const overCost = state.settings.overCost;
@@ -3396,9 +3699,106 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const finEnabled = state.finEnabled;
   state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
+  if(prevSync) state.sync = prevSync;
   ensureFinanzas(); ensureCycle();
   save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
 });
+
+function applyAll(){ applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); }
+
+/* ---------- cuenta: hojas y botones ---------- */
+const dlgAccount = document.getElementById('dlgAccount');
+const dlgSyncConflict = document.getElementById('dlgSyncConflict');
+const accMsg = document.getElementById('accMsg');
+const showAccMsg = t => { accMsg.textContent = t; accMsg.hidden = !t; };
+function authErrorText(e){
+  if(e instanceof NetError) return 'Sin conexión. Inténtalo cuando tengas internet.';
+  const c = e.code || '';
+  if(c === 'invalid_credentials') return 'El correo o la contraseña no son correctos.';
+  if(c === 'user_already_exists' || c === 'email_exists') return 'Ya hay una cuenta con ese correo. Pulsa Entrar.';
+  if(c === 'weak_password') return 'La contraseña tiene que tener al menos 6 caracteres.';
+  if(c === 'email_not_confirmed') return 'Falta confirmar la cuenta desde el correo que te enviamos.';
+  if(c === 'validation_failed' || c === 'email_address_invalid') return 'Ese correo no parece válido.';
+  if(c === 'over_email_send_rate_limit' || e.status === 429) return 'Demasiados intentos seguidos. Espera un poco y vuelve a probar.';
+  return 'No se pudo entrar. Inténtalo otra vez en un rato.';
+}
+async function doAuth(kind){
+  const email = document.getElementById('accEmailIn').value.trim();
+  const password = document.getElementById('accPassIn').value;
+  if(!email || !password){ showAccMsg('Escribe tu correo y una contraseña.'); return; }
+  const btns = [document.getElementById('accSignIn'), document.getElementById('accSignUp')];
+  btns.forEach(b => b.disabled = true);
+  showAccMsg('');
+  try{
+    const j = kind === 'signup'
+      ? await api('/auth/v1/signup', { method:'POST', body:{ email, password } })
+      : await api('/auth/v1/token?grant_type=password', { method:'POST', body:{ email, password } });
+    if(!j || !j.access_token){
+      showAccMsg('Te hemos enviado un correo para confirmar la cuenta. Cuando lo confirmes, vuelve aquí y pulsa Entrar.');
+      return;
+    }
+    storeSession(j);
+    document.getElementById('accPassIn').value = '';
+    document.getElementById('accOutMsg').hidden = true;
+    dlgAccount.close();
+    startSyncForUser();
+  }catch(e){ showAccMsg(authErrorText(e)); }
+  finally{ btns.forEach(b => b.disabled = false); }
+}
+document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); openDialog(dlgAccount); });
+document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
+document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
+document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
+document.getElementById('btnSyncNow').addEventListener('click', syncNow);
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  const t = auth && auth.access_token;
+  signOutLocal();
+  if(t) try{ await api('/auth/v1/logout', { method:'POST', token:t }); }catch(e){}
+});
+document.getElementById('btnAccDelete').addEventListener('click', async () => {
+  if(!confirm('Se borra tu cuenta y la copia en la nube. Lo que hay en este móvil se queda. No se puede deshacer.')) return;
+  try{
+    await api('/rest/v1/rpc/delete_my_account', { method:'POST', token: await accessToken(), body:{} });
+    delete state.sync; persist();
+    signOutLocal();
+  }catch(e){
+    alert(e instanceof NetError ? 'Sin conexión. Para borrar la cuenta hace falta internet.' : 'No se pudo borrar la cuenta. Inténtalo más tarde.');
+  }
+});
+
+function openConflictSheet(){
+  if(!pendingRemote) return;
+  document.getElementById('scLocal').textContent = summarize(state);
+  document.getElementById('scRemote').textContent = summarize(pendingRemote.data || {});
+  if(!dlgSyncConflict.open) openDialog(dlgSyncConflict);
+}
+document.getElementById('btnSyncDecide').addEventListener('click', async () => {
+  try{ pendingRemote = pendingRemote || await getRemote(); }
+  catch(e){ alert('Sin conexión. Para elegir hace falta internet.'); return; }
+  if(!pendingRemote){ state.sync.paused = false; persist(); syncNow(); return; }
+  openConflictSheet();
+});
+// Quedarse con lo de este móvil: se toma la versión de la nube como punto de
+// partida ya visto y se sube encima, por el camino normal.
+document.getElementById('scKeepLocal').addEventListener('click', () => {
+  dlgSyncConflict.close();
+  Object.assign(state.sync, { version: pendingRemote.version, dirty: true, paused: false });
+  pendingRemote = null; persist(); syncNow();
+});
+document.getElementById('scKeepRemote').addEventListener('click', () => {
+  dlgSyncConflict.close();
+  try{ applyRemote(pendingRemote); pendingRemote = null; setSyncStatus('ok'); }
+  catch(e){ setSyncStatus('error'); }
+});
+document.getElementById('scLater').addEventListener('click', () => { dlgSyncConflict.close(); renderAccount(); });
+
+// Subir antes de que el sistema pueda cerrar la app, y comprobar al volver.
+document.addEventListener('visibilitychange', () => {
+  if(!auth || !syncAllowed()) return;
+  clearTimeout(pushTimer);
+  syncNow();
+});
+window.addEventListener('online', () => { if(auth && syncAllowed()) syncNow(); });
 
 /* ---------- cerrar tocando fuera ---------- */
 /* El <dialog> ocupa solo el alto de su .sheet (hoja anclada abajo), así que
@@ -3421,6 +3821,8 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   ['dlgGasto', 'gCancel'],
   ['dlgHist', 'hClose'],
   ['dlgCheckin', 'ciSkip'],
+  ['dlgAccount', 'accCancel'],
+  ['dlgSyncConflict', 'scLater'],
 ].forEach(([dlgId, btnId]) => {
   document.getElementById(dlgId).addEventListener('click', e => {
     if(e.target.id === dlgId) document.getElementById(btnId).click();
@@ -3494,6 +3896,7 @@ function normalize(s){
   renderAll();
   if(!state.settings.introSeen) startTour(false);
   else if(day().budget == null) openCheckin();
+  if(auth && syncAllowed()) startSyncForUser();
 })();
 </script>
 </body>
