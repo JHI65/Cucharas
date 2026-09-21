@@ -31,12 +31,11 @@ siendo un único `index.html`, no depende de un CDN para arrancar y funciona sin
    (eu-central-1)**. El módulo de Ciclo guarda datos de salud, categoría especial en el
    RGPD: que estén en la UE simplifica todo.
 2. En **SQL Editor**, pega y ejecuta `supabase/schema.sql`.
-3. En **Authentication → Sign In / Providers → Email**:
-   - Para la beta, lo más simple es **desactivar "Confirm email"**: la cuenta queda
-     lista al crearla.
-   - Si lo dejas activado, el enlace del correo abre el navegador. Pon antes una
-     página propia en **Authentication → URL Configuration → Site URL**, o quien
-     confirme verá un error de `localhost` aunque la confirmación haya funcionado.
+3. En **Authentication → URL Configuration → Site URL**, pon
+   `https://jhi65.github.io/Cucharas/auth.html`. Es `docs/auth.html` de este
+   repositorio, servido con GitHub Pages. Sin esto, el enlace de confirmación del
+   correo lleva al `localhost:3000` de fábrica de Supabase, y la persona ve un error
+   aunque la cuenta se haya confirmado igual por debajo.
 4. En **Project Settings → API**, copia la **Project URL** y la clave **anon public**, y
    pégalas en `index.html`:
 
@@ -97,14 +96,21 @@ sola de 1 a 2 por el trigger), RLS bloqueando sin token y dejando pasar con el s
 `delete_my_account` borrando la cuenta y la fila (comprobado con el mismo token después:
 ya no ve nada). Las claves reales ya están en `index.html`.
 
-**"Confirm email" está activado en el proyecto**, no desactivado como recomendaba este
-documento para la beta. El enlace de confirmación redirige a `http://localhost:3000`
-porque el **Site URL** de Authentication → URL Configuration sigue en su valor de
-fábrica. Dos formas de arreglarlo, sin decidir todavía cuál:
-1. Desactivar "Confirm email" (Authentication → Sign In / Providers → Email): quien crea
-   la cuenta entra directamente, sin correo de por medio. Más simple para la beta.
-2. Dejarlo activado y poner un Site URL real (aunque sea una página en blanco de
-   `spoony.app` o similar) para que el enlace del correo no rompa.
+**"Confirm email" se queda activado.** El Site URL de fábrica (`localhost:3000`) se
+sustituyó por `https://jhi65.github.io/Cucharas/auth.html` — decisión tomada con el
+usuario el 2026-09-21. Esa página es `docs/auth.html`, estática y sin JS externo, servida
+con GitHub Pages desde `/docs` en `main` (con un `.nojekyll`: el pipeline "legacy" de
+Pages pasa todo por Jekyll si no se le dice lo contrario, y hacía fallar el build sin más
+detalle que "Page build failed"). Lee el fragmento de la URL que manda Supabase
+(`#access_token=...`, `#error=...`) y dice qué ha pasado en lenguaje literal; no hace nada
+con el token, que es de otro origen y no lo comparte con la sesión de la app nativa.
+
+Comprobado sirviendo la página real con `#access_token=x&type=signup` en el fragmento:
+responde 200 y el HTML es el esperado. **Ojo con el nombre del archivo si se vuelve a
+tocar**: GitHub Pages cachea los 404 de builds fallidos por ruta exacta, sin tener en
+cuenta la cadena de consulta; el archivo se llamó primero `confirm.html` y hubo que
+renombrarlo a `auth.html` porque ese 404 viejo se había quedado en el borde de su CDN
+varios minutos después de que el build ya estuviera bien.
 
 **Pendiente de construir**: recuperar la contraseña (hoy, quien la olvida conserva los
 datos del móvil pero pierde el acceso a la nube) y Android en emulador.
