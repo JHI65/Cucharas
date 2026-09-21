@@ -313,6 +313,16 @@ textarea{
    debajo del texto, a todo el ancho. Visto en el simulador de iOS. */
 .row:has(#textScalePick,#cyclePick,#finPick){flex-wrap:wrap}
 .row:has(#textScalePick,#cyclePick,#finPick) > div:first-child{flex:1 1 100%}
+/* Envolver la fila no basta: el grupo de chips conserva flex:0 0 auto y sigue
+   midiendo lo que miden todos sus chips en una línea, así que con el texto en
+   "Muy grande" (zoom 1,3) se salía por la derecha. Ocupando el ancho de la
+   fila puede envolver por dentro. */
+.row:has(#textScalePick,#cyclePick,#finPick) > .chips{flex:1 1 100%}
+/* Contraste cabe junto a su texto a tamaño normal; con el texto ampliado lo
+   estrangulaba a una palabra por línea, así que ahí también envuelve. */
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .row:has(#contrastPick){flex-wrap:wrap}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .row:has(#contrastPick) > div:first-child,
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .row:has(#contrastPick) > .chips{flex:1 1 100%}
 .row .ocgrid{flex:0 0 92px}
 .btn{
   background:var(--surface);border:1px solid var(--line);
@@ -3084,6 +3094,7 @@ document.getElementById('dayStartHourInput').addEventListener('change', e => {
 function applyTextScale(){
   const v = [1, 1.15, 1.3].includes(state.settings.textScale) ? state.settings.textScale : 1;
   document.documentElement.style.setProperty('--text-scale', v);
+  document.documentElement.dataset.textScale = String(v);
   document.querySelectorAll('#textScalePick .chip').forEach(c =>
     c.setAttribute('aria-pressed', +c.dataset.scale === v));
 }
