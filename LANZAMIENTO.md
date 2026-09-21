@@ -157,6 +157,18 @@ document.addEventListener('visibilitychange', () => {
 });
 ```
 
+**Extensión del 2026-09-21**: las 04:00 fijas partían el día por la mitad a quien
+trabaja de noche o se levanta muy tarde. El corte es ahora `state.settings.dayStartHour`,
+ajustable en Ajustes → Tus cucharas → "Cuándo empieza tu día" (0-12, 4 por defecto), en
+vez de la constante fija — decisión tomada como ajuste opcional, no como pregunta de
+onboarding, para no añadir una decisión más al primer arranque. `todayKey()` y
+`logicalMinutes()` (la validación de hora de fin de tarea) leen el mismo valor, así que
+sigue habiendo un único sitio del que cuelga qué cuenta como "hoy". Migración vía
+`normalize()`: quien actualiza sin tocar el ajuste sigue en las 04:00 de siempre.
+Verificado con Node: `todayKey()` con el corte en las 10:00 (turno de noche), el rango de
+0-12 con `clamp()`, y que una tarea de 23:00 a 01:00 sigue siendo válida con cualquier
+corte. **No probado en navegador.**
+
 ### 2.3 `confirm`, `alert` y `prompt` nativos — hecho el 2026-09-20
 
 - Al borrar una tarea que se repite (`renderTasks` y `renderDaySheet`), "Cancelar" en el

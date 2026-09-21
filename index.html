@@ -680,6 +680,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="libsec">Tus cucharas</p>
     <div class="group">
     <div class="row">
+      <div><strong>Cuándo empieza tu día</strong><p>A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
+      <div class="ocgrid">
+        <label>h<input type="number" id="dayStartHourInput" step="1" min="0" max="12" inputmode="numeric" aria-label="Hora en la que empieza el día"></label>
+      </div>
+    </div>
+    <div class="row">
       <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
       <div class="stepper">
         <button id="maxMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
@@ -1219,7 +1225,8 @@ const SEED = [
 ];
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 const PEAK_COST_PERCENT_DEFAULT = 15;
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT },
+const DAY_START_HOUR_DEFAULT = 4;
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null }, finEnabled:false,
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
@@ -1232,20 +1239,25 @@ const localDateKey = d => {
   const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 };
-// El día no cambia a medianoche sino a las 04:00: quien se acuesta tarde
-// sigue viendo "hoy" el día que empezó, no uno nuevo con cero cucharas.
-const DAY_START_HOUR = 4;
+// El día no cambia a medianoche sino a una hora elegida (04:00 por
+// defecto): quien se acuesta tarde sigue viendo "hoy" el día que empezó,
+// no uno nuevo con cero cucharas. Ajustable en Ajustes ("Cuándo empieza tu
+// día") para quien se levanta o se acuesta a otras horas — por ejemplo
+// trabajo nocturno, donde las 04:00 caen a media jornada. state.settings
+// puede no estar listo todavía (esta función se usa antes de que init()
+// cargue y normalice el estado), de ahí el ?? con el valor de fábrica.
+const dayStartHour = () => state.settings?.dayStartHour ?? DAY_START_HOUR_DEFAULT;
 const todayKey = () => {
   const d = new Date();
-  if(d.getHours() < DAY_START_HOUR) d.setDate(d.getDate() - 1);
+  if(d.getHours() < dayStartHour()) d.setDate(d.getDate() - 1);
   return localDateKey(d);
 };
-/* Minutos desde que "empieza" el día (las 04:00), no desde medianoche: así
-   una tarea de madrugada (23:00 -> 01:00) compara bien, porque para la app
-   la 01:00 sigue siendo parte del mismo día que empezó a las 04:00. */
+/* Minutos desde que "empieza" el día, no desde medianoche: así una tarea de
+   madrugada (23:00 -> 01:00) compara bien, porque para la app esa hora
+   sigue siendo parte del mismo día que empezó al corte elegido. */
 const logicalMinutes = hhmm => {
   const [h, m] = hhmm.split(':').map(Number);
-  const shifted = h*60 + m - DAY_START_HOUR*60;
+  const shifted = h*60 + m - dayStartHour()*60;
   return shifted < 0 ? shifted + 1440 : shifted;
 };
 const fmtDate = k => {
@@ -2034,6 +2046,7 @@ function renderExportInfo(){
 function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin(); renderCycle();
   document.getElementById('maxOut').textContent = state.settings.max;
   document.getElementById('peakOut').textContent = state.settings.peakCostPercent + '%';
+  document.getElementById('dayStartHourInput').value = state.settings.dayStartHour;
   renderExportInfo();
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -3003,6 +3016,17 @@ document.getElementById('peakMinus').addEventListener('click', () => {
 document.getElementById('peakPlus').addEventListener('click', () => {
   state.settings.peakCostPercent = Math.min(50, state.settings.peakCostPercent+5); save(); renderAll();
 });
+/* Cambia de qué se considera "hoy" para todo lo que cuelga de todayKey():
+   tareas, check-in, patrones, ciclo. No se fuerza el check-in al cambiarlo
+   —se está en Ajustes, no en Hoy—: si el nuevo "hoy" no tiene cucharas
+   asignadas, el medidor ya lo dice solo cuando se vuelva a esa pestaña,
+   igual que cualquier otro día sin check-in todavía. */
+document.getElementById('dayStartHourInput').addEventListener('change', e => {
+  const n = parseInt(e.target.value, 10);
+  state.settings.dayStartHour = Number.isFinite(n) ? Math.min(12, Math.max(0, n)) : DAY_START_HOUR_DEFAULT;
+  e.target.value = state.settings.dayStartHour;
+  save(); renderAll();
+});
 /* zoom (no line-height/rem) porque hay que escalar de golpe hojas, barra de
    pestañas fija y el resto sin reescribir cada tamaño fijo en px del CSS. */
 function applyTextScale(){
@@ -3232,11 +3256,12 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const overCost = state.settings.overCost;
   const peakCostPercent = state.settings.peakCostPercent;
   const peakPromptOff = state.settings.peakPromptOff;
+  const savedDayStartHour = state.settings.dayStartHour;   // cuándo empieza tu día es rutina, no historial: sobrevive al borrado
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
   const finEnabled = state.finEnabled;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff},
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   ensureFinanzas(); ensureCycle();
   save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
@@ -3293,6 +3318,7 @@ function normalize(s){
   if(!s.settings.overCost) s.settings.overCost = {...OVERCOST_DEFAULT};
   if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
+  if(s.settings.dayStartHour == null) s.settings.dayStartHour = DAY_START_HOUR_DEFAULT;
   // Quien ya tenía historial antes de que existiera esta pantalla no debe
   // encontrársela de sorpresa (predictibilidad): solo se muestra sin pedirlo
   // a quien instala la app de cero (o restaura un backup con días ya apuntados).
