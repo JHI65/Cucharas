@@ -759,7 +759,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
       </div>
     </div>
-    <div class="row">
+    <div class="row" id="colorPickRow">
       <div><strong>Color de la interfaz</strong><p>Cambia el rosa de fábrica por el tono que prefieras.</p></div>
       <input type="color" id="customColorPick" value="#9E5266" aria-label="Elegir color de la interfaz">
     </div>
@@ -3129,10 +3129,29 @@ const CUSTOM_MIX = {
   normal: { spoon:78, line:79, surface2:24, bg:6, surface:3 },
   alto:   { spoon:89, line:65, surface2:27, bg:3, surface:0 },
 };
+/* Toda esta función depende de color-mix(), que no existe antes de Safari
+   16.2 — es decir, en un iPhone con iOS 15.4-16.1, que es donde se quedaron
+   el 6s, el 7 y el SE de primera generación. Ahí la fila aparecería, el
+   selector abriría y no pasaría nada: los setProperty() con un valor
+   inválido se ignoran y la paleta se quedaría en el rosa de fábrica. Una
+   función de accesibilidad sensorial que finge funcionar es peor que no
+   ofrecerla, así que donde no se puede, no se enseña. */
+const CAN_COLOR_MIX = (() => {
+  try{ return CSS.supports('color', 'color-mix(in srgb, #9E5266 50%, white)'); }
+  catch(e){ return false; }
+})();
 function applyCustomColor(){
   const root = document.documentElement.style;
   const hex = state.settings.customColor;
   const infoRow = document.getElementById('colorInfoRow');
+  if(!CAN_COLOR_MIX){
+    /* No se borra state.settings.customColor: es una preferencia de la
+       persona, y si restaura esta copia en un móvil que sí puede, debe
+       volver a aplicarse. Aquí solo se deja de mostrar y de aplicar. */
+    document.getElementById('colorPickRow').hidden = true;
+    infoRow.hidden = true;
+    return;
+  }
   document.getElementById('customColorPick').value = hex || '#9E5266';
   const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line'];
   if(!hex){

@@ -47,15 +47,20 @@ sitios (check-in, añadir tarea, check-out, calculadora, pico sensorial...). Por
 de 15.4 no se abriría ni el check-in. `:has()`, que se usa una vez en el CSS del grupo
 de Ciclo, llega en esa misma versión.
 
-**Queda un hueco conocido**: `color-mix()` necesita Safari 16.2, y "Color de la
-interfaz" (Ajustes → Cómo se ve) lo usa para retiñir toda la paleta. En un iPhone con
-iOS 15.4–16.1 esa función no dará error, pero tampoco hará nada visible. Son iPhone 6s,
-7 y SE de primera generación, que se quedaron en iOS 15. Dos salidas posibles, sin
-decidir todavía:
+**El hueco de `color-mix()` está resuelto** (2026-09-21). `color-mix()` necesita Safari
+16.2 y "Color de la interfaz" (Ajustes → Cómo se ve) lo usa para retiñir toda la paleta,
+así que en un iPhone con iOS 15.4–16.1 la fila habría aparecido sin hacer nada: los
+`setProperty()` con un valor inválido se ignoran y la paleta se habría quedado en el
+rosa de fábrica. Se descartó subir el mínimo a 16.4, que habría dejado fuera al iPhone
+6s, al 7 y al SE de primera generación, en un público donde el 42,7% declara estar mal
+de dinero (N4). En su lugar, `CAN_COLOR_MIX` comprueba el soporte con `CSS.supports()` y
+donde no lo hay se ocultan las dos filas (`#colorPickRow` y `#colorInfoRow`) y no se
+intenta aplicar nada.
 
-1. Ocultar la fila de color donde `CSS.supports('color', 'color-mix(...)')` sea falso,
-   y mantener el mínimo en 15.4. Más inclusivo, una rama más que probar.
-2. Subir el mínimo a 16.4 y quitar el problema. Deja fuera esos modelos.
+El color guardado en `state.settings.customColor` **no se borra** en ese caso: es una
+preferencia de la persona, y si restaura la copia en un móvil que sí puede, vuelve a
+aplicarse. El borde de la última fila visible del grupo lo resuelve solo la regla
+`.group .row:not(:has(~ .row:not([hidden])))` que ya existía.
 
 **Android: minSdk 24** (Android 7), el valor por defecto de Capacitor. Importa menos que
 en iOS porque el WebView se actualiza solo desde Play Store, así que un móvil viejo
