@@ -72,7 +72,11 @@ input,select,textarea{font:inherit;color:inherit}
 .ic{width:18px;height:18px;display:block;flex:0 0 auto}
 
 .app,dialog,.tabs{zoom:var(--text-scale,1)}
-.app{max-width:520px;margin:0 auto;padding:0 var(--pad) calc(104px + env(safe-area-inset-bottom))}
+/* Con viewport-fit=cover el contenido llega hasta el borde físico de la
+   pantalla, así que sin margen arriba el título de cada pestaña quedaba
+   pegado al reloj del sistema (visto en el simulador de iOS). Es 0 en un
+   navegador de escritorio, donde no hay barra de estado. */
+.app{max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) var(--pad) calc(104px + env(safe-area-inset-bottom))}
 .screen{display:none}
 .screen.on{display:block}
 
