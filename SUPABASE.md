@@ -154,8 +154,16 @@ al que Google o Apple puedan redirigir de vuelta.
   simulador reconoce la URL como propia de Spoony al abrirla desde fuera. La misma
   lógica (`completeOAuth`) se probó invocándola directamente y responde igual que en
   Android.
-- **No verificado**: un login real contra Google o Apple, porque ningún proveedor está
-  configurado todavía en el proyecto de Supabase — ver siguiente sección.
+- **Google, verificado de principio a fin el 2026-09-21, con una cuenta real** (no un
+  simulacro): Client ID creado en Google Cloud Console (tipo **Web application**, no
+  Android/iOS — ese tipo pide un ID de paquete que aquí no hace falta), activado en
+  Supabase, y probado en el emulador de Android. A la primera faltaba un paso y quedó
+  documentado en caliente: sin `com.spoony.app://login-callback` en **Authentication →
+  URL Configuration → Redirect URLs**, el login llegaba a completarse en Google pero
+  Supabase lo mandaba de vuelta al Site URL (`auth.html`, la página web) en lugar de al
+  esquema de la app — la sesión se quedaba fuera, en el navegador, sin volver a Spoony.
+  Añadido ese Redirect URL, el círculo se cierra: la app recibe la sesión y entra.
+- **Apple**: sigue sin probar, pendiente de la cuenta de pago de Apple Developer.
 
 ### Lo que falta, y solo lo puedes hacer tú
 
