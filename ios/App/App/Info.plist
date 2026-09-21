@@ -8,6 +8,11 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
         <string>Spoony</string>
+	<!-- Solo se usa HTTPS estándar para hablar con Supabase, sin cifrado
+	     propio: está exento, así que se declara aquí para no repetir la
+	     pregunta de cifrado en cada subida a App Store Connect. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
