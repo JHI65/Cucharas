@@ -107,8 +107,13 @@ compartir, pero sí vale para la lógica.
       grande"), Contraste estrangulado con el texto ampliado, y las etiquetas de la barra
       casi tocándose con cinco pestañas (hueco mínimo de ~4 px, ahora 7,5 px; se limita el
       zoom de la barra a 1,15 en ese caso). Medido con cada pestaña activa por turnos.
-- [ ] Tamaño del texto sobre las hojas `<dialog>` (Añadir tarea, Check-in, Check-out...),
-      en "Grande" y "Muy grande". Sin mirar todavía.
+- [x] Tamaño del texto sobre las hojas (Añadir tarea, Check-in, Check-out) en "Muy grande",
+      2026-09-21: aguantan, se desplazan enteras y sus botones envuelven. Encontró un
+      fallo en Hoy: los nombres de tarea se cortaban con "…"; ahora bajan de línea.
+      Sin mirar todavía: Cuánto cuesta, Día del calendario y Pico sensorial.
+- [ ] Los campos de hora (Hora inicio / Hora fin) se ven como cajas vacías en iOS: con
+      `appearance:none` un `input[type=time]` sin valor no pinta nada. Decidir si se
+      escribe un "--:--" o un texto de ayuda.
 - [x] Área segura superior: el título quedaba pegado al reloj; arreglado y comprobado en
       captura (2026-09-21). Sigue pendiente la barra inferior y un iPhone con Dynamic Island.
 - [ ] Que el corte de día configurable (Ajustes → Cuándo empieza tu día) se comporta al
