@@ -993,6 +993,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
       <input type="text" id="coNote" placeholder="El secador, no. La oficina, sí.">
     </div>
+    <p class="notice" id="coMsg" role="status" hidden style="margin:0 0 16px">Puntúa las dos escalas para guardar.</p>
     <div class="bigrow">
       <button id="coCancel">Ahora no</button>
       <button class="primary" id="coSave">Guardar</button>
@@ -2837,13 +2838,22 @@ document.getElementById('hClose').addEventListener('click', () => dlgHist.close(
 
 /* ---------- check-out ---------- */
 const dlgCheckout = document.getElementById('dlgCheckout');
-let coEnergy = 3, coSensory = 3;
+/* Sin valor por defecto: si arrancaran en 3, "Guardar" sin tocar nada
+   grabaría un 3 que nadie eligió, y ese 3 fantasma entra igual que uno real
+   en Patrones y resta una cuchara por sobrestimulación (overCost[3] = -1).
+   Mismo principio que budgetUnanswered en el check-in: un dato que no se ha
+   dado no se interpreta como respuesta. */
+let coEnergy = null, coSensory = null, coTriedSave = false;
 function coSync(){
   const paint = (id, val) => {
     document.getElementById(id).innerHTML = [1,2,3,4,5]
       .map(v => `<button data-v="${v}" aria-pressed="${v===val}">${v}</button>`).join('');
   };
   paint('coEnergy', coEnergy); paint('coSensory', coSensory);
+  /* El aviso solo aparece tras un intento de guardar incompleto, nunca al
+     abrir el diálogo: puntuar en blanco no es un error, es el estado normal
+     de un formulario que todavía no se ha rellenado. */
+  document.getElementById('coMsg').hidden = !coTriedSave || (coEnergy != null && coSensory != null);
 }
 document.getElementById('coEnergy').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return; coEnergy = +b.dataset.v; coSync();
@@ -2853,13 +2863,19 @@ document.getElementById('coSensory').addEventListener('click', e => {
 });
 document.getElementById('btnCheckout').addEventListener('click', () => {
   const co = day().checkout;
-  coEnergy = co ? co.energy : 3;
-  coSensory = co ? co.sensory : 3;
+  coEnergy = co ? co.energy : null;
+  coSensory = co ? co.sensory : null;
+  coTriedSave = false;
   document.getElementById('coNote').value = co ? (co.note || '') : '';
   coSync(); openDialog(dlgCheckout);
 });
 document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.close());
 document.getElementById('coSave').addEventListener('click', () => {
+  if(coEnergy == null || coSensory == null){
+    coTriedSave = true; coSync();
+    document.getElementById(coEnergy == null ? 'coEnergy' : 'coSensory').querySelector('button')?.focus();
+    return;
+  }
   const d = day();
   d.checkout = { energy:coEnergy, sensory:coSensory, note:document.getElementById('coNote').value.trim() };
   d.extras = (d.extras || []).filter(x => x.type !== 'sobrestimulacion');
