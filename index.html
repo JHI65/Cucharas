@@ -373,6 +373,12 @@ input[type=color]{
    del texto: ni el icono ni el área táctil de 52px cambian. */
 .tabs.compact{gap:2px}
 .tabs.compact button{font-size:11px;padding-left:0;padding-right:0}
+/* Con las cinco pestañas y el texto en "Muy grande" (zoom 1,3) el hueco entre
+   etiquetas se quedaba en unos 4 px (18 a tamaño normal, 9 en "Grande"), y con
+   una pestaña activa en negrita, más ancha, casi se tocan. La barra es
+   estructura, no contenido: amplía como "Grande" en vez de seguir el 1,3. Las
+   etiquetas siguen más grandes que a tamaño normal. */
+:root[data-text-scale="1.3"] .tabs.compact{zoom:1.15}
 .tabs svg{width:21px;height:21px}
 
 /* ---- Sheet ---- */

@@ -102,8 +102,13 @@ compartir, pero sí vale para la lógica.
 - [ ] Que al actualizar desde una versión con datos en `localStorage` se copian al archivo.
 - [ ] Exportar: que la hoja de compartir aparece y el archivo se puede guardar en Archivos.
 - [ ] Importar: que el selector de archivos abre y el JSON se lee.
-- [ ] Tamaño del texto: `zoom` sobre la barra de pestañas `position:fixed` y sobre las
-      hojas `<dialog>`, en los tres pasos.
+- [x] Tamaño del texto en Ajustes y en la barra de pestañas (2026-09-21). Encontró tres
+      fallos, los tres arreglados: chips de Ajustes que se salían (también en "Muy
+      grande"), Contraste estrangulado con el texto ampliado, y las etiquetas de la barra
+      casi tocándose con cinco pestañas (hueco mínimo de ~4 px, ahora 7,5 px; se limita el
+      zoom de la barra a 1,15 en ese caso). Medido con cada pestaña activa por turnos.
+- [ ] Tamaño del texto sobre las hojas `<dialog>` (Añadir tarea, Check-in, Check-out...),
+      en "Grande" y "Muy grande". Sin mirar todavía.
 - [x] Área segura superior: el título quedaba pegado al reloj; arreglado y comprobado en
       captura (2026-09-21). Sigue pendiente la barra inferior y un iPhone con Dynamic Island.
 - [ ] Que el corte de día configurable (Ajustes → Cuándo empieza tu día) se comporta al
