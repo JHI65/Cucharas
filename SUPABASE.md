@@ -163,7 +163,34 @@ al que Google o Apple puedan redirigir de vuelta.
   Supabase lo mandaba de vuelta al Site URL (`auth.html`, la página web) en lugar de al
   esquema de la app — la sesión se quedaba fuera, en el navegador, sin volver a Spoony.
   Añadido ese Redirect URL, el círculo se cierra: la app recibe la sesión y entra.
-- **Apple**: sigue sin probar, pendiente de la cuenta de pago de Apple Developer.
+- **Apple, verificado el 2026-09-21**: llega hasta la pantalla real de login de Apple
+  ("Use your Apple Account to sign in to Sign In Apple"), sin errores. Montado con una
+  cuenta de pago de Apple Developer ya existente:
+  - **Services ID** `com.spoony.app.signin` (no reutilizar el App ID `com.spoony.app`
+    para esto — son identificadores distintos, y el primer intento se lió al crear un
+    App ID donde tocaba un Services ID; el asistente de Apple marca "App IDs" por
+    defecto, hay que cambiarlo a mano a "Services IDs").
+  - Su "Sign In with Apple" configurado con Primary App ID **`com.spoony.app`** (la app
+    real: para poder elegirse ahí, `com.spoony.app` necesita tener activada la misma
+    capacidad "Sign In with Apple" en su propio App ID), Domain
+    `fcmrwfpekzgtsgktyvwk.supabase.co` y Return URL
+    `https://fcmrwfpekzgtsgktyvwk.supabase.co/auth/v1/callback`. **No pide verificar el
+    dominio** — eso solo hace falta para el botón JS de Apple en una web propia, no para
+    este flujo de OAuth normal.
+  - Una Key con "Sign in with Apple", el `.p8` descargado una sola vez.
+  - El campo "Secret Key (for OAuth)" de Supabase **no es el `.p8` en crudo**: es un JWT
+    firmado (ES256) con `iss`=Team ID, `sub`=Services ID, `aud`=`https://appleid.apple.com`,
+    firmado con la clave privada. Apple limita su validez a 6 meses como máximo; se generó
+    uno con 150 días, **caduca el 2027-02-18** — hay que generar uno nuevo antes de esa
+    fecha (con el mismo `.p8`, no hace falta otra Key) o el login deja de funcionar sin
+    ningún aviso previo.
+  - Primer intento con error real de Apple (`invalid_request: Invalid client id or web
+    redirect url`): la configuración de dominio/Return URL del Services ID no se había
+    quedado guardada después de todo el lío de crear primero un App ID por error. Se
+    resolvió volviendo a esa pantalla y guardándola de nuevo.
+  - Falta que una persona complete el login de verdad (escribir sus credenciales o usar
+    Face ID/passkey) — eso ya no se puede automatizar ni falsear, solo lo puede hacer
+    quien tenga la cuenta de Apple delante.
 
 ### Lo que falta, y solo lo puedes hacer tú
 
