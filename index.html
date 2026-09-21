@@ -3356,15 +3356,31 @@ document.getElementById('btnExport').addEventListener('click', async () => {
   save(); renderExportInfo();
 });
 document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileIn').click());
+/* Importar es transaccional. Antes sustituía state, guardaba en el archivo y
+   solo DESPUÉS pintaba: si pintar fallaba (un día sin tasks, por ejemplo) ya
+   era tarde, el historial entero estaba sobrescrito en disco y la persona solo
+   veía "Ese archivo no es una copia de Spoony", como si no hubiera pasado
+   nada. Se comprobó en el simulador de iOS: 17 días de historial y los
+   módulos de Ciclo y Finanzas se perdieron con una sola importación rota.
+   Ahora se guarda solo cuando todo ha salido bien; si algo falla en cualquier
+   punto, se vuelve al estado anterior y no se toca el archivo. */
 document.getElementById('fileIn').addEventListener('change', async e => {
   const f = e.target.files[0]; if(!f) return;
+  const previous = state;
+  const paintAll = () => { applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); };
   try{
     const parsed = JSON.parse(await f.text());
-    if(!parsed.days) throw new Error('formato');
+    if(!parsed || typeof parsed.days !== 'object' || parsed.days === null || Array.isArray(parsed.days)) throw new Error('formato');
     state = normalize(parsed);
     ensureFinanzas(); ensureCycle();
-    await save(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll();
-  }catch(err){ alert('Ese archivo no es una copia de Spoony.'); }
+    paintAll();
+    await save();
+  }catch(err){
+    state = previous;
+    try{ paintAll(); }catch(e2){ console.error('No se pudo volver a pintar', e2); }
+    alert('Ese archivo no es una copia de Spoony. No se ha cambiado nada.');
+  }
+  e.target.value = '';   // sin esto, elegir el mismo archivo otra vez no dispara change
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   if(!confirm('Se borra todo el historial. No se puede deshacer.')) return;
@@ -3429,6 +3445,26 @@ document.addEventListener('visibilitychange', () => {
 // archivo importado: sin esto, un backup de otra versión o manipulado a
 // mano puede faltarle 'library' o 'templates' y romper el render entero.
 function normalize(s){
+  /* Cada día debe tener la forma que el resto del código da por hecha: sin esto,
+     un backup con un día {"budget":8} hacía reventar dayLoad() y el render
+     entero. Las tareas sin nombre no se pueden pintar y se descartan. */
+  if(!s.days || typeof s.days !== 'object' || Array.isArray(s.days)) s.days = {};
+  Object.keys(s.days).forEach(k => {
+    const d = s.days[k];
+    if(!d || typeof d !== 'object' || Array.isArray(d)){ delete s.days[k]; return; }
+    d.tasks = Array.isArray(d.tasks)
+      ? d.tasks.filter(t => t && typeof t === 'object' && typeof t.name === 'string')
+      : [];
+    d.tasks.forEach(t => {
+      if(!t.id) t.id = uid();
+      /* Convertir, no solo comprobar: "2" pasa Number.isFinite(+"2"), pero luego
+         planned + "2" concatena en vez de sumar. */
+      t.est = Number.isFinite(+t.est) ? +t.est : 0;
+      if(t.real != null) t.real = Number.isFinite(+t.real) ? +t.real : null;
+    });
+    d.extras = Array.isArray(d.extras) ? d.extras.filter(x => x && typeof x === 'object') : [];
+    if(typeof d.note !== 'string') d.note = '';
+  });
   if(!s.library || !s.library.length) s.library = SEED.map(x=>({...x,samples:[]}));
   s.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!s.settings) s.settings = { max:12 };

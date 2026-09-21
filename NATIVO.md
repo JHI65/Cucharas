@@ -106,7 +106,16 @@ compartir, pero sí vale para la lógica.
       canceled" en iOS y en Android (leído en el código de los dos plugins), así que
       `Última copia` no se apunta si no hubo copia. Sin probar: Android en emulador, y
       guardar de verdad en Archivos / mandar por correo en un móvil.
-- [ ] Importar: que el selector de archivos abre y el JSON se lee.
+- [x] Importar (2026-09-21, simulador de iOS): **encontró un fallo grave, arreglado.** Una
+      importación con un día sin `tasks` sustituía el historial, lo guardaba en el archivo
+      y solo después reventaba al pintar: la persona veía "Ese archivo no es una copia de
+      Spoony" y al reabrir se encontraba sin sus 17 días y sin los módulos de Ciclo y
+      Finanzas. Ahora la importación es transaccional (solo guarda si todo ha salido bien;
+      si falla algo, vuelve al estado anterior), y `normalize()` repara cada día.
+      Comprobado con tres archivos: válido, roto en el pintado (vuelta atrás, el archivo
+      conserva los 17 días) y reparable (día sin `tasks`, día `null`, tarea sin nombre).
+      **Sin probar**: que el selector de archivos abra al pulsar "Importar" con un dedo de
+      verdad (aquí se simuló la elección del archivo por código).
 - [x] Tamaño del texto en Ajustes y en la barra de pestañas (2026-09-21). Encontró tres
       fallos, los tres arreglados: chips de Ajustes que se salían (también en "Muy
       grande"), Contraste estrangulado con el texto ampliado, y las etiquetas de la barra

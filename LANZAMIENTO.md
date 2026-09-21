@@ -307,6 +307,16 @@ const timeTag = t.time ? `<span class="task-time">${esc(t.time)}</span> ` : '';
 <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
 ```
 
+**Reabierto el 2026-09-21: esto no estaba resuelto.** Comprobado en el simulador de iOS,
+una importación con un día `{"budget":8}` sustituía el estado, lo guardaba en el archivo y
+solo después reventaba al pintar. La persona veía "Ese archivo no es una copia de Spoony"
+y al reabrir la app no tenía ni sus 17 días de historial ni los módulos de Ciclo y
+Finanzas. `normalize()` reparaba la forma del estado pero no la de cada día, y el
+importador no era transaccional. Ahora `normalize()` repara días, tareas (nombre, `id`,
+`est` y `real` convertidos a número) y extras, y el importador solo guarda cuando todo ha
+salido bien; si algo falla vuelve al estado anterior y el aviso dice "No se ha cambiado
+nada". Otra vez, lo que dio por bueno un simulacro en Node lo desmintió el dispositivo.
+
 Verificado con Node: `esc()` neutraliza un `t.time` con `<img onerror=...>`, y
 `fmtN(+(t.real ?? t.est) || 0)` reduce un `t.est` no numérico a `0` en vez de imprimirlo
 tal cual; `normalize()` repara un archivo mínimo (`{ days: {...} }` sin `library` ni
