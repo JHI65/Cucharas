@@ -339,8 +339,10 @@ evidentes y eso es una barrera real para este público.
 
 - [x] Guardado nativo en archivo (§1.1) — escrito, pendiente de probar en dispositivo.
 - [x] Bienvenida con crédito a la teoría de las cucharas (§1.2).
-- [ ] Exportar con los plugins Filesystem + Share: en iOS `<a download>` con blob no
-      funciona dentro de la app envuelta. El archivo aún se llama `cucharas-…json`.
+- [x] Exportar con los plugins Filesystem + Share — hecho el 2026-09-21: en iOS
+      `<a download>` con blob no funciona dentro de la app envuelta. Ahora el archivo
+      se llama `spoony-…json` y sale por la hoja de compartir; comprobado en el
+      simulador de iOS (ver `NATIVO.md`).
 - [ ] Sustituir `confirm`, `alert` y `prompt` por hojas propias (§2.3).
 - [ ] Política de privacidad en una URL pública: la piden las dos tiendas aunque no se
       recoja nada.

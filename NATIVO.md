@@ -100,7 +100,12 @@ compartir, pero sí vale para la lógica.
       Comprobadas las dos direcciones: un archivo sembrado a mano se lee y se muestra, y
       un archivo corrupto se aparta como `spoony-danado.json`.
 - [ ] Que al actualizar desde una versión con datos en `localStorage` se copian al archivo.
-- [ ] Exportar: que la hoja de compartir aparece y el archivo se puede guardar en Archivos.
+- [x] Exportar (2026-09-21, simulador de iOS): la hoja de compartir aparece con
+      `spoony-2026-09-21.json` (JSON, 14 KB) y las opciones Copy y Save to Files, y el
+      archivo se escribe en `Library/Caches`. Cancelar la hoja **rechaza** con "Share
+      canceled" en iOS y en Android (leído en el código de los dos plugins), así que
+      `Última copia` no se apunta si no hubo copia. Sin probar: Android en emulador, y
+      guardar de verdad en Archivos / mandar por correo en un móvil.
 - [ ] Importar: que el selector de archivos abre y el JSON se lee.
 - [x] Tamaño del texto en Ajustes y en la barra de pestañas (2026-09-21). Encontró tres
       fallos, los tres arreglados: chips de Ajustes que se salían (también en "Muy
