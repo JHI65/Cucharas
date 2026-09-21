@@ -40,11 +40,38 @@ desinstalar). Fuera de la app nativa no cambia nada: `window.storage` dentro de 
   muchas veces seguidas; sin cola, dos escrituras pueden solaparse y dejar en el archivo
   un estado viejo.
 
-Verificado ejecutando el bloque real contra un Capacitor falso (13 casos: navegador,
-primer arranque, arranques siguientes, archivo ilegible, vacío, guardados seguidos) y con
-una captura del arranque en navegador. **Queda probarlo en un dispositivo de verdad** al
-montar Capacitor: que `Capacitor.registerPlugin('Filesystem')` funcione sin empaquetador y
-que el archivo aparezca donde se espera.
+Se verificó en su día ejecutando el bloque real contra un Capacitor falso (13 casos:
+navegador, primer arranque, arranques siguientes, archivo ilegible, vacío, guardados
+seguidos) y con una captura del arranque en navegador.
+
+**Ese simulacro mentía, y el bloqueante seguía abierto hasta el 2026-09-21.** El
+Capacitor falso tenía un `registerPlugin()`, y el de verdad no: esa función vive en el
+paquete JS `@capacitor/core`, que necesita empaquetador, y aquí no hay ninguno a
+propósito. El puente que iOS inyecta expone `nativePromise(plugin, método, opciones)`,
+no `registerPlugin`. Así que la llamada lanzaba un `TypeError`, se lo tragaba el `catch`,
+`_fs` quedaba en `null` y **todo iba a `localStorage` sin un solo aviso** — exactamente
+el almacenamiento que este punto venía a abandonar porque iOS lo puede vaciar.
+
+Se vio al abrir la app en el simulador por primera vez: mostraba un estado que no era el
+del archivo. Arreglado usando `nativePromise`, sin gatear con `isPluginAvailable()` (ese
+mira `Capacitor.Plugins`, que solo rellena el paquete JS, así que sin empaquetador
+siempre diría que no) y cacheando solo el acierto, para que un puente que tarde en estar
+listo se reintente en vez de quedarse en `null` para siempre.
+
+Verificado en el simulador de iOS (iPhone 16e, iOS 26.2), ya de verdad:
+
+- **Lectura**: con un `spoony.json` sembrado a mano en `Documents/`, la app arranca
+  mostrando ese estado (17 días, sus tareas con rango horario, su paleta), y no el que
+  había en `localStorage`.
+- **Escritura**: con un `spoony.json` corrupto, la app crea `spoony-danado.json` al
+  arrancar. Eso prueba de paso la cuarentena de archivo ilegible, que tampoco se había
+  ejecutado nunca.
+- **Ubicación**: confirmado leyendo el plugin que en iOS `DATA` mapea a `.document`, o
+  sea la carpeta `Documents/` de la app, como decía este punto.
+
+Lección para el resto del documento: **un simulacro solo vale si alguien ha comprobado
+que la interfaz que imita es la real.** Los demás puntos marcados "verificado con Node
+contra un X falso" merecen la misma desconfianza hasta probarse en dispositivo.
 
 ### 1.2 "Cucharas" no se explica en ningún sitio, y la teoría no tiene crédito — hecho el 2026-09-17
 

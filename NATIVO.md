@@ -90,10 +90,15 @@ argumento del producto y lo que sostiene la ficha de privacidad de las dos tiend
 
 ## Qué falta probar en un dispositivo real
 
-Nada de lo de abajo se ha comprobado nunca fuera del navegador. Es el motivo de montar
-esto ahora:
+Marcado lo que ya se ha comprobado en el simulador de iOS (iPhone 16e, iOS 26.2). El
+simulador no sustituye a un móvil de verdad para lo sensorial ni para la hoja de
+compartir, pero sí vale para la lógica.
 
-- [ ] Que `spoony.json` se crea en `Directory.Data` y sobrevive a cerrar y reabrir.
+- [x] Que `spoony.json` se lee y se escribe en `Directory.Data`. Verificado el
+      2026-09-21, y **encontró el fallo**: `registerPlugin()` no existe en el puente que
+      inyecta Capacitor, así que todo iba a `localStorage`. Ver §1.1 de `LANZAMIENTO.md`.
+      Comprobadas las dos direcciones: un archivo sembrado a mano se lee y se muestra, y
+      un archivo corrupto se aparta como `spoony-danado.json`.
 - [ ] Que al actualizar desde una versión con datos en `localStorage` se copian al archivo.
 - [ ] Exportar: que la hoja de compartir aparece y el archivo se puede guardar en Archivos.
 - [ ] Importar: que el selector de archivos abre y el JSON se lee.

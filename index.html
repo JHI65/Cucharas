@@ -1151,25 +1151,39 @@ const FILE = 'spoony.json';
    archivos internos. Sobrevive a las actualizaciones; se borra al desinstalar. */
 const FILE_DIR = 'DATA';
 
-let _fs;   // se resuelve la primera vez, no al cargar: el puente nativo puede no estar aún
-const nativeFS = () => {
-  if(_fs === undefined){
-    try{ _fs = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.registerPlugin('Filesystem') : null; }
-    catch(e){ _fs = null; }
-  }
-  return _fs;
+/* El puente que Capacitor inyecta en la app nativa NO trae registerPlugin():
+   esa función vive en el paquete JS @capacitor/core, que necesita un
+   empaquetador, y aquí no hay ninguno a propósito. Lo que el puente sí
+   expone es nativePromise(plugin, método, opciones), que es la forma de
+   llamar a un plugin sin bundler.
+
+   Esto costó caro: llamar a registerPlugin lanzaba un TypeError que se
+   tragaba el catch, _fs quedaba en null y TODO acababa en localStorage sin
+   un solo aviso — justo el almacenamiento que el archivo venía a sustituir
+   porque iOS lo puede vaciar. Se vio al abrir la app en el simulador: leía
+   un estado que no era el del archivo.
+
+   Tampoco se gatea con isPluginAvailable(): ese mira Capacitor.Plugins, que
+   solo rellena el paquete JS, así que sin empaquetador siempre diría que no.
+   Los plugins están compilados dentro de la app (Package.swift), de modo que
+   si la plataforma es nativa, están.
+
+   Solo se cachea el acierto: si el puente no estuviera listo todavía, la
+   siguiente llamada lo reintenta en vez de quedarse en null para siempre. */
+const nativePlugin = (name, methods) => {
+  const cap = window.Capacitor;
+  if(!cap?.isNativePlatform?.() || typeof cap.nativePromise !== 'function') return null;
+  const api = {};
+  methods.forEach(m => { api[m] = o => cap.nativePromise(name, m, o); });
+  return api;
 };
 
-/* Igual que el de Filesystem, resuelto la primera vez que se usa: solo hace
-   falta para exportar, así que no hay motivo para pedirlo al arrancar. */
+let _fs;
+const nativeFS = () => _fs || (_fs = nativePlugin('Filesystem', ['readFile', 'writeFile', 'getUri']));
+
+/* Solo hace falta para exportar, así que se resuelve igual, cuando se usa. */
 let _share;
-const nativeShare = () => {
-  if(_share === undefined){
-    try{ _share = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.registerPlugin('Share') : null; }
-    catch(e){ _share = null; }
-  }
-  return _share;
-};
+const nativeShare = () => _share || (_share = nativePlugin('Share', ['share']));
 
 const readLocal = () => { try{ return localStorage.getItem(KEY); }catch(e){ return null; } };
 
