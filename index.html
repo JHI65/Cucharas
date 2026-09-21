@@ -1160,6 +1160,17 @@ const nativeFS = () => {
   return _fs;
 };
 
+/* Igual que el de Filesystem, resuelto la primera vez que se usa: solo hace
+   falta para exportar, así que no hay motivo para pedirlo al arrancar. */
+let _share;
+const nativeShare = () => {
+  if(_share === undefined){
+    try{ _share = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.registerPlugin('Share') : null; }
+    catch(e){ _share = null; }
+  }
+  return _share;
+};
+
 const readLocal = () => { try{ return localStorage.getItem(KEY); }catch(e){ return null; } };
 
 /* Escrituras en cola: writeFile es asíncrono y save() se llama muchas veces
@@ -3245,12 +3256,36 @@ document.getElementById('overCostGrid').addEventListener('change', e => {
   state.settings.overCost[inp.dataset.oc] = Number.isFinite(n) ? n : 0;
   save(); renderMeter();
 });
-document.getElementById('btnExport').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `cucharas-${todayKey()}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
+/* Exportar es la única copia que sale del teléfono, así que tiene que
+   funcionar también dentro de la app envuelta — y ahí <a download> no hace
+   nada: el WebView nativo no tiene descargas, el botón se quedaba mudo sin
+   dar error. En nativo se escribe el archivo y se lo pasa a la hoja de
+   compartir del sistema, que es la que deja guardarlo en Archivos, mandarlo
+   por correo o a donde sea. En navegador sigue siendo la descarga de antes. */
+document.getElementById('btnExport').addEventListener('click', async () => {
+  const data = JSON.stringify(state, null, 2);
+  const name = `spoony-${todayKey()}.json`;
+  const fs = nativeFS(), share = nativeShare();
+  if(fs && share){
+    try{
+      // CACHE, no DATA: es un archivo de paso para compartir, no el almacén
+      // de la app. El FileProvider de Android tiene expuesta justo esa ruta.
+      await fs.writeFile({ path:name, directory:'CACHE', encoding:'utf8', data });
+      const { uri } = await fs.getUri({ path:name, directory:'CACHE' });
+      await share.share({ title:'Copia de Spoony', url:uri });
+    }catch(e){
+      /* Cerrar la hoja de compartir sin elegir nada también cae aquí. No es
+         un fallo que haya que anunciar, pero tampoco es una copia hecha:
+         se sale sin apuntar la fecha, para que "Última copia" no mienta. */
+      console.error('No se pudo exportar', e);
+      return;
+    }
+  }else{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], {type:'application/json'}));
+    a.download = name;
+    a.click(); URL.revokeObjectURL(a.href);
+  }
   state.settings.lastExportKey = todayKey();
   save(); renderExportInfo();
 });
