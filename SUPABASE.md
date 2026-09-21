@@ -114,3 +114,83 @@ varios minutos después de que el build ya estuviera bien.
 
 **Pendiente de construir**: recuperar la contraseña (hoy, quien la olvida conserva los
 datos del móvil pero pierde el acceso a la nube) y Android en emulador.
+
+## Login con Google y Apple (opcional, 2026-09-21)
+
+Decidido con el usuario: **Google y Apple en iOS, solo Google en Android.** No sustituye
+al correo/contraseña, se añade como alternativa dentro de la misma hoja "Tu cuenta".
+
+Apple exige "Sign in with Apple" si se ofrece cualquier login social de terceros (App
+Store Review Guideline 4.8) — por eso Apple aparece en iOS y en Android no, donde esa
+regla no aplica.
+
+### Cómo funciona
+
+Sin librería de Supabase ni SDK de Google/Apple, con los mismos plugins nativos que ya
+usa el resto de la app (`@capacitor/browser` para abrir la pantalla de login dentro de
+la propia app — Custom Tabs en Android, SFSafariViewController en iOS — y
+`@capacitor/app` para escuchar la vuelta):
+
+1. Se abre `${SUPABASE_URL}/auth/v1/authorize?provider=google` (o `apple`) con
+   `redirect_to=com.spoony.app://login-callback`.
+2. Al terminar el login, el proveedor redirige a esa URL con el token en el fragmento.
+   El sistema operativo reabre Spoony y dispara `appUrlOpen`.
+3. Con el token, se pide `/auth/v1/user` para tener el correo y el id, y se entra igual
+   que con correo/contraseña.
+
+Solo aparece dentro de la app nativa: en un navegador de escritorio no hay ningún sitio
+al que Google o Apple puedan redirigir de vuelta.
+
+### Verificado (2026-09-21)
+
+- **Android, por primera vez en un emulador** (`Medium_Phone_API_36.1`, API 36):
+  arranca, se ve bien, y solo aparece "Continuar con Google" (Apple oculto). Pulsar el
+  botón abre Chrome Custom Tabs de verdad con la URL de Supabase.
+- El enlace de vuelta (`com.spoony.app://login-callback#...`), simulado con un intent de
+  Android, dispara `appUrlOpen` con la app en segundo plano, abre la hoja "Tu cuenta" y
+  muestra el error correcto según el caso: token inválido ("No se pudo completar...") y
+  enlace caducado ("Ese enlace ha caducado...").
+- **iOS**: `Info.plist` registra el esquema `com.spoony.app://` — confirmado porque el
+  simulador reconoce la URL como propia de Spoony al abrirla desde fuera. La misma
+  lógica (`completeOAuth`) se probó invocándola directamente y responde igual que en
+  Android.
+- **No verificado**: un login real contra Google o Apple, porque ningún proveedor está
+  configurado todavía en el proyecto de Supabase — ver siguiente sección.
+
+### Lo que falta, y solo lo puedes hacer tú
+
+**Google** (Google Cloud Console, cuenta gratuita):
+1. Crea un **OAuth 2.0 Client ID** de tipo **Web application**.
+2. En **Authorized redirect URIs**, añade
+   `https://fcmrwfpekzgtsgktyvwk.supabase.co/auth/v1/callback`.
+3. En Supabase, **Authentication → Providers → Google**: actívalo y pega el Client ID y
+   el Client Secret que te dé Google.
+
+**Apple** (necesita cuenta de pago de Apple Developer, 99 USD/año — la misma que hace
+falta para publicar en la App Store, así que no es un gasto aparte):
+1. En developer.apple.com, crea un **Services ID** con "Sign in with Apple" activado, y
+   una **Key** para Sign in with Apple.
+2. En Supabase, **Authentication → Providers → Apple**: los campos exactos (Team ID, Key
+   ID, Services ID, la clave) los tiene la propia documentación de Supabase para Apple,
+   que conviene mirar en el momento porque estas pantallas cambian; lo único fijo de mi
+   parte es el paso siguiente.
+
+**El mismo paso para los dos, y es el que rompe todo si se olvida:**
+
+En Supabase, **Authentication → URL Configuration → Redirect URLs**, añade
+
+```
+com.spoony.app://login-callback
+```
+
+Supabase solo redirige a las URLs de esa lista (o al Site URL). Sin esto, el login
+"funciona" hasta el final y luego manda a la persona a `auth.html` en vez de dentro de
+la app, y la sesión se pierde.
+
+### Pendiente, sin decidir
+
+- Los botones son texto plano ("Continuar con Google"/"Continuar con Apple"), no los
+  logos oficiales que piden las guías de marca de Google y Apple. No bloquea nada, es
+  una mejora visual para más adelante.
+- La franja blanca de la barra de estado en Android (se ve sin temar, la app no la
+  pinta) — vista de pasada al probar por primera vez el emulador, no es de este cambio.

@@ -1186,6 +1186,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <div class="sheet">
     <h2>Tu cuenta</h2>
     <p class="sub">Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.</p>
+    <!-- Solo dentro de la app nativa: fuera de ella no hay a dónde volver
+         tras iniciar sesión en Google o Apple. btnAppleAuth además solo en
+         iOS, oculto aparte del grupo (renderOAuthButtons los controla). -->
+    <div class="bigrow" id="oauthButtons" hidden style="flex-direction:column">
+      <button id="btnGoogleAuth">Continuar con Google</button>
+      <button id="btnAppleAuth" hidden>Continuar con Apple</button>
+    </div>
+    <p class="sub" id="oauthDivider" hidden style="text-align:center;margin:2px 0 18px">o con tu correo</p>
     <div class="field">
       <label for="accEmailIn">Correo</label>
       <input type="text" id="accEmailIn" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false">
@@ -1279,6 +1287,24 @@ const nativeFS = () => _fs || (_fs = nativePlugin('Filesystem', ['readFile', 'wr
 /* Solo hace falta para exportar, así que se resuelve igual, cuando se usa. */
 let _share;
 const nativeShare = () => _share || (_share = nativePlugin('Share', ['share']));
+
+/* Solo hace falta para "Continuar con Google/Apple": abre la pantalla de
+   inicio de sesión en un navegador dentro de la app (Custom Tabs en Android,
+   SFSafariViewController en iOS), no en una pestaña externa. */
+let _browser;
+const nativeBrowser = () => _browser || (_browser = nativePlugin('Browser', ['open', 'close']));
+
+/* addListener es otro camino del mismo puente (cap.addListener, no
+   cap.nativePromise): así se escuchan eventos del lado nativo, aquí la
+   vuelta del navegador tras iniciar sesión. El nativo llama al callback como
+   cb(datos) si sale bien o cb(null, error) si no; aquí solo interesa el
+   caso con datos. Ninguno de los plugins con eventos usados aquí necesita
+   quitar el listener, así que no hace falta guardar el id que devuelve. */
+function nativeOn(plugin, event, cb){
+  const cap = window.Capacitor;
+  if(!cap?.isNativePlatform?.() || typeof cap.addListener !== 'function') return;
+  cap.addListener(plugin, event, (data, err) => { if(!err && data) cb(data); });
+}
 
 const readLocal = () => { try{ return localStorage.getItem(KEY); }catch(e){ return null; } };
 
@@ -3745,7 +3771,68 @@ async function doAuth(kind){
   }catch(e){ showAccMsg(authErrorText(e)); }
   finally{ btns.forEach(b => b.disabled = false); }
 }
-document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); openDialog(dlgAccount); });
+/* ---------- iniciar sesión con Google o Apple (opcional) ----------
+   Solo aparece dentro de la app nativa: fuera de ella (navegador de
+   escritorio) no hay ningún sitio al que Google o Apple puedan redirigir de
+   vuelta. Se abre la pantalla de inicio de sesión de Supabase en un
+   navegador dentro de la propia app (Custom Tabs / SFSafariViewController),
+   no en una pestaña aparte, y cuando el proveedor redirige a
+   com.spoony.app://login-callback con el token en el fragmento, el sistema
+   reabre la app y dispara appUrlOpen.
+
+   En iOS, Apple exige "Sign in with Apple" como alternativa si se ofrece
+   un login social de terceros (App Store Review Guideline 4.8): por eso
+   btnAppleAuth solo se muestra ahí, nunca en Android, donde no aplica. */
+const OAUTH_REDIRECT = 'com.spoony.app://login-callback';
+async function oauthSignIn(provider){
+  const browser = nativeBrowser();
+  if(!browser) return;
+  showAccMsg('');
+  const url = `${SUPABASE_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(OAUTH_REDIRECT)}`;
+  try{ await browser.open({ url }); }
+  catch(e){ showAccMsg('No se pudo abrir la pantalla de inicio de sesión.'); }
+}
+/* El fragmento que llega de vuelta trae el token, pero no el correo ni el id
+   de la persona: hay que pedirlos aparte con ese mismo token. */
+async function completeOAuth(url){
+  const hash = url.split('#')[1] || '';
+  const params = new URLSearchParams(hash);
+  nativeBrowser()?.close().catch(() => {});
+  if(params.get('error')){
+    openDialog(dlgAccount);
+    showAccMsg(params.get('error_code') === 'otp_expired'
+      ? 'Ese enlace ha caducado. Inténtalo otra vez.'
+      : 'No se pudo iniciar sesión. Inténtalo otra vez.');
+    return;
+  }
+  const access_token = params.get('access_token');
+  if(!access_token) return;   // deep link ajeno a esto, o sin token: no hay nada que hacer
+  try{
+    const user = await api('/auth/v1/user', { token: access_token });
+    storeSession({
+      access_token, refresh_token: params.get('refresh_token'),
+      expires_in: +params.get('expires_in') || 3600, user: { id: user.id, email: user.email }
+    });
+    document.getElementById('accOutMsg').hidden = true;
+    dlgAccount.close();
+    startSyncForUser();
+  }catch(e){
+    openDialog(dlgAccount);
+    showAccMsg('No se pudo completar el inicio de sesión. Inténtalo otra vez.');
+  }
+}
+nativeOn('App', 'appUrlOpen', data => { if(data && data.url && data.url.startsWith(OAUTH_REDIRECT)) completeOAuth(data.url); });
+function renderOAuthButtons(){
+  const platform = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.getPlatform() : 'web';
+  const show = syncAllowed() && platform !== 'web';
+  document.getElementById('oauthButtons').hidden = !show;
+  document.getElementById('oauthDivider').hidden = !show;
+  document.getElementById('btnAppleAuth').hidden = platform !== 'ios';
+}
+document.getElementById('btnGoogleAuth').addEventListener('click', () => oauthSignIn('google'));
+document.getElementById('btnAppleAuth').addEventListener('click', () => oauthSignIn('apple'));
+
+document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); renderOAuthButtons(); openDialog(dlgAccount); });
 document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
