@@ -104,6 +104,7 @@ compartir, pero sí vale para la lógica.
 - [ ] Importar: que el selector de archivos abre y el JSON se lee.
 - [ ] Tamaño del texto: `zoom` sobre la barra de pestañas `position:fixed` y sobre las
       hojas `<dialog>`, en los tres pasos.
-- [ ] Áreas seguras: notch y barra inferior con `viewport-fit=cover`.
+- [x] Área segura superior: el título quedaba pegado al reloj; arreglado y comprobado en
+      captura (2026-09-21). Sigue pendiente la barra inferior y un iPhone con Dynamic Island.
 - [ ] Que el corte de día configurable (Ajustes → Cuándo empieza tu día) se comporta al
       volver de segundo plano.

@@ -306,6 +306,13 @@ textarea{
 .row:last-child{border-bottom:none}
 .row p{margin:0;font-size:14px;color:var(--ink-soft)}
 .row .chips{margin:0;flex:0 0 auto}
+/* Los chips de tamaño de texto ("Normal / Grande / Muy grande") y los de
+   Activado / Desactivado no caben junto al texto en 390 pt: el bloque no se
+   encoge (flex:0 0 auto), estrangulaba el título a una palabra por línea y el
+   último chip se salía por el borde derecho o lo tocaba. Aquí los chips pasan
+   debajo del texto, a todo el ancho. Visto en el simulador de iOS. */
+.row:has(#textScalePick,#cyclePick,#finPick){flex-wrap:wrap}
+.row:has(#textScalePick,#cyclePick,#finPick) > div:first-child{flex:1 1 100%}
 .row .ocgrid{flex:0 0 92px}
 .btn{
   background:var(--surface);border:1px solid var(--line);
