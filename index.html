@@ -582,13 +582,13 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <!-- ===== HOY ===== -->
   <section class="screen on" id="s-hoy">
     <header class="top">
-      <h1 class="title">Hoy</h1>
+      <h1 class="title" data-i18n="Hoy">Hoy</h1>
       <p class="sub" id="todayDate"></p>
     </header>
 
     <div class="meter">
-      <button class="meter-hit" id="btnAdjustBudget" aria-label="Ajustar las cucharas de hoy"></button>
-      <div class="spoons" id="spoonRow" role="img" aria-label="Cucharas restantes"></div>
+      <button class="meter-hit" id="btnAdjustBudget" data-i18n-aria="Ajustar las cucharas de hoy" aria-label="Ajustar las cucharas de hoy"></button>
+      <div class="spoons" id="spoonRow" role="img" data-i18n-aria="Cucharas restantes" aria-label="Cucharas restantes"></div>
       <div class="meter-foot">
         <span class="count" id="spoonCount"></span>
       </div>
@@ -596,42 +596,42 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <p class="notice" id="spoonNotice" hidden></p>
       <div class="extra-block" id="overBlock" hidden>
         <div class="meter-foot">
-          <span class="extra-label">Sobrestimulación</span>
+          <span class="extra-label" data-i18n="Sobrestimulación">Sobrestimulación</span>
           <span class="count" id="overCount"></span>
         </div>
         <div class="spoons over" id="overRow" role="img"></div>
       </div>
     </div>
-    <button class="peak-btn" id="btnPeak">He tenido un pico sensorial ahora</button>
+    <button class="peak-btn" id="btnPeak" data-i18n="He tenido un pico sensorial ahora">He tenido un pico sensorial ahora</button>
 
     <div class="sectionhead">
-      <h2>Tareas</h2>
-      <button class="btn" id="btnTpl">Días tipo</button>
+      <h2 data-i18n="Tareas">Tareas</h2>
+      <button class="btn" id="btnTpl" data-i18n="Días tipo">Días tipo</button>
     </div>
     <div id="taskList"></div>
-    <button class="add" id="btnAddTask">Añadir tarea</button>
-    <button class="btn" id="btnLib" style="margin-top:9px">Editar cuánto cuesta cada actividad</button>
+    <button class="add" id="btnAddTask" data-i18n="Añadir tarea">Añadir tarea</button>
+    <button class="btn" id="btnLib" style="margin-top:9px" data-i18n="Editar cuánto cuesta cada actividad">Editar cuánto cuesta cada actividad</button>
 
     <div class="closer" id="closer">
-      <button id="btnCheckout">Check-out de hoy</button>
-      <p id="closerHint">Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.</p>
+      <button id="btnCheckout" data-i18n="Check-out de hoy">Check-out de hoy</button>
+      <p id="closerHint" data-i18n="Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.">Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.</p>
     </div>
   </section>
 
   <!-- ===== CALENDARIO ===== -->
   <section class="screen" id="s-cal">
     <header class="top">
-      <h1 class="title">Calendario</h1>
-      <p class="sub">Toca un día para ver o planificar</p>
+      <h1 class="title" data-i18n="Calendario">Calendario</h1>
+      <p class="sub" data-i18n="Toca un día para ver o planificar">Toca un día para ver o planificar</p>
     </header>
     <div class="cal-nav">
-      <button id="calPrev" aria-label="Mes anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
+      <button id="calPrev" data-i18n-aria="Mes anterior" aria-label="Mes anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
       <strong id="calLabel"></strong>
-      <button id="calNext" aria-label="Mes siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+      <button id="calNext" data-i18n-aria="Mes siguiente" aria-label="Mes siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
-    <div class="dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="dow"><span data-i18n="L">L</span><span data-i18n="M">M</span><span data-i18n="X">X</span><span data-i18n="J">J</span><span data-i18n="V">V</span><span data-i18n="S">S</span><span data-i18n="D">D</span></div>
     <div class="grid" id="calGrid"></div>
-    <p class="legend">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
+    <p class="legend" data-i18n="Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
     <p class="legend" id="calLegendCiclo" hidden></p>
     <div class="card" id="patterns"></div>
   </section>
@@ -639,29 +639,29 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <!-- ===== CICLO ===== -->
   <section class="screen" id="s-ciclo">
     <header class="top">
-      <h1 class="title">Ciclo</h1>
+      <h1 class="title" data-i18n="Ciclo">Ciclo</h1>
       <p class="sub" id="cycleHead"></p>
-      <p class="legend" id="cycleFaseAviso" hidden>No sirve para evitar ni para buscar un embarazo.</p>
+      <p class="legend" id="cycleFaseAviso" hidden data-i18n="No sirve para evitar ni para buscar un embarazo.">No sirve para evitar ni para buscar un embarazo.</p>
     </header>
 
     <div class="card">
-      <h2>Registro de hoy</h2>
+      <h2 data-i18n="Registro de hoy">Registro de hoy</h2>
       <div class="field">
-        <label>Sangrado</label>
-        <div class="chips" id="cycBleed" role="group" aria-label="Sangrado">
-          <button class="chip" data-bleed="si" aria-pressed="false">Sí</button>
-          <button class="chip" data-bleed="no" aria-pressed="false">No</button>
+        <label data-i18n="Sangrado">Sangrado</label>
+        <div class="chips" id="cycBleed" role="group" data-i18n-aria="Sangrado" aria-label="Sangrado">
+          <button class="chip" data-bleed="si" aria-pressed="false" data-i18n="Sí">Sí</button>
+          <button class="chip" data-bleed="no" aria-pressed="false" data-i18n="No">No</button>
         </div>
       </div>
       <div class="field">
-        <label>Dolor físico</label>
+        <label data-i18n="Dolor físico">Dolor físico</label>
         <div class="scale" id="cycPain"></div>
-        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
+        <div class="scale-lab"><span data-i18n="Ninguno">Ninguno</span><span data-i18n="Mucho">Mucho</span></div>
       </div>
       <div class="field" id="cycIntField" hidden>
-        <label>Intensidad del sangrado</label>
+        <label data-i18n="Intensidad del sangrado">Intensidad del sangrado</label>
         <div class="scale" id="cycIntensity"></div>
-        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
+        <div class="scale-lab"><span data-i18n="Muy leve">Muy leve</span><span data-i18n="Muy fuerte">Muy fuerte</span></div>
       </div>
     </div>
 
@@ -673,29 +673,29 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <!-- ===== FINANZAS ===== -->
   <section class="screen" id="s-fin">
     <header class="top">
-      <h1 class="title">Finanzas</h1>
+      <h1 class="title" data-i18n="Finanzas">Finanzas</h1>
     </header>
-    <div class="chips" id="finTabs" role="group" aria-label="Vista de finanzas">
-      <button class="chip" data-fintab="fijos" aria-pressed="false">Gastos fijos</button>
-      <button class="chip" data-fintab="variables" aria-pressed="true">Gastos variables</button>
-      <button class="chip" data-fintab="historial" aria-pressed="false">Historial</button>
+    <div class="chips" id="finTabs" role="group" data-i18n-aria="Vista de finanzas" aria-label="Vista de finanzas">
+      <button class="chip" data-fintab="fijos" aria-pressed="false" data-i18n="Gastos fijos">Gastos fijos</button>
+      <button class="chip" data-fintab="variables" aria-pressed="true" data-i18n="Gastos variables">Gastos variables</button>
+      <button class="chip" data-fintab="historial" aria-pressed="false" data-i18n="Historial">Historial</button>
     </div>
 
     <div id="finFijos" hidden>
       <div id="finFijosList"></div>
-      <button class="add" id="btnAddFijo">Añadir gasto fijo</button>
+      <button class="add" id="btnAddFijo" data-i18n="Añadir gasto fijo">Añadir gasto fijo</button>
       <div class="card">
-        <p>Total gastos fijos: <strong id="finTotalFijos"></strong></p>
-        <p>Total del mes (fijos + variables): <strong id="finTotalMesFijos"></strong></p>
+        <p><span data-i18n="Total gastos fijos:">Total gastos fijos:</span> <strong id="finTotalFijos"></strong></p>
+        <p><span data-i18n="Total del mes (fijos + variables):">Total del mes (fijos + variables):</span> <strong id="finTotalMesFijos"></strong></p>
       </div>
     </div>
 
     <div id="finVariables">
       <div id="finVariablesList"></div>
-      <button class="add" id="btnAddVariable">Añadir gasto variable</button>
+      <button class="add" id="btnAddVariable" data-i18n="Añadir gasto variable">Añadir gasto variable</button>
       <div class="card">
-        <p>Total gastos variables: <strong id="finTotalVariables"></strong></p>
-        <p>Total del mes (fijos + variables): <strong id="finTotalMesVariables"></strong></p>
+        <p><span data-i18n="Total gastos variables:">Total gastos variables:</span> <strong id="finTotalVariables"></strong></p>
+        <p><span data-i18n="Total del mes (fijos + variables):">Total del mes (fijos + variables):</span> <strong id="finTotalMesVariables"></strong></p>
       </div>
     </div>
 
@@ -707,17 +707,27 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <!-- ===== AJUSTES ===== -->
   <section class="screen" id="s-set">
     <header class="top">
-      <h1 class="title">Ajustes</h1>
-      <p class="sub" id="privacyLine">Tus datos no salen del teléfono</p>
+      <h1 class="title" data-i18n="Ajustes">Ajustes</h1>
+      <p class="sub" id="privacyLine" data-i18n="Tus datos no salen del teléfono">Tus datos no salen del teléfono</p>
     </header>
-    <p class="libsec">Tus cucharas</p>
+    <p class="libsec">Idioma · Language</p>
     <div class="group">
     <div class="row">
-      <div><strong>Cuándo empieza tu día</strong><p>A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
+      <div><strong>Idioma de la app · App language</strong><p>Cambia el idioma de todos los textos. · Changes the language of all text.</p></div>
+      <div class="chips" id="langPick" role="group" aria-label="Idioma de la app · App language">
+        <button class="chip" data-lang="es" aria-pressed="false">Español</button>
+        <button class="chip" data-lang="en" aria-pressed="false">English</button>
+      </div>
+    </div>
+    </div>
+    <p class="libsec" data-i18n="Tus cucharas">Tus cucharas</p>
+    <div class="group">
+    <div class="row">
+      <div><strong data-i18n="Cuándo empieza tu día">Cuándo empieza tu día</strong><p data-i18n="A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.">A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
       <div class="ocgrid">
         <!-- Opciones con texto fijo "04:00" en vez de <input type=time>: así el
              formato 24h queda garantizado sin depender de la región del móvil. -->
-        <label>h<select id="dayStartHourInput" aria-label="Hora en la que empieza el día">
+        <label>h<select id="dayStartHourInput" data-i18n-aria="Hora en la que empieza el día" aria-label="Hora en la que empieza el día">
           <option value="0">00:00</option>
           <option value="1">01:00</option>
           <option value="2">02:00</option>
@@ -746,155 +756,155 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row">
-      <div><strong>Cucharas máximas</strong><p>El tope del día que mejor te representa.</p></div>
+      <div><strong data-i18n="Cucharas máximas">Cucharas máximas</strong><p data-i18n="El tope del día que mejor te representa.">El tope del día que mejor te representa.</p></div>
       <div class="stepper">
-        <button id="maxMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="maxMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="maxOut"></output>
-        <button id="maxPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="maxPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
     </div>
     <div class="row">
-      <div><strong>Coste de un pico sensorial</strong><p>Qué porcentaje de las cucharas de hoy resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.</p></div>
+      <div><strong data-i18n="Coste de un pico sensorial">Coste de un pico sensorial</strong><p data-i18n='Qué porcentaje de las cucharas de hoy resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.'>Qué porcentaje de las cucharas de hoy resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.</p></div>
       <div class="stepper">
-        <button id="peakMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="peakMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="peakOut"></output>
-        <button id="peakPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="peakPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
     </div>
     <div class="row">
-      <div><strong>Preguntar si necesitas un descanso</strong><p>Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso ("No volver a preguntar") o aquí, y volver a activarlo cuando quieras.</p></div>
-      <div class="chips" id="peakAskPick" role="group" aria-label="Preguntar si necesitas un descanso tras un pico sensorial">
-        <button class="chip" data-peakask="on" aria-pressed="false">Preguntar</button>
-        <button class="chip" data-peakask="off" aria-pressed="false">No preguntar</button>
+      <div><strong data-i18n="Preguntar si necesitas un descanso">Preguntar si necesitas un descanso</strong><p data-i18n='Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso ("No volver a preguntar") o aquí, y volver a activarlo cuando quieras.'>Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso ("No volver a preguntar") o aquí, y volver a activarlo cuando quieras.</p></div>
+      <div class="chips" id="peakAskPick" role="group" data-i18n-aria="Preguntar si necesitas un descanso tras un pico sensorial" aria-label="Preguntar si necesitas un descanso tras un pico sensorial">
+        <button class="chip" data-peakask="on" aria-pressed="false" data-i18n="Preguntar">Preguntar</button>
+        <button class="chip" data-peakask="off" aria-pressed="false" data-i18n="No preguntar">No preguntar</button>
       </div>
     </div>
     <div class="ocrow">
-      <strong>Coste de la sobrestimulación</strong>
-      <p>Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
+      <strong data-i18n="Coste de la sobrestimulación">Coste de la sobrestimulación</strong>
+      <p data-i18n="Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.">Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
       <div class="ocgrid" id="overCostGrid"></div>
     </div>
     </div>
 
-    <p class="libsec">Ciclo</p>
+    <p class="libsec" data-i18n="Ciclo">Ciclo</p>
     <div class="group">
     <div class="row">
-      <div><strong>Seguimiento del ciclo</strong><p>Añade una sección para apuntar sangrado y dolor.</p></div>
-      <div class="chips" id="cyclePick" role="group" aria-label="Seguimiento del ciclo">
-        <button class="chip" data-cycle="on" aria-pressed="false">Activado</button>
-        <button class="chip" data-cycle="off" aria-pressed="true">Desactivado</button>
+      <div><strong data-i18n="Seguimiento del ciclo">Seguimiento del ciclo</strong><p data-i18n="Añade una sección para apuntar sangrado y dolor.">Añade una sección para apuntar sangrado y dolor.</p></div>
+      <div class="chips" id="cyclePick" role="group" data-i18n-aria="Seguimiento del ciclo" aria-label="Seguimiento del ciclo">
+        <button class="chip" data-cycle="on" aria-pressed="false" data-i18n="Activado">Activado</button>
+        <button class="chip" data-cycle="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
       </div>
     </div>
     <div class="row" id="cycleLenRow" hidden>
-      <div><strong>Duración media del ciclo</strong><p>En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.</p></div>
+      <div><strong data-i18n="Duración media del ciclo">Duración media del ciclo</strong><p data-i18n="En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.">En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.</p></div>
       <div class="ocgrid">
-        <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" aria-label="Duración media del ciclo en días"></label>
+        <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" data-i18n-aria="Duración media del ciclo en días" aria-label="Duración media del ciclo en días"></label>
       </div>
     </div>
     <div class="row" id="cycleMarginRow" hidden>
-      <div><strong>Margen de precaución</strong><p>Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.</p></div>
+      <div><strong data-i18n="Margen de precaución">Margen de precaución</strong><p data-i18n="Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.">Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.</p></div>
       <div class="stepper">
-        <button id="marginMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="marginMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="marginOut"></output>
-        <button id="marginPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="marginPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
     </div>
     </div>
 
-    <p class="libsec">Finanzas</p>
+    <p class="libsec" data-i18n="Finanzas">Finanzas</p>
     <div class="group">
     <div class="row">
-      <div><strong>Seguimiento de finanzas</strong><p>Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
-      <div class="chips" id="finPick" role="group" aria-label="Seguimiento de finanzas">
-        <button class="chip" data-fin="on" aria-pressed="false">Activado</button>
-        <button class="chip" data-fin="off" aria-pressed="true">Desactivado</button>
+      <div><strong data-i18n="Seguimiento de finanzas">Seguimiento de finanzas</strong><p data-i18n="Añade una pestaña para tus gastos fijos y variables del mes.">Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
+      <div class="chips" id="finPick" role="group" data-i18n-aria="Seguimiento de finanzas" aria-label="Seguimiento de finanzas">
+        <button class="chip" data-fin="on" aria-pressed="false" data-i18n="Activado">Activado</button>
+        <button class="chip" data-fin="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
       </div>
     </div>
     </div>
 
-    <p class="libsec">Cómo se ve</p>
+    <p class="libsec" data-i18n="Cómo se ve">Cómo se ve</p>
     <div class="group">
     <div class="row">
-      <div><strong>Tamaño del texto</strong><p>Sube el tamaño si te cuesta leer el texto normal.</p></div>
-      <div class="chips" id="textScalePick" role="group" aria-label="Tamaño del texto">
-        <button class="chip" data-scale="1" aria-pressed="true">Normal</button>
-        <button class="chip" data-scale="1.15" aria-pressed="false">Grande</button>
-        <button class="chip" data-scale="1.3" aria-pressed="false">Muy grande</button>
+      <div><strong data-i18n="Tamaño del texto">Tamaño del texto</strong><p data-i18n="Sube el tamaño si te cuesta leer el texto normal.">Sube el tamaño si te cuesta leer el texto normal.</p></div>
+      <div class="chips" id="textScalePick" role="group" data-i18n-aria="Tamaño del texto" aria-label="Tamaño del texto">
+        <button class="chip" data-scale="1" aria-pressed="true" data-i18n="Normal">Normal</button>
+        <button class="chip" data-scale="1.15" aria-pressed="false" data-i18n="Grande">Grande</button>
+        <button class="chip" data-scale="1.3" aria-pressed="false" data-i18n="Muy grande">Muy grande</button>
       </div>
     </div>
     <div class="row">
-      <div><strong>Contraste</strong><p>Sube el contraste si te cuesta leer el texto claro.</p></div>
-      <div class="chips" id="contrastPick" role="group" aria-label="Contraste">
-        <button class="chip" data-contrast="normal" aria-pressed="true">Normal</button>
-        <button class="chip" data-contrast="alto" aria-pressed="false">Alto</button>
+      <div><strong data-i18n="Contraste">Contraste</strong><p data-i18n="Sube el contraste si te cuesta leer el texto claro.">Sube el contraste si te cuesta leer el texto claro.</p></div>
+      <div class="chips" id="contrastPick" role="group" data-i18n-aria="Contraste" aria-label="Contraste">
+        <button class="chip" data-contrast="normal" aria-pressed="true" data-i18n="Normal">Normal</button>
+        <button class="chip" data-contrast="alto" aria-pressed="false" data-i18n="Alto">Alto</button>
       </div>
     </div>
     <div class="row" id="colorPickRow">
-      <div><strong>Color de la interfaz</strong><p>Cambia el rosa de fábrica por el tono que prefieras.</p></div>
-      <input type="color" id="customColorPick" value="#9E5266" aria-label="Elegir color de la interfaz">
+      <div><strong data-i18n="Color de la interfaz">Color de la interfaz</strong><p data-i18n="Cambia el rosa de fábrica por el tono que prefieras.">Cambia el rosa de fábrica por el tono que prefieras.</p></div>
+      <input type="color" id="customColorPick" value="#9E5266" data-i18n-aria="Elegir color de la interfaz" aria-label="Elegir color de la interfaz">
     </div>
     <div class="row" id="colorInfoRow" hidden>
       <div><p id="colorHint" style="margin:0"></p></div>
-      <button class="btn" id="btnColorReset">Restablecer</button>
+      <button class="btn" id="btnColorReset" data-i18n="Restablecer">Restablecer</button>
     </div>
     </div>
 
-    <p class="libsec">Ayuda</p>
+    <p class="libsec" data-i18n="Ayuda">Ayuda</p>
     <div class="group">
     <div class="row">
-      <div><strong>Cómo funciona la app</strong><p>Vuelve a ver la explicación de cada parte, cuando quieras.</p></div>
-      <button class="btn" id="btnIntroReplay">Ver</button>
+      <div><strong data-i18n="Cómo funciona la app">Cómo funciona la app</strong><p data-i18n="Vuelve a ver la explicación de cada parte, cuando quieras.">Vuelve a ver la explicación de cada parte, cuando quieras.</p></div>
+      <button class="btn" id="btnIntroReplay" data-i18n="Ver">Ver</button>
     </div>
     <div class="row" id="cicloReplayRow" hidden>
-      <div><strong>Cómo funciona Ciclo</strong><p>Vuelve a ver la guía de esta sección.</p></div>
-      <button class="btn" id="btnCicloReplay">Ver</button>
+      <div><strong data-i18n="Cómo funciona Ciclo">Cómo funciona Ciclo</strong><p data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</p></div>
+      <button class="btn" id="btnCicloReplay" data-i18n="Ver">Ver</button>
     </div>
     <div class="row" id="finReplayRow" hidden>
-      <div><strong>Cómo funciona Finanzas</strong><p>Vuelve a ver la guía de esta sección.</p></div>
-      <button class="btn" id="btnFinReplay">Ver</button>
+      <div><strong data-i18n="Cómo funciona Finanzas">Cómo funciona Finanzas</strong><p data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</p></div>
+      <button class="btn" id="btnFinReplay" data-i18n="Ver">Ver</button>
     </div>
     <div class="row">
-      <div><strong>Acerca de</strong><p>Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.</p></div>
+      <div><strong data-i18n="Acerca de">Acerca de</strong><p data-i18n-html="Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.">Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.</p></div>
     </div>
     </div>
 
     <div id="accountGroup" hidden>
-    <p class="libsec">Tu cuenta (opcional)</p>
+    <p class="libsec" data-i18n="Tu cuenta (opcional)">Tu cuenta (opcional)</p>
     <div class="group">
     <div class="row" id="accOutRow">
-      <div><strong>Copia en la nube</strong><p>Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.</p><p class="notice" id="accOutMsg" hidden></p></div>
-      <button class="btn" id="btnAccOpen">Entrar</button>
+      <div><strong data-i18n="Copia en la nube">Copia en la nube</strong><p data-i18n="Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.">Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.</p><p class="notice" id="accOutMsg" hidden></p></div>
+      <button class="btn" id="btnAccOpen" data-i18n="Entrar">Entrar</button>
     </div>
     <div class="row" id="accInRow" hidden>
       <div><strong id="accEmail"></strong><p id="accStatus"></p></div>
     </div>
     <div class="row" id="accDecideRow" hidden>
-      <div><strong>Falta elegir qué datos guardar</strong><p>Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.</p></div>
-      <button class="btn" id="btnSyncDecide">Elegir</button>
+      <div><strong data-i18n="Falta elegir qué datos guardar">Falta elegir qué datos guardar</strong><p data-i18n="Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.">Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.</p></div>
+      <button class="btn" id="btnSyncDecide" data-i18n="Elegir">Elegir</button>
     </div>
     <div class="row" id="accLogoutRow" hidden>
-      <div><strong>Cerrar sesión</strong><p>Tus datos se quedan en este móvil.</p></div>
-      <button class="btn" id="btnLogout">Cerrar</button>
+      <div><strong data-i18n="Cerrar sesión">Cerrar sesión</strong><p data-i18n="Tus datos se quedan en este móvil.">Tus datos se quedan en este móvil.</p></div>
+      <button class="btn" id="btnLogout" data-i18n="Cerrar">Cerrar</button>
     </div>
     <div class="row" id="accDeleteRow" hidden>
-      <div><strong>Borrar mi cuenta</strong><p>Borra la cuenta y la copia en la nube. Lo que hay en este móvil se queda.</p></div>
-      <button class="btn warn" id="btnAccDelete">Borrar</button>
+      <div><strong data-i18n="Borrar mi cuenta">Borrar mi cuenta</strong><p data-i18n="Borra la cuenta y la copia en la nube. Lo que hay en este móvil se queda.">Borra la cuenta y la copia en la nube. Lo que hay en este móvil se queda.</p></div>
+      <button class="btn warn" id="btnAccDelete" data-i18n="Borrar">Borrar</button>
     </div>
     </div>
     </div>
 
-    <p class="libsec">Tus datos</p>
+    <p class="libsec" data-i18n="Tus datos">Tus datos</p>
     <div class="group">
     <div class="row">
-      <div><strong>Copia de seguridad</strong><p>Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.</p><p id="exportInfo"></p></div>
-      <button class="btn" id="btnExport">Exportar</button>
+      <div><strong data-i18n="Copia de seguridad">Copia de seguridad</strong><p data-i18n="Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.">Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.</p><p id="exportInfo"></p></div>
+      <button class="btn" id="btnExport" data-i18n="Exportar">Exportar</button>
     </div>
     <div class="row">
-      <div><strong>Restaurar</strong><p>Carga un archivo exportado antes.</p></div>
-      <button class="btn" id="btnImport">Importar</button>
+      <div><strong data-i18n="Restaurar">Restaurar</strong><p data-i18n="Carga un archivo exportado antes.">Carga un archivo exportado antes.</p></div>
+      <button class="btn" id="btnImport" data-i18n="Importar">Importar</button>
     </div>
     <div class="row">
-      <div><strong>Borrar todo</strong><p>No se puede deshacer.</p></div>
-      <button class="btn warn" id="btnWipe">Borrar</button>
+      <div><strong data-i18n="Borrar todo">Borrar todo</strong><p data-i18n="No se puede deshacer.">No se puede deshacer.</p></div>
+      <button class="btn warn" id="btnWipe" data-i18n="Borrar">Borrar</button>
     </div>
     </div>
     <input type="file" id="fileIn" accept="application/json" hidden>
@@ -904,15 +914,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
 <nav class="tabs" id="tabs">
   <button data-go="hoy" aria-current="page">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Hoy</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="Hoy">Hoy</span></button>
   <button data-go="ciclo" id="tabCiclo" hidden>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg>Ciclo</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg><span data-i18n="Ciclo">Ciclo</span></button>
   <button data-go="cal">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Calendario</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span data-i18n="Calendario">Calendario</span></button>
   <button data-go="fin" id="tabFin" hidden>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">€</text></svg>Finanzas</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" stroke="none" font-family="system-ui">€</text></svg><span data-i18n="Finanzas">Finanzas</span></button>
   <button data-go="set">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>Ajustes</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg><span data-i18n="Ajustes">Ajustes</span></button>
 </nav>
 
 <!-- ===== Guía del primer arranque: cada paso señala el elemento del que
@@ -925,14 +935,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="sub tour-step" id="tourStep"></p>
     <h2 id="tourTitle"></h2>
     <p class="sub" id="tourBody"></p>
-    <p class="sub" id="tourToggleLabel" hidden style="margin-bottom:6px"><strong>¿Lo activamos ahora?</strong></p>
-    <div class="chips" id="tourToggle" role="group" aria-label="Activar este módulo" hidden style="margin-bottom:14px">
-      <button class="chip" data-tv="on" aria-pressed="false">Activar</button>
-      <button class="chip" data-tv="off" aria-pressed="true">Dejar apagado</button>
+    <p class="sub" id="tourToggleLabel" hidden style="margin-bottom:6px"><strong data-i18n="¿Lo activamos ahora?">¿Lo activamos ahora?</strong></p>
+    <div class="chips" id="tourToggle" role="group" data-i18n-aria="Activar este módulo" aria-label="Activar este módulo" hidden style="margin-bottom:14px">
+      <button class="chip" data-tv="on" aria-pressed="false" data-i18n="Activar">Activar</button>
+      <button class="chip" data-tv="off" aria-pressed="true" data-i18n="Dejar apagado">Dejar apagado</button>
     </div>
     <div class="bigrow">
-      <button id="tourSkip">Saltar</button>
-      <button class="primary" id="tourNext">Siguiente</button>
+      <button id="tourSkip" data-i18n="Saltar">Saltar</button>
+      <button class="primary" id="tourNext" data-i18n="Siguiente">Siguiente</button>
     </div>
   </div>
 </div>
@@ -940,21 +950,21 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <!-- ===== Check-in ===== -->
 <dialog id="dlgCheckin">
   <div class="sheet">
-    <h2>¿Con cuántas cucharas te levantas?</h2>
-    <p class="sub">Sin pensarlo mucho. Puedes cambiarlo durante el día.</p>
+    <h2 data-i18n="¿Con cuántas cucharas te levantas?">¿Con cuántas cucharas te levantas?</h2>
+    <p class="sub" data-i18n="Sin pensarlo mucho. Puedes cambiarlo durante el día.">Sin pensarlo mucho. Puedes cambiarlo durante el día.</p>
     <div class="bigcount"><span id="ciNum">8</span><small id="ciWord"></small></div>
     <input type="range" class="slider" id="ciRange" min="0" max="12" step="1" value="8">
     <div class="chips" id="ciPresets"></div>
     <label class="row" id="ciMarginRow" hidden style="cursor:pointer">
-      <div><strong>Hoy no necesito el margen</strong><p>Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.</p></div>
-      <input type="checkbox" id="ciMarginOff" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
+      <div><strong data-i18n="Hoy no necesito el margen">Hoy no necesito el margen</strong><p data-i18n="Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.">Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.</p></div>
+      <input type="checkbox" id="ciMarginOff" data-i18n-aria="Desactivar el margen de precaución solo hoy" aria-label="Desactivar el margen de precaución solo hoy" style="flex:0 0 auto;width:20px;height:20px">
     </label>
     <p class="lib-note" id="ciYesterday" hidden style="margin:2px 0 14px"></p>
     <div class="row" id="ciPeakRow" hidden>
-      <div><strong id="ciPeakInfo"></strong><p>Por si ha sido sin querer.</p></div>
-      <button class="btn" id="btnUndoPeak">Deshacer</button>
+      <div><strong id="ciPeakInfo"></strong><p data-i18n="Por si ha sido sin querer.">Por si ha sido sin querer.</p></div>
+      <button class="btn" id="btnUndoPeak" data-i18n="Deshacer">Deshacer</button>
     </div>
-    <div class="bigrow"><button id="ciSkip">Ahora no</button><button class="primary" id="ciSave">Empezar el día</button></div>
+    <div class="bigrow"><button id="ciSkip" data-i18n="Ahora no">Ahora no</button><button class="primary" id="ciSave" data-i18n="Empezar el día">Empezar el día</button></div>
   </div>
 </dialog>
 
@@ -965,58 +975,58 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="sub">Elige de tu lista o escribe una nueva.</p>
     <div class="chips" id="taskSuggest"></div>
     <div class="field">
-      <label for="tName">Qué vas a hacer</label>
-      <input type="text" id="tName" placeholder="Ducha, compra, llamada…">
+      <label for="tName" data-i18n="Qué vas a hacer">Qué vas a hacer</label>
+      <input type="text" id="tName" placeholder="Ducha, compra, llamada…" data-i18n-ph="Ducha, compra, llamada…">
     </div>
     <div class="field">
-      <label>Tipo</label>
+      <label data-i18n="Tipo">Tipo</label>
       <div class="chips" id="tKind">
-        <button class="chip" data-kind="gasto" aria-pressed="true">Gasta cucharas</button>
-        <button class="chip" data-kind="recarga">Recarga cucharas</button>
+        <button class="chip" data-kind="gasto" aria-pressed="true" data-i18n="Gasta cucharas">Gasta cucharas</button>
+        <button class="chip" data-kind="recarga" data-i18n="Recarga cucharas">Recarga cucharas</button>
       </div>
     </div>
     <div class="field">
       <label for="tCost" id="tCostLab">Cuánto crees que te va a costar</label>
       <div class="stepper">
-        <button id="tMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="tMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="tCost">2</output>
-        <button id="tPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="tPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="tLearned"></span>
       </div>
     </div>
     <div class="field-row">
       <div class="field">
-        <label for="tTime">Hora inicio</label>
+        <label for="tTime" data-i18n="Hora inicio">Hora inicio</label>
         <input type="time" id="tTime">
       </div>
       <div class="field">
-        <label for="tTimeEnd">Hora fin</label>
+        <label for="tTimeEnd" data-i18n="Hora fin">Hora fin</label>
         <input type="time" id="tTimeEnd" aria-describedby="tTimeMsg">
       </div>
     </div>
-    <p class="notice" id="tTimeMsg" role="status" hidden style="margin:0 0 16px">La hora de fin no puede ser anterior a la de inicio.</p>
+    <p class="notice" id="tTimeMsg" role="status" hidden style="margin:0 0 16px" data-i18n="La hora de fin no puede ser anterior a la de inicio.">La hora de fin no puede ser anterior a la de inicio.</p>
     <div class="field" id="repField">
-      <label>Repetir</label>
+      <label data-i18n="Repetir">Repetir</label>
       <div class="chips" id="repMode">
-        <button class="chip" data-rep="once" aria-pressed="true">Solo ese día</button>
-        <button class="chip" data-rep="weekdays">De lunes a viernes</button>
-        <button class="chip" data-rep="daily">Todos los días</button>
-        <button class="chip" data-rep="custom">Elegir días</button>
+        <button class="chip" data-rep="once" aria-pressed="true" data-i18n="Solo ese día">Solo ese día</button>
+        <button class="chip" data-rep="weekdays" data-i18n="De lunes a viernes">De lunes a viernes</button>
+        <button class="chip" data-rep="daily" data-i18n="Todos los días">Todos los días</button>
+        <button class="chip" data-rep="custom" data-i18n="Elegir días">Elegir días</button>
       </div>
       <div class="chips" id="repDays" hidden></div>
       <div class="stepper" id="repDur" hidden>
-        <button id="wMinus" aria-label="Menos semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="wMinus" data-i18n-aria="Menos semanas" aria-label="Menos semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="wOut">4</output>
-        <button id="wPlus" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="wPlus" data-i18n-aria="Más semanas" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="wLabel">semanas</span>
       </div>
     </div>
     <div class="bigrow" id="tDeleteRow" hidden>
-      <button class="warn" id="tDelete">Borrar tarea</button>
+      <button class="warn" id="tDelete" data-i18n="Borrar tarea">Borrar tarea</button>
     </div>
     <div class="bigrow">
-      <button id="tCancel">Cancelar</button>
-      <button class="primary" id="tSave">Añadir</button>
+      <button id="tCancel" data-i18n="Cancelar">Cancelar</button>
+      <button class="primary" id="tSave" data-i18n="Añadir">Añadir</button>
     </div>
   </div>
 </dialog>
@@ -1024,12 +1034,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <!-- ===== Borrar tarea que se repite ===== -->
 <dialog id="dlgDeleteSeries">
   <div class="sheet">
-    <h2>Esta tarea se repite en más días</h2>
-    <p class="sub">¿Qué quieres borrar?</p>
+    <h2 data-i18n="Esta tarea se repite en más días">Esta tarea se repite en más días</h2>
+    <p class="sub" data-i18n="¿Qué quieres borrar?">¿Qué quieres borrar?</p>
     <div class="bigrow" style="flex-direction:column">
-      <button class="warn" id="delOnlyDay">Solo este día</button>
-      <button class="warn" id="delAllSeries">Todos los días de la serie</button>
-      <button id="delSeriesCancel">Cancelar</button>
+      <button class="warn" id="delOnlyDay" data-i18n="Solo este día">Solo este día</button>
+      <button class="warn" id="delAllSeries" data-i18n="Todos los días de la serie">Todos los días de la serie</button>
+      <button id="delSeriesCancel" data-i18n="Cancelar">Cancelar</button>
     </div>
   </div>
 </dialog>
@@ -1040,57 +1050,57 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <h2 id="lTitle">Actividad</h2>
     <p class="sub" id="lSub"></p>
     <div class="field">
-      <label for="lName">Nombre</label>
-      <input type="text" id="lName" placeholder="Ducha, trabajo, ver a gente…">
+      <label for="lName" data-i18n="Nombre">Nombre</label>
+      <input type="text" id="lName" placeholder="Ducha, trabajo, ver a gente…" data-i18n-ph="Ducha, trabajo, ver a gente…">
     </div>
     <div class="field">
-      <label>Tipo</label>
+      <label data-i18n="Tipo">Tipo</label>
       <div class="chips" id="lKind">
-        <button class="chip" data-kind="gasto" aria-pressed="true">Gasta cucharas</button>
-        <button class="chip" data-kind="recarga">Recarga cucharas</button>
+        <button class="chip" data-kind="gasto" aria-pressed="true" data-i18n="Gasta cucharas">Gasta cucharas</button>
+        <button class="chip" data-kind="recarga" data-i18n="Recarga cucharas">Recarga cucharas</button>
       </div>
     </div>
     <div class="field">
       <label for="lCost" id="lCostLab">Lo que te cuesta</label>
       <div class="stepper">
-        <button id="lMinus" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <button id="lMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="lCost">2</output>
-        <button id="lPlus" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="lPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="lHint"></span>
       </div>
     </div>
-    <button class="linkbtn" id="lReset" hidden>Olvidar lo que ha aprendido</button>
+    <button class="linkbtn" id="lReset" hidden data-i18n="Olvidar lo que ha aprendido">Olvidar lo que ha aprendido</button>
     <div class="bigrow">
-      <button class="warn" id="lDelete">Borrar</button>
-      <button class="primary" id="lSave">Guardar</button>
+      <button class="warn" id="lDelete" data-i18n="Borrar">Borrar</button>
+      <button class="primary" id="lSave" data-i18n="Guardar">Guardar</button>
     </div>
-    <div class="bigrow"><button id="lCancel">Cancelar</button></div>
+    <div class="bigrow"><button id="lCancel" data-i18n="Cancelar">Cancelar</button></div>
   </div>
 </dialog>
 
 <!-- ===== Check-out ===== -->
 <dialog id="dlgCheckout">
   <div class="sheet">
-    <h2>Check-out de hoy</h2>
-    <p class="sub">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
+    <h2 data-i18n="Check-out de hoy">Check-out de hoy</h2>
+    <p class="sub" data-i18n="Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.">Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.</p>
     <div class="field">
-      <label>¿Cuánta capacidad te queda ahora?</label>
+      <label data-i18n="¿Cuánta capacidad te queda ahora?">¿Cuánta capacidad te queda ahora?</label>
       <div class="scale" id="coEnergy"></div>
-      <div class="scale-lab"><span>Ninguna</span><span>De sobra</span></div>
+      <div class="scale-lab"><span data-i18n="Ninguna">Ninguna</span><span data-i18n="De sobra">De sobra</span></div>
     </div>
     <div class="field">
-      <label>¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
+      <label data-i18n="¿Cuánto has aguantado hoy de ruido, luz, gente?">¿Cuánto has aguantado hoy de ruido, luz, gente?</label>
       <div class="scale" id="coSensory"></div>
-      <div class="scale-lab"><span>Nada</span><span>Todo llevadero</span></div>
+      <div class="scale-lab"><span data-i18n="Nada">Nada</span><span data-i18n="Todo llevadero">Todo llevadero</span></div>
     </div>
     <div class="field">
-      <label for="coNote">Qué se pudo tolerar y qué no (opcional)</label>
-      <input type="text" id="coNote" placeholder="El secador, no. La oficina, sí.">
+      <label for="coNote" data-i18n="Qué se pudo tolerar y qué no (opcional)">Qué se pudo tolerar y qué no (opcional)</label>
+      <input type="text" id="coNote" placeholder="El secador, no. La oficina, sí." data-i18n-ph="El secador, no. La oficina, sí.">
     </div>
-    <p class="notice" id="coMsg" role="status" hidden style="margin:0 0 16px">Puntúa las dos escalas para guardar.</p>
+    <p class="notice" id="coMsg" role="status" hidden style="margin:0 0 16px" data-i18n="Puntúa las dos escalas para guardar.">Puntúa las dos escalas para guardar.</p>
     <div class="bigrow">
-      <button id="coCancel">Ahora no</button>
-      <button class="primary" id="coSave">Guardar</button>
+      <button id="coCancel" data-i18n="Ahora no">Ahora no</button>
+      <button class="primary" id="coSave" data-i18n="Guardar">Guardar</button>
     </div>
   </div>
 </dialog>
@@ -1099,8 +1109,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <dialog id="dlgPeak">
   <div class="sheet">
     <div id="peakAsk">
-      <h2>¿Quieres tomar un descanso?</h2>
-      <p class="sub">Parar un momento, a tu manera, puede ayudar a bajar la activación del cuerpo.</p>
+      <h2 data-i18n="¿Quieres tomar un descanso?">¿Quieres tomar un descanso?</h2>
+      <p class="sub" data-i18n="Parar un momento, a tu manera, puede ayudar a bajar la activación del cuerpo.">Parar un momento, a tu manera, puede ayudar a bajar la activación del cuerpo.</p>
       <!-- A diferencia de otras filas con checkbox (p.ej. ciMarginRow), esta NO
            es <label> envolviendo toda la fila: apuntas un pico en pleno agobio
            sensorial, tocando rápido, y esto queda activo para siempre (sin
@@ -1108,19 +1118,19 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
            en el texto no debería bastar para desactivarlo. Solo la casilla
            en sí, deliberada, lo hace. -->
       <div class="row">
-        <div><strong>No preguntar más</strong><p>La próxima vez que apuntes un pico, no se te volverá a preguntar. Puedes reactivarlo luego en Ajustes.</p></div>
-        <input type="checkbox" id="peakDontAsk" aria-label="No volver a preguntar tras un pico sensorial" style="flex:0 0 auto;width:20px;height:20px">
+        <div><strong data-i18n="No preguntar más">No preguntar más</strong><p data-i18n="La próxima vez que apuntes un pico, no se te volverá a preguntar. Puedes reactivarlo luego en Ajustes.">La próxima vez que apuntes un pico, no se te volverá a preguntar. Puedes reactivarlo luego en Ajustes.</p></div>
+        <input type="checkbox" id="peakDontAsk" data-i18n-aria="No volver a preguntar tras un pico sensorial" aria-label="No volver a preguntar tras un pico sensorial" style="flex:0 0 auto;width:20px;height:20px">
       </div>
       <div class="bigrow">
-        <button id="peakNo">No</button>
-        <button class="primary" id="peakYes">Sí</button>
+        <button id="peakNo" data-i18n="No">No</button>
+        <button class="primary" id="peakYes" data-i18n="Sí">Sí</button>
       </div>
     </div>
     <div id="peakCalm" hidden>
-      <h2>Tómate el tiempo que necesites</h2>
-      <p class="sub">Nada que seguir ni que contar. Cierra cuando estés listo.</p>
-      <div class="bigrow"><button id="peakStop">Ya está, gracias</button></div>
-      <button class="linkbtn" id="peakWantBreath" style="margin-top:14px">Seguir un conteo de respiración (opcional)</button>
+      <h2 data-i18n="Tómate el tiempo que necesites">Tómate el tiempo que necesites</h2>
+      <p class="sub" data-i18n="Nada que seguir ni que contar. Cierra cuando estés listo.">Nada que seguir ni que contar. Cierra cuando estés listo.</p>
+      <div class="bigrow"><button id="peakStop" data-i18n="Ya está, gracias">Ya está, gracias</button></div>
+      <button class="linkbtn" id="peakWantBreath" style="margin-top:14px" data-i18n="Seguir un conteo de respiración (opcional)">Seguir un conteo de respiración (opcional)</button>
     </div>
     <div id="peakBreath" hidden>
       <h2 id="peakPhase">Inhala</h2>
@@ -1128,7 +1138,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <p class="bigcount breath-num" id="peakCount">4</p>
       </div>
       <p class="sub" id="peakBreathSub">Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.</p>
-      <div class="bigrow"><button id="peakStop2">Ya está, gracias</button></div>
+      <div class="bigrow"><button id="peakStop2" data-i18n="Ya está, gracias">Ya está, gracias</button></div>
     </div>
   </div>
 </dialog>
@@ -1136,25 +1146,25 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 <!-- ===== Días tipo ===== -->
 <dialog id="dlgTpl">
   <div class="sheet">
-    <h2>Días tipo</h2>
+    <h2 data-i18n="Días tipo">Días tipo</h2>
     <p class="sub" id="tplSub"></p>
     <div id="tplList"></div>
     <button class="add" id="tplSaveDay">Guardar este día como día tipo</button>
-    <div class="bigrow"><button id="tplClose">Cerrar</button></div>
+    <div class="bigrow"><button id="tplClose" data-i18n="Cerrar">Cerrar</button></div>
   </div>
 </dialog>
 
 <!-- ===== Nombre del día tipo ===== -->
 <dialog id="dlgTplName">
   <div class="sheet">
-    <h2>¿Cómo llamamos a este día tipo?</h2>
+    <h2 data-i18n="¿Cómo llamamos a este día tipo?">¿Cómo llamamos a este día tipo?</h2>
     <div class="field">
-      <label for="tplNameInput">Nombre</label>
-      <input type="text" id="tplNameInput" placeholder="Día de trabajo">
+      <label for="tplNameInput" data-i18n="Nombre">Nombre</label>
+      <input type="text" id="tplNameInput" placeholder="Día de trabajo" data-i18n-ph="Día de trabajo">
     </div>
     <div class="bigrow">
-      <button id="tplNameCancel">Cancelar</button>
-      <button class="primary" id="tplNameSave">Guardar</button>
+      <button id="tplNameCancel" data-i18n="Cancelar">Cancelar</button>
+      <button class="primary" id="tplNameSave" data-i18n="Guardar">Guardar</button>
     </div>
   </div>
 </dialog>
@@ -1164,25 +1174,25 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <div class="sheet">
     <h2 id="gTitle">Gasto</h2>
     <div class="field">
-      <label for="gName">Nombre</label>
-      <input type="text" id="gName" placeholder="Alquiler, luz, gimnasio…">
+      <label for="gName" data-i18n="Nombre">Nombre</label>
+      <input type="text" id="gName" placeholder="Alquiler, luz, gimnasio…" data-i18n-ph="Alquiler, luz, gimnasio…">
     </div>
     <div class="field">
-      <label for="gImporte">Importe (€)</label>
+      <label for="gImporte" data-i18n="Importe (€)">Importe (€)</label>
       <input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal">
     </div>
     <div class="field" id="gScopeField" hidden>
-      <label>¿Cómo aplicamos el cambio?</label>
+      <label data-i18n="¿Cómo aplicamos el cambio?">¿Cómo aplicamos el cambio?</label>
       <div class="chips" id="gScope">
-        <button class="chip" data-scope="siempre" aria-pressed="true">Aplicar desde ahora en adelante</button>
-        <button class="chip" data-scope="mes" aria-pressed="false">Solo este mes</button>
+        <button class="chip" data-scope="siempre" aria-pressed="true" data-i18n="Aplicar desde ahora en adelante">Aplicar desde ahora en adelante</button>
+        <button class="chip" data-scope="mes" aria-pressed="false" data-i18n="Solo este mes">Solo este mes</button>
       </div>
     </div>
     <div class="bigrow">
-      <button class="warn" id="gDelete">Borrar</button>
-      <button class="primary" id="gSave">Guardar</button>
+      <button class="warn" id="gDelete" data-i18n="Borrar">Borrar</button>
+      <button class="primary" id="gSave" data-i18n="Guardar">Guardar</button>
     </div>
-    <div class="bigrow"><button id="gCancel">Cancelar</button></div>
+    <div class="bigrow"><button id="gCancel" data-i18n="Cancelar">Cancelar</button></div>
   </div>
 </dialog>
 
@@ -1191,79 +1201,79 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <div class="sheet">
     <h2 id="hTitle"></h2>
     <p class="sub" id="hSub"></p>
-    <p class="libsec">Gastos fijos</p>
+    <p class="libsec" data-i18n="Gastos fijos">Gastos fijos</p>
     <div id="hFijos"></div>
-    <p class="libsec">Gastos variables</p>
+    <p class="libsec" data-i18n="Gastos variables">Gastos variables</p>
     <div id="hVariables"></div>
-    <div class="bigrow"><button id="hClose">Cerrar</button></div>
+    <div class="bigrow"><button id="hClose" data-i18n="Cerrar">Cerrar</button></div>
   </div>
 </dialog>
 
 <!-- ===== Detalle de día ===== -->
 <dialog id="dlgWhyMargin">
   <div class="sheet">
-    <h2>¿Por qué se restan cucharas?</h2>
-    <p class="hint">Durante la menstruación y los días previos, tu cuerpo y tu mente pueden necesitar más descanso. El dolor, la sensibilidad, la ansiedad o la sobrecarga pueden hacer que tengas menos energía disponible para afrontar el día.</p>
-    <p class="hint">Por eso, la app reserva un pequeño margen de tus cucharas. <strong>No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</strong></p>
-    <p class="hint">Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.</p>
-    <p class="hint">Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».</p>
-    <p class="hint">El porcentaje base es del 20 % y puedes cambiarlo (o dejarlo en 0) desde Ajustes. Si ya has apuntado el dolor de hoy, el margen se ajusta a partir de ese porcentaje: baja con dolor 1-2, se mantiene con dolor 3 y sube con dolor 4-5. Sin dolor apuntado se usa el porcentaje base, como en el día previo estimado.</p>
-    <p class="hint"><strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong></p>
-    <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
+    <h2 data-i18n="¿Por qué se restan cucharas?">¿Por qué se restan cucharas?</h2>
+    <p class="hint" data-i18n="Durante la menstruación y los días previos, tu cuerpo y tu mente pueden necesitar más descanso. El dolor, la sensibilidad, la ansiedad o la sobrecarga pueden hacer que tengas menos energía disponible para afrontar el día.">Durante la menstruación y los días previos, tu cuerpo y tu mente pueden necesitar más descanso. El dolor, la sensibilidad, la ansiedad o la sobrecarga pueden hacer que tengas menos energía disponible para afrontar el día.</p>
+    <p class="hint" data-i18n-html="Por eso, la app reserva un pequeño margen de tus cucharas. <strong>No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</strong>">Por eso, la app reserva un pequeño margen de tus cucharas. <strong>No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</strong></p>
+    <p class="hint" data-i18n="Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.">Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.</p>
+    <p class="hint" data-i18n="Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».">Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».</p>
+    <p class="hint" data-i18n="El porcentaje base es del 20 % y puedes cambiarlo (o dejarlo en 0) desde Ajustes. Si ya has apuntado el dolor de hoy, el margen se ajusta a partir de ese porcentaje: baja con dolor 1-2, se mantiene con dolor 3 y sube con dolor 4-5. Sin dolor apuntado se usa el porcentaje base, como en el día previo estimado.">El porcentaje base es del 20 % y puedes cambiarlo (o dejarlo en 0) desde Ajustes. Si ya has apuntado el dolor de hoy, el margen se ajusta a partir de ese porcentaje: baja con dolor 1-2, se mantiene con dolor 3 y sube con dolor 4-5. Sin dolor apuntado se usa el porcentaje base, como en el día previo estimado.</p>
+    <p class="hint" data-i18n-html="<strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong>"><strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong></p>
+    <div class="bigrow"><button class="primary" id="whyMarginClose" data-i18n="Cerrar">Cerrar</button></div>
   </div>
 </dialog>
 
 <dialog id="dlgLibList">
   <div class="sheet">
-    <h2>Cuánto cuesta</h2>
-    <p class="hint">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
+    <h2 data-i18n="Cuánto cuesta">Cuánto cuesta</h2>
+    <p class="hint" data-i18n="Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.">Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.</p>
     <div id="libList"></div>
-    <button class="add" id="btnAddLib">Añadir actividad</button>
-    <div class="bigrow" style="margin-top:18px"><button class="primary" id="libListClose">Cerrar</button></div>
+    <button class="add" id="btnAddLib" data-i18n="Añadir actividad">Añadir actividad</button>
+    <div class="bigrow" style="margin-top:18px"><button class="primary" id="libListClose" data-i18n="Cerrar">Cerrar</button></div>
   </div>
 </dialog>
 
 <!-- ===== Cuenta ===== -->
 <dialog id="dlgAccount">
   <div class="sheet">
-    <h2>Tu cuenta</h2>
-    <p class="sub">Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.</p>
+    <h2 data-i18n="Tu cuenta">Tu cuenta</h2>
+    <p class="sub" data-i18n="Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.">Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.</p>
     <!-- Solo dentro de la app nativa: fuera de ella no hay a dónde volver
          tras iniciar sesión en Google o Apple. btnAppleAuth además solo en
          iOS, oculto aparte del grupo (renderOAuthButtons los controla). -->
     <div class="bigrow" id="oauthButtons" hidden style="flex-direction:column">
-      <button id="btnGoogleAuth">Continuar con Google</button>
-      <button id="btnAppleAuth" hidden>Continuar con Apple</button>
+      <button id="btnGoogleAuth" data-i18n="Continuar con Google">Continuar con Google</button>
+      <button id="btnAppleAuth" hidden data-i18n="Continuar con Apple">Continuar con Apple</button>
     </div>
-    <p class="sub" id="oauthDivider" hidden style="text-align:center;margin:2px 0 18px">o con tu correo</p>
+    <p class="sub" id="oauthDivider" hidden style="text-align:center;margin:2px 0 18px" data-i18n="o con tu correo">o con tu correo</p>
     <div class="field">
-      <label for="accEmailIn">Correo</label>
+      <label for="accEmailIn" data-i18n="Correo">Correo</label>
       <input type="text" id="accEmailIn" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false">
     </div>
     <div class="field">
-      <label for="accPassIn">Contraseña</label>
+      <label for="accPassIn" data-i18n="Contraseña">Contraseña</label>
       <input type="password" id="accPassIn" autocomplete="current-password">
     </div>
     <p class="notice" id="accMsg" role="status" hidden style="margin:0 0 16px"></p>
     <div class="bigrow">
-      <button id="accSignUp">Crear cuenta</button>
-      <button class="primary" id="accSignIn">Entrar</button>
+      <button id="accSignUp" data-i18n="Crear cuenta">Crear cuenta</button>
+      <button class="primary" id="accSignIn" data-i18n="Entrar">Entrar</button>
     </div>
-    <div class="bigrow"><button id="accCancel">Cancelar</button></div>
+    <div class="bigrow"><button id="accCancel" data-i18n="Cancelar">Cancelar</button></div>
   </div>
 </dialog>
 
 <!-- ===== Datos distintos en el móvil y en la cuenta ===== -->
 <dialog id="dlgSyncConflict">
   <div class="sheet">
-    <h2>Hay datos distintos en este móvil y en tu cuenta</h2>
-    <p class="sub">Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.</p>
-    <div class="card" style="margin-top:0"><h3>En este móvil</h3><p id="scLocal"></p></div>
-    <div class="card"><h3>En tu cuenta</h3><p id="scRemote"></p></div>
+    <h2 data-i18n="Hay datos distintos en este móvil y en tu cuenta">Hay datos distintos en este móvil y en tu cuenta</h2>
+    <p class="sub" data-i18n="Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.">Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.</p>
+    <div class="card" style="margin-top:0"><h3 data-i18n="En este móvil">En este móvil</h3><p id="scLocal"></p></div>
+    <div class="card"><h3 data-i18n="En tu cuenta">En tu cuenta</h3><p id="scRemote"></p></div>
     <div class="bigrow" style="flex-direction:column;margin-top:18px">
-      <button class="primary" id="scKeepLocal">Guardar los de este móvil</button>
-      <button id="scKeepRemote">Guardar los de la cuenta</button>
-      <button id="scLater">Decidir más tarde</button>
+      <button class="primary" id="scKeepLocal" data-i18n="Guardar los de este móvil">Guardar los de este móvil</button>
+      <button id="scKeepRemote" data-i18n="Guardar los de la cuenta">Guardar los de la cuenta</button>
+      <button id="scLater" data-i18n="Decidir más tarde">Decidir más tarde</button>
     </div>
   </div>
 </dialog>
@@ -1273,35 +1283,35 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <h2 id="dTitle"></h2>
     <p class="sub" id="dSub"></p>
     <div id="dTasks"></div>
-    <button class="add" id="dAdd">Añadir tarea a este día</button>
-    <button class="add" id="dTpl" style="margin-top:9px">Usar un día tipo</button>
-    <button class="add" id="dAddCycle" style="margin-top:9px" hidden>Añadir registro de ciclo a este día</button>
+    <button class="add" id="dAdd" data-i18n="Añadir tarea a este día">Añadir tarea a este día</button>
+    <button class="add" id="dTpl" style="margin-top:9px" data-i18n="Usar un día tipo">Usar un día tipo</button>
+    <button class="add" id="dAddCycle" style="margin-top:9px" hidden data-i18n="Añadir registro de ciclo a este día">Añadir registro de ciclo a este día</button>
     <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
-      <h2>Ciclo</h2>
-      <p>Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
+      <h2 data-i18n="Ciclo">Ciclo</h2>
+      <p data-i18n="Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.">Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
       <div class="field">
-        <label>Sangrado</label>
-        <div class="chips" id="dCycBleed" role="group" aria-label="Sangrado">
-          <button class="chip" data-bleed="si" aria-pressed="false">Sí</button>
-          <button class="chip" data-bleed="no" aria-pressed="false">No</button>
+        <label data-i18n="Sangrado">Sangrado</label>
+        <div class="chips" id="dCycBleed" role="group" data-i18n-aria="Sangrado" aria-label="Sangrado">
+          <button class="chip" data-bleed="si" aria-pressed="false" data-i18n="Sí">Sí</button>
+          <button class="chip" data-bleed="no" aria-pressed="false" data-i18n="No">No</button>
         </div>
       </div>
       <div class="field">
-        <label>Dolor físico</label>
+        <label data-i18n="Dolor físico">Dolor físico</label>
         <div class="scale" id="dCycPain"></div>
-        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
+        <div class="scale-lab"><span data-i18n="Ninguno">Ninguno</span><span data-i18n="Mucho">Mucho</span></div>
       </div>
       <div class="field" id="dCycIntField" hidden>
-        <label>Intensidad del sangrado</label>
+        <label data-i18n="Intensidad del sangrado">Intensidad del sangrado</label>
         <div class="scale" id="dCycIntensity"></div>
-        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
+        <div class="scale-lab"><span data-i18n="Muy leve">Muy leve</span><span data-i18n="Muy fuerte">Muy fuerte</span></div>
       </div>
     </div>
     <div class="field" style="margin-top:18px">
-      <label for="dNote">Nota</label>
-      <textarea id="dNote" placeholder="Qué pesó, qué ayudó, qué repetirías."></textarea>
+      <label for="dNote" data-i18n="Nota">Nota</label>
+      <textarea id="dNote" placeholder="Qué pesó, qué ayudó, qué repetirías." data-i18n-ph="Qué pesó, qué ayudó, qué repetirías."></textarea>
     </div>
-    <div class="bigrow"><button class="primary" id="dClose">Cerrar</button></div>
+    <div class="bigrow"><button class="primary" id="dClose" data-i18n="Cerrar">Cerrar</button></div>
   </div>
 </dialog>
 
@@ -1437,7 +1447,483 @@ const SEED = [
 const OVERCOST_DEFAULT = {1:-3, 2:-2, 3:-1, 4:0, 5:0};
 const PEAK_COST_PERCENT_DEFAULT = 15;
 const DAY_START_HOUR_DEFAULT = 4;
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT },
+/* Inglés como idioma por defecto de la app (español disponible desde
+   Ajustes). EN es un diccionario español→inglés: el texto en español que ya
+   vive en el HTML y en las plantillas JS sigue siendo la fuente de verdad
+   ("es" no necesita su propia entrada), tr() solo busca una traducción
+   cuando el idioma activo es inglés. Así una cadena sin traducir nunca
+   rompe nada, solo se queda en español hasta que se añada su entrada.
+   Se llama tr() y no t(): "t" ya se usa por toda la app como nombre de
+   variable para una tarea suelta (t.name, t.done, fmtTaskTime(t)...), y
+   una función global t() quedaría tapada silenciosamente dentro de
+   cualquier .map(t => ...) de tareas. */
+const EN = {
+ " · recuperación {lab}": " · recovery {lab}",
+ " · recuperación {lab}, va a más": " · recovery {lab}, getting longer",
+ ", {n} cucharas": ", {n} spoons",
+ ", con sangrado": ", bleeding",
+ ", por encima de tu media": ", above your average",
+ ", sangrado estimado": ", estimated bleeding",
+ "¿Actualizar tu margen a {n}%?": "Update your margin to {n}%?",
+ "¿Borrar \"{name}\"?": "Delete \"{name}\"?",
+ "¿Cómo aplicamos el cambio?": "How should we apply the change?",
+ "¿Cómo estaba el entorno?": "What was the environment like?",
+ "¿Cómo llamamos a este día tipo?": "What do we call this routine day?",
+ "¿Con cuántas cucharas te levantas?": "How many spoons do you wake up with?",
+ "¿Cuánta capacidad te queda ahora?": "How much capacity do you have left right now?",
+ "¿Cuánto costó de verdad?": "How much did it really cost?",
+ "¿Cuánto has aguantado hoy de ruido, luz, gente?": "How much noise, light or people could you take today?",
+ "¿Cuánto tardaste en recuperarte?": "How long did it take you to recover?",
+ "¿Cuánto te devolvió?": "How much did it give back?",
+ "¿Lo activamos ahora?": "Turn it on now?",
+ "¿Por qué se restan cucharas?": "Why are spoons subtracted?",
+ "¿Por qué?": "Why?",
+ "¿Qué quieres borrar?": "What do you want to delete?",
+ "¿Quieres tomar un descanso?": "Do you want to take a break?",
+ "¿Quitar \"{name}\" de la calculadora? Las tareas ya apuntadas se quedan como están.": "Remove \"{name}\" from the calculator? Tasks already logged stay as they are.",
+ "· antes {n}": "· before {n}",
+ "· media de los últimos 7": "· average of the last 7",
+ "{action} {name}": "{action} {name}",
+ "{action} de {name}": "{action} for {name}",
+ "{d} día{ds} con datos y {t} tarea{ts}. El último, el {fecha}.": "{d} day{ds} with data and {t} task{ts}. The latest one, {fecha}.",
+ "{left} de {budget} cucharas restantes": "{left} of {budget} spoons left",
+ "{n} ciclo medido": "{n} cycle measured",
+ "{n} ciclos medidos": "{n} cycles measured",
+ "{n} cucharas de sobrestimulación": "{n} spoons of overstimulation",
+ "{n} cucharas por debajo de lo asignado hoy": "{n} spoons below what was assigned today",
+ "{n} cucharas previstas de las {avg} que sueles tener.": "{n} spoons planned out of the {avg} you usually have.",
+ "{n} cucharas previstas. Tu media es {avg}.": "{n} spoons planned. Your average is {avg}.",
+ "{n} disponibles": "{n} available",
+ "{n} gastadas": "{n} spent",
+ "{n} pico sensorial apuntado hoy": "{n} sensory peak logged today",
+ "{n} picos sensoriales apuntados hoy": "{n} sensory peaks logged today",
+ "{n} recuperadas": "{n} recovered",
+ "{n} tarea": "{n} task",
+ "{n} tareas": "{n} tasks",
+ "{spent} cucharas gastadas": "{spent} spoons spent",
+ "{spent} cucharas gastadas de {budget}": "{spent} spoons spent out of {budget}",
+ "<strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong>": "<strong>You don't have to perform the same every day to be doing fine.</strong>",
+ "−{n} cucharas": "−{n} spoons",
+ "1 h": "1 h",
+ "15 min": "15 min",
+ "2 h": "2 h",
+ "30 min": "30 min",
+ "A medias": "Halfway",
+ "A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.": "What time your spoons reset. If you go to bed late or work nights, raise it so the early hours still count as yesterday.",
+ "Acerca de": "About",
+ "Activado": "On",
+ "Activar": "Turn on",
+ "Activar este módulo": "Turn on this module",
+ "Actualizar margen a {n}%": "Update margin to {n}%",
+ "Ahora no": "Not now",
+ "Ajustar las cucharas de hoy": "Adjust today's spoons",
+ "Ajustes": "Settings",
+ "Al día siguiente": "The next day",
+ "Alquiler, luz, gimnasio…": "Rent, electricity, gym…",
+ "Alto": "High",
+ "Añade una pestaña para tus gastos fijos y variables del mes.": "Adds a tab for your fixed and variable expenses this month.",
+ "Añade una pestaña para tus gastos fijos y variables del mes. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.": "Adds a tab for your fixed and variable expenses this month. Off by default; turn it on here or later, whenever you want.",
+ "Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.": "Adds a section to log bleeding and pain, and lowers the day's spoon margin accordingly. Off by default; turn it on here or later, whenever you want.",
+ "Añade una sección para apuntar sangrado y dolor.": "Adds a section to log bleeding and pain.",
+ "Añadir": "Add",
+ "Añadir actividad": "Add activity",
+ "Añadir gasto {tipo}": "Add {tipo} expense",
+ "Añadir gasto fijo": "Add fixed expense",
+ "Añadir gasto variable": "Add variable expense",
+ "Añadir registro de ciclo a este día": "Add a cycle log to this day",
+ "Añadir tarea": "Add task",
+ "Añadir tarea a este día": "Add a task to this day",
+ "Añadir un gasto": "Adding an expense",
+ "Aplicar desde ahora en adelante": "Apply from now on",
+ "Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcar la tarea como finalizada puedes corregir lo que costó de verdad: la app aprende de eso.": "Log what's really going to happen today and how much you think it will cost. When you mark a task done you can correct what it really cost: the app learns from that.",
+ "Apunta un gasto variable de este mes. Los fijos se añaden igual, desde su propia pestaña.": "Log a variable expense for this month. Fixed ones are added the same way, from their own tab.",
+ "Aquí ves cuántas te quedan. Al abrir la app se te pregunta con cuántas te levantas; puedes tocar este recuadro para cambiarlo en cualquier momento del día.": "Here you see how many you have left. Opening the app asks how many you wake up with; you can tap this box to change it any time of day.",
+ "Ayer registraste {n} pico sensorial.": "Yesterday you logged {n} sensory peak.",
+ "Ayer registraste {n} picos sensoriales.": "Yesterday you logged {n} sensory peaks.",
+ "Ayuda": "Help",
+ "Bien": "Good",
+ "Borra la cuenta y la copia en la nube. Lo que hay en este móvil se queda.": "Deletes the account and the cloud copy. What's on this phone stays.",
+ "Borrar": "Delete",
+ "Borrar {name}": "Delete {name}",
+ "Borrar mi cuenta": "Delete my account",
+ "Borrar tarea": "Delete task",
+ "Borrar todo": "Delete everything",
+ "Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.": "Each mark is two spoons. Days above your average get a tall dash instead of a dot, in another colour.",
+ "Calendario": "Calendar",
+ "Cambia el rosa de fábrica por el tono que prefieras.": "Swap the default pink for whichever shade you prefer.",
+ "Cambia entre tus gastos fijos, los variables de este mes y el historial de meses anteriores.": "Switch between your fixed expenses, this month's variable ones, and the history of past months.",
+ "Cambia lo que haga falta.": "Change whatever needs it.",
+ "Cancelar": "Cancel",
+ "Carga un archivo exportado antes.": "Load a file you exported before.",
+ "Cerrar": "Close",
+ "Cerrar el día": "Close the day",
+ "Cerrar sesión": "Log out",
+ "Check-out de hoy": "Today's check-out",
+ "Check-out hecho · capacidad {n} de 5": "Check-out done · capacity {n} of 5",
+ "Ciclo": "Cycle",
+ "Ciclo (opcional)": "Cycle (optional)",
+ "Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.": "Close the day with two 1-to-5 scales. It's what feeds the Patterns section.",
+ "Color de la interfaz": "Interface colour",
+ "Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.": "Colour, contrast and your data: export them or replay this guide from here.",
+ "Cómo funciona Ciclo": "How Cycle works",
+ "Cómo funciona Finanzas": "How Finances works",
+ "Cómo funciona la app": "How the app works",
+ "Cómo se ve": "How it looks",
+ "Con margen": "Room to spare",
+ "Con tu variación de siempre, caería entre el {desde} y el {hasta}.": "With your usual variation, it would fall between {desde} and {hasta}.",
+ "Con uno al día, a partir del {fecha}.": "At one a day, from {fecha}.",
+ "Continuar con Apple": "Continue with Apple",
+ "Continuar con Google": "Continue with Google",
+ "Contraseña": "Password",
+ "Contraste": "Contrast",
+ "Copia de seguridad": "Backup",
+ "Copia de Spoony": "Spoony backup",
+ "Copia en la nube": "Cloud copy",
+ "Correo": "Email",
+ "Coste de la sobrestimulación": "Overstimulation cost",
+ "Coste de un pico sensorial": "Sensory peak cost",
+ "Crear cuenta": "Create account",
+ "Cuándo empieza tu día": "When your day starts",
+ "Cuando tengas dos ciclos completos apuntados, aquí verás cómo suele cambiar tu gasto de cucharas en cada fase.": "Once you have two full cycles logged, you'll see here how your spoon spending tends to change in each phase.",
+ "Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.": "How many spoons each sensory tolerance score from check-out subtracts.",
+ "Cuántas cucharas te devuelve": "How many spoons it gives back",
+ "Cuánto crees que te va a costar": "How much you think it will cost",
+ "Cuánto cuesta": "How much it costs",
+ "cuchara": "spoon",
+ "cucharas": "spoons",
+ "Cucharas gastadas {n}": "Spoons spent {n}",
+ "Cucharas gastadas y tolerancia sensorial en los últimos {n} check-out, del {desde} al {hasta}": "Spoons spent and sensory tolerance over the last {n} check-outs, from {desde} to {hasta}",
+ "Cucharas máximas": "Maximum spoons",
+ "Cucharas restantes": "Spoons left",
+ "D": "S",
+ "de {budget} · quedan": "of {budget} · left",
+ "De lunes a viernes": "Monday to Friday",
+ "De media son {n} en {reg} registros. Si pones un valor a mano, se usará ese.": "On average it's {n} over {reg} records. If you set a value by hand, that's the one used.",
+ "De momento no hay ninguna bajada que se repita de un ciclo a otro.": "So far there's no dip that repeats from one cycle to another.",
+ "De sobra": "Plenty",
+ "Decidir más tarde": "Decide later",
+ "Dejar apagado": "Leave it off",
+ "Del 1 al 5, sin necesidad de ponerle nombre a lo que sientes.": "1 to 5, no need to put a name to what you feel.",
+ "Demasiados intentos seguidos. Espera un poco y vuelve a probar.": "Too many attempts in a row. Wait a bit and try again.",
+ "Desactivado": "Off",
+ "Desactivar el margen de precaución solo hoy": "Turn off the precaution margin just for today",
+ "Descanso sensorial": "Sensory rest",
+ "Deshacer": "Undo",
+ "Desmarcar": "Unmark",
+ "Día {n} del ciclo — Fase estimada: {fase}": "Cycle day {n} — Estimated phase: {fase}",
+ "Día de trabajo": "Work day",
+ "Días tipo": "Routine days",
+ "Dolor físico": "Physical pain",
+ "Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.": "Two 1-to-5 scales: capacity you have left and how much noise, light and people you could take. No need to put a name to what you feel.",
+ "Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.": "Two minutes. No need to put a name to what you feel: just score it.",
+ "Ducha": "Shower",
+ "Ducha, compra, llamada…": "Shower, groceries, phone call…",
+ "Ducha, trabajo, ver a gente…": "Shower, work, seeing people…",
+ "Duración media del ciclo": "Average cycle length",
+ "Duración media del ciclo en días": "Average cycle length in days",
+ "Durante la menstruación y los días previos, tu cuerpo y tu mente pueden necesitar más descanso. El dolor, la sensibilidad, la ansiedad o la sobrecarga pueden hacer que tengas menos energía disponible para afrontar el día.": "During your period and the days before it, your body and mind can need more rest. Pain, sensitivity, anxiety or overload can leave you with less energy available for the day.",
+ "Editar {name}": "Edit {name}",
+ "Editar actividad": "Edit activity",
+ "Editar cuánto cuesta cada actividad": "Edit how much each activity costs",
+ "Editar gasto {tipo}": "Edit {tipo} expense",
+ "Editar tarea": "Edit task",
+ "El correo o la contraseña no son correctos.": "The email or password is wrong.",
+ "el día {n}": "day {n}",
+ "El porcentaje base es del 20 % y puedes cambiarlo (o dejarlo en 0) desde Ajustes. Si ya has apuntado el dolor de hoy, el margen se ajusta a partir de ese porcentaje: baja con dolor 1-2, se mantiene con dolor 3 y sube con dolor 4-5. Sin dolor apuntado se usa el porcentaje base, como en el día previo estimado.": "The base percentage is 20% and you can change it (or set it to 0) from Settings. If you've already logged today's pain, the margin adjusts from that percentage: lower with pain 1-2, unchanged with pain 3, higher with pain 4-5. Without a logged pain it uses the base percentage, same as the estimated day before.",
+ "El secador, no. La oficina, sí.": "The hair dryer, no. The office, yes.",
+ "El tope del día que mejor te representa.": "The day's cap that best represents you.",
+ "Elegir": "Choose",
+ "Elegir color de la interfaz": "Choose interface colour",
+ "Elegir días": "Choose days",
+ "Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.": "Choose which ones you want to keep. The others are replaced and can't be recovered.",
+ "Elige de tu lista o escribe una nueva.": "Choose from your list or write a new one.",
+ "Empezar": "Start",
+ "Empezar el día": "Start the day",
+ "Empieza el {fecha}.": "Starts {fecha}.",
+ "En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.": "As soon as you log a day of bleeding, the estimate for the next one appears here.",
+ "En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.": "In days. Used until cycles have been measured; after that your real average takes over.",
+ "En este móvil": "On this phone",
+ "En reserva": "In reserve",
+ "En tu cuenta": "In your account",
+ "En tus últimos ciclos, tus cucharas bajaron {span}.": "In your last cycles, your spoons dropped {span}.",
+ "Entrar": "Log in",
+ "entre el día {a} y el día {b}": "between day {a} and day {b}",
+ "es hoy": "is today",
+ "Es lo que ya pasó, no una previsión de lo que va a pasar.": "It's what already happened, not a forecast of what's going to happen.",
+ "es mañana": "is tomorrow",
+ "Es una estimación a partir de lo que has apuntado, no una certeza.": "It's an estimate based on what you've logged, not a certainty.",
+ "Escribe tu correo y una contraseña.": "Write your email and a password.",
+ "Ese archivo no es una copia de Spoony. No se ha cambiado nada.": "That file isn't a Spoony backup. Nothing has changed.",
+ "Ese correo no parece válido.": "That email doesn't look valid.",
+ "Ese día no tiene tareas que guardar.": "That day has no tasks to save.",
+ "Ese enlace ha caducado. Inténtalo otra vez.": "That link has expired. Try again.",
+ "Esta tarea se repite en más días": "This task repeats on more days",
+ "Este botón resta cucharas de golpe cuando el ruido, la luz o la gente te pasan por encima, y te ofrece un espacio de calma. Sin preguntas ni cronómetro.": "This button subtracts spoons straight away when noise, light or people become too much, and offers you a calm space. No questions, no timer.",
+ "Este color puede costar de leer. Prueba otro más oscuro o más saturado.": "This colour can be hard to read. Try a darker or more saturated one.",
+ "Estimabas {est}, {verb} {avg}": "You estimated {est}, you {verb} {avg}",
+ "Estimado con {medidos}: {min} días.": "Estimated with {medidos}: {min} days.",
+ "Estimado con {medidos}: entre {min} y {max} días, media {avg}.": "Estimated with {medidos}: between {min} and {max} days, average {avg}.",
+ "Estimado con la duración media que tienes puesta en Ajustes ({n} días). Cuando apuntes el siguiente sangrado, la estimación pasará a usar tus ciclos reales.": "Estimated with the average length set in Settings ({n} days). Once you log the next bleeding, the estimate will start using your real cycles.",
+ "Estimado: {fecha}": "Estimated: {fecha}",
+ "Exhala": "Exhale",
+ "Exportar": "Export",
+ "Falta confirmar la cuenta desde el correo que te enviamos.": "The account still needs confirming from the email we sent you.",
+ "Falta elegir qué datos guardar": "You still need to choose which data to keep",
+ "faltan {n} días": "{n} days left",
+ "fijo": "fixed",
+ "Fijos {a} · Variables {b}": "Fixed {a} · Variable {b}",
+ "Fijos, variables e historial": "Fixed, variable and history",
+ "Finanzas": "Finances",
+ "Finanzas (opcional)": "Finances (optional)",
+ "Folicular": "Follicular",
+ "Gasta cucharas": "Spends spoons",
+ "Gastan cucharas": "Spend spoons",
+ "gastar": "spend",
+ "gastas": "spend",
+ "Gastos fijos": "Fixed expenses",
+ "Gastos variables": "Variable expenses",
+ "Grande": "Large",
+ "Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.": "Saves a file with your whole history. Without an account, it's the only copy outside this phone.",
+ "Guardar": "Save",
+ "Guardar el día de hoy como día tipo": "Save today as a routine day",
+ "Guardar ese día como día tipo": "Save that day as a routine day",
+ "Guardar los de este móvil": "Keep the ones on this phone",
+ "Guardar los de la cuenta": "Keep the ones in the account",
+ "Hacen falta dos ciclos completos para poder describir un patrón. Llevas {n}.": "Two full cycles are needed to describe a pattern. You have {n}.",
+ "Hay cambios pendientes de subir.": "There are changes still to upload.",
+ "Hay datos distintos en este móvil y en tu cuenta": "There's different data on this phone and in your account",
+ "Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.": "There's different data on this phone and in your account. Nothing syncs until you choose.",
+ "He tenido un pico sensorial ahora": "I've just had a sensory peak",
+ "hecha": "done",
+ "Historial": "History",
+ "Hora en la que empieza el día": "Hour the day starts",
+ "Hora fin": "End time",
+ "Hora inicio": "Start time",
+ "Hoy": "Today",
+ "Hoy no necesito el margen": "I don't need the margin today",
+ "Importar": "Import",
+ "Importe (€)": "Amount (€)",
+ "Inhala": "Inhale",
+ "Intensidad del sangrado": "Bleeding intensity",
+ "Intenso": "Intense",
+ "J": "T",
+ "Justo": "Just enough",
+ "L": "M",
+ "La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.": "The load of every day in the month and the patterns that repeat, for example if a heavy day tends to be followed by a light one.",
+ "La contraseña tiene que tener al menos 6 caracteres.": "The password needs to be at least 6 characters.",
+ "La hora de fin no puede ser anterior a la de inicio.": "The end time can't be earlier than the start time.",
+ "La próxima vez que apuntes un pico, no se te volverá a preguntar. Puedes reactivarlo luego en Ajustes.": "Next time you log a peak, you won't be asked again. You can turn it back on later in Settings.",
+ "Las cucharas de hoy": "Today's spoons",
+ "Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.": "The spoons don't disappear: you can use them if you need to. The \"below what was assigned\" notice will show up sooner, to remind you that day you had less energy to count on.",
+ "Las tareas del día": "The day's tasks",
+ "Lo apuntado para hoy suma {planned} y tienes {effective}.": "What's logged for today adds up to {planned} and you have {effective}.",
+ "Lo has fijado tú · sueles {verb} {n}": "You've set it yourself · you usually {verb} {n}",
+ "Lo que te cuesta": "What it costs you",
+ "Los días después de un pico sensorial ({n} caso{s}), {frase}.": "On the days after a sensory peak ({n} case{s}), {frase}.",
+ "Los días teñidos en Ciruela son sangrado apuntado.": "Days tinted in Plum are logged bleeding.",
+ "Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.": "Days tinted in Plum are logged bleeding. The dashed border is estimated bleeding, not logged: it's an estimate from your cycles, not a certainty.",
+ "Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.": "The last few days barely differ from each other. When the range narrows, that's usually useful information.",
+ "Lútea": "Luteal",
+ "M": "T",
+ "Marca si hoy tienes sangrado. Si dices que sí, se abre una escala para la intensidad.": "Mark whether you're bleeding today. If you say yes, a scale opens for the intensity.",
+ "Marcar": "Mark",
+ "Margen de precaución": "Precaution margin",
+ "Más": "More",
+ "Más semanas": "More weeks",
+ "Media tarde": "Half an afternoon",
+ "Menos": "Less",
+ "Menos semanas": "Fewer weeks",
+ "Menstrual": "Menstrual",
+ "Mes anterior": "Previous month",
+ "Mes siguiente": "Next month",
+ "Mucho": "A lot",
+ "Muy fuerte": "Very strong",
+ "Muy grande": "Extra large",
+ "Muy justo": "Very tight",
+ "Muy leve": "Very mild",
+ "Nada": "None",
+ "Nada apuntado todavía.": "Nothing logged yet.",
+ "Nada apuntado. Añade solo lo que de verdad va a pasar hoy.": "Nothing logged. Add only what's really going to happen today.",
+ "Nada planificado para este día.": "Nothing planned for this day.",
+ "Nada que seguir ni que contar. Cierra cuando estés listo.": "Nothing to follow or count. Close it whenever you're ready.",
+ "Ninguna": "None",
+ "Ninguno": "None",
+ "No": "No",
+ "No preguntar": "Don't ask",
+ "No preguntar más": "Don't ask again",
+ "no se nota una diferencia clara con tu media": "there's no clear difference from your average",
+ "No se pudo abrir la pantalla de inicio de sesión.": "Couldn't open the login screen.",
+ "No se pudo borrar la cuenta. Inténtalo más tarde.": "Couldn't delete the account. Try again later.",
+ "No se pudo completar el inicio de sesión. Inténtalo otra vez.": "Couldn't complete the login. Try again.",
+ "No se pudo entrar. Inténtalo otra vez en un rato.": "Couldn't log in. Try again in a bit.",
+ "No se pudo iniciar sesión. Inténtalo otra vez.": "Couldn't log in. Try again.",
+ "No se pudo sincronizar. Se volverá a intentar.": "Couldn't sync. It will try again.",
+ "No se puede deshacer.": "This can't be undone.",
+ "No sirve para evitar ni para buscar un embarazo.": "Not meant for avoiding or trying for pregnancy.",
+ "No volver a preguntar tras un pico sensorial": "Don't ask again after a sensory peak",
+ "Nombre": "Name",
+ "Normal": "Normal",
+ "Nota": "Note",
+ "Nueva actividad": "New activity",
+ "o con tu correo": "or with your email",
+ "Ocultar detalle": "Hide detail",
+ "Olvidar lo que ha aprendido": "Forget what it has learnt",
+ "Opcional. Con una cuenta, tus datos se guardan también en la nube (servidores en la Unión Europea) y puedes recuperarlos en otro móvil. Nadie más puede verlos.": "Optional. With an account, your data is also stored in the cloud (servers in the European Union) and you can recover it on another phone. No one else can see it.",
+ "Ovulación": "Ovulation",
+ "Para los días que se repiten. Guardas las tareas de un día con un nombre —\"lunes de trabajo\", \"día de médico\"— y luego las vuelcas de una vez en otro día, en lugar de apuntarlas una a una.": "For days that repeat. You save a day's tasks under a name — \"work Monday\", \"doctor's day\" — and then drop them all into another day at once, instead of adding them one by one.",
+ "Parar un momento, a tu manera, puede ayudar a bajar la activación del cuerpo.": "Stopping for a moment, your own way, can help bring your body's activation down.",
+ "Paso {n} de {total}": "Step {n} of {total}",
+ "Patrón": "Pattern",
+ "Patrones": "Patterns",
+ "Poco": "Low",
+ "Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.": "Set what each thing costs you. When you mark a task and correct what it really cost, the app learns and warns you if your estimate falls short.",
+ "por debajo de lo asignado hoy": "below what was assigned today",
+ "Por eso, la app reserva un pequeño margen de tus cucharas. <strong>No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</strong>": "That's why the app sets aside a small margin of your spoons. <strong>It's not a prediction or an obligation, but a way to take care of yourself and adjust your expectations to how you feel.</strong>",
+ "Por si ha sido sin querer.": "In case it was by accident.",
+ "Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.": "Base percentage that lowers the day's spoons when bleeding is due, logged or estimated. If you log the pain, that day's margin goes up or down from this percentage.",
+ "Preguntar": "Ask",
+ "Preguntar si necesitas un descanso": "Ask if you need a break",
+ "Preguntar si necesitas un descanso tras un pico sensorial": "Ask if you need a break after a sensory peak",
+ "Próximo ciclo": "Next cycle",
+ "Puedes cerrar cuando quieras.": "You can close it whenever you want.",
+ "Puntúa las dos escalas para guardar.": "Score both scales to save.",
+ "Qué es Spoony": "What Spoony is",
+ "Qué es una cuchara": "What a spoon is",
+ "Qué pesó, qué ayudó, qué repetirías.": "What weighed on you, what helped, what you'd repeat.",
+ "Qué se pudo tolerar y qué no (opcional)": "What was tolerable and what wasn't (optional)",
+ "Qué vas a hacer": "What you're going to do",
+ "Quitar {name}": "Remove {name}",
+ "Recarga": "Recharge",
+ "Recarga cucharas": "Recharges spoons",
+ "Recargan cucharas": "Recharge spoons",
+ "Recuperación: {lab}": "Recovery: {lab}",
+ "recuperar": "recover",
+ "recuperas": "recover",
+ "registro": "record",
+ "Registro de hoy": "Today's log",
+ "registros": "records",
+ "Repetir": "Repeat",
+ "Restablecer": "Reset",
+ "Restaurar": "Restore",
+ "s": "s",
+ "S": "S",
+ "Saltar": "Skip",
+ "Sangrado": "Bleeding",
+ "Se añadirán a hoy.": "They'll be added to today.",
+ "Se añadirán al {fecha}.": "They'll be added to {fecha}.",
+ "Se borra todo el historial, en este móvil y en tu cuenta. No se puede deshacer.": "This deletes your whole history, on this phone and in your account. This can't be undone.",
+ "Se borra todo el historial. No se puede deshacer.": "This deletes your whole history. This can't be undone.",
+ "Se borra tu cuenta y la copia en la nube. Lo que hay en este móvil se queda. No se puede deshacer.": "This deletes your account and the cloud copy. What's on this phone stays. This can't be undone.",
+ "Se repite": "Repeats",
+ "Seguimiento de finanzas": "Finance tracking",
+ "Seguimiento del ciclo": "Cycle tracking",
+ "Seguir un conteo de respiración (opcional)": "Follow a breathing count (optional)",
+ "Según tus datos, tus cucharas bajan una media del {n}% estos días.": "Based on your data, your spoons drop by an average of {n}% these days.",
+ "semana": "week",
+ "semanas": "weeks",
+ "Sí": "Yes",
+ "Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.": "If you create an account, your data is also stored in the cloud and you can recover it on another phone. Without an account, it never leaves this phone.",
+ "Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.": "If you remember how this day went, you can log it even though it's already past.",
+ "Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».": "If you're feeling fine, you can turn off the margin that day from \"How many spoons do you wake up with?\".",
+ "Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.": "If you're feeling up to it, use today the spoons that are normally set aside for the cycle.",
+ "Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.": "Follow the number at your own pace if it helps. You can stop whenever you want.",
+ "Siguiente": "Next",
+ "Sin conexión.": "No connection.",
+ "Sin conexión. Inténtalo cuando tengas internet.": "No connection. Try again once you have internet.",
+ "Sin conexión. Los cambios se subirán cuando vuelva.": "No connection. Changes will upload once it's back.",
+ "Sin conexión. Para borrar la cuenta hace falta internet.": "No connection. Deleting the account needs internet.",
+ "Sin conexión. Para elegir hace falta internet.": "No connection. Choosing needs internet.",
+ "Sin cucharas asignadas todavía.": "No spoons assigned yet.",
+ "Sin energía": "No energy",
+ "Sin gastos fijos ese mes.": "No fixed expenses that month.",
+ "Sin gastos variables ese mes.": "No variable expenses that month.",
+ "Sin pensarlo mucho. Puedes cambiarlo durante el día.": "Without overthinking it. You can change it during the day.",
+ "Sin registros todavía": "No records yet",
+ "Sin sincronizar hasta que elijas qué datos guardar.": "Not syncing until you choose which data to keep.",
+ "Sincronizando…": "Syncing…",
+ "Sobrestimulación": "Overstimulation",
+ "Solo ese día": "Just that day",
+ "Solo este día": "Just this day",
+ "Solo este mes": "Just this month",
+ "Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.": "Spoony is based on the spoon theory by Christine Miserandino and on <em>Energy Accounting</em> by Maja Toudal and Tony Attwood.",
+ "Sube el contraste si te cuesta leer el texto claro.": "Raise the contrast if light text is hard to read.",
+ "Sube el tamaño si te cuesta leer el texto normal.": "Raise the size if normal text is hard to read.",
+ "Sube o baja de una cuchara en una.": "Goes up or down one spoon at a time.",
+ "Sueles {verbo} {n}": "You usually {verbo} {n}",
+ "sueles empezar con {n} {unidad} más que tu media": "you usually start with {n} {unidad} more than your average",
+ "sueles empezar con {n} {unidad} menos que tu media": "you usually start with {n} {unidad} fewer than your average",
+ "sueles gastar {n}": "you usually spend {n}",
+ "Suma gastos fijos y variables para saber cuánto llevas gastado. Al cambiar de mes, este se archiva solo en el historial.": "Adds fixed and variable expenses to show how much you've spent. When the month changes, this one archives itself into the history.",
+ "Tamaño del texto": "Text size",
+ "Tardas más que antes en recuperarte de: {lista}.": "You're taking longer than before to recover from: {lista}.",
+ "Tareas": "Tasks",
+ "Te hemos enviado un correo para confirmar la cuenta. Cuando lo confirmes, vuelve aquí y pulsa Entrar.": "We've sent you an email to confirm the account. Once you confirm it, come back here and tap Log in.",
+ "Tienes {n} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.": "You have {n} full cycles, but there still aren't enough days with tasks logged to describe anything.",
+ "Tipo": "Type",
+ "Toca un día para ver o planificar": "Tap a day to see or plan it",
+ "Todavía no has hecho ninguna copia.": "You haven't made a backup yet.",
+ "Todavía no hay actividades. Añade las que más se repiten en tu día.": "No activities yet. Add the ones that come up most in your day.",
+ "Todavía no hay gastos fijos.": "No fixed expenses yet.",
+ "Todavía no hay gastos variables este mes.": "No variable expenses this month yet.",
+ "Todavía no hay meses cerrados.": "No months closed yet.",
+ "Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.": "No day of bleeding logged yet, so there's no cycle day to count.",
+ "Todavía no hay suficientes datos para ver una tendencia. Hacen falta {n} check-out.": "Not enough data yet to see a trend. {n} check-outs are needed.",
+ "Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.": "You don't have any routine days yet. Save a day that worked for you and you'll be able to repeat it.",
+ "Todo llevadero": "All manageable",
+ "Todos los días": "Every day",
+ "Todos los días de la serie": "Every day in the series",
+ "Tolerancia sensorial {n} de 5": "Sensory tolerance {n} of 5",
+ "Tómate el tiempo que necesites": "Take the time you need",
+ "Total {tot} · fijos {f} · variables {v}": "Total {tot} · fixed {f} · variable {v}",
+ "Total del mes": "Month's total",
+ "Total del mes (fijos + variables):": "Month's total (fixed + variable):",
+ "Total gastos fijos:": "Total fixed expenses:",
+ "Total gastos variables:": "Total variable expenses:",
+ "Trabajo": "Work",
+ "Tranquilo": "Calm",
+ "Tu cuenta": "Your account",
+ "Tu cuenta (opcional)": "Your account (optional)",
+ "Tu estimación acierta · {n} registros": "Your estimate is on point · {n} records",
+ "Tu lista de actividades con lo que te cuesta cada una, para no decidirlo de cero cada vez. Cuando corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.": "Your list of activities with what each one costs you, so you don't decide from scratch every time. When you correct what it really cost, the app learns and warns you if your estimate falls short.",
+ "Tu sesión ha caducado. Vuelve a entrar para seguir con la copia en la nube.": "Your session has expired. Log in again to keep using the cloud copy.",
+ "Tu último sangrado apuntado es del {fecha}, así que esta estimación salta {n} ciclos y es más floja. Apuntar el siguiente la endereza.": "Your last logged bleeding was on {fecha}, so this estimate skips {n} cycles and is weaker. Logging the next one will sharpen it.",
+ "Tus cucharas": "Your spoons",
+ "Tus datos": "Your data",
+ "Tus datos están también en la nube.": "Your data is also in the cloud.",
+ "Tus datos no salen del teléfono": "Your data never leaves your phone",
+ "Tus datos se guardan en este teléfono y en tu cuenta": "Your data is stored on this phone and in your account",
+ "Tus datos se quedan en este móvil.": "Your data stays on this phone.",
+ "Tus últimos {n} check-out.": "Your last {n} check-outs.",
+ "Última copia: hace {n} día.": "Last backup: {n} day ago.",
+ "Última copia: hace {n} días.": "Last backup: {n} days ago.",
+ "Última copia: hoy.": "Last backup: today.",
+ "Una app para organizar el día por la energía que tienes, no por las horas que quedan. Apuntas lo que vas a hacer y lo que te cuesta, y con el tiempo te enseña patrones de tu propio gasto. Sin cuenta, tus datos no salen del teléfono.": "An app to organize your day by the energy you have, not by the hours left. You log what you're going to do and what it costs, and over time it shows you patterns in your own spending. Without an account, your data never leaves your phone.",
+ "Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).": "A spoon is a unit of energy. Each day you have a different number; tasks spend spoons and resting recovers them. The idea comes from Christine Miserandino (spoon theory) and from Maja Toudal and Tony Attwood (Energy Accounting).",
+ "Una estimación de cuándo llegará el siguiente sangrado, a partir de tus propios ciclos anteriores. Es para tu seguimiento, no para buscar ni evitar un embarazo.": "An estimate of when the next bleeding will arrive, based on your own past cycles. It's for your own tracking, not for trying for or avoiding pregnancy.",
+ "Usar": "Use",
+ "Usar un día tipo": "Use a routine day",
+ "V": "F",
+ "variable": "variable",
+ "Ver": "View",
+ "Ver a gente": "Seeing people",
+ "Ver detalle": "Show detail",
+ "Vista de finanzas": "Finances view",
+ "Vuelve a ver la explicación de cada parte, cuando quieras.": "Replay the explanation of each part, whenever you want.",
+ "Vuelve a ver la guía de esta sección.": "Replay this section's guide.",
+ "X": "W",
+ "Ya está": "Done",
+ "Ya está, gracias": "That's enough, thanks",
+ "Ya hay una cuenta con ese correo. Pulsa Entrar.": "There's already an account with that email. Tap Log in."
+};
+
+const LANG_DEFAULT = 'en';
+const tr = s => (state.settings?.lang === 'en' && EN[s]) ? EN[s] : s;
+/* Para cadenas con partes variables (nombres, números): la clave del
+   diccionario lleva marcadores {como_este}, se traduce la plantilla y
+   luego se sustituyen los valores. */
+const trf = (s, vars) => tr(s).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+const LOCALE = () => state.settings?.lang === 'en' ? 'en-GB' : 'es-ES';
+let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT, lang:LANG_DEFAULT },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null }, finEnabled:false,
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
@@ -1473,7 +1959,7 @@ const logicalMinutes = hhmm => {
 };
 const fmtDate = k => {
   const d = new Date(k+'T12:00:00');
-  return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  return d.toLocaleDateString(LOCALE(),{weekday:'long',day:'numeric',month:'long'});
 };
 const uid = () => Math.random().toString(36).slice(2,9);
 const monthKey = (d=new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -1567,7 +2053,7 @@ async function accessToken(){
     try{
       storeSession(await api('/auth/v1/token?grant_type=refresh_token', { method:'POST', body:{ refresh_token: auth.refresh_token } }));
     }catch(e){
-      if(!(e instanceof NetError)) signOutLocal('Tu sesión ha caducado. Vuelve a entrar para seguir con la copia en la nube.');
+      if(!(e instanceof NetError)) signOutLocal(tr('Tu sesión ha caducado. Vuelve a entrar para seguir con la copia en la nube.'));
       throw e;
     }finally{ refreshing = null; }
   })();
@@ -1588,9 +2074,10 @@ function summarize(s){
     const d = s.days[k] || {};
     return (d.tasks || []).length || d.checkout || (d.budget != null && !d.budgetUnanswered);
   }).sort();
-  if(!keys.length) return 'Nada apuntado todavía.';
+  if(!keys.length) return tr('Nada apuntado todavía.');
   const tasks = keys.reduce((a, k) => a + ((s.days[k].tasks || []).length), 0);
-  return `${keys.length} día${keys.length === 1 ? '' : 's'} con datos y ${tasks} tarea${tasks === 1 ? '' : 's'}. El último, el ${fmtDate(keys[keys.length - 1])}.`;
+  return trf('{d} día{ds} con datos y {t} tarea{ts}. El último, el {fecha}.',
+    {d:keys.length, ds:keys.length===1?'':tr('s'), t:tasks, ts:tasks===1?'':tr('s'), fecha:fmtDate(keys[keys.length-1])});
 }
 // Comparación que no depende del orden de las claves (jsonb las reordena).
 const canon = v => Array.isArray(v) ? '[' + v.map(canon).join(',') + ']'
@@ -1698,19 +2185,19 @@ function signOutLocal(msg){
 function setSyncStatus(st){ syncStatus = st; renderAccount(); }
 function syncStatusText(){
   const s = state.sync || {};
-  if(s.paused) return 'Sin sincronizar hasta que elijas qué datos guardar.';
-  if(syncStatus === 'busy') return 'Sincronizando…';
-  if(syncStatus === 'offline') return s.dirty ? 'Sin conexión. Los cambios se subirán cuando vuelva.' : 'Sin conexión.';
-  if(syncStatus === 'error') return 'No se pudo sincronizar. Se volverá a intentar.';
-  if(s.dirty) return 'Hay cambios pendientes de subir.';
-  return 'Tus datos están también en la nube.';
+  if(s.paused) return tr('Sin sincronizar hasta que elijas qué datos guardar.');
+  if(syncStatus === 'busy') return tr('Sincronizando…');
+  if(syncStatus === 'offline') return tr(s.dirty ? 'Sin conexión. Los cambios se subirán cuando vuelva.' : 'Sin conexión.');
+  if(syncStatus === 'error') return tr('No se pudo sincronizar. Se volverá a intentar.');
+  if(s.dirty) return tr('Hay cambios pendientes de subir.');
+  return tr('Tus datos están también en la nube.');
 }
 function renderAccount(){
   const on = syncAllowed(), inside = on && !!auth;
   document.getElementById('accountGroup').hidden = !on;
-  document.getElementById('privacyLine').textContent = inside
+  document.getElementById('privacyLine').textContent = tr(inside
     ? 'Tus datos se guardan en este teléfono y en tu cuenta'
-    : 'Tus datos no salen del teléfono';
+    : 'Tus datos no salen del teléfono');
   if(!on) return;
   document.getElementById('accOutRow').hidden = inside;
   ['accInRow', 'accLogoutRow', 'accDeleteRow'].forEach(id => document.getElementById(id).hidden = !inside);
@@ -1722,7 +2209,7 @@ function renderAccount(){
 
 /* learned cost: manual estimate blended with the last real costs */
 const RECOV = [[0,'Nada'],[15,'15 min'],[30,'30 min'],[60,'1 h'],[120,'2 h'],[300,'Media tarde'],[1440,'Al día siguiente']];
-const recovLabel = m => (RECOV.find(r => r[0] === m) || [null,'—'])[1];
+const recovLabel = m => tr((RECOV.find(r => r[0] === m) || [null,'—'])[1]);
 function recoveryStats(name){
   const all = [];
   Object.keys(state.days).sort().forEach(k =>
@@ -1738,7 +2225,11 @@ function recoveryStats(name){
     rising: all.length >= 4 && avg(all.slice(half)) > avg(all.slice(0,half)) * 1.5
   };
 }
-const fmtN = n => Number.isInteger(n) ? String(n) : String(Math.round(n*10)/10).replace('.', ',');
+const fmtN = n => {
+  if(Number.isInteger(n)) return String(n);
+  const s = String(Math.round(n*10)/10);
+  return state.settings?.lang === 'en' ? s : s.replace('.', ',');
+};
 const fmtMoney = n => `${String(Math.round((n||0)*100)/100).replace('.', ',')} €`;
 function libItem(name){
   return state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
@@ -1806,39 +2297,39 @@ function renderMeter(){
   const left = budget - gasto + recarga - marginAmount + extras;
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
-  row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : '<span class="lib-note">Sin cucharas asignadas todavía.</span>';
+  row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : `<span class="lib-note">${tr('Sin cucharas asignadas todavía.')}</span>`;
   row.setAttribute('aria-label', left < 0
-    ? `${fmtN(Math.abs(left))} cucharas por debajo de lo asignado hoy`
-    : `${fmtN(left)} de ${fmtN(budget)} cucharas restantes`);
+    ? trf('{n} cucharas por debajo de lo asignado hoy', {n:fmtN(Math.abs(left))})
+    : trf('{left} de {budget} cucharas restantes', {left:fmtN(left), budget:fmtN(budget)}));
   const c = document.getElementById('spoonCount');
   c.className = 'count' + (left < 0 ? ' overdrawn' : '');
   c.innerHTML = left < 0
-    ? `${fmtN(Math.abs(left))} <small>por debajo de lo asignado hoy</small>`
-    : `${fmtN(left)} <small>de ${fmtN(budget)} · quedan</small>`;
+    ? `${fmtN(Math.abs(left))} <small>${tr('por debajo de lo asignado hoy')}</small>`
+    : `${fmtN(left)} <small>${trf('de {budget} · quedan', {budget:fmtN(budget)})}</small>`;
   /* una sola línea con todo el desglose: gasto, recarga si la hay, y lo
      disponible con el margen del ciclo señalado con una gota, no en prosa */
-  const breakParts = [`${fmtN(gasto)} gastadas`];
-  if(recarga) breakParts.push(`${fmtN(recarga)} recuperadas`);
+  const breakParts = [trf('{n} gastadas', {n:fmtN(gasto)})];
+  if(recarga) breakParts.push(trf('{n} recuperadas', {n:fmtN(recarga)}));
   const dropIcon = marginAmount > 0
     ? ' <svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg>' +
-      `−${fmtN(marginAmount)} cucharas`
+      trf('−{n} cucharas', {n:fmtN(marginAmount)})
     : '';
-  breakParts.push(`${fmtN(Math.max(0, left))} disponibles${dropIcon}`);
+  breakParts.push(trf('{n} disponibles', {n:fmtN(Math.max(0, left))}) + dropIcon);
   document.getElementById('spoonBreak').innerHTML = breakParts.join(' · ') +
-    (marginAmount > 0 ? ' <button class="linkbtn inline" id="btnWhyMargin">¿Por qué?</button>' : '');
+    (marginAmount > 0 ? ` <button class="linkbtn inline" id="btnWhyMargin">${tr('¿Por qué?')}</button>` : '');
 
   /* aviso de día cargado: dice el hecho, no juzga. El titular ya dice si vas
      por debajo, así que aquí solo se avisa si lo apuntado no cabe. */
   const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
   const notice = document.getElementById('spoonNotice');
-  const msg = (effective > 0 && planned > effective) ? `Lo apuntado para hoy suma ${fmtN(planned)} y tienes ${fmtN(effective)}.` : '';
+  const msg = (effective > 0 && planned > effective) ? trf('Lo apuntado para hoy suma {planned} y tienes {effective}.', {planned:fmtN(planned), effective:fmtN(effective)}) : '';
   notice.textContent = msg;
   notice.hidden = !msg;
 
   const co = d.checkout;
   document.getElementById('btnCheckout').textContent = co
-    ? `Check-out hecho · capacidad ${co.energy} de 5`
-    : 'Check-out de hoy';
+    ? trf('Check-out hecho · capacidad {n} de 5', {n:co.energy})
+    : tr('Check-out de hoy');
   document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
   document.getElementById('closerHint').hidden = !!co;
 
@@ -1852,7 +2343,7 @@ function renderMeter(){
     document.getElementById('overCount').textContent = `-${fmtN(n)}`;
     const row = document.getElementById('overRow');
     row.innerHTML = spoonRowHTML(n, n);
-    row.setAttribute('aria-label', `${fmtN(n)} cucharas de sobrestimulación`);
+    row.setAttribute('aria-label', trf('{n} cucharas de sobrestimulación', {n:fmtN(n)}));
   }else{
     overBlock.hidden = true;
   }
@@ -1861,7 +2352,7 @@ function renderTasks(){
   const d = day();
   const el = document.getElementById('taskList');
   if(!d.tasks.length){
-    el.innerHTML = '<div class="empty">Nada apuntado. Añade solo lo que de verdad va a pasar hoy.</div>';
+    el.innerHTML = `<div class="empty">${tr('Nada apuntado. Añade solo lo que de verdad va a pasar hoy.')}</div>`;
     return;
   }
   el.innerHTML = '<div class="group">' + d.tasks.map(t => {
@@ -1869,9 +2360,9 @@ function renderTasks(){
     const dep = cost < 0;
     const l = learned(t.name);
     const notes = [];
-    if(t.series) notes.push('Se repite');
-    if(dep) notes.push('Recarga');
-    if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(`sueles gastar ${fmtN(l.avg)}`);
+    if(t.series) notes.push(tr('Se repite'));
+    if(dep) notes.push(tr('Recarga'));
+    if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
     const isOpen = t.done && !collapsedTasks.has(t.id);
     const timeTag = t.time ? `<span class="task-time">${esc(fmtTaskTime(t))}</span> ` : '';
@@ -1879,13 +2370,13 @@ function renderTasks(){
       ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`
-      : `<button class="task-body" data-edit="${t.id}" aria-label="Editar ${esc(t.name)}">
+      : `<button class="task-body" data-edit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`;
-    const chev = t.done ? `<button class="chev-btn" data-trow="${t.id}" aria-expanded="${isOpen}" aria-label="${isOpen?'Ocultar detalle':'Ver detalle'} de ${esc(t.name)}"><svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>` : '';
+    const chev = t.done ? `<button class="chev-btn" data-trow="${t.id}" aria-expanded="${isOpen}" aria-label="${trf('{action} de {name}', {action:tr(isOpen?'Ocultar detalle':'Ver detalle'), name:esc(t.name)})}"><svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>` : '';
     return `
     <div class="task ${t.done?'done':''}">
-      <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${t.done?'Desmarcar':'Marcar'} ${esc(t.name)}" aria-pressed="${t.done}">
+      <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${trf('{action} {name}', {action:tr(t.done?'Desmarcar':'Marcar'), name:esc(t.name)})}" aria-pressed="${t.done}">
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
       </button>
       ${body}
@@ -1899,42 +2390,42 @@ function renderTasks(){
            check-out de esa noche no la vuelva a cobrar aparte (ver
            yaSobrecargado en el guardado del check-out). -->
       <div class="arow">
-        <span>${dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?'}</span>
+        <span>${tr(dep ? '¿Cuánto te devolvió?' : '¿Cuánto costó de verdad?')}</span>
         <div class="stepper">
-          <button data-real="${t.id}" data-delta="${dep?1:-1}" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+          <button data-real="${t.id}" data-delta="${dep?1:-1}" aria-label="${tr('Menos')}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
           <output>${fmtN(Math.abs(cost))}</output>
-          <button data-real="${t.id}" data-delta="${dep?-1:1}" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          <button data-real="${t.id}" data-delta="${dep?-1:1}" aria-label="${tr('Más')}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         </div>
       </div>
       ${dep ? '' : `<div class="arow">
-        <span>¿Cómo estaba el entorno?</span>
+        <span>${tr('¿Cómo estaba el entorno?')}</span>
         <div class="chips">
-          <button class="chip" data-ent="${t.id}" data-val="tranquilo" aria-pressed="${t.entorno==='tranquilo'}">Tranquilo</button>
-          <button class="chip" data-ent="${t.id}" data-val="normal" aria-pressed="${t.entorno==='normal'}">Normal</button>
-          <button class="chip" data-ent="${t.id}" data-val="intenso" aria-pressed="${t.entorno==='intenso'}">Intenso</button>
+          <button class="chip" data-ent="${t.id}" data-val="tranquilo" aria-pressed="${t.entorno==='tranquilo'}">${tr('Tranquilo')}</button>
+          <button class="chip" data-ent="${t.id}" data-val="normal" aria-pressed="${t.entorno==='normal'}">${tr('Normal')}</button>
+          <button class="chip" data-ent="${t.id}" data-val="intenso" aria-pressed="${t.entorno==='intenso'}">${tr('Intenso')}</button>
         </div>
       </div>
       <div class="arow">
-        <span>¿Cuánto tardaste en recuperarte?</span>
+        <span>${tr('¿Cuánto tardaste en recuperarte?')}</span>
         <div class="chips">${RECOV.map(([m,lab]) =>
-          `<button class="chip" data-rec="${t.id}" data-min="${m}" aria-pressed="${t.recovery===m}">${lab}</button>`).join('')}</div>
+          `<button class="chip" data-rec="${t.id}" data-min="${m}" aria-pressed="${t.recovery===m}">${tr(lab)}</button>`).join('')}</div>
       </div>`}
     </div>` : ''}`;
   }).join('') + '</div>';
 }
 function renderLib(){
   const el = document.getElementById('libList');
-  if(!state.library.length){ el.innerHTML = '<div class="empty">Todavía no hay actividades. Añade las que más se repiten en tu día.</div>'; return; }
+  if(!state.library.length){ el.innerHTML = `<div class="empty">${tr('Todavía no hay actividades. Añade las que más se repiten en tu día.')}</div>`; return; }
   const row = l => {
     const st = learned(l.name);
     const rc = recoveryStats(l.name);
     const dep = l.est < 0;
     let note;
-    if(st.avg == null) note = st.n ? `${st.n} registro${st.n===1?'':'s'}` : 'Sin registros todavía';
-    else if(st.fixed) note = `Lo has fijado tú · sueles ${dep?'recuperar':'gastar'} ${fmtN(Math.abs(st.avg))}`;
-    else if(Math.abs(st.avg - st.est) < 0.5) note = `Tu estimación acierta · ${st.n} registros`;
-    else note = `Estimabas ${fmtN(Math.abs(st.est))}, ${dep?'recuperas':'gastas'} ${fmtN(Math.abs(st.avg))}`;
-    if(rc) note += ` · recuperación ${recovLabel(rc.last)}${rc.rising ? ', va a más' : ''}`;
+    if(st.avg == null) note = st.n ? `${st.n} ${tr(st.n===1?'registro':'registros')}` : tr('Sin registros todavía');
+    else if(st.fixed) note = trf('Lo has fijado tú · sueles {verb} {n}', {verb:tr(dep?'recuperar':'gastar'), n:fmtN(Math.abs(st.avg))});
+    else if(Math.abs(st.avg - st.est) < 0.5) note = trf('Tu estimación acierta · {n} registros', {n:st.n});
+    else note = trf('Estimabas {est}, {verb} {avg}', {est:fmtN(Math.abs(st.est)), verb:tr(dep?'recuperas':'gastas'), avg:fmtN(Math.abs(st.avg))});
+    if(rc) note += trf(rc.rising ? ' · recuperación {lab}, va a más' : ' · recuperación {lab}', {lab:recovLabel(rc.last)});
     return `<button class="lib" data-lib="${l.id}">
       <span><span class="lib-name">${esc(l.name)}</span><br><span class="lib-note">${note}</span></span>
       <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(st.suggest))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
@@ -1944,12 +2435,15 @@ function renderLib(){
   const gastan = byUse(state.library.filter(l => l.est >= 0));
   const recargan = byUse(state.library.filter(l => l.est < 0));
   el.innerHTML =
-    (gastan.length ? `<p class="libsec">Gastan cucharas</p><div class="group">${gastan.map(row).join('')}</div>` : '') +
-    (recargan.length ? `<p class="libsec">Recargan cucharas</p><div class="group">${recargan.map(row).join('')}</div>` : '');
+    (gastan.length ? `<p class="libsec">${tr('Gastan cucharas')}</p><div class="group">${gastan.map(row).join('')}</div>` : '') +
+    (recargan.length ? `<p class="libsec">${tr('Recargan cucharas')}</p><div class="group">${recargan.map(row).join('')}</div>` : '');
 }
 
 /* ---------- finanzas ---------- */
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MESES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const monthName = i => state.settings?.lang === 'en' ? MESES_EN[i] : MESES[i];
+const monthYear = (i, y) => state.settings?.lang === 'en' ? `${MESES_EN[i]} ${y}` : `${MESES[i]} de ${y}`;
 function ensureFinanzas(){
   if(!state.finanzas) state.finanzas = { gastosFijos:[], gastosVariables:[], historial:[], mesActual:null };
   if(!state.finanzas.mesActual) state.finanzas.mesActual = monthKey();
@@ -1992,7 +2486,7 @@ function checkMonthRollover(){
 }
 function finRow(g, tipo){
   const importe = tipo === 'fijo' ? (g.overrideMes ?? g.importe) : g.importe;
-  const note = (tipo === 'fijo' && g.overrideMes != null) ? 'Solo este mes' : '';
+  const note = (tipo === 'fijo' && g.overrideMes != null) ? tr('Solo este mes') : '';
   return `<button class="lib" data-fin="${g.id}">
       <span><span class="lib-name">${esc(g.nombre)}</span>${note ? `<br><span class="lib-note">${note}</span>` : ''}</span>
       <span class="cost">${fmtMoney(importe)}</span>
@@ -2003,10 +2497,10 @@ function renderFin(){
   const f = state.finanzas;
   document.getElementById('finFijosList').innerHTML = f.gastosFijos.length
     ? `<div class="group">${f.gastosFijos.map(g => finRow(g,'fijo')).join('')}</div>`
-    : '<div class="empty">Todavía no hay gastos fijos.</div>';
+    : `<div class="empty">${tr('Todavía no hay gastos fijos.')}</div>`;
   document.getElementById('finVariablesList').innerHTML = f.gastosVariables.length
     ? `<div class="group">${f.gastosVariables.map(g => finRow(g,'variable')).join('')}</div>`
-    : '<div class="empty">Todavía no hay gastos variables este mes.</div>';
+    : `<div class="empty">${tr('Todavía no hay gastos variables este mes.')}</div>`;
   const totalFijos = f.gastosFijos.reduce((a,g)=>a+(g.overrideMes ?? g.importe),0);
   const totalVariables = f.gastosVariables.reduce((a,g)=>a+g.importe,0);
   document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
@@ -2027,25 +2521,25 @@ function renderFinHistorial(){
   const hist = state.finanzas.historial;
   el.innerHTML = hist.length
     ? `<div class="group">${[...hist].reverse().map(h => `<button class="lib" data-hist="${h.id}">
-        <span><span class="lib-name">${MESES[h.month-1]} de ${h.year}</span><br>
-          <span class="lib-note">Fijos ${fmtMoney(h.totalFijos)} · Variables ${fmtMoney(h.totalVariables)}</span></span>
+        <span><span class="lib-name">${monthYear(h.month-1, h.year)}</span><br>
+          <span class="lib-note">${trf('Fijos {a} · Variables {b}', {a:fmtMoney(h.totalFijos), b:fmtMoney(h.totalVariables)})}</span></span>
         <span class="cost">${fmtMoney(h.total)}</span>
       </button>`).join('')}</div>`
-    : '<div class="empty">Todavía no hay meses cerrados.</div>';
+    : `<div class="empty">${tr('Todavía no hay meses cerrados.')}</div>`;
 }
 function histItemRow(g){
   return `<div class="lib"><span class="lib-name">${esc(g.nombre)}</span><span class="cost">${fmtMoney(g.importe)}</span></div>`;
 }
 function openHistDetail(h){
-  document.getElementById('hTitle').textContent = `${MESES[h.month-1]} de ${h.year}`;
+  document.getElementById('hTitle').textContent = monthYear(h.month-1, h.year);
   document.getElementById('hSub').textContent =
-    `Total ${fmtMoney(h.total)} · fijos ${fmtMoney(h.totalFijos)} · variables ${fmtMoney(h.totalVariables)}`;
+    trf('Total {tot} · fijos {f} · variables {v}', {tot:fmtMoney(h.total), f:fmtMoney(h.totalFijos), v:fmtMoney(h.totalVariables)});
   document.getElementById('hFijos').innerHTML = h.fijos.length
     ? `<div class="group">${h.fijos.map(histItemRow).join('')}</div>`
-    : '<div class="empty">Sin gastos fijos ese mes.</div>';
+    : `<div class="empty">${tr('Sin gastos fijos ese mes.')}</div>`;
   document.getElementById('hVariables').innerHTML = h.variables.length
     ? `<div class="group">${h.variables.map(histItemRow).join('')}</div>`
-    : '<div class="empty">Sin gastos variables ese mes.</div>';
+    : `<div class="empty">${tr('Sin gastos variables ese mes.')}</div>`;
   openDialog(dlgHist);
 }
 
@@ -2196,8 +2690,8 @@ function renderCycle(){
   const head = document.getElementById('cycleHead');
   const dayNum = (state.cycleLogs || []).length ? cycleDayOn(k) : null;
   head.textContent = dayNum == null
-    ? 'Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.'
-    : `Día ${dayNum} del ciclo — Fase estimada: ${cyclePhase(dayNum, effectiveCycleLength(), bleedRunFrom(lastStartOn(k)))}`;
+    ? tr('Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.')
+    : trf('Día {n} del ciclo — Fase estimada: {fase}', {n:dayNum, fase:tr(cyclePhase(dayNum, effectiveCycleLength(), bleedRunFrom(lastStartOn(k))))});
   document.getElementById('cycleFaseAviso').hidden = dayNum == null;
 
   const log = cycleLog(k);
@@ -2220,25 +2714,25 @@ function renderCyclePrediction(){
   const el = document.getElementById('cycleNext');
   const starts = cycleStarts();
   if(!starts.length){
-    el.innerHTML = `<h2>Próximo ciclo</h2>
-      <p>En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.</p>`;
+    el.innerHTML = `<h2>${tr('Próximo ciclo')}</h2>
+      <p>${tr('En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.')}</p>`;
     return;
   }
   const { date, jumps, length } = nextCycleStart();
   const falta = daysBetween(todayKey(), date);
-  const cuando = falta === 0 ? 'es hoy' : falta === 1 ? 'es mañana' : `faltan ${falta} días`;
+  const cuando = falta === 0 ? tr('es hoy') : falta === 1 ? tr('es mañana') : trf('faltan {n} días', {n:falta});
   const lens = cycleLengths().slice(-6);
   const min = lens.length ? Math.min(...lens) : null;
   const max = lens.length ? Math.max(...lens) : null;
 
   let base;
   if(!lens.length){
-    base = `Estimado con la duración media que tienes puesta en Ajustes (${length} días). Cuando apuntes el siguiente sangrado, la estimación pasará a usar tus ciclos reales.`;
+    base = trf('Estimado con la duración media que tienes puesta en Ajustes ({n} días). Cuando apuntes el siguiente sangrado, la estimación pasará a usar tus ciclos reales.', {n:length});
   }else{
-    const medidos = `${lens.length} ciclo${lens.length === 1 ? '' : 's'} medido${lens.length === 1 ? '' : 's'}`;
+    const medidos = trf(lens.length === 1 ? '{n} ciclo medido' : '{n} ciclos medidos', {n:lens.length});
     base = min === max
-      ? `Estimado con ${medidos}: ${min} días.`
-      : `Estimado con ${medidos}: entre ${min} y ${max} días, media ${length}.`;
+      ? trf('Estimado con {medidos}: {min} días.', {medidos, min})
+      : trf('Estimado con {medidos}: entre {min} y {max} días, media {avg}.', {medidos, min, max, avg:length});
   }
 
   /* Horquilla real: si los ciclos medidos no duran todos lo mismo, la fecha
@@ -2247,18 +2741,18 @@ function renderCyclePrediction(){
   if(lens.length && min !== max){
     const desde = shiftKey(starts[starts.length-1], min * jumps);
     const hasta = shiftKey(starts[starts.length-1], max * jumps);
-    horquilla = `<p>Con tu variación de siempre, caería entre el ${fmtDate(desde)} y el ${fmtDate(hasta)}.</p>`;
+    horquilla = `<p>${trf('Con tu variación de siempre, caería entre el {desde} y el {hasta}.', {desde:fmtDate(desde), hasta:fmtDate(hasta)})}</p>`;
   }
   const viejo = jumps > 1
-    ? `<p>Tu último sangrado apuntado es del ${fmtDate(starts[starts.length-1])}, así que esta estimación salta ${jumps} ciclos y es más floja. Apuntar el siguiente la endereza.</p>`
+    ? `<p>${trf('Tu último sangrado apuntado es del {fecha}, así que esta estimación salta {n} ciclos y es más floja. Apuntar el siguiente la endereza.', {fecha:fmtDate(starts[starts.length-1]), n:jumps})}</p>`
     : '';
 
-  el.innerHTML = `<h2>Próximo ciclo</h2>
-    <p><strong>Estimado: ${fmtDate(date)}</strong> — ${cuando}.</p>
+  el.innerHTML = `<h2>${tr('Próximo ciclo')}</h2>
+    <p><strong>${trf('Estimado: {fecha}', {fecha:fmtDate(date)})}</strong> — ${cuando}.</p>
     ${horquilla}
     <p>${base}</p>
     ${viejo}
-    <p>Es una estimación a partir de lo que has apuntado, no una certeza.</p>`;
+    <p>${tr('Es una estimación a partir de lo que has apuntado, no una certeza.')}</p>`;
 }
 /* Descripción de lo ya ocurrido: se promedia, por cada día del ciclo, lo que
    se gastó ese día en los ciclos ya cerrados, y se busca la racha seguida que
@@ -2268,8 +2762,8 @@ function renderCyclePattern(){
   const starts = cycleStarts();
   const closed = Math.max(0, starts.length - 1);
   if(closed < 2){
-    el.innerHTML = `<h2>Patrón</h2>
-      <p>Hacen falta dos ciclos completos para poder describir un patrón. Llevas ${closed}.</p>`;
+    el.innerHTML = `<h2>${tr('Patrón')}</h2>
+      <p>${trf('Hacen falta dos ciclos completos para poder describir un patrón. Llevas {n}.', {n:closed})}</p>`;
     return;
   }
   const perDay = [];
@@ -2285,8 +2779,8 @@ function renderCyclePattern(){
   const avgByDay = perDay.map(a => (a && a.length >= 2) ? a.reduce((x,y)=>x+y,0) / a.length : null);
   const vals = avgByDay.filter(v => v != null);
   if(vals.length < 5){
-    el.innerHTML = `<h2>Patrón</h2>
-      <p>Tienes ${closed} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.</p>`;
+    el.innerHTML = `<h2>${tr('Patrón')}</h2>
+      <p>${trf('Tienes {n} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.', {n:closed})}</p>`;
     return;
   }
   const overall = vals.reduce((a,b)=>a+b,0) / vals.length;
@@ -2301,7 +2795,7 @@ function renderCyclePattern(){
     }
   });
   const span = best
-    ? (best.from === best.to ? `el día ${best.from+1}` : `entre el día ${best.from+1} y el día ${best.to+1}`)
+    ? (best.from === best.to ? trf('el día {n}', {n:best.from+1}) : trf('entre el día {a} y el día {b}', {a:best.from+1, b:best.to+1}))
     : null;
   let suggestion = '';
   if(best){
@@ -2309,15 +2803,15 @@ function renderCyclePattern(){
     const spanAvg = spanVals.reduce((a,b)=>a+b,0) / spanVals.length;
     const drop = Math.round((1 - spanAvg/overall) * 100);
     if(drop > 0 && drop !== state.marginPercent){
-      suggestion = `<p class="insight">Según tus datos, tus cucharas bajan una media del ${drop}% estos días.
-        ¿Actualizar tu margen a ${drop}%?</p>
-        <button class="add" id="btnApplyMarginSuggestion" data-margin="${drop}">Actualizar margen a ${drop}%</button>`;
+      suggestion = `<p class="insight">${trf('Según tus datos, tus cucharas bajan una media del {n}% estos días.', {n:drop})}
+        ${trf('¿Actualizar tu margen a {n}%?', {n:drop})}</p>
+        <button class="add" id="btnApplyMarginSuggestion" data-margin="${drop}">${trf('Actualizar margen a {n}%', {n:drop})}</button>`;
     }
   }
-  el.innerHTML = `<h2>Patrón</h2>` + (span
-    ? `<p>En tus últimos ciclos, tus cucharas bajaron ${span}.</p>
-       <p>Es lo que ya pasó, no una previsión de lo que va a pasar.</p>${suggestion}`
-    : `<p>De momento no hay ninguna bajada que se repita de un ciclo a otro.</p>`);
+  el.innerHTML = `<h2>${tr('Patrón')}</h2>` + (span
+    ? `<p>${trf('En tus últimos ciclos, tus cucharas bajaron {span}.', {span})}</p>
+       <p>${tr('Es lo que ya pasó, no una previsión de lo que va a pasar.')}</p>${suggestion}`
+    : `<p>${tr('De momento no hay ninguna bajada que se repita de un ciclo a otro.')}</p>`);
 }
 document.getElementById('cyclePattern').addEventListener('click', e => {
   const b = e.target.closest('#btnApplyMarginSuggestion'); if(!b) return;
@@ -2346,8 +2840,8 @@ function dayLoad(k){
 }
 
 const NEED = 14;   // check-outs mínimos para que una tendencia signifique algo
-const shortDate = k => new Date(k+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'});
-const longDate = d => d.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
+const shortDate = k => new Date(k+'T12:00:00').toLocaleDateString(LOCALE(),{day:'numeric',month:'short'});
+const longDate = d => d.toLocaleDateString(LOCALE(),{day:'numeric',month:'long'});
 
 /* dos series sobre los últimos check-outs: cucharas gastadas (escala propia)
    y tolerancia sensorial de 1 a 5. Se diferencian por forma de marca además de por color. */
@@ -2370,7 +2864,7 @@ function patternsChart(keys){
     `<line x1="${L}" y1="${ySens(v)}" x2="${W-R}" y2="${ySens(v)}" stroke="var(--line)" stroke-width="1"/>
      <text x="0" y="${(ySens(v)+3.5).toFixed(1)}">${v}</text>`).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img"
-    aria-label="Cucharas gastadas y tolerancia sensorial en los últimos ${keys.length} check-out, del ${shortDate(keys[0])} al ${shortDate(keys[keys.length-1])}">
+    aria-label="${trf('Cucharas gastadas y tolerancia sensorial en los últimos {n} check-out, del {desde} al {hasta}', {n:keys.length, desde:shortDate(keys[0]), hasta:shortDate(keys[keys.length-1])})}">
     ${grid}
     <polyline points="${line(spentVals, ySpent)}" fill="none" stroke="var(--spoon)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     <polyline points="${line(sensVals, ySens)}" fill="none" stroke="var(--deposit)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
@@ -2407,9 +2901,9 @@ function renderPatterns(){
   const keys = Object.keys(state.days).sort().filter(k => state.days[k].checkout);
   if(keys.length < NEED){
     const eta = new Date(); eta.setDate(eta.getDate() + (NEED - keys.length));
-    el.innerHTML = `<h2>Patrones</h2>
-      <p>Todavía no hay suficientes datos para ver una tendencia. Hacen falta ${NEED} check-out.</p>
-      <p>Con uno al día, a partir del ${longDate(eta)}.</p>`;
+    el.innerHTML = `<h2>${tr('Patrones')}</h2>
+      <p>${trf('Todavía no hay suficientes datos para ver una tendencia. Hacen falta {n} check-out.', {n:NEED})}</p>
+      <p>${trf('Con uno al día, a partir del {fecha}.', {fecha:longDate(eta)})}</p>`;
     return;
   }
   const shown = keys.slice(-NEED);
@@ -2424,22 +2918,23 @@ function renderPatterns(){
     ? '<svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="var(--spoon)"/></svg>'
     : '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1.2" y="1.2" width="7.6" height="7.6" fill="var(--deposit)"/></svg>';
 
-  let out = `<h2>Patrones</h2><p>Tus últimos ${shown.length} check-out.</p>`;
+  let out = `<h2>${tr('Patrones')}</h2><p>${trf('Tus últimos {n} check-out.', {n:shown.length})}</p>`;
   out += patternsChart(shown);
+  const last7lab = tr('· media de los últimos 7');
   out += `<div class="series">
-    <p class="serie">${mark('circle')}<span>Cucharas gastadas ${fmtN(sp1)} <small>${sp0 != null ? `· antes ${fmtN(sp0)}` : '· media de los últimos 7'}</small></span></p>
-    <p class="serie">${mark('square')}<span>Tolerancia sensorial ${fmtN(s1)} de 5 <small>${s0 != null ? `· antes ${fmtN(s0)}` : '· media de los últimos 7'}</small></span></p>
+    <p class="serie">${mark('circle')}<span>${trf('Cucharas gastadas {n}', {n:fmtN(sp1)})} <small>${sp0 != null ? trf('· antes {n}', {n:fmtN(sp0)}) : last7lab}</small></span></p>
+    <p class="serie">${mark('square')}<span>${trf('Tolerancia sensorial {n} de 5', {n:fmtN(s1)})} <small>${s0 != null ? trf('· antes {n}', {n:fmtN(s0)}) : last7lab}</small></span></p>
   </div>`;
-  if(flat) out += '<p class="insight">Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.</p>';
-  if(rising.length) out += `<p class="insight">Tardas más que antes en recuperarte de: ${esc(rising.join(', '))}.</p>`;
+  if(flat) out += `<p class="insight">${tr('Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.')}</p>`;
+  if(rising.length) out += `<p class="insight">${trf('Tardas más que antes en recuperarte de: {lista}.', {lista:esc(rising.join(', '))})}</p>`;
   const peaks = peakNextDayInsight();
   if(peaks){
     const d = peaks.avgDiff;
-    const cuch = n => Math.abs(n) === 1 ? 'cuchara' : 'cucharas';
-    const frase = d <= -0.5 ? `sueles empezar con ${fmtN(Math.abs(d))} ${cuch(d)} menos que tu media`
-      : d >= 0.5 ? `sueles empezar con ${fmtN(d)} ${cuch(d)} más que tu media`
-      : 'no se nota una diferencia clara con tu media';
-    out += `<p class="insight">Los días después de un pico sensorial (${peaks.n} caso${peaks.n===1?'':'s'}), ${frase}.</p>`;
+    const cuch = n => tr(Math.abs(n) === 1 ? 'cuchara' : 'cucharas');
+    const frase = d <= -0.5 ? trf('sueles empezar con {n} {unidad} menos que tu media', {n:fmtN(Math.abs(d)), unidad:cuch(d)})
+      : d >= 0.5 ? trf('sueles empezar con {n} {unidad} más que tu media', {n:fmtN(d), unidad:cuch(d)})
+      : tr('no se nota una diferencia clara con tu media');
+    out += `<p class="insight">${trf('Los días después de un pico sensorial ({n} caso{s}), {frase}.', {n:peaks.n, s:peaks.n===1?'':tr('s'), frase})}</p>`;
   }
   el.innerHTML = out;
 }
@@ -2448,7 +2943,7 @@ let calMonth = new Date();
 function renderCal(){
   const y = calMonth.getFullYear(), m = calMonth.getMonth();
   document.getElementById('calLabel').textContent =
-    calMonth.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    calMonth.toLocaleDateString(LOCALE(),{month:'long',year:'numeric'});
   const first = new Date(y, m, 1);
   const offset = (first.getDay() + 6) % 7;            // semana empieza en lunes
   const total = new Date(y, m+1, 0).getDate();
@@ -2470,7 +2965,7 @@ function renderCal(){
       bleed ? 'bleed' : '',
       bleedEst ? 'bleed-est' : ''
     ].join(' ');
-    const label = `${fmtDate(k)}${planned ? `, ${fmtN(planned)} cucharas` : ''}${heavy ? ', por encima de tu media' : ''}${bleed ? ', con sangrado' : ''}${bleedEst ? ', sangrado estimado' : ''}`;
+    const label = `${fmtDate(k)}${planned ? trf(', {n} cucharas', {n:fmtN(planned)}) : ''}${heavy ? tr(', por encima de tu media') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
     html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -2478,8 +2973,8 @@ function renderCal(){
   leg.hidden = !state.cycleEnabled;
   leg.textContent = !state.cycleEnabled ? ''
     : est.size
-      ? 'Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.'
-      : 'Los días teñidos en Ciruela son sangrado apuntado.';
+      ? tr('Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.')
+      : tr('Los días teñidos en Ciruela son sangrado apuntado.');
 }
 function renderOverCost(){
   const el = document.getElementById('overCostGrid');
@@ -2493,9 +2988,9 @@ function renderOverCost(){
 function renderExportInfo(){
   const el = document.getElementById('exportInfo');
   const k = state.settings.lastExportKey;
-  if(k == null){ el.textContent = 'Todavía no has hecho ninguna copia.'; return; }
+  if(k == null){ el.textContent = tr('Todavía no has hecho ninguna copia.'); return; }
   const n = daysBetween(k, todayKey());
-  el.textContent = n <= 0 ? 'Última copia: hoy.' : `Última copia: hace ${n} día${n===1?'':'s'}.`;
+  el.textContent = n <= 0 ? tr('Última copia: hoy.') : trf(n===1 ? 'Última copia: hace {n} día.' : 'Última copia: hace {n} días.', {n});
 }
 function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); renderPatterns(); renderOverCost(); renderFin(); renderCycle();
   document.getElementById('maxOut').textContent = state.settings.max;
@@ -2654,10 +3149,10 @@ function renderTourStep(){
     const b = document.querySelector(`#tabs [data-go="${step.nav}"]`);
     if(b) b.click();
   }
-  document.getElementById('tourStep').textContent = `Paso ${tourIdx+1} de ${tourSteps.length}`;
-  document.getElementById('tourTitle').textContent = step.title;
-  document.getElementById('tourBody').textContent = step.body;
-  document.getElementById('tourNext').textContent = tourIdx === tourSteps.length - 1 ? 'Empezar' : 'Siguiente';
+  document.getElementById('tourStep').textContent = trf('Paso {n} de {total}', {n:tourIdx+1, total:tourSteps.length});
+  document.getElementById('tourTitle').textContent = tr(step.title);
+  document.getElementById('tourBody').textContent = tr(step.body);
+  document.getElementById('tourNext').textContent = tourIdx === tourSteps.length - 1 ? tr('Empezar') : tr('Siguiente');
   const toggle = document.getElementById('tourToggle');
   toggle.hidden = !step.toggleKey;
   document.getElementById('tourToggleLabel').hidden = !step.toggleKey;
@@ -2699,7 +3194,7 @@ function runTour(steps, { seenKey, replay, forceTab, isMain } = {}){
   });
   if(!tourSteps.length) return endTour();
   tourIdx = 0;
-  document.getElementById('tourSkip').textContent = tourReplay ? 'Cerrar' : 'Saltar';
+  document.getElementById('tourSkip').textContent = tourReplay ? tr('Cerrar') : tr('Saltar');
   document.getElementById('tour').hidden = false;
   renderTourStep();
 }
@@ -2751,7 +3246,7 @@ const WORDS = ['En reserva','Muy justo','Muy justo','Poco','Poco','A medias','A 
 function ciSync(){
   const v = +ciRange.value;
   document.getElementById('ciNum').textContent = v;
-  document.getElementById('ciWord').textContent = WORDS[Math.min(v, WORDS.length-1)];
+  document.getElementById('ciWord').textContent = tr(WORDS[Math.min(v, WORDS.length-1)]);
 }
 ciRange.addEventListener('input', ciSync);
 /* Picos sensoriales de hoy: mismo apartado que ajusta las cucharas, porque
@@ -2762,7 +3257,7 @@ function refreshPeakInfo(){
   const row = document.getElementById('ciPeakRow');
   row.hidden = !picos;
   if(picos) document.getElementById('ciPeakInfo').textContent =
-    `${picos} pico${picos===1?'':'s'} sensorial${picos===1?'':'es'} apuntado${picos===1?'':'s'} hoy`;
+    trf(picos===1 ? '{n} pico sensorial apuntado hoy' : '{n} picos sensoriales apuntados hoy', {n:picos});
 }
 function openCheckin(){
   ciRange.max = state.settings.max;
@@ -2775,7 +3270,7 @@ function openCheckin(){
     ['De sobra', state.settings.max]
   ];
   document.getElementById('ciPresets').innerHTML = presets
-    .map(([n,v]) => `<button class="chip" data-ci="${v}">${n} · ${v}</button>`).join('');
+    .map(([n,v]) => `<button class="chip" data-ci="${v}">${tr(n)} · ${v}</button>`).join('');
   const marginRow = document.getElementById('ciMarginRow');
   marginRow.hidden = !precautionReason(todayKey());
   document.getElementById('ciMarginOff').checked = !!day().marginOff;
@@ -2785,7 +3280,7 @@ function openCheckin(){
   const yDay = state.days[shiftKey(todayKey(), -1)];
   const yPeaks = yDay ? (yDay.extras || []).filter(e => e.type === 'pico-sensorial').length : 0;
   yEl.hidden = !yPeaks;
-  if(yPeaks) yEl.textContent = `Ayer registraste ${yPeaks} pico${yPeaks===1?'':'s'} sensorial${yPeaks===1?'':'es'}.`;
+  if(yPeaks) yEl.textContent = trf(yPeaks===1 ? 'Ayer registraste {n} pico sensorial.' : 'Ayer registraste {n} picos sensoriales.', {n:yPeaks});
   refreshPeakInfo();
   openDialog(dlgCheckin);
 }
@@ -2834,11 +3329,11 @@ function tSync(){
   tCostOut.textContent = fmtN(tCost);
   document.querySelectorAll('#tKind .chip').forEach(c =>
     c.setAttribute('aria-pressed', c.dataset.kind === tKind));
-  document.getElementById('tCostLab').textContent = tKind === 'recarga'
-    ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar';
+  document.getElementById('tCostLab').textContent = tr(tKind === 'recarga'
+    ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
   const l = tName.value.trim() ? learned(tName.value.trim()) : null;
   document.getElementById('tLearned').textContent =
-    (l && l.avg != null) ? `Sueles ${l.avg < 0 ? 'recuperar' : 'gastar'} ${fmtN(Math.abs(l.avg))}` : '';
+    (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))}) : '';
 }
 document.getElementById('tKind').addEventListener('click', e => {
   const b = e.target.closest('[data-kind]'); if(!b) return;
@@ -2859,10 +3354,10 @@ function repSync(){
   document.getElementById('repDur').hidden = repMode === 'once';
   if(custom){
     document.getElementById('repDays').innerHTML = DOW
-      .map((d,i) => `<button class="chip" data-dow="${i}" aria-pressed="${repDays.has(i)}">${d}</button>`).join('');
+      .map((d,i) => `<button class="chip" data-dow="${i}" aria-pressed="${repDays.has(i)}">${tr(d)}</button>`).join('');
   }
   document.getElementById('wOut').textContent = repWeeks;
-  document.getElementById('wLabel').textContent = repWeeks === 1 ? 'semana' : 'semanas';
+  document.getElementById('wLabel').textContent = tr(repWeeks === 1 ? 'semana' : 'semanas');
 }
 document.getElementById('repMode').addEventListener('click', e => {
   const b = e.target.closest('[data-rep]'); if(!b) return;
@@ -2900,14 +3395,14 @@ function openTaskSheet(dateKey){
   taskDate = dateKey;
   tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
-  document.querySelector('#dlgTask h2').textContent = 'Añadir tarea';
+  document.querySelector('#dlgTask h2').textContent = tr('Añadir tarea');
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
-    ? 'Elige de tu lista o escribe una nueva.'
-    : `Empieza el ${fmtDate(dateKey)}.`;
+    ? tr('Elige de tu lista o escribe una nueva.')
+    : trf('Empieza el {fecha}.', {fecha:fmtDate(dateKey)});
   document.getElementById('taskSuggest').hidden = false;
   document.getElementById('repField').hidden = false;
   document.getElementById('tDeleteRow').hidden = true;
-  tSave.textContent = 'Añadir';
+  tSave.textContent = tr('Añadir');
   const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
   document.getElementById('taskSuggest').innerHTML = top
     .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}" aria-pressed="false">${esc(l.name)}</button>`).join('');
@@ -2925,13 +3420,13 @@ function openTaskEdit(taskId){
   tTimeEnd.value = t.timeEnd || '';
   tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
-  document.querySelector('#dlgTask h2').textContent = 'Editar tarea';
-  document.querySelector('#dlgTask .sub').textContent = 'Cambia lo que haga falta.';
+  document.querySelector('#dlgTask h2').textContent = tr('Editar tarea');
+  document.querySelector('#dlgTask .sub').textContent = tr('Cambia lo que haga falta.');
   document.getElementById('taskSuggest').hidden = true;
   document.getElementById('taskSuggest').innerHTML = '';
   document.getElementById('repField').hidden = true;
   document.getElementById('tDeleteRow').hidden = false;
-  tSave.textContent = 'Guardar';
+  tSave.textContent = tr('Guardar');
   tSync(); openDialog(dlgTask);
 }
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
@@ -3010,8 +3505,8 @@ document.getElementById('peakWantBreath').addEventListener('click', () => {
   const phaseEl = document.getElementById('peakPhase');
   const countEl = document.getElementById('peakCount');
   const subEl = document.getElementById('peakBreathSub');
-  subEl.textContent = 'Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.';
-  const paint = () => { phaseEl.textContent = PEAK_PHASES[phaseIdx][0]; countEl.textContent = n; };
+  subEl.textContent = tr('Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.');
+  const paint = () => { phaseEl.textContent = tr(PEAK_PHASES[phaseIdx][0]); countEl.textContent = n; };
   paint();
   clearInterval(peakTimer);
   peakTimer = setInterval(() => {
@@ -3022,9 +3517,9 @@ document.getElementById('peakWantBreath').addEventListener('click', () => {
         phaseIdx = 0; round++;
         if(round >= PEAK_ROUNDS){
           clearInterval(peakTimer); peakTimer = null;
-          phaseEl.textContent = 'Ya está';
+          phaseEl.textContent = tr('Ya está');
           countEl.textContent = '';
-          subEl.textContent = 'Puedes cerrar cuando quieras.';
+          subEl.textContent = tr('Puedes cerrar cuando quieras.');
           return;
         }
       }
@@ -3164,10 +3659,10 @@ function lSync(){
   document.getElementById('lCost').textContent = fmtN(lCost);
   document.querySelectorAll('#lKind .chip').forEach(c =>
     c.setAttribute('aria-pressed', c.dataset.kind === lKind));
-  document.getElementById('lCostLab').textContent = lKind === 'recarga'
-    ? 'Cuántas cucharas te devuelve' : 'Lo que te cuesta';
+  document.getElementById('lCostLab').textContent = tr(lKind === 'recarga'
+    ? 'Cuántas cucharas te devuelve' : 'Lo que te cuesta');
   const rc = libEditing ? recoveryStats(libEditing.name) : null;
-  document.getElementById('lHint').textContent = rc ? `Recuperación: ${recovLabel(rc.last)}` : '';
+  document.getElementById('lHint').textContent = rc ? trf('Recuperación: {lab}', {lab:recovLabel(rc.last)}) : '';
 }
 document.getElementById('lKind').addEventListener('click', e => {
   const b = e.target.closest('[data-kind]'); if(!b) return;
@@ -3178,11 +3673,11 @@ function openLib(item){
   lName.value = item ? item.name : '';
   lKind = item && item.est < 0 ? 'recarga' : 'gasto';
   lCost = item ? Math.round(Math.abs(item.est)) : 2;
-  document.getElementById('lTitle').textContent = item ? 'Editar actividad' : 'Nueva actividad';
+  document.getElementById('lTitle').textContent = tr(item ? 'Editar actividad' : 'Nueva actividad');
   const st = item ? learned(item.name) : null;
   document.getElementById('lSub').textContent = (st && st.avg != null)
-    ? `De media son ${fmtN(Math.abs(st.avg))} en ${st.n} registros. Si pones un valor a mano, se usará ese.`
-    : 'Sube o baja de una cuchara en una.';
+    ? trf('De media son {n} en {reg} registros. Si pones un valor a mano, se usará ese.', {n:fmtN(Math.abs(st.avg)), reg:st.n})
+    : tr('Sube o baja de una cuchara en una.');
   document.getElementById('lDelete').hidden = !item;
   document.getElementById('lReset').hidden = !(st && st.n);
   lSync(); openDialog(dlgLib);
@@ -3200,7 +3695,7 @@ document.getElementById('lReset').addEventListener('click', () => {
 });
 document.getElementById('lDelete').addEventListener('click', () => {
   if(!libEditing) return;
-  if(!confirm(`¿Quitar "${libEditing.name}" de la calculadora? Las tareas ya apuntadas se quedan como están.`)) return;
+  if(!confirm(trf('¿Quitar "{name}" de la calculadora? Las tareas ya apuntadas se quedan como están.', {name:libEditing.name}))) return;
   state.library = state.library.filter(l => l.id !== libEditing.id);
   save(); dlgLib.close(); renderAll();
 });
@@ -3235,9 +3730,10 @@ function openGasto(tipo, item){
   gType = tipo; gEditing = item; gScope = 'siempre';
   gName.value = item ? item.nombre : '';
   gImporte.value = item ? (tipo === 'fijo' ? (item.overrideMes ?? item.importe) : item.importe) : '';
+  const tipoLab = tr(tipo === 'fijo' ? 'fijo' : 'variable');
   document.getElementById('gTitle').textContent = item
-    ? `Editar gasto ${tipo === 'fijo' ? 'fijo' : 'variable'}`
-    : `Añadir gasto ${tipo === 'fijo' ? 'fijo' : 'variable'}`;
+    ? trf('Editar gasto {tipo}', {tipo:tipoLab})
+    : trf('Añadir gasto {tipo}', {tipo:tipoLab});
   document.getElementById('gScopeField').hidden = !(tipo === 'fijo' && item);
   gScopeSync();
   document.getElementById('gDelete').hidden = !item;
@@ -3275,7 +3771,7 @@ document.getElementById('gSave').addEventListener('click', () => {
 });
 document.getElementById('gDelete').addEventListener('click', () => {
   if(!gEditing) return;
-  if(!confirm(`¿Borrar "${gEditing.nombre}"?`)) return;
+  if(!confirm(trf('¿Borrar "{name}"?', {name:gEditing.nombre}))) return;
   const f = state.finanzas;
   if(gType === 'fijo') f.gastosFijos = f.gastosFijos.filter(g => g.id !== gEditing.id);
   else f.gastosVariables = f.gastosVariables.filter(g => g.id !== gEditing.id);
@@ -3354,22 +3850,22 @@ function renderTplList(){
   const el = document.getElementById('tplList');
   el.innerHTML = state.templates.length
     ? state.templates.map(t => `<div class="mini">
-        <span>${esc(t.name)}<br><span class="lib-note">${t.items.length} tarea${t.items.length===1?'':'s'}</span></span>
+        <span>${esc(t.name)}<br><span class="lib-note">${trf(t.items.length===1?'{n} tarea':'{n} tareas', {n:t.items.length})}</span></span>
         <span class="cost">
-          <button class="use" data-use="${t.id}">Usar</button>
-          <button data-tdel="${t.id}" aria-label="Borrar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+          <button class="use" data-use="${t.id}">${tr('Usar')}</button>
+          <button data-tdel="${t.id}" aria-label="${trf('Borrar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
         </span>
       </div>`).join('')
-    : '<div class="empty">Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.</div>';
+    : `<div class="empty">${tr('Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.')}</div>`;
 }
 function openTpl(dateKey){
   tplTarget = dateKey;
   document.getElementById('tplSub').textContent = dateKey === todayKey()
-    ? 'Se añadirán a hoy.'
-    : `Se añadirán al ${fmtDate(dateKey)}.`;
+    ? tr('Se añadirán a hoy.')
+    : trf('Se añadirán al {fecha}.', {fecha:fmtDate(dateKey)});
   document.getElementById('tplSaveDay').textContent = dateKey === todayKey()
-    ? 'Guardar el día de hoy como día tipo'
-    : 'Guardar ese día como día tipo';
+    ? tr('Guardar el día de hoy como día tipo')
+    : tr('Guardar ese día como día tipo');
   renderTplList(); openDialog(dlgTpl);
 }
 document.getElementById('btnTpl').addEventListener('click', () => openTpl(todayKey()));
@@ -3396,9 +3892,9 @@ const tplNameInput = document.getElementById('tplNameInput');
 let pendingTplItems = null;
 document.getElementById('tplSaveDay').addEventListener('click', () => {
   const items = day(tplTarget).tasks.map(t => ({ name:t.name, est:t.est }));
-  if(!items.length){ alert('Ese día no tiene tareas que guardar.'); return; }
+  if(!items.length){ alert(tr('Ese día no tiene tareas que guardar.')); return; }
   pendingTplItems = items;
-  tplNameInput.value = 'Día de trabajo';
+  tplNameInput.value = tr('Día de trabajo');
   openDialog(dlgTplName);
   tplNameInput.select();
 });
@@ -3428,29 +3924,29 @@ function renderDaySheet(){
   const { planned, spent } = dayLoad(k);
   const typical = typicalBudget();
   document.getElementById('dTitle').textContent =
-    isToday ? 'Hoy' : fmtDate(k).replace(/^./, c => c.toUpperCase());
+    isToday ? tr('Hoy') : fmtDate(k).replace(/^./, c => c.toUpperCase());
   const sub = document.getElementById('dSub');
   if(past || isToday){
     sub.textContent = d.budget != null
-      ? `${spent} cucharas gastadas de ${d.budget}`
-      : `${spent} cucharas gastadas`;
+      ? trf('{spent} cucharas gastadas de {budget}', {spent, budget:d.budget})
+      : trf('{spent} cucharas gastadas', {spent});
     sub.style.color = '';
   }else{
     sub.textContent = planned > typical
-      ? `${fmtN(planned)} cucharas previstas. Tu media es ${fmtN(typical)}.`
-      : `${fmtN(planned)} cucharas previstas de las ${fmtN(typical)} que sueles tener.`;
+      ? trf('{n} cucharas previstas. Tu media es {avg}.', {n:fmtN(planned), avg:fmtN(typical)})
+      : trf('{n} cucharas previstas de las {avg} que sueles tener.', {n:fmtN(planned), avg:fmtN(typical)});
     sub.style.color = planned > typical ? 'var(--alert)' : '';
   }
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
-        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${esc(t.name)}${t.done?' · hecha':''}</span>
+        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${esc(t.name)}${t.done?` · ${tr('hecha')}`:''}</span>
         <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
-          <button data-del="${t.id}" aria-label="Quitar ${esc(t.name)}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+          <button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
         </span>
       </div>`).join('')
-    : '<div class="empty">Nada planificado para este día.</div>';
+    : `<div class="empty">${tr('Nada planificado para este día.')}</div>`;
   document.getElementById('dNote').value = d.note || '';
   renderDayCycleCard(k, past || isToday);
 }
@@ -3532,6 +4028,25 @@ document.getElementById('dayStartHourInput').addEventListener('change', e => {
 });
 /* zoom (no line-height/rem) porque hay que escalar de golpe hojas, barra de
    pestañas fija y el resto sin reescribir cada tamaño fijo en px del CSS. */
+/* Recorre las etiquetas data-i18n* y traduce ese elemento según el idioma
+   activo. El español de la propia etiqueta es la clave del diccionario EN,
+   así que no traducir un texto todavía nunca lo rompe: solo se queda en
+   español hasta que se le añada una entrada. */
+function applyI18n(){
+  document.documentElement.lang = state.settings.lang === 'en' ? 'en' : 'es';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = tr(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', tr(el.getAttribute('data-i18n-aria'))); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.setAttribute('placeholder', tr(el.getAttribute('data-i18n-ph'))); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.setAttribute('title', tr(el.getAttribute('data-i18n-title'))); });
+  document.querySelectorAll('#langPick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', c.dataset.lang === state.settings.lang));
+}
+document.getElementById('langPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-lang]'); if(!b) return;
+  state.settings.lang = b.dataset.lang;
+  save(); applyI18n(); renderAll();
+});
 function applyTextScale(){
   const v = [1, 1.15, 1.3].includes(state.settings.textScale) ? state.settings.textScale : 1;
   document.documentElement.style.setProperty('--text-scale', v);
@@ -3661,7 +4176,7 @@ function applyCustomColor(){
   const textOK = textRatio >= 4.5, borderOK = borderRatio >= 3;
   document.getElementById('colorHint').textContent = textOK && borderOK
     ? ''
-    : 'Este color puede costar de leer. Prueba otro más oscuro o más saturado.';
+    : tr('Este color puede costar de leer. Prueba otro más oscuro o más saturado.');
 }
 document.getElementById('customColorPick').addEventListener('input', e => {
   state.settings.customColor = e.target.value;
@@ -3791,7 +4306,7 @@ document.getElementById('btnExport').addEventListener('click', async () => {
       // de la app. El FileProvider de Android tiene expuesta justo esa ruta.
       await fs.writeFile({ path:name, directory:'CACHE', encoding:'utf8', data });
       const { uri } = await fs.getUri({ path:name, directory:'CACHE' });
-      await share.share({ title:'Copia de Spoony', url:uri });
+      await share.share({ title:tr('Copia de Spoony'), url:uri });
     }catch(e){
       /* Cerrar la hoja de compartir sin elegir nada también cae aquí. No es
          un fallo que haya que anunciar, pero tampoco es una copia hecha:
@@ -3834,15 +4349,15 @@ document.getElementById('fileIn').addEventListener('change', async e => {
   }catch(err){
     state = previous;
     try{ applyAll(); }catch(e2){ console.error('No se pudo volver a pintar', e2); }
-    alert('Ese archivo no es una copia de Spoony. No se ha cambiado nada.');
+    alert(tr('Ese archivo no es una copia de Spoony. No se ha cambiado nada.'));
   }
   e.target.value = '';   // sin esto, elegir el mismo archivo otra vez no dispara change
 });
 document.getElementById('btnWipe').addEventListener('click', () => {
   const inCloud = !!(auth && syncAllowed());
-  if(!confirm(inCloud
+  if(!confirm(tr(inCloud
     ? 'Se borra todo el historial, en este móvil y en tu cuenta. No se puede deshacer.'
-    : 'Se borra todo el historial. No se puede deshacer.')) return;
+    : 'Se borra todo el historial. No se puede deshacer.'))) return;
   const prevSync = state.sync;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const customColor = state.settings.customColor;
@@ -3850,18 +4365,19 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const peakCostPercent = state.settings.peakCostPercent;
   const peakPromptOff = state.settings.peakPromptOff;
   const savedDayStartHour = state.settings.dayStartHour;   // cuándo empieza tu día es rutina, no historial: sobrevive al borrado
+  const savedLang = state.settings.lang;   // el idioma es preferencia, no historial: sobrevive al borrado
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
   const finEnabled = state.finEnabled;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour},
+  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, lang:savedLang},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   if(prevSync) state.sync = prevSync;
   ensureFinanzas(); ensureCycle();
   save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
 });
 
-function applyAll(){ applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); }
+function applyAll(){ applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); }
 
 /* ---------- cuenta: hojas y botones ---------- */
 const dlgAccount = document.getElementById('dlgAccount');
@@ -3869,20 +4385,20 @@ const dlgSyncConflict = document.getElementById('dlgSyncConflict');
 const accMsg = document.getElementById('accMsg');
 const showAccMsg = t => { accMsg.textContent = t; accMsg.hidden = !t; };
 function authErrorText(e){
-  if(e instanceof NetError) return 'Sin conexión. Inténtalo cuando tengas internet.';
+  if(e instanceof NetError) return tr('Sin conexión. Inténtalo cuando tengas internet.');
   const c = e.code || '';
-  if(c === 'invalid_credentials') return 'El correo o la contraseña no son correctos.';
-  if(c === 'user_already_exists' || c === 'email_exists') return 'Ya hay una cuenta con ese correo. Pulsa Entrar.';
-  if(c === 'weak_password') return 'La contraseña tiene que tener al menos 6 caracteres.';
-  if(c === 'email_not_confirmed') return 'Falta confirmar la cuenta desde el correo que te enviamos.';
-  if(c === 'validation_failed' || c === 'email_address_invalid') return 'Ese correo no parece válido.';
-  if(c === 'over_email_send_rate_limit' || e.status === 429) return 'Demasiados intentos seguidos. Espera un poco y vuelve a probar.';
-  return 'No se pudo entrar. Inténtalo otra vez en un rato.';
+  if(c === 'invalid_credentials') return tr('El correo o la contraseña no son correctos.');
+  if(c === 'user_already_exists' || c === 'email_exists') return tr('Ya hay una cuenta con ese correo. Pulsa Entrar.');
+  if(c === 'weak_password') return tr('La contraseña tiene que tener al menos 6 caracteres.');
+  if(c === 'email_not_confirmed') return tr('Falta confirmar la cuenta desde el correo que te enviamos.');
+  if(c === 'validation_failed' || c === 'email_address_invalid') return tr('Ese correo no parece válido.');
+  if(c === 'over_email_send_rate_limit' || e.status === 429) return tr('Demasiados intentos seguidos. Espera un poco y vuelve a probar.');
+  return tr('No se pudo entrar. Inténtalo otra vez en un rato.');
 }
 async function doAuth(kind){
   const email = document.getElementById('accEmailIn').value.trim();
   const password = document.getElementById('accPassIn').value;
-  if(!email || !password){ showAccMsg('Escribe tu correo y una contraseña.'); return; }
+  if(!email || !password){ showAccMsg(tr('Escribe tu correo y una contraseña.')); return; }
   const btns = [document.getElementById('accSignIn'), document.getElementById('accSignUp')];
   btns.forEach(b => b.disabled = true);
   showAccMsg('');
@@ -3891,7 +4407,7 @@ async function doAuth(kind){
       ? await api('/auth/v1/signup', { method:'POST', body:{ email, password } })
       : await api('/auth/v1/token?grant_type=password', { method:'POST', body:{ email, password } });
     if(!j || !j.access_token){
-      showAccMsg('Te hemos enviado un correo para confirmar la cuenta. Cuando lo confirmes, vuelve aquí y pulsa Entrar.');
+      showAccMsg(tr('Te hemos enviado un correo para confirmar la cuenta. Cuando lo confirmes, vuelve aquí y pulsa Entrar.'));
       return;
     }
     storeSession(j);
@@ -3921,7 +4437,7 @@ async function oauthSignIn(provider){
   showAccMsg('');
   const url = `${SUPABASE_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(OAUTH_REDIRECT)}`;
   try{ await browser.open({ url }); }
-  catch(e){ showAccMsg('No se pudo abrir la pantalla de inicio de sesión.'); }
+  catch(e){ showAccMsg(tr('No se pudo abrir la pantalla de inicio de sesión.')); }
 }
 /* El fragmento que llega de vuelta trae el token, pero no el correo ni el id
    de la persona: hay que pedirlos aparte con ese mismo token. */
@@ -3931,9 +4447,9 @@ async function completeOAuth(url){
   nativeBrowser()?.close().catch(() => {});
   if(params.get('error')){
     openDialog(dlgAccount);
-    showAccMsg(params.get('error_code') === 'otp_expired'
+    showAccMsg(tr(params.get('error_code') === 'otp_expired'
       ? 'Ese enlace ha caducado. Inténtalo otra vez.'
-      : 'No se pudo iniciar sesión. Inténtalo otra vez.');
+      : 'No se pudo iniciar sesión. Inténtalo otra vez.'));
     return;
   }
   const access_token = params.get('access_token');
@@ -3949,7 +4465,7 @@ async function completeOAuth(url){
     startSyncForUser();
   }catch(e){
     openDialog(dlgAccount);
-    showAccMsg('No se pudo completar el inicio de sesión. Inténtalo otra vez.');
+    showAccMsg(tr('No se pudo completar el inicio de sesión. Inténtalo otra vez.'));
   }
 }
 nativeOn('App', 'appUrlOpen', data => { if(data && data.url && data.url.startsWith(OAUTH_REDIRECT)) completeOAuth(data.url); });
@@ -3973,13 +4489,13 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
   if(t) try{ await api('/auth/v1/logout', { method:'POST', token:t }); }catch(e){}
 });
 document.getElementById('btnAccDelete').addEventListener('click', async () => {
-  if(!confirm('Se borra tu cuenta y la copia en la nube. Lo que hay en este móvil se queda. No se puede deshacer.')) return;
+  if(!confirm(tr('Se borra tu cuenta y la copia en la nube. Lo que hay en este móvil se queda. No se puede deshacer.'))) return;
   try{
     await api('/rest/v1/rpc/delete_my_account', { method:'POST', token: await accessToken(), body:{} });
     delete state.sync; persist();
     signOutLocal();
   }catch(e){
-    alert(e instanceof NetError ? 'Sin conexión. Para borrar la cuenta hace falta internet.' : 'No se pudo borrar la cuenta. Inténtalo más tarde.');
+    alert(tr(e instanceof NetError ? 'Sin conexión. Para borrar la cuenta hace falta internet.' : 'No se pudo borrar la cuenta. Inténtalo más tarde.'));
   }
 });
 
@@ -3991,7 +4507,7 @@ function openConflictSheet(){
 }
 document.getElementById('btnSyncDecide').addEventListener('click', async () => {
   try{ pendingRemote = pendingRemote || await getRemote(); }
-  catch(e){ alert('Sin conexión. Para elegir hace falta internet.'); return; }
+  catch(e){ alert(tr('Sin conexión. Para elegir hace falta internet.')); return; }
   if(!pendingRemote){ state.sync.paused = false; persist(); syncNow(); return; }
   openConflictSheet();
 });
@@ -4084,13 +4600,14 @@ function normalize(s){
     d.extras = Array.isArray(d.extras) ? d.extras.filter(x => x && typeof x === 'object') : [];
     if(typeof d.note !== 'string') d.note = '';
   });
-  if(!s.library || !s.library.length) s.library = SEED.map(x=>({...x,samples:[]}));
+  if(!s.library || !s.library.length) s.library = SEED.map(x=>({...x,name:tr(x.name),samples:[]}));
   s.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!s.settings) s.settings = { max:12 };
   if(!s.settings.overCost) s.settings.overCost = {...OVERCOST_DEFAULT};
   if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
   if(s.settings.dayStartHour == null) s.settings.dayStartHour = DAY_START_HOUR_DEFAULT;
+  if(s.settings.lang == null) s.settings.lang = LANG_DEFAULT;
   // Quien ya tenía historial antes de que existiera esta pantalla no debe
   // encontrársela de sorpresa (predictibilidad): solo se muestra sin pedirlo
   // a quien instala la app de cero (o restaura un backup con días ya apuntados).
@@ -4105,7 +4622,7 @@ function normalize(s){
   if(loaded) state = loaded;
   normalize(state);
   ensureFinanzas(); ensureCycle();
-  applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI();
+  applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.
