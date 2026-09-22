@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismos tokens que --bg y --accent en index.html, para que la carcasa
+         nativa (splash, barra de estado) no desentone con la app web. -->
+    <color name="colorPrimary">#9E5266</color>
+    <color name="colorPrimaryDark">#FBF2F3</color>
+    <color name="colorAccent">#9E5266</color>
+    <color name="statusBarBg">#FBF2F3</color>
+</resources>
