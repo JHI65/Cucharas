@@ -763,7 +763,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row" id="cycleMarginRow" hidden>
-      <div><strong>Margen de precaución</strong><p>Baja las cucharas del día este porcentaje cuando toca sangrado, apuntado o estimado.</p></div>
+      <div><strong>Margen de precaución</strong><p>Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.</p></div>
       <div class="ocgrid">
         <label>%<input type="number" id="cycleMargin" step="1" min="0" max="90" inputmode="numeric" aria-label="Margen de precaución en porcentaje"></label>
       </div>
@@ -1177,7 +1177,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="hint">Por eso, la app reserva un pequeño margen de tus cucharas. <strong>No es una predicción ni una obligación, sino una forma de cuidarte y ajustar tus expectativas a cómo te encuentras.</strong></p>
     <p class="hint">Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.</p>
     <p class="hint">Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».</p>
-    <p class="hint">El porcentaje inicial es del 20 %. Puedes modificarlo o dejarlo en 0 desde Ajustes. Con el registro de varios ciclos, podrás conocer mejor tus ritmos y adaptar el margen a tus necesidades.</p>
+    <p class="hint">El porcentaje base es del 20 % y puedes cambiarlo (o dejarlo en 0) desde Ajustes. Si ya has apuntado el dolor de hoy, el margen se ajusta a partir de ese porcentaje: baja con dolor 1-2, se mantiene con dolor 3 y sube con dolor 4-5. Sin dolor apuntado se usa el porcentaje base, como en el día previo estimado.</p>
     <p class="hint"><strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong></p>
     <div class="bigrow"><button class="primary" id="whyMarginClose">Cerrar</button></div>
   </div>
@@ -1741,7 +1741,7 @@ function renderMeter(){
   const budget = d.budget ?? 0;
   const precaution = (d.budget != null && !d.marginOff) ? precautionReason(todayKey()) : null;
   const effective = precaution
-    ? Math.max(1, Math.round(budget * (1 - state.marginPercent/100)))
+    ? Math.max(1, Math.round(budget * (1 - marginPercentFor(todayKey(), precaution)/100)))
     : budget;
   const marginAmount = budget - effective;
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
@@ -2113,6 +2113,17 @@ function precautionReason(k){
   if(log && log.bleeding) return 'real';
   if(k === precautionDayEstimate()) return 'estimada';
   return null;
+}
+/* El margen no es el mismo con dolor 1 que con dolor 5: se escala el
+   porcentaje base de Ajustes según el dolor que se apunte ese mismo día. Sin
+   dolor apuntado (día previo estimado, o día real todavía sin puntuar) se
+   usa el porcentaje base tal cual, como antes de que esto existiera. */
+const PAIN_MARGIN_MULTIPLIER = {1:0.5, 2:0.75, 3:1, 4:1.5, 5:2};
+function marginPercentFor(k, reason){
+  const base = state.marginPercent;
+  const log = reason === 'real' ? cycleLog(k) : null;
+  const mult = log && log.pain != null ? PAIN_MARGIN_MULTIPLIER[log.pain] : null;
+  return mult ? Math.min(95, Math.round(base * mult)) : base;
 }
 /* Función pura. Los límites son aproximados a propósito: la ovulación se marca
    como un entorno de ±2 días alrededor de la mitad del ciclo, no como un día. */
@@ -3656,7 +3667,7 @@ document.getElementById('cycPain').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return;
   const l = todayCycleLog();
   l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
-  save(); renderCycle();
+  save(); renderCycle(); renderMeter();
 });
 
 document.getElementById('overCostGrid').addEventListener('change', e => {
