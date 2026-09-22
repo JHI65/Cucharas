@@ -836,7 +836,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div class="row" id="accInRow" hidden>
       <div><strong id="accEmail"></strong><p id="accStatus"></p></div>
-      <button class="btn" id="btnSyncNow">Sincronizar</button>
     </div>
     <div class="row" id="accDecideRow" hidden>
       <div><strong>Falta elegir qué datos guardar</strong><p>Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.</p></div>
@@ -3858,7 +3857,6 @@ document.getElementById('btnAccOpen').addEventListener('click', () => { showAccM
 document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
-document.getElementById('btnSyncNow').addEventListener('click', syncNow);
 document.getElementById('btnLogout').addEventListener('click', async () => {
   const t = auth && auth.access_token;
   signOutLocal();
