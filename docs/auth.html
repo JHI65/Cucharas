@@ -25,32 +25,99 @@
   h1{font-size:22px; margin:0 0 12px}
   p{font-size:16px; line-height:1.5; color:var(--ink-soft); margin:0 0 8px}
   .tag{font-size:14px; color:var(--ink-soft); margin-top:22px}
+  form{margin-top:18px; text-align:left}
+  label{display:block; font-size:14px; color:var(--ink); margin:0 0 6px}
+  input{
+    width:100%; font:inherit; font-size:16px; color:var(--ink);
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; margin:0 0 14px; box-sizing:border-box;
+  }
+  button{
+    width:100%; font:inherit; font-size:16px; font-weight:600; color:#fff;
+    background:var(--accent); border:none; border-radius:10px; padding:12px;
+    cursor:pointer;
+  }
+  button:disabled{opacity:.6; cursor:default}
+  .err{color:#B3261E; font-size:14px; margin:0 0 8px; text-align:left}
 </style>
 </head>
 <body>
   <div class="card">
     <h1 id="title">Un momento…</h1>
     <p id="body">Comprobando el enlace.</p>
+    <form id="pwForm" hidden>
+      <label for="pw1">Contraseña nueva</label>
+      <input type="password" id="pw1" autocomplete="new-password" minlength="6">
+      <label for="pw2">Repítela</label>
+      <input type="password" id="pw2" autocomplete="new-password" minlength="6">
+      <p class="err" id="pwErr" hidden></p>
+      <button type="submit" id="pwBtn">Guardar contraseña</button>
+    </form>
     <p class="tag">Spoony</p>
   </div>
   <script>
-    /* Este enlace lo abre el correo de Supabase (confirmar cuenta, o más
-       adelante recuperar contraseña). Esta página no hace nada con la
-       sesión que llega en la URL: la app nativa guarda su propia sesión por
-       separado en cada móvil, así que aquí solo hace falta decir qué ha
-       pasado y mandar a la persona de vuelta a Spoony. Sin JS externo ni
-       compilación, igual que el resto del proyecto. */
+    /* Este enlace lo abre el correo de Supabase (confirmar cuenta o
+       recuperar contraseña). Esta página no hace nada con la sesión que
+       llega en la URL para confirmar cuenta: la app nativa guarda su propia
+       sesión por separado en cada móvil, así que ahí solo hace falta decir
+       qué ha pasado y mandar a la persona de vuelta a Spoony.
+
+       Para recuperar contraseña es distinto: el token de recuperación solo
+       sirve para eso (poner una contraseña nueva), no para entrar, así que
+       hay que usarlo aquí mismo con un formulario — no hay ningún sitio al
+       que reenviarlo. Mismas credenciales públicas que index.html: la clave
+       "anon" no protege nada por sí sola, la protección la ponen las
+       políticas RLS de supabase/schema.sql. Sin JS externo ni compilación,
+       igual que el resto del proyecto. */
+    const SUPABASE_URL = 'https://fcmrwfpekzgtsgktyvwk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjbXJ3ZnBla3pndHNna3R5dndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDMxMzIsImV4cCI6MjEwNTU3OTEzMn0.o_Z43sKGLCqjXvbTQFjY9PiiYmwITM5mG4bvOPhQkg0';
+
     const p = new URLSearchParams(location.hash.slice(1));
     const title = document.getElementById('title');
     const body = document.getElementById('body');
+    const form = document.getElementById('pwForm');
+    const pwErr = document.getElementById('pwErr');
+    const showErr = t => { pwErr.textContent = t; pwErr.hidden = !t; };
+
     if(p.get('error')){
       title.textContent = 'Ese enlace ya no vale';
       body.textContent = p.get('error_code') === 'otp_expired'
         ? 'Ha caducado. Vuelve a Spoony e inténtalo otra vez desde "Tu cuenta".'
         : 'Vuelve a Spoony e inténtalo otra vez desde "Tu cuenta".';
-    }else if(p.get('type') === 'recovery'){
-      title.textContent = 'Enlace confirmado';
-      body.textContent = 'Vuelve a Spoony para poner una contraseña nueva.';
+    }else if(p.get('type') === 'recovery' && p.get('access_token')){
+      const token = p.get('access_token');
+      title.textContent = 'Pon una contraseña nueva';
+      body.textContent = 'Solo se usa aquí; luego entra en Spoony con tu correo y esta contraseña.';
+      form.hidden = false;
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        showErr('');
+        const pw1 = document.getElementById('pw1').value;
+        const pw2 = document.getElementById('pw2').value;
+        if(pw1.length < 6){ showErr('La contraseña tiene que tener al menos 6 caracteres.'); return; }
+        if(pw1 !== pw2){ showErr('Las dos contraseñas no coinciden.'); return; }
+        const btn = document.getElementById('pwBtn');
+        btn.disabled = true;
+        try{
+          const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+            method: 'PUT',
+            headers: {
+              apikey: SUPABASE_ANON_KEY, 'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({ password: pw1 })
+          });
+          if(!r.ok){
+            const j = await r.json().catch(() => null);
+            throw new Error((j && (j.msg || j.message)) || ('HTTP ' + r.status));
+          }
+          form.hidden = true;
+          title.textContent = 'Contraseña actualizada';
+          body.textContent = 'Vuelve a Spoony y entra con tu correo y tu contraseña nueva.';
+        }catch(err){
+          showErr('No se pudo guardar. Puede que el enlace haya caducado: vuelve a pedir el correo desde "Tu cuenta".');
+        }finally{ btn.disabled = false; }
+      });
     }else if(p.get('access_token')){
       title.textContent = 'Cuenta confirmada';
       body.textContent = 'Ya puedes cerrar esto y entrar en Spoony con tu correo y tu contraseña.';

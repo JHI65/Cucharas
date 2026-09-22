@@ -1288,6 +1288,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label for="accPassIn" data-i18n="Contraseña">Contraseña</label>
       <input type="password" id="accPassIn" autocomplete="current-password">
     </div>
+    <button class="linkbtn" id="accForgot" style="margin:-8px 0 16px" data-i18n="¿Has olvidado tu contraseña?">¿Has olvidado tu contraseña?</button>
     <p class="notice" id="accMsg" role="status" hidden style="margin:0 0 16px"></p>
     <div class="bigrow">
       <button id="accSignUp" data-i18n="Crear cuenta">Crear cuenta</button>
@@ -1509,6 +1510,7 @@ const EN = {
  "¿Cuánto has aguantado hoy de ruido, luz, gente?": "How much noise, light or people could you take today?",
  "¿Cuánto tardaste en recuperarte?": "How long did it take you to recover?",
  "¿Cuánto te devolvió?": "How much did it give back?",
+ "¿Has olvidado tu contraseña?": "Forgot your password?",
  "¿Lo activamos ahora?": "Turn it on now?",
  "¿Por qué se restan cucharas?": "Why are spoons subtracted?",
  "¿Por qué?": "Why?",
@@ -1686,6 +1688,7 @@ const EN = {
  "Es lo que ya pasó, no una previsión de lo que va a pasar.": "It's what already happened, not a forecast of what's going to happen.",
  "es mañana": "is tomorrow",
  "Es una estimación a partir de lo que has apuntado, no una certeza.": "It's an estimate based on what you've logged, not a certainty.",
+ "Escribe tu correo arriba y vuelve a pulsar.": "Write your email above and tap again.",
  "Escribe tu correo y una contraseña.": "Write your email and a password.",
  "Ese archivo no es una copia de Spoony. No se ha cambiado nada.": "That file isn't a Spoony backup. Nothing has changed.",
  "Ese correo no parece válido.": "That email doesn't look valid.",
@@ -1893,6 +1896,7 @@ const EN = {
  "Tardas más que antes en recuperarte de: {lista}.": "You're taking longer than before to recover from: {lista}.",
  "Tareas": "Tasks",
  "Te hemos enviado un correo para confirmar la cuenta. Cuando lo confirmes, vuelve aquí y pulsa Entrar.": "We've sent you an email to confirm the account. Once you confirm it, come back here and tap Log in.",
+ "Te hemos enviado un correo. Sigue el enlace para poner una contraseña nueva.": "We've sent you an email. Follow the link to set a new password.",
  "Tienes {n} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.": "You have {n} full cycles, but there still aren't enough days with tasks logged to describe anything.",
  "Tipo": "Type",
  "Toca un día para ver o planificar": "Tap a day to see or plan it",
@@ -4458,6 +4462,21 @@ async function doAuth(kind){
   }catch(e){ showAccMsg(authErrorText(e)); }
   finally{ btns.forEach(b => b.disabled = false); }
 }
+/* El correo de recuperación manda siempre a auth.html (Site URL de
+   Supabase, ver SUPABASE.md): ahí es donde se pone la contraseña nueva, no
+   aquí. Por eso esta función no espera ninguna sesión de vuelta. */
+async function doRecover(){
+  const email = document.getElementById('accEmailIn').value.trim();
+  if(!email){ showAccMsg(tr('Escribe tu correo arriba y vuelve a pulsar.')); return; }
+  const btn = document.getElementById('accForgot');
+  btn.disabled = true;
+  showAccMsg('');
+  try{
+    await api('/auth/v1/recover', { method:'POST', body:{ email } });
+    showAccMsg(tr('Te hemos enviado un correo. Sigue el enlace para poner una contraseña nueva.'));
+  }catch(e){ showAccMsg(authErrorText(e)); }
+  finally{ btn.disabled = false; }
+}
 /* ---------- iniciar sesión con Google o Apple (opcional) ----------
    Solo aparece dentro de la app nativa: fuera de ella (navegador de
    escritorio) no hay ningún sitio al que Google o Apple puedan redirigir de
@@ -4523,6 +4542,7 @@ document.getElementById('btnAccOpen').addEventListener('click', () => { showAccM
 document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
+document.getElementById('accForgot').addEventListener('click', doRecover);
 document.getElementById('btnLogout').addEventListener('click', async () => {
   const t = auth && auth.access_token;
   signOutLocal();
