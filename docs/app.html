@@ -1275,6 +1275,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div id="dTasks"></div>
     <button class="add" id="dAdd">Añadir tarea a este día</button>
     <button class="add" id="dTpl" style="margin-top:9px">Usar un día tipo</button>
+    <button class="add" id="dAddCycle" style="margin-top:9px" hidden>Añadir registro de ciclo a este día</button>
     <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
       <h2>Ciclo</h2>
       <p>Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
@@ -3421,6 +3422,7 @@ document.getElementById('calNext').addEventListener('click', () => {
 
 const dlgDay = document.getElementById('dlgDay');
 let selectedDay = todayKey();
+let dCycleOpen = false;
 function renderDaySheet(){
   const k = selectedDay, d = day(k), past = k < todayKey(), isToday = k === todayKey();
   const { planned, spent } = dayLoad(k);
@@ -3455,10 +3457,15 @@ function renderDaySheet(){
 /* Registro de ciclo retroactivo: el mismo campo que "Registro de hoy" pero
    sobre el día que se esté mirando en el calendario, no solo hoy. No se
    ofrece en días futuros porque no tiene sentido apuntar un sangrado que
-   todavía no ha pasado. */
+   todavía no ha pasado. Empieza siempre plegado tras un botón, como
+   "Añadir tarea a este día", para no mostrar de golpe un dato de salud que
+   la mayoría de días no hace falta tocar. */
 function renderDayCycleCard(k, notFuture){
+  const show = !!state.cycleEnabled && notFuture;
+  const btn = document.getElementById('dAddCycle');
   const card = document.getElementById('dCycleCard');
-  card.hidden = !state.cycleEnabled || !notFuture;
+  btn.hidden = !show || dCycleOpen;
+  card.hidden = !show || !dCycleOpen;
   if(card.hidden) return;
   const log = cycleLog(k);
   const bleeding = log ? log.bleeding : null;
@@ -3470,8 +3477,9 @@ function renderDayCycleCard(k, notFuture){
 }
 document.getElementById('calGrid').addEventListener('click', e => {
   const c = e.target.closest('[data-day]'); if(!c) return;
-  selectedDay = c.dataset.day; renderDaySheet(); openDialog(dlgDay);
+  selectedDay = c.dataset.day; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay);
 });
+document.getElementById('dAddCycle').addEventListener('click', () => { dCycleOpen = true; renderDaySheet(); });
 document.getElementById('dAdd').addEventListener('click', () => openTaskSheet(selectedDay));
 document.getElementById('dTpl').addEventListener('click', () => openTpl(selectedDay));
 document.getElementById('dTasks').addEventListener('click', e => {
