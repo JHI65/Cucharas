@@ -1275,6 +1275,27 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div id="dTasks"></div>
     <button class="add" id="dAdd">Añadir tarea a este día</button>
     <button class="add" id="dTpl" style="margin-top:9px">Usar un día tipo</button>
+    <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
+      <h2>Ciclo</h2>
+      <p>Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
+      <div class="field">
+        <label>Sangrado</label>
+        <div class="chips" id="dCycBleed" role="group" aria-label="Sangrado">
+          <button class="chip" data-bleed="si" aria-pressed="false">Sí</button>
+          <button class="chip" data-bleed="no" aria-pressed="false">No</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Dolor físico</label>
+        <div class="scale" id="dCycPain"></div>
+        <div class="scale-lab"><span>Ninguno</span><span>Mucho</span></div>
+      </div>
+      <div class="field" id="dCycIntField" hidden>
+        <label>Intensidad del sangrado</label>
+        <div class="scale" id="dCycIntensity"></div>
+        <div class="scale-lab"><span>Muy leve</span><span>Muy fuerte</span></div>
+      </div>
+    </div>
     <div class="field" style="margin-top:18px">
       <label for="dNote">Nota</label>
       <textarea id="dNote" placeholder="Qué pesó, qué ayudó, qué repetirías."></textarea>
@@ -3429,6 +3450,23 @@ function renderDaySheet(){
       </div>`).join('')
     : '<div class="empty">Nada planificado para este día.</div>';
   document.getElementById('dNote').value = d.note || '';
+  renderDayCycleCard(k, past || isToday);
+}
+/* Registro de ciclo retroactivo: el mismo campo que "Registro de hoy" pero
+   sobre el día que se esté mirando en el calendario, no solo hoy. No se
+   ofrece en días futuros porque no tiene sentido apuntar un sangrado que
+   todavía no ha pasado. */
+function renderDayCycleCard(k, notFuture){
+  const card = document.getElementById('dCycleCard');
+  card.hidden = !state.cycleEnabled || !notFuture;
+  if(card.hidden) return;
+  const log = cycleLog(k);
+  const bleeding = log ? log.bleeding : null;
+  document.querySelectorAll('#dCycBleed .chip').forEach(c =>
+    c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
+  document.getElementById('dCycIntField').hidden = !bleeding;
+  paintScale('dCycPain', log ? log.pain : null);
+  paintScale('dCycIntensity', log ? log.bleedingIntensity : null);
 }
 document.getElementById('calGrid').addEventListener('click', e => {
   const c = e.target.closest('[data-day]'); if(!c) return;
@@ -3678,12 +3716,12 @@ document.getElementById('marginPlus').addEventListener('click', () => {
   document.getElementById('marginOut').textContent = state.marginPercent + '%';
   save(); renderMeter(); renderCycle();
 });
-function todayCycleLog(){
-  const k = todayKey();
+function cycleLogFor(k){
   let l = cycleLog(k);
   if(!l){ l = { date:k, bleeding:false, bleedingIntensity:null, pain:null }; state.cycleLogs.push(l); }
   return l;
 }
+function todayCycleLog(){ return cycleLogFor(todayKey()); }
 document.getElementById('cycBleed').addEventListener('click', e => {
   const b = e.target.closest('[data-bleed]'); if(!b) return;
   const l = todayCycleLog();
@@ -3702,6 +3740,25 @@ document.getElementById('cycPain').addEventListener('click', e => {
   const l = todayCycleLog();
   l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
   save(); renderCycle(); renderMeter();
+});
+document.getElementById('dCycBleed').addEventListener('click', e => {
+  const b = e.target.closest('[data-bleed]'); if(!b) return;
+  const l = cycleLogFor(selectedDay);
+  l.bleeding = b.dataset.bleed === 'si';
+  if(!l.bleeding) l.bleedingIntensity = null;
+  save(); renderDaySheet(); renderCycle(); renderMeter();
+});
+document.getElementById('dCycIntensity').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = cycleLogFor(selectedDay);
+  l.bleedingIntensity = l.bleedingIntensity === +b.dataset.v ? null : +b.dataset.v;
+  save(); renderDaySheet(); renderCycle();
+});
+document.getElementById('dCycPain').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if(!b) return;
+  const l = cycleLogFor(selectedDay);
+  l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
+  save(); renderDaySheet(); renderCycle(); renderMeter();
 });
 
 document.getElementById('overCostGrid').addEventListener('change', e => {
