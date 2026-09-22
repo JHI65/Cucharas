@@ -4145,7 +4145,7 @@ function applyCustomColor(){
     return;
   }
   document.getElementById('customColorPick').value = hex || '#9E5266';
-  const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line'];
+  const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line','--glass'];
   if(!hex){
     props.forEach(p => root.removeProperty(p));
     infoRow.hidden = true;
@@ -4164,6 +4164,10 @@ function applyCustomColor(){
   root.setProperty('--surface-2', mix(m.surface2));
   root.setProperty('--bg', mix(m.bg));
   root.setProperty('--surface', surfaceCss);
+  /* La barra de pestañas es cristal: superficie con transparencia, no un
+     color aparte. Si no se deriva del color elegido, se queda con el tono
+     rosa de fábrica por debajo del desenfoque pase lo que pase. */
+  root.setProperty('--glass', `color-mix(in srgb, ${surfaceCss} 70%, transparent)`);
 
   const accentHex = resolveToHex(accentCss);
   const surfaceHex = resolveToHex(surfaceCss);
