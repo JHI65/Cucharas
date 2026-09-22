@@ -10,6 +10,7 @@
     --ink:#4B3A3F; --ink-soft:#7A6167; --accent:#9E5266;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none !important}
   html,body{margin:0;min-height:100%;background:var(--bg)}
   body{
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
@@ -21,6 +22,12 @@
     border:1px solid var(--line); border-radius:20px; padding:28px 24px;
     text-align:center;
   }
+  .langsw{display:flex; justify-content:center; gap:8px; margin:0 0 18px}
+  .langsw button{
+    font:inherit; font-size:13px; color:var(--ink-soft); cursor:pointer;
+    background:none; border:1px solid var(--line); border-radius:999px; padding:5px 12px;
+  }
+  .langsw button[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:#FFF8F9}
   h1{font-size:24px; margin:0 0 12px}
   p{font-size:16px; line-height:1.5; color:var(--ink-soft); margin:0 0 16px}
   a{color:var(--accent)}
@@ -28,9 +35,39 @@
 </head>
 <body>
   <div class="card">
+    <div class="langsw" role="group" aria-label="Language / Idioma">
+      <button type="button" data-lang="en" aria-pressed="true">English</button>
+      <button type="button" data-lang="es" aria-pressed="false">Español</button>
+    </div>
     <h1>Spoony</h1>
-    <p>Plan your day by the energy you have, not by the hours. Without an account, your data never leaves your phone.</p>
-    <p><a href="privacidad.html">Privacy policy</a></p>
+    <div data-content="en">
+      <p>Plan your day by the energy you have, not by the hours. Without an account, your data never leaves your phone.</p>
+      <p><a href="privacidad.html">Privacy policy</a></p>
+    </div>
+    <div data-content="es" hidden>
+      <p>Planifica tu día por la energía que tienes, no por las horas. Sin cuenta, tus datos no salen del teléfono.</p>
+      <p><a href="privacidad.html">Política de privacidad</a></p>
+    </div>
   </div>
+  <script>
+    var KEY = 'spoony-docs-lang';
+    function apply(lang){
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-content]').forEach(function(el){
+        el.hidden = el.dataset.content !== lang;
+      });
+      document.querySelectorAll('.langsw button').forEach(function(b){
+        b.setAttribute('aria-pressed', b.dataset.lang === lang);
+      });
+    }
+    document.querySelector('.langsw').addEventListener('click', function(e){
+      var b = e.target.closest('[data-lang]'); if(!b) return;
+      try{ localStorage.setItem(KEY, b.dataset.lang); }catch(e){}
+      apply(b.dataset.lang);
+    });
+    var saved = 'en';
+    try{ saved = localStorage.getItem(KEY) || 'en'; }catch(e){}
+    apply(saved);
+  </script>
 </body>
 </html>
