@@ -4503,7 +4503,7 @@ function applyFinUI(){
   document.getElementById('finReplayRow').hidden = !visible;
   updateTabsCompact();
   document.querySelectorAll('#finPick .chip').forEach(c =>
-    c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === enabled));
+    c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === visible));
   if(!visible && currentTab === 'fin') document.querySelector('#tabs [data-go="hoy"]').click();
 }
 document.getElementById('finPick').addEventListener('click', e => {
