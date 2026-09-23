@@ -1298,6 +1298,19 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<!-- ===== Muro de pago (freemium, ver DESIGN_LOG.md) ===== -->
+<dialog id="dlgPremium">
+  <div class="sheet">
+    <h2 data-i18n="Spoony Premium">Spoony Premium</h2>
+    <p class="sub" id="premiumSub"></p>
+    <p class="sub" data-i18n="14 días de prueba gratis. Luego, 36 €/año o 3,99 €/mes. Cancela cuando quieras.">14 días de prueba gratis. Luego, 36 €/año o 3,99 €/mes. Cancela cuando quieras.</p>
+    <p class="notice" id="premiumMsg" role="status" hidden style="margin:0 0 16px"></p>
+    <div class="bigrow"><button class="primary" id="premiumStart" data-i18n="Empezar prueba gratis">Empezar prueba gratis</button></div>
+    <button class="linkbtn" id="premiumRestore" style="margin:-8px 0 16px" data-i18n="Ya tengo Premium · Restaurar compras">Ya tengo Premium · Restaurar compras</button>
+    <div class="bigrow"><button id="premiumCancel" data-i18n="Cancelar">Cancelar</button></div>
+  </div>
+</dialog>
+
 <!-- ===== Datos distintos en el móvil y en la cuenta ===== -->
 <dialog id="dlgSyncConflict">
   <div class="sheet">
@@ -1317,6 +1330,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <div class="sheet">
     <h2 id="dTitle"></h2>
     <p class="sub" id="dSub"></p>
+    <p class="sub" id="dLockedNote" hidden data-i18n="Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.">Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.</p>
     <div id="dTasks"></div>
     <button class="add" id="dAdd" data-i18n="Añadir tarea a este día">Añadir tarea a este día</button>
     <button class="add" id="dTpl" style="margin-top:9px" data-i18n="Usar un día tipo">Usar un día tipo</button>
@@ -1402,6 +1416,58 @@ const nativeShare = () => _share || (_share = nativePlugin('Share', ['share']));
    SFSafariViewController en iOS), no en una pestaña externa. */
 let _browser;
 const nativeBrowser = () => _browser || (_browser = nativePlugin('Browser', ['open', 'close']));
+
+/* Compras (freemium, ver DESIGN_LOG.md): @revenuecat/purchases-capacitor,
+   plugin nativo "Purchases" (mismo puente sin bundler que el resto). Solo
+   sirve dentro de la app nativa; en la versión web no hay tienda a la que
+   comprar. Las claves están vacías hasta que exista la cuenta de RevenueCat
+   y los productos en App Store Connect / Google Play Console (pasos
+   manuales pendientes, ver DESIGN_LOG.md): mientras tanto configure()
+   fallará y purchaseFlow() lo cuenta como "no disponible todavía", no como
+   un error de la persona que prueba la app. */
+let _purchases;
+const nativePurchases = () => _purchases || (_purchases = nativePlugin('Purchases',
+  ['configure', 'getOfferings', 'purchasePackage', 'restorePurchases', 'getCustomerInfo', 'logIn', 'logOut']));
+const RC_API_KEY_IOS = '';       // TODO: clave pública de RevenueCat para iOS (App Store Connect + RevenueCat ya creados)
+const RC_API_KEY_ANDROID = '';   // TODO: clave pública de RevenueCat para Android (Google Play Console + RevenueCat ya creados)
+const RC_ENTITLEMENT_ID = 'premium';   // debe coincidir con el identificador del entitlement en el panel de RevenueCat
+let rcConfigured = false;
+async function rcConfigure(){
+  const p = nativePurchases();
+  if(!p) return null;
+  const apiKey = window.Capacitor.getPlatform() === 'ios' ? RC_API_KEY_IOS : RC_API_KEY_ANDROID;
+  if(!apiKey) return null;
+  if(!rcConfigured){
+    await p.configure({ apiKey, appUserID: auth ? auth.user.id : null });
+    rcConfigured = true;
+  }
+  return p;
+}
+/* Un mismo comprador debe ver su compra tanto si entró con cuenta antes de
+   pagar como si paga primero y crea cuenta después: por eso el appUserID de
+   RevenueCat se ata al id de Supabase en cuanto hay sesión, no se deja
+   anónimo. */
+async function rcSyncIdentity(){
+  const p = await rcConfigure();
+  if(!p) return;
+  try{ auth ? await p.logIn({ appUserID: auth.user.id }) : await p.logOut(); }catch(e){}
+}
+/* Fuente de verdad de "¿esta compra es real?": la propia caché de
+   RevenueCat, validada contra Apple/Google, no algo que el cliente se
+   invente. Vive aparte de `entitlement` (que lee spoony_entitlements en
+   Supabase) porque hoy no hay webhook que sincronice una compra real hacia
+   esa tabla — ver "Preguntas abiertas" en DESIGN_LOG.md. isPremium() acepta
+   cualquiera de las dos fuentes. */
+let rcEntitlementActive = false;
+async function refreshRcEntitlement(){
+  const p = await rcConfigure();
+  if(!p) return;
+  try{
+    const { customerInfo } = await p.getCustomerInfo();
+    rcEntitlementActive = !!(customerInfo && customerInfo.entitlements && customerInfo.entitlements.active[RC_ENTITLEMENT_ID]);
+  }catch(e){ /* sin conexión o sin configurar: se mantiene lo último sabido */ }
+  applyAll();
+}
 
 /* addListener es otro camino del mismo puente (cap.addListener, no
    cap.nativePromise): así se escuchan eventos del lado nativo, aquí la
@@ -1541,6 +1607,7 @@ const EN = {
  "<strong>No tienes que rendir igual todos los días para estar haciéndolo bien.</strong>": "<strong>You don't have to perform the same every day to be doing fine.</strong>",
  "−{n} cucharas": "−{n} spoons",
  "1 h": "1 h",
+ "14 días de prueba gratis. Luego, 36 €/año o 3,99 €/mes. Cancela cuando quieras.": "14 days free trial. Then, €36/year or €3.99/month. Cancel anytime.",
  "15 min": "15 min",
  "2 h": "2 h",
  "30 min": "30 min",
@@ -1601,10 +1668,12 @@ const EN = {
  "Cierra el día con dos escalas del 1 al 5. Es lo que alimenta la sección de patrones.": "Close the day with two 1-to-5 scales. It's what feeds the Patterns section.",
  "Color de la interfaz": "Interface colour",
  "Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.": "Colour, contrast and your data: export them or replay this guide from here.",
+ "Cómo cambian tus cucharas y tu tolerancia sensorial con el tiempo, y qué días tardas más en recuperarte.": "How your spoons and sensory tolerance change over time, and which days you take longer to recover from.",
  "Cómo funciona Ciclo": "How Cycle works",
  "Cómo funciona Finanzas": "How Finances works",
  "Cómo funciona la app": "How the app works",
  "Cómo se ve": "How it looks",
+ "Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.": "On the free version, this day is read-only. Today and tomorrow can always be edited.",
  "Con margen": "Room to spare",
  "Con tu variación de siempre, caería entre el {desde} y el {hasta}.": "With your usual variation, it would fall between {desde} and {hasta}.",
  "Con uno al día, a partir del {fecha}.": "At one a day, from {fecha}.",
@@ -1649,6 +1718,7 @@ const EN = {
  "Día {n} del ciclo — Fase estimada: {fase}": "Cycle day {n} — Estimated phase: {fase}",
  "Día de trabajo": "Work day",
  "Días tipo": "Routine days",
+ "Días tipo es una función de Spoony Premium.": "Routine days is a Spoony Premium feature.",
  "Dolor físico": "Physical pain",
  "Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.": "Two 1-to-5 scales: capacity you have left and how much noise, light and people you could take. No need to put a name to what you feel.",
  "Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.": "Two minutes. No need to put a name to what you feel: just score it.",
@@ -1661,6 +1731,7 @@ const EN = {
  "Editar {name}": "Edit {name}",
  "Editar actividad": "Edit activity",
  "Editar cuánto cuesta cada actividad": "Edit how much each activity costs",
+ "Editar días ya pasados es una función de Spoony Premium.": "Editing past days is a Spoony Premium feature.",
  "Editar gasto {tipo}": "Edit {tipo} expense",
  "Editar tarea": "Edit task",
  "El correo o la contraseña no son correctos.": "The email or password is wrong.",
@@ -1671,10 +1742,12 @@ const EN = {
  "Elegir": "Choose",
  "Elegir color de la interfaz": "Choose interface colour",
  "Elegir días": "Choose days",
+ "Elegir la hora en la que empieza tu día es una función de Spoony Premium.": "Choosing the time your day starts is a Spoony Premium feature.",
  "Elige cuáles quieres guardar. Los otros se sustituyen y no se pueden recuperar.": "Choose which ones you want to keep. The others are replaced and can't be recovered.",
  "Elige de tu lista o escribe una nueva.": "Choose from your list or write a new one.",
  "Empezar": "Start",
  "Empezar el día": "Start the day",
+ "Empezar prueba gratis": "Start free trial",
  "Empieza el {fecha}.": "Starts {fecha}.",
  "En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.": "As soon as you log a day of bleeding, the estimate for the next one appears here.",
  "En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.": "In days. Used until cycles have been measured; after that your real average takes over.",
@@ -1712,6 +1785,7 @@ const EN = {
  "Fijos, variables e historial": "Fixed, variable and history",
  "Finanzas": "Finances",
  "Finanzas (opcional)": "Finances (optional)",
+ "Finanzas es una función de Spoony Premium.": "Finances is a Spoony Premium feature.",
  "Folicular": "Follicular",
  "Gasta cucharas": "Spends spoons",
  "Gastan cucharas": "Spend spoons",
@@ -1753,6 +1827,7 @@ const EN = {
  "Las cucharas de hoy": "Today's spoons",
  "Las cucharas no desaparecen: puedes utilizarlas si las necesitas. El aviso de «por debajo de lo asignado» aparecerá antes para recordarte que ese día contabas con menos energía.": "The spoons don't disappear: you can use them if you need to. The \"below what was assigned\" notice will show up sooner, to remind you that day you had less energy to count on.",
  "Las tareas del día": "The day's tasks",
+ "Las tareas que se repiten son una función de Spoony Premium.": "Repeating tasks are a Spoony Premium feature.",
  "Lo apuntado para hoy suma {planned} y tienes {effective}.": "What's logged for today adds up to {planned} and you have {effective}.",
  "Lo has fijado tú · sueles {verb} {n}": "You've set it yourself · you usually {verb} {n}",
  "Lo que te cuesta": "What it costs you",
@@ -1786,12 +1861,16 @@ const EN = {
  "Ninguna": "None",
  "Ninguno": "None",
  "No": "No",
+ "No aprende de esta actividad · Premium": "Doesn't learn from this activity · Premium",
  "No preguntar": "Don't ask",
  "No preguntar más": "Don't ask again",
+ "No se ha encontrado ninguna compra que restaurar.": "No purchase was found to restore.",
+ "No se ha podido activar Premium. Escríbenos si el cobro sí se hizo.": "Premium couldn't be activated. Write to us if the charge did go through.",
  "no se nota una diferencia clara con tu media": "there's no clear difference from your average",
  "No se pudo abrir la pantalla de inicio de sesión.": "Couldn't open the login screen.",
  "No se pudo borrar la cuenta. Inténtalo más tarde.": "Couldn't delete the account. Try again later.",
  "No se pudo completar el inicio de sesión. Inténtalo otra vez.": "Couldn't complete the login. Try again.",
+ "No se pudo completar la compra. Inténtalo otra vez.": "Couldn't complete the purchase. Try again.",
  "No se pudo entrar. Inténtalo otra vez en un rato.": "Couldn't log in. Try again in a bit.",
  "No se pudo iniciar sesión. Inténtalo otra vez.": "Couldn't log in. Try again.",
  "No se pudo sincronizar. Se volverá a intentar.": "Couldn't sync. It will try again.",
@@ -1812,6 +1891,8 @@ const EN = {
  "Paso {n} de {total}": "Step {n} of {total}",
  "Patrón": "Pattern",
  "Patrones": "Patterns",
+ "Patrones es una función de Spoony Premium.": "Patterns is a Spoony Premium feature.",
+ "Planificar más allá de mañana es una función de Spoony Premium.": "Planning beyond tomorrow is a Spoony Premium feature.",
  "Poco": "Low",
  "Pon lo que te cuesta cada cosa. Cuando marcas una tarea y corriges lo que costó de verdad, la app aprende y te avisa si tu estimación se queda corta.": "Set what each thing costs you. When you mark a task and correct what it really cost, the app learns and warns you if your estimate falls short.",
  "por debajo de lo asignado hoy": "below what was assigned today",
@@ -1883,6 +1964,7 @@ const EN = {
  "Solo ese día": "Just that day",
  "Solo este día": "Just this day",
  "Solo este mes": "Just this month",
+ "Spoony Premium": "Spoony Premium",
  "Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.": "Spoony is based on the spoon theory by Christine Miserandino and on <em>Energy Accounting</em> by Maja Toudal and Tony Attwood.",
  "Sube el contraste si te cuesta leer el texto claro.": "Raise the contrast if light text is hard to read.",
  "Sube el tamaño si te cuesta leer el texto normal.": "Raise the size if normal text is hard to read.",
@@ -1907,6 +1989,7 @@ const EN = {
  "Todavía no hay meses cerrados.": "No months closed yet.",
  "Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.": "No day of bleeding logged yet, so there's no cycle day to count.",
  "Todavía no hay suficientes datos para ver una tendencia. Hacen falta {n} check-out.": "Not enough data yet to see a trend. {n} check-outs are needed.",
+ "Todavía no se puede pagar desde la app. Vuelve a intentarlo más adelante.": "You can't pay from the app yet. Try again later.",
  "Todavía no tienes días tipo. Guarda un día que te haya funcionado y podrás repetirlo.": "You don't have any routine days yet. Save a day that worked for you and you'll be able to repeat it.",
  "Todo llevadero": "All manageable",
  "Todos los días": "Every day",
@@ -1946,6 +2029,7 @@ const EN = {
  "variable": "variable",
  "Ver": "View",
  "Ver a gente": "Seeing people",
+ "Ver con Premium": "See with Premium",
  "Ver detalle": "Show detail",
  "Vista de finanzas": "Finances view",
  "Vuelve a ver la explicación de cada parte, cuando quieras.": "Replay the explanation of each part, whenever you want.",
@@ -1953,7 +2037,8 @@ const EN = {
  "X": "W",
  "Ya está": "Done",
  "Ya está, gracias": "That's enough, thanks",
- "Ya hay una cuenta con ese correo. Pulsa Entrar.": "There's already an account with that email. Tap Log in."
+ "Ya hay una cuenta con ese correo. Pulsa Entrar.": "There's already an account with that email. Tap Log in.",
+ "Ya tengo Premium · Restaurar compras": "I already have Premium · Restore purchases"
 };
 
 const LANG_DEFAULT = 'en';
@@ -2041,6 +2126,48 @@ const saveAuth = a => {
   auth = a;
   try{ a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); }catch(e){}
 };
+
+/* ---- Derecho de acceso (freemium, ver DESIGN_LOG.md) ----
+   Vive en spoony_entitlements, no en spoony_state: esa tabla no tiene
+   política de escritura para el cliente (supabase/schema.sql), así que nadie
+   puede dárselo a sí mismo con un PATCH como podría con un campo dentro del
+   estado que sí se sube entero. Sin cuenta no hay premium posible.
+
+   Se cachea en localStorage, aparte del archivo de datos (igual que `auth`),
+   para que valga sin conexión: hasta 7 días desde la última comprobación
+   correcta. Pasado ese margen sin poder confirmar, se cae a gratis — no es
+   ningún dato de seguridad ni accesibilidad básica (P11 solo exige lo
+   contrario ahí), así que fallar a "gratis" no hace daño. */
+const ENT_KEY = 'spoony:entitlement';
+const ENT_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
+/* Interruptor manual del muro de pago entero (DESIGN_LOG.md): RevenueCat
+   todavía no tiene productos reales creados en las tiendas, así que con
+   PAYWALL_LIVE en false isPremium() deja pasar a todo el mundo — es el modo
+   en el que debe estar mientras haya gente probando la beta. Se pone en
+   true solo para probar el propio muro antes de publicar. */
+const PAYWALL_LIVE = true;
+let entitlement = (() => { try{ return JSON.parse(localStorage.getItem(ENT_KEY)) || { isPremium:false, checkedAt:0, userId:null }; }catch(e){ return { isPremium:false, checkedAt:0, userId:null }; } })();
+function saveEntitlement(e){
+  entitlement = e;
+  try{ localStorage.setItem(ENT_KEY, JSON.stringify(e)); }catch(err){}
+}
+function isPremium(){
+  if(!PAYWALL_LIVE) return true;
+  if(rcEntitlementActive) return true;
+  return !!(auth && syncAllowed() && entitlement.userId === auth.user.id && entitlement.isPremium);
+}
+async function refreshEntitlement(){
+  if(!auth) return;
+  try{
+    const t = await accessToken();
+    const rows = await api(`/rest/v1/spoony_entitlements?select=is_premium&user_id=eq.${auth.user.id}`, { token:t });
+    saveEntitlement({ isPremium: !!(rows && rows[0] && rows[0].is_premium), checkedAt: Date.now(), userId: auth.user.id });
+  }catch(e){
+    const stillFresh = entitlement.userId === auth.user.id && (Date.now() - entitlement.checkedAt) < ENT_GRACE_MS;
+    if(!stillFresh) saveEntitlement({ isPremium:false, checkedAt:0, userId: auth.user.id });
+  }
+  applyAll();
+}
 
 let changeSeq = 0, pushTimer = null, syncBusy = false, syncStatus = '', pendingRemote = null;
 
@@ -2212,14 +2339,20 @@ function startSyncForUser(){
   }
   renderAccount();
   syncNow();
+  refreshEntitlement();
+  rcSyncIdentity().then(refreshRcEntitlement);
 }
 function signOutLocal(msg){
   saveAuth(null);
+  saveEntitlement({ isPremium:false, checkedAt:0, userId:null });
+  rcEntitlementActive = false;
+  rcSyncIdentity();
   clearTimeout(pushTimer);
   syncStatus = ''; pendingRemote = null;
   const m = document.getElementById('accOutMsg');
   m.textContent = msg || ''; m.hidden = !msg;
   renderAccount();
+  applyAll();
 }
 
 function setSyncStatus(st){ syncStatus = st; renderAccount(); }
@@ -2274,12 +2407,25 @@ const fmtMoney = n => `${String(Math.round((n||0)*100)/100).replace('.', ',')} �
 function libItem(name){
   return state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
 }
+/* Cupo gratis de la librería de aprendizaje (freemium, DESIGN_LOG.md): las
+   FREE_LIB_GASTO actividades que restan cucharas + FREE_LIB_RECARGA que
+   suman, de las que más se repiten (por número de muestras, no por orden de
+   aparición) siguen aprendiendo sin cuenta premium. Se recalcula cada vez
+   que se pide: si el uso cambia, el cupo se mueve solo. */
+const byUse = a => [...a].sort((x,y) => y.samples.length - x.samples.length);
+const FREE_LIB_GASTO = 2, FREE_LIB_RECARGA = 1;
+function freeLibQuotaIds(){
+  const gastan = byUse(state.library.filter(l => l.est >= 0)).slice(0, FREE_LIB_GASTO);
+  const recargan = byUse(state.library.filter(l => l.est < 0)).slice(0, FREE_LIB_RECARGA);
+  return new Set([...gastan, ...recargan].map(l => l.id));
+}
 function learned(name){
   const item = libItem(name);
   if(!item) return null;
   const s = item.samples.slice(-5);
   const base = { est:item.est, fixed:!!item.fixed, n:s.length };
   if(s.length < 2) return { ...base, avg:null, suggest:item.est };
+  if(!isPremium() && !freeLibQuotaIds().has(item.id)) return { ...base, avg:null, suggest:item.est, gated:true };
   const avg = Math.round((s.reduce((a,b)=>a+b,0)/s.length) * 10) / 10;
   return { ...base, avg, suggest: item.fixed ? item.est : avg };
 }
@@ -2403,6 +2549,7 @@ function renderTasks(){
     if(t.series) notes.push(tr('Se repite'));
     if(dep) notes.push(tr('Recarga'));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
+    else if(!t.done && !dep && l && l.gated) notes.push(tr('No aprende de esta actividad · Premium'));
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
     const isOpen = t.done && !collapsedTasks.has(t.id);
     const timeTag = t.time ? `<span class="task-time">${esc(fmtTaskTime(t))}</span> ` : '';
@@ -2461,7 +2608,8 @@ function renderLib(){
     const rc = recoveryStats(l.name);
     const dep = l.est < 0;
     let note;
-    if(st.avg == null) note = st.n ? `${st.n} ${tr(st.n===1?'registro':'registros')}` : tr('Sin registros todavía');
+    if(st.gated) note = tr('No aprende de esta actividad · Premium');
+    else if(st.avg == null) note = st.n ? `${st.n} ${tr(st.n===1?'registro':'registros')}` : tr('Sin registros todavía');
     else if(st.fixed) note = trf('Lo has fijado tú · sueles {verb} {n}', {verb:tr(dep?'recuperar':'gastar'), n:fmtN(Math.abs(st.avg))});
     else if(Math.abs(st.avg - st.est) < 0.5) note = trf('Tu estimación acierta · {n} registros', {n:st.n});
     else note = trf('Estimabas {est}, {verb} {avg}', {est:fmtN(Math.abs(st.est)), verb:tr(dep?'recuperas':'gastas'), avg:fmtN(Math.abs(st.avg))});
@@ -2471,7 +2619,6 @@ function renderLib(){
       <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(st.suggest))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
     </button>`;
   };
-  const byUse = a => a.sort((x,y) => y.samples.length - x.samples.length);
   const gastan = byUse(state.library.filter(l => l.est >= 0));
   const recargan = byUse(state.library.filter(l => l.est < 0));
   el.innerHTML =
@@ -2938,6 +3085,14 @@ function peakNextDayInsight(){
 
 function renderPatterns(){
   const el = document.getElementById('patterns');
+  if(!isPremium()){
+    el.innerHTML = `<h2>${tr('Patrones')}</h2>
+      <p>${tr('Cómo cambian tus cucharas y tu tolerancia sensorial con el tiempo, y qué días tardas más en recuperarte.')}</p>
+      <div class="bigrow"><button id="patternsUpsell">${tr('Ver con Premium')}</button></div>`;
+    document.getElementById('patternsUpsell').addEventListener('click',
+      () => requirePremium(tr('Patrones es una función de Spoony Premium.')));
+    return;
+  }
   const keys = Object.keys(state.days).sort().filter(k => state.days[k].checkout);
   if(keys.length < NEED){
     const eta = new Date(); eta.setDate(eta.getDate() + (NEED - keys.length));
@@ -3373,7 +3528,8 @@ function tSync(){
     ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
   const l = tName.value.trim() ? learned(tName.value.trim()) : null;
   document.getElementById('tLearned').textContent =
-    (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))}) : '';
+    (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))})
+    : (l && l.gated) ? tr('No aprende de esta actividad · Premium') : '';
 }
 document.getElementById('tKind').addEventListener('click', e => {
   const b = e.target.closest('[data-kind]'); if(!b) return;
@@ -3401,6 +3557,10 @@ function repSync(){
 }
 document.getElementById('repMode').addEventListener('click', e => {
   const b = e.target.closest('[data-rep]'); if(!b) return;
+  /* Una tarea "cada día laborable, 4 semanas" ya planifica un mes entero
+     desde hoy: sin esto, alguien gratis se saltaría "solo mañana" sin tocar
+     el calendario para nada. */
+  if(b.dataset.rep !== 'once' && !requirePremium(tr('Las tareas que se repiten son una función de Spoony Premium.'))) return;
   repMode = b.dataset.rep;
   if(repMode === 'custom' && !repDays.size) repDays.add(mondayIndex(new Date(taskDate+'T12:00:00')));
   repSync();
@@ -3717,6 +3877,7 @@ function openLib(item){
   const st = item ? learned(item.name) : null;
   document.getElementById('lSub').textContent = (st && st.avg != null)
     ? trf('De media son {n} en {reg} registros. Si pones un valor a mano, se usará ese.', {n:fmtN(Math.abs(st.avg)), reg:st.n})
+    : (st && st.gated) ? tr('No aprende de esta actividad · Premium')
     : tr('Sube o baja de una cuchara en una.');
   document.getElementById('lDelete').hidden = !item;
   document.getElementById('lReset').hidden = !(st && st.n);
@@ -3908,7 +4069,10 @@ function openTpl(dateKey){
     : tr('Guardar ese día como día tipo');
   renderTplList(); openDialog(dlgTpl);
 }
-document.getElementById('btnTpl').addEventListener('click', () => openTpl(todayKey()));
+document.getElementById('btnTpl').addEventListener('click', () => {
+  if(!requirePremium(tr('Días tipo es una función de Spoony Premium.'))) return;
+  openTpl(todayKey());
+});
 document.getElementById('tplClose').addEventListener('click', () => { dlgTpl.close(); renderAll(); });
 document.getElementById('tplList').addEventListener('click', e => {
   const use = e.target.closest('[data-use]');
@@ -3959,8 +4123,22 @@ document.getElementById('calNext').addEventListener('click', () => {
 const dlgDay = document.getElementById('dlgDay');
 let selectedDay = todayKey();
 let dCycleOpen = false;
+/* Planificar (freemium, ver DESIGN_LOG.md): con la versión gratis solo se
+   puede tocar hoy y mañana — añadir o borrar tareas, y la nota. Ciclo queda
+   fuera de esto a propósito (renderDayCycleCard ya lo controla aparte,
+   nunca por isPremium): es una decisión "vigente" del log, no se toca aquí. */
+const tomorrowKey = () => shiftKey(todayKey(), 1);
+function dayEditAllowed(k){
+  return isPremium() || k === todayKey() || k === tomorrowKey();
+}
+function dLockReason(k){
+  return k < todayKey()
+    ? tr('Editar días ya pasados es una función de Spoony Premium.')
+    : tr('Planificar más allá de mañana es una función de Spoony Premium.');
+}
 function renderDaySheet(){
   const k = selectedDay, d = day(k), past = k < todayKey(), isToday = k === todayKey();
+  const editable = dayEditAllowed(k);
   const { planned, spent } = dayLoad(k);
   const typical = typicalBudget();
   document.getElementById('dTitle').textContent =
@@ -3977,17 +4155,20 @@ function renderDaySheet(){
       : trf('{n} cucharas previstas de las {avg} que sueles tener.', {n:fmtN(planned), avg:fmtN(typical)});
     sub.style.color = planned > typical ? 'var(--alert)' : '';
   }
+  document.getElementById('dLockedNote').hidden = editable;
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
         <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${esc(t.name)}${t.done?` · ${tr('hecha')}`:''}</span>
         <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
-          <button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+          ${editable ? `<button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>` : ''}
         </span>
       </div>`).join('')
     : `<div class="empty">${tr('Nada planificado para este día.')}</div>`;
-  document.getElementById('dNote').value = d.note || '';
+  const note = document.getElementById('dNote');
+  note.value = d.note || '';
+  note.readOnly = !editable;
   renderDayCycleCard(k, past || isToday);
 }
 /* Registro de ciclo retroactivo: el mismo campo que "Registro de hoy" pero
@@ -4016,10 +4197,16 @@ document.getElementById('calGrid').addEventListener('click', e => {
   selectedDay = c.dataset.day; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay);
 });
 document.getElementById('dAddCycle').addEventListener('click', () => { dCycleOpen = true; renderDaySheet(); });
-document.getElementById('dAdd').addEventListener('click', () => openTaskSheet(selectedDay));
-document.getElementById('dTpl').addEventListener('click', () => openTpl(selectedDay));
+document.getElementById('dAdd').addEventListener('click', () => {
+  if(!dayEditAllowed(selectedDay)){ requirePremium(dLockReason(selectedDay)); return; }
+  openTaskSheet(selectedDay);
+});
+document.getElementById('dTpl').addEventListener('click', () => {
+  if(!requirePremium(tr('Días tipo es una función de Spoony Premium.'))) return;
+  openTpl(selectedDay);
+});
 document.getElementById('dTasks').addEventListener('click', e => {
-  const b = e.target.closest('[data-del]'); if(!b) return;
+  const b = e.target.closest('[data-del]'); if(!b || !dayEditAllowed(selectedDay)) return;
   const d = day(selectedDay);
   const t = d.tasks.find(x => x.id === b.dataset.del);
   askDeleteTask(t, which => {
@@ -4030,6 +4217,7 @@ document.getElementById('dTasks').addEventListener('click', e => {
 });
 let noteTimer;
 document.getElementById('dNote').addEventListener('input', e => {
+  if(!dayEditAllowed(selectedDay)) return;
   day(selectedDay).note = e.target.value;
   clearTimeout(noteTimer); noteTimer = setTimeout(save, 500);
 });
@@ -4061,6 +4249,10 @@ document.getElementById('peakAskPick').addEventListener('click', e => {
    asignadas, el medidor ya lo dice solo cuando se vuelva a esa pestaña,
    igual que cualquier otro día sin check-in todavía. */
 document.getElementById('dayStartHourInput').addEventListener('change', e => {
+  if(!requirePremium(tr('Elegir la hora en la que empieza tu día es una función de Spoony Premium.'))){
+    e.target.value = state.settings.dayStartHour;
+    return;
+  }
   const n = parseInt(e.target.value, 10);
   state.settings.dayStartHour = Number.isFinite(n) ? Math.min(23, Math.max(0, n)) : DAY_START_HOUR_DEFAULT;
   e.target.value = state.settings.dayStartHour;
@@ -4234,7 +4426,7 @@ document.getElementById('btnColorReset').addEventListener('click', () => {
    pestaña ni nada calculado. Con ambos encendidos hay cinco pestañas, así
    que la barra pasa a modo compacto; con uno o ninguno caben holgadas. */
 function updateTabsCompact(){
-  document.getElementById('tabs').classList.toggle('compact', !!state.cycleEnabled && !!state.finEnabled);
+  document.getElementById('tabs').classList.toggle('compact', !!state.cycleEnabled && !!state.finEnabled && isPremium());
 }
 function applyCycleUI(){
   const on = !!state.cycleEnabled;
@@ -4254,16 +4446,18 @@ document.getElementById('cyclePick').addEventListener('click', e => {
   applyCycleUI(); save(); renderAll();
 });
 function applyFinUI(){
-  const on = !!state.finEnabled;
-  document.getElementById('tabFin').hidden = !on;
-  document.getElementById('finReplayRow').hidden = !on;
+  const enabled = !!state.finEnabled;
+  const visible = enabled && isPremium();
+  document.getElementById('tabFin').hidden = !visible;
+  document.getElementById('finReplayRow').hidden = !visible;
   updateTabsCompact();
   document.querySelectorAll('#finPick .chip').forEach(c =>
-    c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === on));
-  if(!on && currentTab === 'fin') document.querySelector('#tabs [data-go="hoy"]').click();
+    c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === enabled));
+  if(!visible && currentTab === 'fin') document.querySelector('#tabs [data-go="hoy"]').click();
 }
 document.getElementById('finPick').addEventListener('click', e => {
   const b = e.target.closest('[data-fin]'); if(!b) return;
+  if(b.dataset.fin === 'on' && !requirePremium(tr('Finanzas es una función de Spoony Premium.'))) return;
   state.finEnabled = b.dataset.fin === 'on';
   applyFinUI(); save(); renderAll();
 });
@@ -4439,6 +4633,56 @@ function authErrorText(e){
   if(c === 'over_email_send_rate_limit' || e.status === 429) return tr('Demasiados intentos seguidos. Espera un poco y vuelve a probar.');
   return tr('No se pudo entrar. Inténtalo otra vez en un rato.');
 }
+
+/* ---------- muro de pago: hoja y compra ---------- */
+const dlgPremium = document.getElementById('dlgPremium');
+const premiumMsg = document.getElementById('premiumMsg');
+const showPremiumMsg = t => { premiumMsg.textContent = t; premiumMsg.hidden = !t; };
+/* Punto de entrada único desde cualquier función de pago: si ya hay premium
+   deja pasar sin más, si no abre la hoja con el motivo concreto (P5: nunca
+   un muro genérico sin explicar qué lo ha disparado). */
+function requirePremium(sub){
+  if(isPremium()) return true;
+  document.getElementById('premiumSub').textContent = sub;
+  showPremiumMsg('');
+  openDialog(dlgPremium);
+  return false;
+}
+async function purchaseFlow(kind){
+  if(!auth){
+    // El derecho de acceso se comprueba contra la cuenta (spoony_entitlements
+    // en Supabase); sin cuenta no hay dónde guardarlo. Se manda primero a
+    // crear/entrar en una antes de intentar cobrar nada.
+    dlgPremium.close();
+    showAccMsg('');
+    openDialog(dlgAccount);
+    return;
+  }
+  const btns = [document.getElementById('premiumStart'), document.getElementById('premiumRestore')];
+  btns.forEach(b => b.disabled = true);
+  showPremiumMsg('');
+  try{
+    const p = await rcConfigure();
+    if(!p){ showPremiumMsg(tr('Todavía no se puede pagar desde la app. Vuelve a intentarlo más adelante.')); return; }
+    if(kind === 'restore'){
+      await p.restorePurchases();
+    }else{
+      const offerings = await p.getOfferings();
+      const offering = offerings && offerings.current;
+      const pkg = offering && (offering.annual || offering.monthly);
+      if(!pkg){ showPremiumMsg(tr('Todavía no se puede pagar desde la app. Vuelve a intentarlo más adelante.')); return; }
+      await p.purchasePackage({ aPackage: pkg });
+    }
+    await refreshRcEntitlement();
+    if(isPremium()) dlgPremium.close();
+    else showPremiumMsg(tr(kind === 'restore' ? 'No se ha encontrado ninguna compra que restaurar.' : 'No se ha podido activar Premium. Escríbenos si el cobro sí se hizo.'));
+  }catch(e){
+    if(!(e && e.userCancelled)) showPremiumMsg(tr('No se pudo completar la compra. Inténtalo otra vez.'));
+  }finally{ btns.forEach(b => b.disabled = false); }
+}
+document.getElementById('premiumStart').addEventListener('click', () => purchaseFlow('purchase'));
+document.getElementById('premiumRestore').addEventListener('click', () => purchaseFlow('restore'));
+
 async function doAuth(kind){
   const email = document.getElementById('accEmailIn').value.trim();
   const password = document.getElementById('accPassIn').value;
@@ -4615,6 +4859,7 @@ window.addEventListener('online', () => { if(auth && syncAllowed()) syncNow(); }
   ['dlgHist', 'hClose'],
   ['dlgCheckin', 'ciSkip'],
   ['dlgAccount', 'accCancel'],
+  ['dlgPremium', 'premiumCancel'],
   ['dlgSyncConflict', 'scLater'],
 ].forEach(([dlgId, btnId]) => {
   document.getElementById(dlgId).addEventListener('click', e => {
@@ -4691,6 +4936,7 @@ function normalize(s){
   if(!state.settings.introSeen) startTour(false);
   else if(day().budget == null) openCheckin();
   if(auth && syncAllowed()) startSyncForUser();
+  else refreshRcEntitlement();
 })();
 </script>
 </body>

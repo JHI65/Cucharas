@@ -60,3 +60,35 @@ $$;
 
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- Derecho de acceso a lo de pago (freemium, ver DESIGN_LOG.md). Tabla aparte
+-- de spoony_state a propósito: esa tabla deja al cliente reescribir su fila
+-- entera (política "cambiar lo propio"), así que un campo premium ahí sería
+-- tan seguro como un `if(premium)` en el JS. Aquí solo hay política de
+-- lectura para el propio usuario; nada de insert/update/delete para
+-- anon/authenticated, así que solo puede tocarla el rol de servicio (el panel
+-- de Supabase a mano, o más adelante un webhook de RevenueCat).
+create table if not exists public.spoony_entitlements (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  is_premium boolean     not null default false,
+  source     text        not null default 'manual', -- 'manual' | 'revenuecat'
+  updated_at timestamptz not null default now()
+);
+
+alter table public.spoony_entitlements enable row level security;
+
+drop policy if exists "leer mi derecho de acceso" on public.spoony_entitlements;
+create policy "leer mi derecho de acceso" on public.spoony_entitlements
+  for select using (auth.uid() = user_id);
+
+-- Dar acceso total a las cuentas del desarrollador y su pareja, autista
+-- (decisión 2026-09-23 en DESIGN_LOG.md, ampliada 2026-09-23). Ejecutar a
+-- mano en el editor SQL de Supabase; es seguro volver a ejecutar el archivo
+-- entero, no duplica nada.
+insert into public.spoony_entitlements (user_id, is_premium, source)
+select id, true, 'manual' from auth.users where email = 'jaimelillobenito@gmail.com'
+on conflict (user_id) do update set is_premium = true, source = 'manual', updated_at = now();
+
+insert into public.spoony_entitlements (user_id, is_premium, source)
+select id, true, 'manual' from auth.users where email = 'claudiaballesteroscalzon@gmail.com'
+on conflict (user_id) do update set is_premium = true, source = 'manual', updated_at = now();
