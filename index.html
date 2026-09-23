@@ -431,6 +431,16 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   border-radius:999px;padding:9px 14px;font-size:15px;
 }
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+/* Aviso de qué es de pago, visible sin tener que tocar nada (freemium, ver
+   DESIGN_LOG.md): mismo tono que el resto del muro, sin candado ni color de
+   alarma, solo el color de la propia marca. Va en un <span> aparte del texto
+   con data-i18n para que applyI18n() (que hace textContent =) no se lo coma. */
+.premium-tag{
+  display:inline-block;margin-left:7px;padding:1px 8px;vertical-align:middle;
+  border:1px solid var(--accent);border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--accent);
+}
+.chip[aria-pressed="true"] .premium-tag{color:#FFF8F9;border-color:#FFF8F9}
 /* ---- Guía del primer arranque ----
    Bocadillo anclado al elemento del que habla. Sin animación ni
    desplazamiento suave: el recorrido salta de sitio, no viaja. */
@@ -634,7 +644,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
     <div class="sectionhead">
       <h2 data-i18n="Tareas">Tareas</h2>
-      <button class="btn" id="btnTpl" data-i18n="Días tipo">Días tipo</button>
+      <button class="btn" id="btnTpl"><span data-i18n="Días tipo">Días tipo</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
     </div>
     <div id="taskList"></div>
     <button class="add" id="btnAddTask" data-i18n="Añadir tarea">Añadir tarea</button>
@@ -751,7 +761,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="libsec" data-i18n="Tus cucharas">Tus cucharas</p>
     <div class="group">
     <div class="row">
-      <div><strong data-i18n="Cuándo empieza tu día">Cuándo empieza tu día</strong><p data-i18n="A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.">A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
+      <div><strong data-i18n="Cuándo empieza tu día">Cuándo empieza tu día</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.">A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
       <div class="ocgrid">
         <!-- Opciones con texto fijo "04:00" en vez de <input type=time>: así el
              formato 24h queda garantizado sin depender de la región del móvil. -->
@@ -841,7 +851,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="libsec" data-i18n="Finanzas">Finanzas</p>
     <div class="group">
     <div class="row">
-      <div><strong data-i18n="Seguimiento de finanzas">Seguimiento de finanzas</strong><p data-i18n="Añade una pestaña para tus gastos fijos y variables del mes.">Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
+      <div><strong data-i18n="Seguimiento de finanzas">Seguimiento de finanzas</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Añade una pestaña para tus gastos fijos y variables del mes.">Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
       <div class="chips" id="finPick" role="group" data-i18n-aria="Seguimiento de finanzas" aria-label="Seguimiento de finanzas">
         <button class="chip" data-fin="on" aria-pressed="false" data-i18n="Activado">Activado</button>
         <button class="chip" data-fin="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
@@ -899,11 +909,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="libsec" data-i18n="Tu cuenta (opcional)">Tu cuenta (opcional)</p>
     <div class="group">
     <div class="row" id="accOutRow">
-      <div><strong data-i18n="Copia en la nube">Copia en la nube</strong><p data-i18n="Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.">Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.</p><p class="notice" id="accOutMsg" hidden></p></div>
+      <div><strong data-i18n="Copia en la nube">Copia en la nube</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.">Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.</p><p class="notice" id="accOutMsg" hidden></p></div>
       <button class="btn" id="btnAccOpen" data-i18n="Entrar">Entrar</button>
     </div>
     <div class="row" id="accInRow" hidden>
       <div><strong id="accEmail"></strong><p id="accStatus"></p></div>
+      <button class="btn" id="accGoPremium" hidden data-i18n="Ver Premium">Ver Premium</button>
     </div>
     <div class="row" id="accDecideRow" hidden>
       <div><strong data-i18n="Falta elegir qué datos guardar">Falta elegir qué datos guardar</strong><p data-i18n="Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.">Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.</p></div>
@@ -1037,9 +1048,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label data-i18n="Repetir">Repetir</label>
       <div class="chips" id="repMode">
         <button class="chip" data-rep="once" aria-pressed="true" data-i18n="Solo ese día">Solo ese día</button>
-        <button class="chip" data-rep="weekdays" data-i18n="De lunes a viernes">De lunes a viernes</button>
-        <button class="chip" data-rep="daily" data-i18n="Todos los días">Todos los días</button>
-        <button class="chip" data-rep="custom" data-i18n="Elegir días">Elegir días</button>
+        <button class="chip" data-rep="weekdays"><span data-i18n="De lunes a viernes">De lunes a viernes</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
+        <button class="chip" data-rep="daily"><span data-i18n="Todos los días">Todos los días</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
+        <button class="chip" data-rep="custom"><span data-i18n="Elegir días">Elegir días</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
       </div>
       <div class="chips" id="repDays" hidden></div>
       <div class="stepper" id="repDur" hidden>
@@ -1333,7 +1344,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="sub" id="dLockedNote" hidden data-i18n="Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.">Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.</p>
     <div id="dTasks"></div>
     <button class="add" id="dAdd" data-i18n="Añadir tarea a este día">Añadir tarea a este día</button>
-    <button class="add" id="dTpl" style="margin-top:9px" data-i18n="Usar un día tipo">Usar un día tipo</button>
+    <button class="add" id="dTpl" style="margin-top:9px"><span data-i18n="Usar un día tipo">Usar un día tipo</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
     <button class="add" id="dAddCycle" style="margin-top:9px" hidden data-i18n="Añadir registro de ciclo a este día">Añadir registro de ciclo a este día</button>
     <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
       <h2 data-i18n="Ciclo">Ciclo</h2>
@@ -1633,6 +1644,7 @@ const EN = {
  "Añadir gasto {tipo}": "Add {tipo} expense",
  "Añadir gasto fijo": "Add fixed expense",
  "Añadir gasto variable": "Add variable expense",
+ "Añadir más actividades a la librería es una función de Spoony Premium.": "Adding more activities to the library is a Spoony Premium feature.",
  "Añadir registro de ciclo a este día": "Add a cycle log to this day",
  "Añadir tarea": "Add task",
  "Añadir tarea a este día": "Add a task to this day",
@@ -1794,6 +1806,7 @@ const EN = {
  "Gastos fijos": "Fixed expenses",
  "Gastos variables": "Variable expenses",
  "Grande": "Large",
+ "Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.": "Saves your data to the cloud too, and you can recover it on another phone. You need a (free) account and Spoony Premium.",
  "Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.": "Saves a file with your whole history. Without an account, it's the only copy outside this phone.",
  "Guardar": "Save",
  "Guardar el día de hoy como día tipo": "Save today as a routine day",
@@ -1822,6 +1835,7 @@ const EN = {
  "L": "M",
  "La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.": "The load of every day in the month and the patterns that repeat, for example if a heavy day tends to be followed by a light one.",
  "La contraseña tiene que tener al menos 6 caracteres.": "The password needs to be at least 6 characters.",
+ "La copia en la nube es una función de Spoony Premium.": "The cloud copy is a Spoony Premium feature.",
  "La hora de fin no puede ser anterior a la de inicio.": "The end time can't be earlier than the start time.",
  "La próxima vez que apuntes un pico, no se te volverá a preguntar. Puedes reactivarlo luego en Ajustes.": "Next time you log a peak, you won't be asked again. You can turn it back on later in Settings.",
  "Las cucharas de hoy": "Today's spoons",
@@ -1902,6 +1916,7 @@ const EN = {
  "Preguntar": "Ask",
  "Preguntar si necesitas un descanso": "Ask if you need a break",
  "Preguntar si necesitas un descanso tras un pico sensorial": "Ask if you need a break after a sensory peak",
+ "Premium": "Premium",
  "Próximo ciclo": "Next cycle",
  "Puedes cerrar cuando quieras.": "You can close it whenever you want.",
  "Puntúa las dos escalas para guardar.": "Score both scales to save.",
@@ -1941,7 +1956,6 @@ const EN = {
  "semana": "week",
  "semanas": "weeks",
  "Sí": "Yes",
- "Si creas una cuenta, tus datos se guardan también en la nube y los recuperas en otro móvil. Sin cuenta, no salen de este teléfono.": "If you create an account, your data is also stored in the cloud and you can recover it on another phone. Without an account, it never leaves this phone.",
  "Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.": "If you remember how this day went, you can log it even though it's already past.",
  "Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».": "If you're feeling fine, you can turn off the margin that day from \"How many spoons do you wake up with?\".",
  "Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.": "If you're feeling up to it, use today the spoons that are normally set aside for the cycle.",
@@ -2031,6 +2045,7 @@ const EN = {
  "Ver a gente": "Seeing people",
  "Ver con Premium": "See with Premium",
  "Ver detalle": "Show detail",
+ "Ver Premium": "See Premium",
  "Vista de finanzas": "Finances view",
  "Vuelve a ver la explicación de cada parte, cuando quieras.": "Replay the explanation of each part, whenever you want.",
  "Vuelve a ver la guía de esta sección.": "Replay this section's guide.",
@@ -2112,10 +2127,16 @@ const day = (k=todayKey()) => {
      versión sigue siendo la que vi", para no pisar lo que haya subido otro
      móvil entretanto.
 
-   Será de pago más adelante: syncAllowed() es el único sitio donde decidirlo. */
+   De pago (freemium, ver DESIGN_LOG.md): cloudConfigured() dice si Supabase
+   está configurado en absoluto (siempre true en este proyecto; solo decide
+   si se muestra "Tu cuenta"), syncAllowed() dice si esta cuenta puede
+   sincronizar de verdad. Van separadas a propósito: crear cuenta y entrar
+   tienen que seguir funcionando sin premium — si no, nadie podría llegar a
+   comprobar su propio derecho de acceso (isPremium() necesita `auth`). */
 const SUPABASE_URL = 'https://fcmrwfpekzgtsgktyvwk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjbXJ3ZnBla3pndHNna3R5dndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDMxMzIsImV4cCI6MjEwNTU3OTEzMn0.o_Z43sKGLCqjXvbTQFjY9PiiYmwITM5mG4bvOPhQkg0';   // clave pública "anon": la protección la ponen las políticas RLS de supabase/schema.sql
-const syncAllowed = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);   // aquí irá la comprobación de la suscripción
+const cloudConfigured = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+const syncAllowed = () => cloudConfigured() && isPremium();
 const AUTH_KEY = 'spoony:auth';
 
 /* La sesión va en localStorage, no en el archivo de datos: así nunca viaja en
@@ -2154,7 +2175,7 @@ function saveEntitlement(e){
 function isPremium(){
   if(!PAYWALL_LIVE) return true;
   if(rcEntitlementActive) return true;
-  return !!(auth && syncAllowed() && entitlement.userId === auth.user.id && entitlement.isPremium);
+  return !!(auth && cloudConfigured() && entitlement.userId === auth.user.id && entitlement.isPremium);
 }
 async function refreshEntitlement(){
   if(!auth) return;
@@ -2163,6 +2184,7 @@ async function refreshEntitlement(){
     const rows = await api(`/rest/v1/spoony_entitlements?select=is_premium&user_id=eq.${auth.user.id}`, { token:t });
     saveEntitlement({ isPremium: !!(rows && rows[0] && rows[0].is_premium), checkedAt: Date.now(), userId: auth.user.id });
   }catch(e){
+    if(!(e instanceof NetError)) console.error('Derecho de acceso', e);
     const stillFresh = entitlement.userId === auth.user.id && (Date.now() - entitlement.checkedAt) < ENT_GRACE_MS;
     if(!stillFresh) saveEntitlement({ isPremium:false, checkedAt:0, userId: auth.user.id });
   }
@@ -2357,6 +2379,7 @@ function signOutLocal(msg){
 
 function setSyncStatus(st){ syncStatus = st; renderAccount(); }
 function syncStatusText(){
+  if(!isPremium()) return tr('La copia en la nube es una función de Spoony Premium.');
   const s = state.sync || {};
   if(s.paused) return tr('Sin sincronizar hasta que elijas qué datos guardar.');
   if(syncStatus === 'busy') return tr('Sincronizando…');
@@ -2366,19 +2389,25 @@ function syncStatusText(){
   return tr('Tus datos están también en la nube.');
 }
 function renderAccount(){
-  const on = syncAllowed(), inside = on && !!auth;
+  // Crear cuenta y entrar se ven siempre que Supabase esté configurado, con
+  // o sin premium: la cuenta es lo que permite comprobar el derecho de
+  // acceso, así que no puede depender de él.
+  const on = cloudConfigured(), inside = on && !!auth;
   document.getElementById('accountGroup').hidden = !on;
-  document.getElementById('privacyLine').textContent = tr(inside
+  document.getElementById('privacyLine').textContent = tr(inside && isPremium()
     ? 'Tus datos se guardan en este teléfono y en tu cuenta'
     : 'Tus datos no salen del teléfono');
   if(!on) return;
   document.getElementById('accOutRow').hidden = inside;
   ['accInRow', 'accLogoutRow', 'accDeleteRow'].forEach(id => document.getElementById(id).hidden = !inside);
-  document.getElementById('accDecideRow').hidden = !(inside && state.sync && state.sync.paused);
+  document.getElementById('accDecideRow').hidden = !(inside && isPremium() && state.sync && state.sync.paused);
   if(!inside) return;
   document.getElementById('accEmail').textContent = auth.user.email;
   document.getElementById('accStatus').textContent = syncStatusText();
+  document.getElementById('accGoPremium').hidden = isPremium();
 }
+document.getElementById('accGoPremium').addEventListener('click',
+  () => requirePremium(tr('La copia en la nube es una función de Spoony Premium.')));
 
 /* learned cost: manual estimate blended with the last real costs */
 const RECOV = [[0,'Nada'],[15,'15 min'],[30,'30 min'],[60,'1 h'],[120,'2 h'],[300,'Media tarde'],[1440,'Al día siguiente']];
@@ -2419,6 +2448,18 @@ function freeLibQuotaIds(){
   const recargan = byUse(state.library.filter(l => l.est < 0)).slice(0, FREE_LIB_RECARGA);
   return new Set([...gastan, ...recargan].map(l => l.id));
 }
+/* Tope de la librería en sí (no solo de quién aprende): sin cuenta premium
+   solo caben FREE_LIB_GASTO actividades que restan + FREE_LIB_RECARGA que
+   suman, en total, para siempre — no por uso. Mismos números que el cupo de
+   aprendizaje a propósito (2 y 1), pero es otra cosa: esto decide si la fila
+   llega a existir, byUse()/freeLibQuotaIds() deciden si una fila que ya
+   existe sigue calculando la media. */
+function libAddAllowed(kind){
+  if(isPremium()) return true;
+  const max = kind === 'recarga' ? FREE_LIB_RECARGA : FREE_LIB_GASTO;
+  const count = state.library.filter(l => (l.est < 0) === (kind === 'recarga')).length;
+  return count < max;
+}
 function learned(name){
   const item = libItem(name);
   if(!item) return null;
@@ -2431,7 +2472,14 @@ function learned(name){
 }
 function record(name, est, real){
   let item = state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
-  if(!item){ item = {id:uid(), name, est, samples:[]}; state.library.push(item); }
+  if(!item){
+    // La tarea del día se guarda igual (eso nunca se bloquea); lo único que
+    // pasa sin cupo es que esta actividad no entra en la librería, así que
+    // nunca llega a tener media ni tarjeta propia.
+    if(!libAddAllowed(est < 0 ? 'recarga' : 'gasto')) return;
+    item = {id:uid(), name, est, samples:[]};
+    state.library.push(item);
+  }
   if(real != null) item.samples.push(real);
 }
 
@@ -3086,7 +3134,7 @@ function peakNextDayInsight(){
 function renderPatterns(){
   const el = document.getElementById('patterns');
   if(!isPremium()){
-    el.innerHTML = `<h2>${tr('Patrones')}</h2>
+    el.innerHTML = `<h2>${tr('Patrones')}<span class="premium-tag">${tr('Premium')}</span></h2>
       <p>${tr('Cómo cambian tus cucharas y tu tolerancia sensorial con el tiempo, y qué días tardas más en recuperarte.')}</p>
       <div class="bigrow"><button id="patternsUpsell">${tr('Ver con Premium')}</button></div>`;
     document.getElementById('patternsUpsell').addEventListener('click',
@@ -3908,7 +3956,10 @@ document.getElementById('lSave').addEventListener('click', () => {
   }else{
     const dup = libItem(name);
     if(dup){ dup.est = est; dup.fixed = true; }
-    else state.library.push({ id:uid(), name, est, fixed:true, samples:[] });
+    else{
+      if(!libAddAllowed(lKind) && !requirePremium(tr('Añadir más actividades a la librería es una función de Spoony Premium.'))) return;
+      state.library.push({ id:uid(), name, est, fixed:true, samples:[] });
+    }
   }
   save(); dlgLib.close(); renderAll();
 });
@@ -4774,7 +4825,9 @@ async function completeOAuth(url){
 nativeOn('App', 'appUrlOpen', data => { if(data && data.url && data.url.startsWith(OAUTH_REDIRECT)) completeOAuth(data.url); });
 function renderOAuthButtons(){
   const platform = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.getPlatform() : 'web';
-  const show = syncAllowed() && platform !== 'web';
+  // Entrar con Google/Apple tiene que verse sin premium: es cómo alguien
+  // crea/recupera la cuenta con la que luego comprobará su derecho de acceso.
+  const show = cloudConfigured() && platform !== 'web';
   document.getElementById('oauthButtons').hidden = !show;
   document.getElementById('oauthDivider').hidden = !show;
   document.getElementById('btnAppleAuth').hidden = platform !== 'ios';
@@ -4784,6 +4837,7 @@ document.getElementById('btnAppleAuth').addEventListener('click', () => oauthSig
 
 document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); renderOAuthButtons(); openDialog(dlgAccount); });
 document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
+document.getElementById('premiumCancel').addEventListener('click', () => dlgPremium.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
 document.getElementById('accForgot').addEventListener('click', doRecover);
@@ -4935,7 +4989,12 @@ function normalize(s){
   renderAll();
   if(!state.settings.introSeen) startTour(false);
   else if(day().budget == null) openCheckin();
-  if(auth && syncAllowed()) startSyncForUser();
+  /* Con cuenta, arranca siempre startSyncForUser() aunque syncAllowed() diga
+     que no: es la propia isPremium()/refreshEntitlement() de ahí dentro la
+     que puede decir que sí, y syncNow() ya se protege sola si no toca
+     sincronizar nada. Exigir syncAllowed() aquí antes de comprobarlo dejaría
+     a cualquier cuenta premium sin forma de que la app llegue a saberlo. */
+  if(auth) startSyncForUser();
   else refreshRcEntitlement();
 })();
 </script>
