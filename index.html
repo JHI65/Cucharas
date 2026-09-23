@@ -4666,7 +4666,15 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
 });
 
-function applyAll(){ applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); renderAll(); }
+/* Las etiquetas "Premium" son un cartel de qué es de pago, no falta que
+   verlo quien ya lo tiene: se ocultan solas en cuanto isPremium() es true,
+   en cualquier botón o fila que las lleve (data-i18n="Premium" es lo que
+   pone el texto; esto solo decide si se ve). */
+function applyPremiumTags(){
+  const premium = isPremium();
+  document.querySelectorAll('.premium-tag').forEach(el => { el.hidden = premium; });
+}
+function applyAll(){ applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); applyPremiumTags(); renderAll(); }
 
 /* ---------- cuenta: hojas y botones ---------- */
 const dlgAccount = document.getElementById('dlgAccount');
@@ -4981,7 +4989,7 @@ function normalize(s){
   if(loaded) state = loaded;
   normalize(state);
   ensureFinanzas(); ensureCycle();
-  applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI();
+  applyI18n(); applyContrast(); applyCustomColor(); applyTextScale(); applyCycleUI(); applyFinUI(); applyPremiumTags();
   document.getElementById('todayDate').textContent = fmtDate(todayKey());
   // Al reabrir la app las tareas ya hechas deben verse cerradas, no como se
   // quedaron abiertas antes de cerrar: se colapsan todas de inicio.
