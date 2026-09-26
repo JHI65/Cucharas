@@ -4707,11 +4707,18 @@ function requirePremium(sub){
   openDialog(dlgPremium);
   return false;
 }
+/* Cuando purchaseFlow() desvía a "Tu cuenta" por no haber sesión, se guarda
+   aquí el motivo que tenía la hoja de Premium para poder reabrirla sola en
+   cuanto el login/registro termine — si no, quien pulsa "Empezar prueba
+   gratis" se queda tras el login sin volver a ver el paywall y sin saber
+   que tiene que pulsar otra vez lo mismo que antes. */
+let pendingPremiumSub = null;
 async function purchaseFlow(kind){
   if(!auth){
     // El derecho de acceso se comprueba contra la cuenta (spoony_entitlements
     // en Supabase); sin cuenta no hay dónde guardarlo. Se manda primero a
     // crear/entrar en una antes de intentar cobrar nada.
+    pendingPremiumSub = document.getElementById('premiumSub').textContent;
     dlgPremium.close();
     showAccMsg('');
     openDialog(dlgAccount);
@@ -4762,6 +4769,11 @@ async function doAuth(kind){
     document.getElementById('accOutMsg').hidden = true;
     dlgAccount.close();
     startSyncForUser();
+    if(pendingPremiumSub){
+      const sub = pendingPremiumSub;
+      pendingPremiumSub = null;
+      requirePremium(sub);
+    }
   }catch(e){ showAccMsg(authErrorText(e)); }
   finally{ btns.forEach(b => b.disabled = false); }
 }
@@ -4844,7 +4856,7 @@ document.getElementById('btnGoogleAuth').addEventListener('click', () => oauthSi
 document.getElementById('btnAppleAuth').addEventListener('click', () => oauthSignIn('apple'));
 
 document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); renderOAuthButtons(); openDialog(dlgAccount); });
-document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
+document.getElementById('accCancel').addEventListener('click', () => { pendingPremiumSub = null; dlgAccount.close(); });
 document.getElementById('premiumCancel').addEventListener('click', () => dlgPremium.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));
