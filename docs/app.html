@@ -1109,6 +1109,18 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <button class="linkbtn" id="lReset" hidden data-i18n="Olvidar lo que ha aprendido">Olvidar lo que ha aprendido</button>
+    <div class="field" id="lAccumField">
+      <label class="row" style="cursor:pointer">
+        <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Si la apuntas varios días sin interrupción, el gasto de cada día siguiente sube solo. En cuanto falta un día, vuelve a empezar desde el coste base.">Si la apuntas varios días sin interrupción, el gasto de cada día siguiente sube solo. En cuanto falta un día, vuelve a empezar desde el coste base.</p></div>
+        <input type="checkbox" id="lAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+      <div class="stepper" id="lAccumStepRow" hidden>
+        <button id="lAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <output id="lAccumStep">1</output>
+        <button id="lAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
+      </div>
+    </div>
     <div class="bigrow">
       <button class="warn" id="lDelete" data-i18n="Borrar">Borrar</button>
       <button class="primary" id="lSave" data-i18n="Guardar">Guardar</button>
@@ -1980,6 +1992,11 @@ const EN = {
  "Solo este mes": "Just this month",
  "Spoony Premium": "Spoony Premium",
  "Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.": "Spoony is based on the spoon theory by Christine Miserandino and on <em>Energy Accounting</em> by Maja Toudal and Tony Attwood.",
+ "cucharas más por cada día seguido": "more spoons for each day in a row",
+ "Llevas {n} días seguidos: hoy +{bonus}": "You're on day {n} in a row: today +{bonus}",
+ "Que el gasto suba solo con los días seguidos es una función de Spoony Premium.": "Having the cost rise on its own with consecutive days is a Spoony Premium feature.",
+ "Si la apuntas varios días sin interrupción, el gasto de cada día siguiente sube solo. En cuanto falta un día, vuelve a empezar desde el coste base.": "If you log it several days in a row without a gap, each following day's cost rises on its own. As soon as a day is missing, it starts over from the base cost.",
+ "Sube con los días seguidos": "Rises with consecutive days",
  "Sube el contraste si te cuesta leer el texto claro.": "Raise the contrast if light text is hard to read.",
  "Sube el tamaño si te cuesta leer el texto normal.": "Raise the size if normal text is hard to read.",
  "Sube o baja de una cuchara en una.": "Goes up or down one spoon at a time.",
@@ -2481,6 +2498,21 @@ function record(name, est, real){
     state.library.push(item);
   }
   if(real != null) item.samples.push(real);
+}
+/* Racha de días seguidos con esta actividad, contando hacia atrás desde el
+   día anterior a dateKey. Se corta en el primer día sin ella (o sin
+   registrar todavía), así que un fin de semana sin "trabajo" reinicia sola
+   la cuenta el lunes. Usada por las tareas con accum activado para que el
+   gasto suba solo cada día en vez de tener que subirlo a mano. */
+function accumStreak(name, dateKey){
+  const n = name.toLowerCase();
+  let count = 0, k = shiftKey(dateKey, -1);
+  for(let i = 0; i < 365; i++){
+    const d = state.days[k];
+    if(!d || !d.tasks.some(t => t.name.toLowerCase() === n)) break;
+    count++; k = shiftKey(k, -1);
+  }
+  return count;
 }
 
 /* ---------- render ---------- */
@@ -3574,9 +3606,14 @@ function tSync(){
     c.setAttribute('aria-pressed', c.dataset.kind === tKind));
   document.getElementById('tCostLab').textContent = tr(tKind === 'recarga'
     ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
-  const l = tName.value.trim() ? learned(tName.value.trim()) : null;
+  const nameV = tName.value.trim();
+  const l = nameV ? learned(nameV) : null;
+  const lib = nameV ? libItem(nameV) : null;
+  const accumOn = !editingTask && tKind === 'gasto' && lib && lib.accum;
+  const streak = accumOn ? accumStreak(nameV, taskDate) : 0;
   document.getElementById('tLearned').textContent =
-    (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))})
+    (accumOn && streak > 0) ? trf('Llevas {n} días seguidos: hoy +{bonus}', {n:streak, bonus:fmtN(streak * (lib.accumStep || 1))})
+    : (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))})
     : (l && l.gated) ? tr('No aprende de esta actividad · Premium') : '';
 }
 document.getElementById('tKind').addEventListener('click', e => {
@@ -3823,7 +3860,16 @@ tSave.addEventListener('click', () => {
   }
   const dates = expandDates(taskDate);
   const series = dates.length > 1 ? uid() : null;
-  dates.forEach(k => day(k).tasks.push({ id:uid(), series, name, est, real:null, done:false, recovery:null, time, timeEnd }));
+  const lib = libItem(name);
+  const accumOn = tKind === 'gasto' && lib && lib.accum;
+  const step = lib && lib.accumStep ? lib.accumStep : 1;
+  /* dentro del forEach cada fecha ya ve en state.days las que se acaban de
+     insertar en las iteraciones anteriores (van en orden cronológico), así
+     que la racha se va encadenando sola a lo largo de toda la serie. */
+  dates.forEach(k => {
+    const bonus = accumOn ? accumStreak(name, k) * step : 0;
+    day(k).tasks.push({ id:uid(), series, name, est: est + bonus, real:null, done:false, recovery:null, time, timeEnd });
+  });
   record(name, est, null);
   save(); dlgTask.close(); renderAll();
   if(dlgDay.open) renderDaySheet();
@@ -3902,7 +3948,7 @@ function closeAdjustPanel(id){
 /* ---------- library editor ---------- */
 const dlgLib = document.getElementById('dlgLib');
 const lName = document.getElementById('lName');
-let libEditing = null, lCost = 2, lKind = 'gasto';
+let libEditing = null, lCost = 2, lKind = 'gasto', lAccumOn = false, lAccumStep = 1;
 function lSync(){
   document.getElementById('lCost').textContent = fmtN(lCost);
   document.querySelectorAll('#lKind .chip').forEach(c =>
@@ -3911,16 +3957,31 @@ function lSync(){
     ? 'Cuántas cucharas te devuelve' : 'Lo que te cuesta');
   const rc = libEditing ? recoveryStats(libEditing.name) : null;
   document.getElementById('lHint').textContent = rc ? trf('Recuperación: {lab}', {lab:recovLabel(rc.last)}) : '';
+  /* acumular solo tiene sentido en gastos: una recarga no "se te acumula" de un día para otro */
+  document.getElementById('lAccumField').hidden = lKind === 'recarga';
+  document.getElementById('lAccumOn').checked = lAccumOn;
+  document.getElementById('lAccumStepRow').hidden = !lAccumOn;
+  document.getElementById('lAccumStep').textContent = fmtN(lAccumStep);
 }
 document.getElementById('lKind').addEventListener('click', e => {
   const b = e.target.closest('[data-kind]'); if(!b) return;
   lKind = b.dataset.kind; lSync();
 });
+document.getElementById('lAccumOn').addEventListener('change', e => {
+  if(e.target.checked && !requirePremium(tr('Que el gasto suba solo con los días seguidos es una función de Spoony Premium.'))){
+    e.target.checked = false; return;
+  }
+  lAccumOn = e.target.checked; lSync();
+});
+document.getElementById('lAccumMinus').addEventListener('click', () => { lAccumStep = Math.max(1, lAccumStep-1); lSync(); });
+document.getElementById('lAccumPlus').addEventListener('click', () => { lAccumStep = Math.min(6, lAccumStep+1); lSync(); });
 function openLib(item){
   libEditing = item;
   lName.value = item ? item.name : '';
   lKind = item && item.est < 0 ? 'recarga' : 'gasto';
   lCost = item ? Math.round(Math.abs(item.est)) : 2;
+  lAccumOn = !!(item && item.accum);
+  lAccumStep = item && item.accumStep ? item.accumStep : 1;
   document.getElementById('lTitle').textContent = tr(item ? 'Editar actividad' : 'Nueva actividad');
   const st = item ? learned(item.name) : null;
   document.getElementById('lSub').textContent = (st && st.avg != null)
@@ -3951,14 +4012,16 @@ document.getElementById('lDelete').addEventListener('click', () => {
 document.getElementById('lSave').addEventListener('click', () => {
   const name = lName.value.trim(); if(!name){ lName.focus(); return; }
   const est = lKind === 'recarga' ? -lCost : lCost;
+  const accum = lKind === 'gasto' && lAccumOn;
   if(libEditing){
     libEditing.name = name; libEditing.est = est; libEditing.fixed = true;
+    libEditing.accum = accum; libEditing.accumStep = lAccumStep;
   }else{
     const dup = libItem(name);
-    if(dup){ dup.est = est; dup.fixed = true; }
+    if(dup){ dup.est = est; dup.fixed = true; dup.accum = accum; dup.accumStep = lAccumStep; }
     else{
       if(!libAddAllowed(lKind) && !requirePremium(tr('Añadir más actividades a la librería es una función de Spoony Premium.'))) return;
-      state.library.push({ id:uid(), name, est, fixed:true, samples:[] });
+      state.library.push({ id:uid(), name, est, fixed:true, samples:[], accum, accumStep:lAccumStep });
     }
   }
   save(); dlgLib.close(); renderAll();
@@ -4707,11 +4770,18 @@ function requirePremium(sub){
   openDialog(dlgPremium);
   return false;
 }
+/* Cuando purchaseFlow() desvía a "Tu cuenta" por no haber sesión, se guarda
+   aquí el motivo que tenía la hoja de Premium para poder reabrirla sola en
+   cuanto el login/registro termine — si no, quien pulsa "Empezar prueba
+   gratis" se queda tras el login sin volver a ver el paywall y sin saber
+   que tiene que pulsar otra vez lo mismo que antes. */
+let pendingPremiumSub = null;
 async function purchaseFlow(kind){
   if(!auth){
     // El derecho de acceso se comprueba contra la cuenta (spoony_entitlements
     // en Supabase); sin cuenta no hay dónde guardarlo. Se manda primero a
     // crear/entrar en una antes de intentar cobrar nada.
+    pendingPremiumSub = document.getElementById('premiumSub').textContent;
     dlgPremium.close();
     showAccMsg('');
     openDialog(dlgAccount);
@@ -4762,6 +4832,11 @@ async function doAuth(kind){
     document.getElementById('accOutMsg').hidden = true;
     dlgAccount.close();
     startSyncForUser();
+    if(pendingPremiumSub){
+      const sub = pendingPremiumSub;
+      pendingPremiumSub = null;
+      requirePremium(sub);
+    }
   }catch(e){ showAccMsg(authErrorText(e)); }
   finally{ btns.forEach(b => b.disabled = false); }
 }
@@ -4844,7 +4919,7 @@ document.getElementById('btnGoogleAuth').addEventListener('click', () => oauthSi
 document.getElementById('btnAppleAuth').addEventListener('click', () => oauthSignIn('apple'));
 
 document.getElementById('btnAccOpen').addEventListener('click', () => { showAccMsg(''); renderOAuthButtons(); openDialog(dlgAccount); });
-document.getElementById('accCancel').addEventListener('click', () => dlgAccount.close());
+document.getElementById('accCancel').addEventListener('click', () => { pendingPremiumSub = null; dlgAccount.close(); });
 document.getElementById('premiumCancel').addEventListener('click', () => dlgPremium.close());
 document.getElementById('accSignIn').addEventListener('click', () => doAuth('signin'));
 document.getElementById('accSignUp').addEventListener('click', () => doAuth('signup'));

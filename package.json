@@ -4,7 +4,7 @@
   "private": true,
   "description": "Spoony: planifica el día por la energía que tienes, no por las horas. Carcasa nativa (Capacitor) de index.html.",
   "scripts": {
-    "prep": "rm -rf www && mkdir -p www && cp index.html www/index.html",
+    "prep": "rm -rf www && mkdir -p www && cp index.html www/index.html && cp index.html docs/app.html",
     "sync": "npm run prep && cap sync",
     "ios": "npm run sync && cap open ios",
     "android": "npm run sync && cap open android"
