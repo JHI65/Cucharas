@@ -886,6 +886,29 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     </div>
 
+    <div id="calGroup" hidden>
+    <p class="libsec" data-i18n="Calendario del móvil">Calendario del móvil</p>
+    <div class="group">
+    <div class="row" id="calConnectRow">
+      <div><strong data-i18n="Importar eventos del calendario">Importar eventos del calendario</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.">Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.</p>
+        <p id="calHintIOS" hidden data-i18n="Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.">Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.</p>
+        <p id="calHintAndroid" hidden data-i18n="Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.">Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.</p>
+        <p class="notice" id="calMsg" role="status" hidden></p></div>
+      <button class="btn" id="btnCalConnect" data-i18n="Conectar">Conectar</button>
+    </div>
+    <div class="row" id="calManageRow" hidden>
+      <div><strong data-i18n="Calendarios que se importan">Calendarios que se importan</strong>
+        <p data-i18n="Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.">Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.</p>
+        <div class="chips" id="calList" role="group" data-i18n-aria="Calendarios que se importan" aria-label="Calendarios que se importan"></div>
+        <p class="notice" id="calStatus" role="status" hidden></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn" id="btnCalSync" data-i18n="Actualizar ahora">Actualizar ahora</button>
+          <button class="btn" id="btnCalOff" data-i18n="Desconectar">Desconectar</button>
+        </div></div>
+    </div>
+    </div>
+    </div>
+
     <p class="libsec" data-i18n="Ayuda">Ayuda</p>
     <div class="group">
     <div class="row">
@@ -1017,6 +1040,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <label for="tName" data-i18n="Qué vas a hacer">Qué vas a hacer</label>
       <input type="text" id="tName" placeholder="Ducha, compra, llamada…" data-i18n-ph="Ducha, compra, llamada…">
     </div>
+    <p class="lib-note" id="tCalNote" hidden style="margin:-8px 0 16px" data-i18n="Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.">Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.</p>
     <div class="field">
       <label data-i18n="Tipo">Tipo</label>
       <div class="chips" id="tKind">
@@ -1433,6 +1457,10 @@ const nativeFS = () => _fs || (_fs = nativePlugin('Filesystem', ['readFile', 'wr
 /* Solo hace falta para exportar, así que se resuelve igual, cuando se usa. */
 let _share;
 const nativeShare = () => _share || (_share = nativePlugin('Share', ['share']));
+/* Calendario del móvil (solo lectura). Nunca se usan los métodos de escritura del plugin. */
+let _cal;
+const nativeCalendar = () => _cal || (_cal = nativePlugin('CapacitorCalendar',
+  ['requestFullCalendarAccess','requestReadOnlyCalendarAccess','listCalendars','listEventsInRange']));
 
 /* Solo hace falta para "Continuar con Google/Apple": abre la pantalla de
    inicio de sesión en un navegador dentro de la app (Custom Tabs en Android,
@@ -2066,6 +2094,32 @@ const EN = {
  "Vista de finanzas": "Finances view",
  "Vuelve a ver la explicación de cada parte, cuando quieras.": "Replay the explanation of each part, whenever you want.",
  "Vuelve a ver la guía de esta sección.": "Replay this section's guide.",
+ "Del calendario": "From your calendar",
+ "Toca para asignar cucharas": "Tap to assign spoons",
+ "Coste estimado": "Estimated cost",
+ "Ya no está en tu calendario": "No longer in your calendar",
+ "Cambiado en tu calendario: {detalle}": "Changed in your calendar: {detalle}",
+ "sin hora": "no time",
+ "Sin coste": "No cost",
+ "Evento sin título": "Untitled event",
+ "Calendario sin nombre": "Unnamed calendar",
+ "No hay calendarios en este móvil.": "There are no calendars on this phone.",
+ "Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.": "Spoony doesn't have permission to read your calendar. You can allow it in your phone's settings.",
+ "No se pudo leer el calendario. Inténtalo otra vez más tarde.": "Couldn't read the calendar. Try again later.",
+ "Elige al menos un calendario para importar sus eventos.": "Pick at least one calendar to import its events.",
+ "Última lectura: {hora}.": "Last read: {hora}.",
+ "Importar el calendario del móvil es una función de Spoony Premium.": "Importing your phone's calendar is a Spoony Premium feature.",
+ "Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.": "This comes from your calendar. Here you only set the cost: the event isn't changed.",
+ "Calendario del móvil": "Phone calendar",
+ "Importar eventos del calendario": "Import calendar events",
+ "Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.": "Brings in your calendar events so you can assign spoons to them. It only reads: Spoony never changes or deletes anything in your calendar.",
+ "Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.": "To see your Google Calendar here, add your Google account in iPhone Settings → Calendar → Accounts.",
+ "Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.": "Your Google calendars show up here if the account is added on the phone.",
+ "Conectar": "Connect",
+ "Calendarios que se importan": "Calendars to import",
+ "Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.": "Events with a time from today and the next 14 days are imported. All-day events are not. Tasks already imported stay even if you disconnect.",
+ "Actualizar ahora": "Update now",
+ "Desconectar": "Disconnect",
  "X": "W",
  "Ya está": "Done",
  "Ya está, gracias": "That's enough, thanks",
@@ -2220,7 +2274,10 @@ function markChanged(){
 }
 const save = () => { markChanged(); return store.set(state); };
 const persist = () => store.set(state);   // sin contar como cambio: para lo que llega de la nube
-const cloudData = () => { const { sync, ...rest } = state; return rest; };
+/* state.calendar (qué calendarios se leen, ids de este móvil) tampoco se sube
+   ni se exporta: los ids no valen en otro móvil. Las tareas ya importadas sí
+   viajan, como cualquier otra tarea. */
+const cloudData = () => { const { sync, calendar, ...rest } = state; return rest; };
 
 class NetError extends Error {}
 async function api(path, { method = 'GET', body, token, headers = {} } = {}){
@@ -2323,6 +2380,7 @@ function applyRemote(remote){
     state = normalize(remote.data || {});
     ensureFinanzas(); ensureCycle();
     state.sync = { ...prev.sync, version: remote.version, dirty: false, paused: false };
+    if(prev.calendar) state.calendar = prev.calendar;
     // Igual que al arrancar: las tareas ya hechas llegan plegadas.
     collapsedTasks.clear();
     day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
@@ -2515,6 +2573,174 @@ function accumStreak(name, dateKey){
   return count;
 }
 
+/* ---------- calendario del móvil (Premium) ----------
+   Lee, sin escribir nunca, los eventos con hora de los calendarios que la
+   persona elige (los de Google llegan por la cuenta añadida en el móvil).
+   Cada evento entra como una tarea del día con task.cal. Sin coste hasta que
+   la persona lo asigne: no resta cucharas por su cuenta. Solo si el título
+   coincide con una actividad de la librería entra con su coste, avisado como
+   estimado. Lo que la persona ya decidió (coste, nombre) no se toca nunca:
+   si el evento cambia, se avisa con texto en la tarea.
+   state.calendar.seen recuerda qué eventos ya se importaron, para no volver a
+   traer uno que la persona quitó. */
+const CAL_DAYS = 14, CAL_MIN_GAP = 5*60*1000;
+let calBusy = false;
+const hhmm = ms => { const d = new Date(ms); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const calDayKey = ms => { const d = new Date(ms); if(d.getHours() < dayStartHour()) d.setDate(d.getDate() - 1); return localDateKey(d); };
+const calRange = (a, b) => a ? (b ? `${a}–${b}` : a) : '';
+function calNotes(t){
+  const c = t.cal; if(!c) return [];
+  const n = [tr('Del calendario')];
+  if(c.noCost && !t.done) n.push(tr('Toca para asignar cucharas'));
+  else if(c.estimated && !t.done) n.push(tr('Coste estimado'));
+  if(c.gone) n.push(tr('Ya no está en tu calendario'));
+  else if(c.changed){
+    const parts = [];
+    if(c.changed.title !== c.title) parts.push(`«${esc(c.changed.title)}»`);
+    const now = calRange(c.changed.time, c.changed.timeEnd);
+    if(now !== calRange(c.time, c.timeEnd)) parts.push(now || tr('sin hora'));
+    n.push(trf('Cambiado en tu calendario: {detalle}', { detalle: parts.join(' · ') }));
+  }
+  return n;
+}
+async function calSync(force){
+  const c = state.calendar, api = nativeCalendar();
+  if(!c || !api || !c.enabled || !c.cals.length || !isPremium() || calBusy) return false;
+  if(!force && Date.now() - c.last < CAL_MIN_GAP) return false;
+  calBusy = true;
+  let dirty = false;
+  try{
+    const startKey = todayKey(), endKey = shiftKey(startKey, CAL_DAYS);
+    const from = new Date(startKey + 'T00:00:00'); from.setHours(dayStartHour());
+    const to = new Date(endKey + 'T00:00:00'); to.setDate(to.getDate() + 1); to.setHours(dayStartHour());
+    const { result } = await api.listEventsInRange({ from: from.getTime(), to: to.getTime() });
+    const incoming = new Map();
+    (result || [])
+      .filter(ev => ev && !ev.isAllDay && c.cals.includes(String(ev.calendarId)) && String(ev.status || '').toLowerCase() !== 'canceled')
+      .sort((a, b) => a.startDate - b.startDate)
+      .forEach(ev => {
+        const dk = calDayKey(+ev.startDate);
+        if(dk < startKey || dk > endKey) return;
+        let k = `${ev.id}@${dk}`; if(incoming.has(k)) k += '@' + ev.startDate;
+        const end = +ev.endDate;
+        incoming.set(k, { dk, cid:String(ev.calendarId), title:(ev.title || '').trim() || tr('Evento sin título'),
+          time:hhmm(+ev.startDate), timeEnd: end > +ev.startDate ? hhmm(end) : null });
+      });
+    const have = new Set();
+    Object.keys(state.days).filter(k => k >= startKey && k <= endKey).forEach(dk => {
+      const d = state.days[dk];
+      d.tasks = d.tasks.filter(t => {
+        const ce = t.cal; if(!ce) return true;
+        const ev = incoming.get(ce.k);
+        if(ev){
+          have.add(ce.k); c.seen[ce.k] = dk;
+          if(ce.gone){ delete ce.gone; dirty = true; }
+          if(ev.title === ce.title && ev.time === ce.time && ev.timeEnd === ce.timeEnd){
+            if(ce.changed){ delete ce.changed; dirty = true; }
+          }else if(ce.noCost && !t.done){
+            t.name = ev.title; t.time = ev.time; t.timeEnd = ev.timeEnd;
+            Object.assign(ce, { title:ev.title, time:ev.time, timeEnd:ev.timeEnd }); dirty = true;
+          }else{
+            const ch = { title:ev.title, time:ev.time, timeEnd:ev.timeEnd };
+            if(JSON.stringify(ce.changed) !== JSON.stringify(ch)){ ce.changed = ch; dirty = true; }
+          }
+          return true;
+        }
+        if(ce.noCost && !t.done){ dirty = true; return false; }
+        if(!ce.gone && c.cals.includes(ce.cid)){ ce.gone = true; dirty = true; }
+        return true;
+      });
+    });
+    incoming.forEach((ev, k) => {
+      if(have.has(k) || c.seen[k]) return;
+      const l = libItem(ev.title);
+      const cal = { k, cid:ev.cid, title:ev.title, time:ev.time, timeEnd:ev.timeEnd };
+      let est = 0;
+      if(l){ est = learned(ev.title).suggest; cal.estimated = true; } else cal.noCost = true;
+      day(ev.dk).tasks.push({ id:uid(), series:null, name:ev.title, est, real:null, done:false, recovery:null, time:ev.time, timeEnd:ev.timeEnd, cal });
+      c.seen[k] = ev.dk; dirty = true;
+    });
+    Object.keys(c.seen).forEach(k => { if(c.seen[k] < startKey) delete c.seen[k]; });
+    c.status = 'ok';
+  }catch(e){
+    c.status = /denied|permission|permiso/i.test(String((e && e.message) || e)) ? 'denied' : 'error';
+    console.error('Calendario', e);
+  }finally{
+    calBusy = false;
+  }
+  c.last = Date.now();
+  if(dirty){ await save(); renderAll(); if(dlgDay.open) renderDaySheet(); }
+  else persist();
+  renderCalSettings();
+  return dirty;
+}
+async function calLoadList(api){
+  const { result } = await api.listCalendars();
+  const c = state.calendar;
+  c.avail = (result || []).filter(x => x && x.id != null).map(x => ({
+    id:String(x.id), title:x.title || x.internalTitle || tr('Calendario sin nombre'),
+    src:(x.source && x.source.title) || x.accountName || '' }));
+  c.cals = c.cals.filter(id => c.avail.some(a => a.id === id));
+}
+const showCalMsg = t => { const el = document.getElementById('calMsg'); el.textContent = t; el.hidden = !t; };
+function renderCalSettings(){
+  const g = document.getElementById('calGroup'); if(!g) return;
+  const api = nativeCalendar();
+  g.hidden = !api; if(!api) return;
+  const c = state.calendar;
+  const platform = window.Capacitor.getPlatform();
+  document.getElementById('calConnectRow').hidden = c.enabled;
+  document.getElementById('calManageRow').hidden = !c.enabled;
+  document.getElementById('calHintIOS').hidden = platform !== 'ios';
+  document.getElementById('calHintAndroid').hidden = platform !== 'android';
+  if(!c.enabled) return;
+  document.getElementById('calList').innerHTML = c.avail.length
+    ? c.avail.map(a => `<button class="chip" data-cal="${esc(a.id)}" aria-pressed="${c.cals.includes(a.id)}">${esc(a.title)}${a.src ? ` · ${esc(a.src)}` : ''}</button>`).join('')
+    : `<span class="lib-note">${tr('No hay calendarios en este móvil.')}</span>`;
+  let status = '';
+  if(c.status === 'denied') status = tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.');
+  else if(c.status === 'error') status = tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.');
+  else if(!c.cals.length) status = tr('Elige al menos un calendario para importar sus eventos.');
+  else if(c.last) status = trf('Última lectura: {hora}.', { hora: hhmm(c.last) });
+  const el = document.getElementById('calStatus');
+  el.textContent = status; el.hidden = !status;
+}
+async function calConnect(){
+  if(!requirePremium(tr('Importar el calendario del móvil es una función de Spoony Premium.'))) return;
+  const api = nativeCalendar(); if(!api) return;
+  showCalMsg('');
+  try{
+    const r = window.Capacitor.getPlatform() === 'android' ? await api.requestReadOnlyCalendarAccess() : await api.requestFullCalendarAccess();
+    if(!r || r.result !== 'granted'){
+      showCalMsg(tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.'));
+      return;
+    }
+    await calLoadList(api);
+    state.calendar.enabled = true; state.calendar.status = 'ok';
+    persist(); renderCalSettings();
+  }catch(e){
+    console.error('Calendario', e);
+    showCalMsg(tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.'));
+  }
+}
+document.getElementById('btnCalConnect').addEventListener('click', calConnect);
+document.getElementById('btnCalOff').addEventListener('click', () => {
+  state.calendar.enabled = false; persist(); showCalMsg(''); renderCalSettings();
+});
+document.getElementById('btnCalSync').addEventListener('click', async () => {
+  const api = nativeCalendar(); if(!api) return;
+  showCalMsg('');
+  try{ await calLoadList(api); persist(); }catch(e){ console.error('Calendario', e); }
+  await calSync(true);
+});
+document.getElementById('calList').addEventListener('click', e => {
+  const b = e.target.closest('[data-cal]'); if(!b) return;
+  const c = state.calendar, id = b.dataset.cal;
+  c.cals = c.cals.includes(id) ? c.cals.filter(x => x !== id) : [...c.cals, id];
+  persist(); renderCalSettings(); calSync(true);
+});
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') calSync(false); });
+
 /* ---------- render ---------- */
 /* una cuchara: llena, media o vacía. Vacía = contorno, no relleno claro:
    la diferencia es de forma, no solo de color. */
@@ -2625,7 +2851,7 @@ function renderTasks(){
     const cost = t.real ?? t.est;
     const dep = cost < 0;
     const l = learned(t.name);
-    const notes = [];
+    const notes = calNotes(t);
     if(t.series) notes.push(tr('Se repite'));
     if(dep) notes.push(tr('Recarga'));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
@@ -2647,7 +2873,9 @@ function renderTasks(){
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
       </button>
       ${body}
-      <span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(cost))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>
+      ${t.cal?.noCost
+        ? `<span class="cost">${tr('Sin coste')}</span>`
+        : `<span class="cost ${dep?'dep':''}">${dep?'+':''}${fmtN(Math.abs(cost))}<svg viewBox="0 0 20 40" fill="${dep?'var(--deposit)':'var(--spoon)'}"><use href="#spoon"/></svg></span>`}
       ${chev}
     </div>
     ${isOpen ? `
@@ -3275,6 +3503,7 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
   document.getElementById('dayStartHourInput').value = state.settings.dayStartHour;
   renderExportInfo();
   renderAccount();
+  renderCalSettings();
 }
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const fmtTaskTime = t => t.time ? (t.timeEnd ? `${t.time}–${t.timeEnd}` : t.time) : '';
@@ -3680,6 +3909,7 @@ function openTaskSheet(dateKey){
   taskDate = dateKey;
   tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  document.getElementById('tCalNote').hidden = true;
   document.querySelector('#dlgTask h2').textContent = tr('Añadir tarea');
   document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
     ? tr('Elige de tu lista o escribe una nueva.')
@@ -3693,11 +3923,13 @@ function openTaskSheet(dateKey){
     .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}" aria-pressed="false">${esc(l.name)}</button>`).join('');
   tSync(); repSync(); openDialog(dlgTask);
 }
-function openTaskEdit(taskId){
-  const t = day().tasks.find(x => x.id === taskId);
+function openTaskEdit(taskId, dateKey = todayKey()){
+  const t = day(dateKey).tasks.find(x => x.id === taskId);
   if(!t) return;
   editingTask = taskId;
-  taskDate = todayKey();
+  taskDate = dateKey;
+  const calNote = document.getElementById('tCalNote');
+  calNote.hidden = !t.cal;
   tName.value = t.name;
   tKind = t.est < 0 ? 'recarga' : 'gasto';
   tCost = Math.abs(t.est);
@@ -3852,10 +4084,17 @@ tSave.addEventListener('click', () => {
   const time = tTime.value || null;
   const timeEnd = tTimeEnd.value || null;
   if(editingTask){
-    const t = day().tasks.find(x => x.id === editingTask);
-    if(t){ t.name = name; t.est = est; t.time = time; t.timeEnd = timeEnd; }
+    const t = day(taskDate).tasks.find(x => x.id === editingTask);
+    if(t){
+      t.name = name; t.est = est; t.time = time; t.timeEnd = timeEnd;
+      if(t.cal){
+        t.cal.noCost = false; delete t.cal.estimated; delete t.cal.gone;
+        if(t.cal.changed){ Object.assign(t.cal, t.cal.changed); delete t.cal.changed; }
+      }
+    }
     record(name, est, null);
     save(); dlgTask.close(); renderAll();
+    if(dlgDay.open) renderDaySheet();
     return;
   }
   const dates = expandDates(taskDate);
@@ -3883,10 +4122,10 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     t.done = !t.done;
-    if(t.done){ t.real = t.est; record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
+    if(t.done){ t.real = t.est; if(!t.cal?.noCost) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
     else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item) item.samples.pop();
+      if(item && !t.cal?.noCost) item.samples.pop();
       t.real = null;
       collapsedTasks.delete(t.id);
     }
@@ -3920,8 +4159,14 @@ document.getElementById('taskList').addEventListener('click', e => {
     const t = day().tasks.find(x => x.id === adj.dataset.real);
     const v = (t.real ?? t.est) + (+adj.dataset.delta);
     t.real = t.est < 0 ? Math.min(0, v) : Math.max(0, v);
-    const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-    if(item && item.samples.length){ item.samples[item.samples.length-1] = t.real; }
+    if(t.cal?.noCost){
+      // Primer coste que se le pone a un evento del calendario: recién ahora es un dato que aprender.
+      t.cal.noCost = false;
+      record(t.name, t.real, t.real);
+    }else{
+      const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
+      if(item && item.samples.length){ item.samples[item.samples.length-1] = t.real; }
+    }
     save(); renderAll();
     if(t.est < 0) closeAdjustPanel(t.id);
   }
@@ -4273,9 +4518,11 @@ function renderDaySheet(){
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini">
-        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${esc(t.name)}${t.done?` · ${tr('hecha')}`:''}</span>
-        <span class="cost">${fmtN(+(t.real ?? t.est) || 0)}
-          <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>
+        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${t.cal && editable && !t.done
+          ? `<button class="linkbtn inline" data-dedit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">${esc(t.name)}</button>`
+          : esc(t.name)}${t.done?` · ${tr('hecha')}`:''}${t.cal ? `<br><span class="task-meta">${calNotes(t).join(' · ')}</span>` : ''}</span>
+        <span class="cost">${t.cal?.noCost ? tr('Sin coste') : `${fmtN(+(t.real ?? t.est) || 0)}
+          <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>`}
           ${editable ? `<button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>` : ''}
         </span>
       </div>`).join('')
@@ -4320,6 +4567,8 @@ document.getElementById('dTpl').addEventListener('click', () => {
   openTpl(selectedDay);
 });
 document.getElementById('dTasks').addEventListener('click', e => {
+  const ed = e.target.closest('[data-dedit]');
+  if(ed && dayEditAllowed(selectedDay)){ openTaskEdit(ed.dataset.dedit, selectedDay); return; }
   const b = e.target.closest('[data-del]'); if(!b || !dayEditAllowed(selectedDay)) return;
   const d = day(selectedDay);
   const t = d.tasks.find(x => x.id === b.dataset.del);
@@ -4696,6 +4945,7 @@ document.getElementById('fileIn').addEventListener('change', async e => {
     // La cuenta es de este móvil, no del archivo: se conserva, y lo importado
     // cuenta como cambio y se sube.
     if(previous.sync) state.sync = { ...previous.sync };
+    if(previous.calendar) state.calendar = previous.calendar;
     applyAll();
     await save();
   }catch(err){
@@ -4711,6 +4961,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
     ? 'Se borra todo el historial, en este móvil y en tu cuenta. No se puede deshacer.'
     : 'Se borra todo el historial. No se puede deshacer.'))) return;
   const prevSync = state.sync;
+  const prevCal = state.calendar;
   const contrast = state.settings.contrast;   // preferencia de accesibilidad, no dato: sobrevive al borrado
   const customColor = state.settings.customColor;
   const overCost = state.settings.overCost;
@@ -4725,6 +4976,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, lang:savedLang},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   if(prevSync) state.sync = prevSync;
+  if(prevCal) state.calendar = { ...prevCal, seen:{} };   // qué calendarios lees es preferencia; lo ya importado se borra con el historial
   ensureFinanzas(); ensureCycle();
   save(); applyCustomColor(); applyCycleUI(); applyFinUI(); renderAll();
 });
@@ -5038,6 +5290,7 @@ function normalize(s){
          planned + "2" concatena en vez de sumar. */
       t.est = Number.isFinite(+t.est) ? +t.est : 0;
       if(t.real != null) t.real = Number.isFinite(+t.real) ? +t.real : null;
+      if(t.cal && (typeof t.cal !== 'object' || typeof t.cal.k !== 'string')) delete t.cal;
     });
     d.extras = Array.isArray(d.extras) ? d.extras.filter(x => x && typeof x === 'object') : [];
     if(typeof d.note !== 'string') d.note = '';
@@ -5055,6 +5308,13 @@ function normalize(s){
   // a quien instala la app de cero (o restaura un backup con días ya apuntados).
   if(s.settings.introSeen == null) s.settings.introSeen = Object.keys(s.days).length > 0;
   if(!s.templates) s.templates = [];
+  if(!s.calendar || typeof s.calendar !== 'object' || Array.isArray(s.calendar)) s.calendar = {};
+  const cl = s.calendar;
+  cl.enabled = !!cl.enabled;
+  cl.cals = Array.isArray(cl.cals) ? cl.cals.filter(x => typeof x === 'string') : [];
+  cl.avail = Array.isArray(cl.avail) ? cl.avail.filter(x => x && typeof x.id === 'string') : [];
+  if(!cl.seen || typeof cl.seen !== 'object' || Array.isArray(cl.seen)) cl.seen = {};
+  cl.last = Number.isFinite(+cl.last) ? +cl.last : 0;
   return s;
 }
 
@@ -5079,6 +5339,7 @@ function normalize(s){
      a cualquier cuenta premium sin forma de que la app llegue a saberlo. */
   if(auth) startSyncForUser();
   else refreshRcEntitlement();
+  calSync(false);
 })();
 </script>
 </body>

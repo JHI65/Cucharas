@@ -361,6 +361,10 @@ evidentes y eso es una barrera real para este público.
       persona crea cuenta, está en `SUPABASE.md`. Sigue valiendo: sin SDKs de analítica ni
       de informes de fallos.
 - [ ] Cuestionario de datos de salud: rellenarlo con cuidado por el módulo de Ciclo.
+- [ ] Ficha de privacidad y formulario de permisos: declarar el acceso al calendario del móvil
+      (solo lectura, solo de los calendarios que elige la persona). Los eventos se leen en el
+      dispositivo; entran en la copia en la nube solo como tareas, igual que cualquier otra tarea.
+      Google Play: `READ_CALENDAR` es un permiso sensible, justificarlo en la declaración.
 - [ ] Icono de 1024×1024. El actual es un PNG de 180px incrustado en el HTML.
 - [ ] Buscar "Spoony" en ambas tiendas y en OEPM/EUIPO antes de invertir en la ficha.
 - [ ] Costes: Apple 99 USD/año, Google 25 USD pago único. Para iOS hace falta un Mac con

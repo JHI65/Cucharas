@@ -42,4 +42,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Solo lectura del calendario del móvil (Premium). No se pide WRITE_CALENDAR: Spoony nunca escribe en él. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
 </manifest>

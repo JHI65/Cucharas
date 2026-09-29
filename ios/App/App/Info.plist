@@ -13,6 +13,14 @@
 	     pregunta de cifrado en cada subida a App Store Connect. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Calendario del móvil, solo lectura (Premium): Spoony lee título y hora
+	     de los eventos de los calendarios que la persona elige, para que
+	     pueda asignarles coste en cucharas. iOS exige acceso completo para
+	     leer; nunca escribe ni borra nada. -->
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Spoony lee el título y la hora de los eventos de los calendarios que elijas, para que puedas asignarles cucharas. No cambia ni borra nada de tu calendario, y no sale de tu móvil.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Spoony lee el título y la hora de los eventos de los calendarios que elijas, para que puedas asignarles cucharas. No cambia ni borra nada de tu calendario, y no sale de tu móvil.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

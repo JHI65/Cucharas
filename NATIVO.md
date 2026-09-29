@@ -84,6 +84,12 @@ clavarla en un archivo del repositorio rompe el proyecto en cualquier otra.
 - `@capacitor/filesystem` — el almacén real de la app (`spoony.json` en `Directory.Data`)
   y el archivo de paso al exportar.
 - `@capacitor/share` — la hoja de compartir del sistema al exportar.
+- `@ebarooni/capacitor-calendar` — lee (solo lectura) los eventos del calendario del móvil
+  para importarlos como tareas (Premium). iOS: `NSCalendarsFullAccessUsageDescription` y
+  `NSCalendarsUsageDescription` en `Info.plist` (iOS exige acceso completo para leer).
+  Android: solo `READ_CALENDAR`; **no** se añade `WRITE_CALENDAR` y no se usa ningún método de
+  escritura del plugin. Nombre JS del plugin: `CapacitorCalendar`, llamado con `nativePlugin()`
+  como los demás. Tras instalarlo: `npm run sync` (iOS usa Swift Package Manager, no hace falta `pod install`).
 
 Deliberadamente **no** hay analítica ni informes de fallos. Ese "no recogemos nada" es el
 argumento del producto y lo que sostiene la ficha de privacidad de las dos tiendas.
