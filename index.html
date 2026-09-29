@@ -273,35 +273,116 @@ textarea{
 }
 
 /* ---- Calendar ---- */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
-.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-cell);width:42px;height:42px;padding:0;display:grid;place-items:center;color:var(--accent)}
-.cal-nav strong{font-size:17px}
-.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:6px}
+/* Calendario a todo el ancho: la rejilla y la lista de la semana se salen del
+   margen de la página (el mismo --pad, en negativo) para que cada día tenga
+   todo el ancho posible y los nombres se lean enteros. Celdas planas separadas
+   por líneas, sin cajas redondeadas, y sin transiciones. */
+.cal-view{display:flex;gap:10px;margin:16px 0 0}
+.cal-view button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);color:var(--ink);font-size:16px}
+/* Tinta sobre Rosa Algodón (7,5:1): Ciruela ahí se queda en 3,8:1. */
+.cal-view button[aria-pressed="true"]{background:var(--surface-2);font-weight:700}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin:14px 0 12px}
+.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-cell);width:44px;height:44px;padding:0;display:grid;place-items:center;color:var(--accent)}
+.cal-nav strong{font-size:17px;text-align:center}
+.cal-full{margin:0 calc(-1 * var(--pad))}
+.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding-bottom:6px;border-bottom:1px solid var(--line)}
 .dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
-.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;grid-auto-rows:58px}
+.wk{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:90px;border-bottom:1px solid var(--line)}
 .cell{
-  display:block;width:100%;height:100%;overflow:hidden;
-  border:1px solid var(--line);background:var(--surface);
-  border-radius:var(--r-cell);padding:9px 0 0;text-align:center;
-  font-size:15px;line-height:1.1;font-variant-numeric:tabular-nums;
+  position:relative;display:flex;align-items:flex-start;gap:3px;width:100%;height:100%;min-width:0;margin:0;
+  padding:6px 4px 0 6px;border:none;border-right:1px solid var(--line);border-radius:0;
+  background:var(--surface);color:var(--ink);text-align:left;
+  font-size:15px;line-height:17px;font-variant-numeric:tabular-nums;
 }
-.cell.blank{border:none;background:none;pointer-events:none}
-.cell.past{color:var(--ink-soft);background:var(--bg)}
-.cell.today{border:2px solid var(--accent);padding-top:8px}
-.load{display:flex;justify-content:center;align-items:flex-end;gap:3px;height:11px;margin-top:6px}
+.cell:nth-child(7){border-right:none}
+.cell.blank{background:var(--bg)}
+.dn{flex:none}
+/* Las tareas del día son barras dentro de la fila de la semana, no dentro de
+   la celda: así un mismo elemento en días seguidos es una sola barra. Van por
+   encima de las celdas pero no reciben toques: tocar una barra es tocar el
+   día que hay debajo. El texto completo va en el aria-label de la celda. */
+.cbars{position:absolute;inset:0;z-index:1;pointer-events:none}
+.cbar{position:absolute;display:block;padding:3px 6px;border-radius:6px;font-size:13px;line-height:18px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--surface-2);color:var(--ink)}
+.cbar.fl{border-top-left-radius:0;border-bottom-left-radius:0}
+.cbar.fr{border-top-right-radius:0;border-bottom-right-radius:0}
+.cbar-more{position:absolute;display:block;padding:0 4px;font-size:12px;line-height:13px;color:var(--ink)}
+.cbar.cal,.wchip.cal{background:color-mix(in srgb, var(--accent) 24%, var(--surface))}
+/* Hecha: tachado, no transparencia, que bajaría el texto de 4,5:1. */
+.cbar.done,.wchip.done{text-decoration:line-through}
+/* Semana: una fila por día, con los nombres enteros. */
+.wlist{border-top:1px solid var(--line)}
+.wrow{position:relative;display:flex;align-items:flex-start;gap:12px;width:100%;min-height:62px;margin:0;
+  padding:10px var(--pad);border:none;border-bottom:1px solid var(--line);border-radius:0;
+  background:var(--surface);color:var(--ink);text-align:left;font-variant-numeric:tabular-nums}
+.wd{flex:none;width:44px;display:flex;flex-direction:column;align-items:flex-start}
+.wd small{font-size:13px;line-height:16px;color:var(--ink-soft)}
+.wd b{font-size:22px;line-height:26px}
+.wchips{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-self:center}
+.wchip{padding:6px 12px;border-radius:10px;font-size:16px;line-height:20px;background:var(--surface-2);color:var(--ink);overflow-wrap:anywhere}
+.wnone{font-size:16px;line-height:20px;color:var(--ink-soft)}
+.wrow .load{flex:none;max-width:40px;align-self:center;margin:0}
+/* Etiquetas por calendario: un color y un icono que elige la persona. El texto
+   va siempre en tinta para que se lea igual en cualquier tinte; el color lo
+   llevan el fondo suave y el icono. Seis tonos que se distinguen entre sí
+   también en escala de grises por el icono, no solo por el color. */
+:root{--tg0:#9E5266;--tg1:#3E7B5A;--tg2:#C0453A;--tg3:#3F6EA8;--tg4:#7B5AA6;--tg5:#A2701C}
+[class*="tg-"]{--tg:var(--tg0)}
+.tg-1{--tg:var(--tg1)}.tg-2{--tg:var(--tg2)}.tg-3{--tg:var(--tg3)}.tg-4{--tg:var(--tg4)}.tg-5{--tg:var(--tg5)}
+/* Texto al 60% del tono: al 75% el Ámbar se quedaba en 4,1:1. */
+.cbar[class*="tg-"],.wchip[class*="tg-"]{background:color-mix(in srgb, var(--tg) 18%, var(--surface));color:color-mix(in srgb, var(--tg) 60%, var(--ink))}
+.ctag{display:inline-flex;align-items:center;gap:5px;padding:1px 8px 1px 6px;border-radius:999px;
+  background:color-mix(in srgb, var(--tg) 20%, var(--surface));color:var(--ink);font-size:12px;line-height:1.5;vertical-align:1px}
+.ctag svg{width:12px;height:12px;flex:none;color:var(--tg)}
+/* Ajustes: solo los calendarios elegidos, cada uno en su fila con su etiqueta. */
+.calrows{margin:10px 0 4px}
+.calrow{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:6px 0}
+.calrow:first-child{border-top:none}
+.calrow-main{flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:none;border:none;padding:8px 0;text-align:left;min-height:44px;color:var(--ink)}
+.calrow-main .ctag{font-size:15px;padding:3px 11px 3px 8px}
+.calrow-main .ctag svg{width:16px;height:16px}
+.calrow-src{font-size:13px;color:var(--ink-soft)}
+.calrow-x{flex:none;width:44px;height:44px;display:grid;place-items:center;background:none;border:none;color:var(--ink-soft)}
+.caledit{padding:4px 0 12px}
+.caledit p{margin:6px 0 6px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb, var(--tg) 20%, var(--surface));display:grid;place-items:center;padding:0;color:var(--tg)}
+.swatch svg{width:20px;height:20px}
+.swatch[aria-pressed="true"]{border:3px solid var(--tg)}
+.swatch.dot::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--tg)}
+#calMore{margin:8px 0 0}
+.cell.past,.wrow.past{color:var(--ink-soft);background:var(--bg)}
+/* Hoy: el número sobre Ciruela (5,2:1). Un borde se confundiría con el foco. */
+.cell.today .dn,.wrow.today .wd b{background:var(--accent);color:var(--surface);border-radius:999px;padding:0 5px;margin-left:-3px}
+/* Las marcas a la derecha del número. Si no caben en una línea (móvil
+   estrecho) bajan a otra por la derecha, sin tapar las barras. */
+.load{flex:1;min-width:0;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:flex-end;align-content:flex-start;gap:1px 2px;margin-top:3px}
 .lm{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
-.cell.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
+.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
 /* Sangrado: el punto entre las cucharas resultó poco visible y se confundía
    con la tira de tareas. Se marca en su lugar toda la celda, en Ciruela —el
    mismo color que ya usa el borde de "hoy"—, para que se distinga de un
    vistazo. Estimado usa el mismo tinte pero solo de borde, a rayas. */
-.cell.bleed{background:color-mix(in srgb, var(--accent) 22%, var(--surface));border-color:var(--accent)}
-.cell.bleed-est{border:1.5px dashed var(--accent)}
+.cell.bleed,.wrow.bleed{background:color-mix(in srgb, var(--accent) 22%, var(--surface));color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.cell.bleed-est,.wrow.bleed-est{outline:1.5px dashed var(--accent);outline-offset:-2px}
+/* Foco dentro de la celda, por encima de las barras: hacia fuera lo taparían
+   las celdas vecinas. */
+.cell:focus-visible,.wrow:focus-visible{outline:none}
+.cell:focus-visible::after,.wrow:focus-visible::after{content:"";position:absolute;inset:0;z-index:2;border:3px solid var(--accent);pointer-events:none}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
 .mini button{background:none;border:none;color:var(--ink-soft);font-size:15px;padding:0 4px;line-height:1;display:grid;place-items:center}
 .mini .use{padding:6px 2px}
+.mini .linkbtn.inline{display:inline;padding:0;font-size:inherit}
+/* Toda la tarjeta de un evento importado abre el editor: el botón del nombre
+   (el que lee el lector de pantalla y se alcanza con teclado) extiende su zona
+   táctil a la tarjeta entera. El de quitar queda por encima y sigue siendo suyo. */
+.mini.tap{position:relative}
+.mini.tap .linkbtn.inline::after{content:"";position:absolute;inset:0;border-radius:var(--r-row)}
+.mini.tap .linkbtn.inline:focus-visible{outline:none}
+.mini.tap .linkbtn.inline:focus-visible::after{outline:3px solid var(--accent);outline-offset:2px}
+.mini.tap [data-del]{position:relative;z-index:1}
 
 /* ---- Settings ---- */
 .row{
@@ -311,6 +392,9 @@ textarea{
 .row:last-child{border-bottom:none}
 .row p{margin:0;font-size:14px;color:var(--ink-soft)}
 .row .chips{margin:0;flex:0 0 auto}
+.info-btn{min-height:44px;padding:0 8px 0 0}
+.info-text{margin:0 0 12px;font-size:14px;color:var(--ink-soft)}
+.field label.row{display:flex;margin-bottom:0;font-size:inherit;color:inherit;border-bottom:none}
 /* Los chips de tamaño de texto ("Normal / Grande / Muy grande") y los de
    Activado / Desactivado no caben junto al texto en 390 pt: el bloque no se
    encoge (flex:0 0 auto), estrangulaba el título a una palabra por línea y el
@@ -543,7 +627,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
 /* Cambios de estado. La Quietud está levantada, pero el movimiento se limita a
    fundidos de color: nada se desplaza ni rebota. */
-.check,.chip,.scale button,.cell,.btn,.task{
+.check,.chip,.scale button,.btn,.task{
   transition:background-color .18s ease,border-color .18s ease,color .18s ease;
 }
 
@@ -594,6 +678,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <symbol id="i-plus" viewBox="0 0 24 24">
     <path d="M12 6v12M6 12h12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
+  <!-- Iconos de las etiquetas de calendario: trazo, en el color de la etiqueta. -->
+  <symbol id="t-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/></g></symbol>
+  <symbol id="t-person" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6"/></g></symbol>
+  <symbol id="t-food" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M17 21V3c-2.2 1.2-3 3.5-3 6.5V13h3"/></g></symbol>
+  <symbol id="t-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="currentColor"/><path d="M12 7v6.2" stroke="var(--surface)" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.4" fill="var(--surface)"/></symbol>
+  <symbol id="t-work" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5h6v2M3.5 12.5h17"/></g></symbol>
+  <symbol id="t-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></g></symbol>
+  <symbol id="t-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24">
     <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
@@ -662,14 +754,26 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <h1 class="title" data-i18n="Calendario">Calendario</h1>
       <p class="sub" data-i18n="Toca un día para ver o planificar">Toca un día para ver o planificar</p>
     </header>
+    <div class="cal-view" role="group" data-i18n-aria="Vista del calendario" aria-label="Vista del calendario">
+      <button data-calview="mes" aria-pressed="true" data-i18n="Mes">Mes</button>
+      <button data-calview="semana" aria-pressed="false" data-i18n="Semana">Semana</button>
+    </div>
     <div class="cal-nav">
       <button id="calPrev" data-i18n-aria="Mes anterior" aria-label="Mes anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
       <strong id="calLabel"></strong>
       <button id="calNext" data-i18n-aria="Mes siguiente" aria-label="Mes siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
-    <div class="dow"><span data-i18n="L">L</span><span data-i18n="M">M</span><span data-i18n="X">X</span><span data-i18n="J">J</span><span data-i18n="V">V</span><span data-i18n="S">S</span><span data-i18n="D">D</span></div>
-    <div class="grid" id="calGrid"></div>
-    <p class="legend" data-i18n="Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
+    <div id="calMonthView">
+      <div class="cal-full">
+        <div class="dow" aria-hidden="true"><span data-i18n="L">L</span><span data-i18n="M">M</span><span data-i18n="X">X</span><span data-i18n="J">J</span><span data-i18n="V">V</span><span data-i18n="S">S</span><span data-i18n="D">D</span></div>
+        <div id="calGrid"></div>
+      </div>
+      <p class="legend" data-i18n="Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
+    </div>
+    <div id="calWeekView" hidden>
+      <div class="cal-full wlist" id="calWeek"></div>
+      <p class="legend" data-i18n="Cada marca son dos cucharas.">Cada marca son dos cucharas.</p>
+    </div>
     <p class="legend" id="calLegendCiclo" hidden></p>
     <div class="card" id="patterns"></div>
   </section>
@@ -898,8 +1002,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div class="row" id="calManageRow" hidden>
       <div><strong data-i18n="Calendarios que se importan">Calendarios que se importan</strong>
-        <p data-i18n="Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.">Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.</p>
-        <div class="chips" id="calList" role="group" data-i18n-aria="Calendarios que se importan" aria-label="Calendarios que se importan"></div>
+        <p data-i18n="Se importan los eventos de hoy y de los próximos 12 meses. Los de todo el día entran sin hora. Si cambias el nombre de un evento en tu calendario, cambia también aquí, salvo que lo hayas renombrado en Spoony. Se actualiza al abrir la app y cada pocos minutos. Toca un calendario para cambiar su etiqueta. Las tareas ya importadas se quedan aunque desconectes.">Se importan los eventos de hoy y de los próximos 12 meses. Los de todo el día entran sin hora. Si cambias el nombre de un evento en tu calendario, cambia también aquí, salvo que lo hayas renombrado en Spoony. Se actualiza al abrir la app y cada pocos minutos. Toca un calendario para cambiar su etiqueta. Las tareas ya importadas se quedan aunque desconectes.</p>
+        <div class="calrows" id="calList"></div>
+        <button class="btn" id="btnCalMore" aria-expanded="false"></button>
+        <div class="chips" id="calMore" hidden role="group" data-i18n-aria="Calendarios que puedes añadir" aria-label="Calendarios que puedes añadir"></div>
         <p class="notice" id="calStatus" role="status" hidden></p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           <button class="btn" id="btnCalSync" data-i18n="Actualizar ahora">Actualizar ahora</button>
@@ -1057,6 +1163,24 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <span class="lib-note" id="tLearned"></span>
       </div>
     </div>
+    <div class="field" id="tLibField">
+      <label class="row" style="cursor:pointer">
+        <div><strong data-i18n="Añadir a «Cuánto cuesta cada actividad»">Añadir a «Cuánto cuesta cada actividad»</strong></div>
+        <input type="checkbox" id="tLibOn" data-i18n-aria="Añadir a «Cuánto cuesta cada actividad»" aria-label="Añadir a «Cuánto cuesta cada actividad»" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+    </div>
+    <div class="field" id="tAccumField">
+      <label class="row" style="cursor:pointer">
+        <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span></div>
+        <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+      <div class="stepper" id="tAccumStepRow" hidden>
+        <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <output id="tAccumOut">1</output>
+        <button id="tAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
+      </div>
+    </div>
     <div class="field-row">
       <div class="field">
         <label for="tTime" data-i18n="Hora inicio">Hora inicio</label>
@@ -1135,9 +1259,11 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <button class="linkbtn" id="lReset" hidden data-i18n="Olvidar lo que ha aprendido">Olvidar lo que ha aprendido</button>
     <div class="field" id="lAccumField">
       <label class="row" style="cursor:pointer">
-        <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.">Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.</p></div>
+        <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span></div>
         <input type="checkbox" id="lAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
       </label>
+      <button type="button" class="linkbtn info-btn" data-info="lAccumInfo" aria-expanded="false" aria-controls="lAccumInfo" data-i18n="Info" data-i18n-aria="Info: sube con los días seguidos" aria-label="Info: sube con los días seguidos">Info</button>
+      <p class="info-text" id="lAccumInfo" hidden data-i18n="Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.">Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.</p>
       <div class="stepper" id="lAccumStepRow" hidden>
         <button id="lAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="lAccumStep">1</output>
@@ -1612,7 +1738,6 @@ const DAY_START_HOUR_DEFAULT = 4;
 const EN = {
  " · recuperación {lab}": " · recovery {lab}",
  " · recuperación {lab}, va a más": " · recovery {lab}, getting longer",
- ", {n} cucharas": ", {n} spoons",
  ", con sangrado": ", bleeding",
  ", por encima de tu media": ", above your average",
  ", sangrado estimado": ", estimated bleeding",
@@ -2025,6 +2150,11 @@ const EN = {
  "Que el gasto suba solo con los días seguidos es una función de Spoony Premium.": "Having the cost rise on its own with consecutive days is a Spoony Premium feature.",
  "Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.": "Each day in a row you log it, its cost rises a bit more than the day before. As soon as you skip a day, the streak ends and it starts over from the base cost.",
  "Sube con los días seguidos": "Rises with consecutive days",
+ "Info": "Info",
+ "Info: sube con los días seguidos": "Info: rises with consecutive days",
+ "Añadir a «Cuánto cuesta cada actividad»": "Add to «How much each activity costs»",
+ "Info: añadir a Cuánto cuesta cada actividad": "Info: add to How much each activity costs",
+ "Si está marcada, esta tarea entra en «Cuánto cuesta cada actividad» y la app aprende de lo que te cuesta. Si la desmarcas, la tarea se apunta igual en tu día, pero no se guarda ahí ni se aprende de ella.": "If checked, this task goes into «How much each activity costs» and the app learns from what it costs you. If unchecked, the task is still added to your day, but it isn't saved there and nothing is learned from it.",
  "Sube el contraste si te cuesta leer el texto claro.": "Raise the contrast if light text is hard to read.",
  "Sube el tamaño si te cuesta leer el texto normal.": "Raise the size if normal text is hard to read.",
  "Sube o baja de una cuchara en una.": "Goes up or down one spoon at a time.",
@@ -2096,6 +2226,24 @@ const EN = {
  "Vuelve a ver la guía de esta sección.": "Replay this section's guide.",
  "Del calendario": "From your calendar",
  "Toca para asignar cucharas": "Tap to assign spoons",
+ "Todo el día": "All day",
+ "Se importan los eventos de hoy y de los próximos 12 meses. Los de todo el día entran sin hora. Si cambias el nombre de un evento en tu calendario, cambia también aquí, salvo que lo hayas renombrado en Spoony. Se actualiza al abrir la app y cada pocos minutos. Toca un calendario para cambiar su etiqueta. Las tareas ya importadas se quedan aunque desconectes.": "Events from today and the next 12 months are imported. All-day events come in without a time. If you rename an event in your calendar, it is renamed here too, unless you renamed it in Spoony. It updates when you open the app and every few minutes. Tap a calendar to change its label. Tasks already imported stay even if you disconnect.",
+ "Calendarios que puedes añadir": "Calendars you can add",
+ "Añadir un calendario ({n} más)": "Add a calendar ({n} more)",
+ "Cambiar la etiqueta de {name}": "Change the label of {name}",
+ "Dejar de importar {name}": "Stop importing {name}",
+ "Color": "Colour",
+ "Icono": "Icon",
+ "Ciruela": "Plum", "Verde": "Green", "Rojo": "Red", "Azul": "Blue", "Lila": "Lilac", "Ámbar": "Amber",
+ "Persona": "Person", "Comida": "Food", "Aviso": "Alert", "Casa": "Home", "Cuidado": "Care",
+ "Vista del calendario": "Calendar view",
+ "Mes": "Month", "Semana": "Week",
+ "Semana anterior": "Previous week", "Semana siguiente": "Next week",
+ "Nada planificado": "Nothing planned",
+ "+{n} más": "+{n} more",
+ ", {n} cuchara planificada": ", {n} spoon planned",
+ ", {n} cucharas planificadas": ", {n} spoons planned",
+ "Cada marca son dos cucharas.": "Each mark is two spoons.",
  "Coste estimado": "Estimated cost",
  "Ya no está en tu calendario": "No longer in your calendar",
  "Cambiado en tu calendario: {detalle}": "Changed in your calendar: {detalle}",
@@ -2134,7 +2282,7 @@ const tr = s => (state.settings?.lang === 'en' && EN[s]) ? EN[s] : s;
    luego se sustituyen los valores. */
 const trf = (s, vars) => tr(s).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
 const LOCALE = () => state.settings?.lang === 'en' ? 'en-GB' : 'es-ES';
-let state = { v:1, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT, lang:LANG_DEFAULT },
+let state = { v:2, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT, lang:LANG_DEFAULT, calView:'mes' },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null }, finEnabled:false,
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
 let currentTab = 'hoy';
@@ -2574,23 +2722,61 @@ function accumStreak(name, dateKey){
 }
 
 /* ---------- calendario del móvil (Premium) ----------
-   Lee, sin escribir nunca, los eventos con hora de los calendarios que la
+   Lee, sin escribir nunca, los eventos (con hora o de todo el día) de los calendarios que la
    persona elige (los de Google llegan por la cuenta añadida en el móvil).
    Cada evento entra como una tarea del día con task.cal. Sin coste hasta que
    la persona lo asigne: no resta cucharas por su cuenta. Solo si el título
    coincide con una actividad de la librería entra con su coste, avisado como
-   estimado. Lo que la persona ya decidió (coste, nombre) no se toca nunca:
-   si el evento cambia, se avisa con texto en la tarea.
+   estimado. El coste que la persona ya puso no se toca nunca. Si cambia el
+   nombre del evento, la tarea lo sigue mientras la persona no la haya
+   renombrado en Spoony (y no esté hecha); en otro caso se avisa con texto.
+   La hora que cambia sigue la misma regla que antes: se avisa.
    state.calendar.seen recuerda qué eventos ya se importaron, para no volver a
    traer uno que la persona quitó. */
-const CAL_DAYS = 14, CAL_MIN_GAP = 5*60*1000;
+const CAL_DAYS = 365, CAL_MIN_GAP = 5*60*1000, CAL_RESUME_GAP = 15*1000;
 let calBusy = false;
 const hhmm = ms => { const d = new Date(ms); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 const calDayKey = ms => { const d = new Date(ms); if(d.getHours() < dayStartHour()) d.setDate(d.getDate() - 1); return localDateKey(d); };
 const calRange = (a, b) => a ? (b ? `${a}–${b}` : a) : '';
+/* Un evento de todo el día no tiene hora: solo importan los días que cubre.
+   iOS lo da de 00:00 local a 23:59:59 del último día; Android, en UTC, de
+   medianoche a la medianoche siguiente (fin exclusivo). Un múltiplo exacto de
+   24 h solo puede ser UTC (una medianoche local con desfase no lo es), así que
+   así se distingue sin depender de la zona horaria. Sin el desplazamiento de
+   "cuándo empieza tu día": un evento de todo el día es del día natural. */
+const CAL_DAY_MS = 86400000, CAL_MAX_SPAN = 31;
+const allDayKeys = (start, end) => {
+  const key = (ms, utc) => utc ? new Date(ms).toISOString().slice(0, 10) : localDateKey(new Date(ms));
+  const first = key(start, start % CAL_DAY_MS === 0);
+  const last = end > start ? key(end - 1, end % CAL_DAY_MS === 0) : first;
+  const out = [];
+  for(let k = first; k <= last && out.length < CAL_MAX_SPAN; k = shiftKey(k, 1)) out.push(k);
+  return out;
+};
+const CAL_ICONS = ['cal','person','food','alert','work','home','heart'];
+const CAL_ICON_NAMES = { cal:'Calendario', person:'Persona', food:'Comida', alert:'Aviso', work:'Trabajo', home:'Casa', heart:'Cuidado' };
+const CAL_COLOR_NAMES = ['Ciruela','Verde','Rojo','Azul','Lila','Ámbar'];
+const calTag = cid => state.calendar?.tags?.[cid] || null;
+const calTitle = cid => state.calendar?.avail?.find(a => a.id === cid)?.title || '';
+/* Nombre para las barras del calendario: sin emojis, el resto entero. */
+const calClean = s => String(s).replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}\u{1F1E6}-\u{1F1FF}]/gu, '').replace(/\s+/g, ' ').trim() || String(s).trim();
+const tagIcon = i => `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#t-${CAL_ICONS.includes(i) ? i : 'cal'}"/></svg>`;
+function calTagHtml(cid){
+  const g = calTag(cid), name = calTitle(cid);
+  if(!g) return esc(tr('Del calendario'));
+  return `<span class="ctag tg-${g.c}">${tagIcon(g.i)}${esc(name || tr('Del calendario'))}</span>`;
+}
+function ensureCalTag(id){
+  const c = state.calendar;
+  if(c.tags[id]) return;
+  const used = new Set(c.cals.map(x => c.tags[x]?.c));
+  let color = 0; while(used.has(color) && color < 5) color++;
+  c.tags[id] = { c: color, i: 'cal' };
+}
 function calNotes(t){
   const c = t.cal; if(!c) return [];
-  const n = [tr('Del calendario')];
+  const n = [calTagHtml(c.cid)];
+  if(c.allDay) n.push(tr('Todo el día'));
   if(c.noCost && !t.done) n.push(tr('Toca para asignar cucharas'));
   else if(c.estimated && !t.done) n.push(tr('Coste estimado'));
   if(c.gone) n.push(tr('Ya no está en tu calendario'));
@@ -2616,15 +2802,18 @@ async function calSync(force){
     const { result } = await api.listEventsInRange({ from: from.getTime(), to: to.getTime() });
     const incoming = new Map();
     (result || [])
-      .filter(ev => ev && !ev.isAllDay && c.cals.includes(String(ev.calendarId)) && String(ev.status || '').toLowerCase() !== 'canceled')
+      .filter(ev => ev && c.cals.includes(String(ev.calendarId)) && String(ev.status || '').toLowerCase() !== 'canceled')
       .sort((a, b) => a.startDate - b.startDate)
       .forEach(ev => {
-        const dk = calDayKey(+ev.startDate);
-        if(dk < startKey || dk > endKey) return;
-        let k = `${ev.id}@${dk}`; if(incoming.has(k)) k += '@' + ev.startDate;
-        const end = +ev.endDate;
-        incoming.set(k, { dk, cid:String(ev.calendarId), title:(ev.title || '').trim() || tr('Evento sin título'),
-          time:hhmm(+ev.startDate), timeEnd: end > +ev.startDate ? hhmm(end) : null });
+        const start = +ev.startDate, end = +ev.endDate;
+        const title = (ev.title || '').trim() || tr('Evento sin título'), cid = String(ev.calendarId);
+        const add = (dk, extra) => {
+          if(dk < startKey || dk > endKey) return;
+          let k = `${ev.id}@${dk}`; if(incoming.has(k)) k += '@' + ev.startDate;
+          incoming.set(k, { dk, cid, title, time:null, timeEnd:null, ...extra });
+        };
+        if(ev.isAllDay) allDayKeys(start, end).forEach(dk => add(dk, { allDay:true }));
+        else add(calDayKey(start), { time:hhmm(start), timeEnd: end > start ? hhmm(end) : null });
       });
     const have = new Set();
     Object.keys(state.days).filter(k => k >= startKey && k <= endKey).forEach(dk => {
@@ -2635,6 +2824,9 @@ async function calSync(force){
         if(ev){
           have.add(ce.k); c.seen[ce.k] = dk;
           if(ce.gone){ delete ce.gone; dirty = true; }
+          if(ev.title !== ce.title && t.name === ce.title && !t.done){
+            t.name = ev.title; ce.title = ev.title; dirty = true;
+          }
           if(ev.title === ce.title && ev.time === ce.time && ev.timeEnd === ce.timeEnd){
             if(ce.changed){ delete ce.changed; dirty = true; }
           }else if(ce.noCost && !t.done){
@@ -2655,6 +2847,7 @@ async function calSync(force){
       if(have.has(k) || c.seen[k]) return;
       const l = libItem(ev.title);
       const cal = { k, cid:ev.cid, title:ev.title, time:ev.time, timeEnd:ev.timeEnd };
+      if(ev.allDay) cal.allDay = true;
       let est = 0;
       if(l){ est = learned(ev.title).suggest; cal.estimated = true; } else cal.noCost = true;
       day(ev.dk).tasks.push({ id:uid(), series:null, name:ev.title, est, real:null, done:false, recovery:null, time:ev.time, timeEnd:ev.timeEnd, cal });
@@ -2694,9 +2887,32 @@ function renderCalSettings(){
   document.getElementById('calHintIOS').hidden = platform !== 'ios';
   document.getElementById('calHintAndroid').hidden = platform !== 'android';
   if(!c.enabled) return;
-  document.getElementById('calList').innerHTML = c.avail.length
-    ? c.avail.map(a => `<button class="chip" data-cal="${esc(a.id)}" aria-pressed="${c.cals.includes(a.id)}">${esc(a.title)}${a.src ? ` · ${esc(a.src)}` : ''}</button>`).join('')
-    : `<span class="lib-note">${tr('No hay calendarios en este móvil.')}</span>`;
+  const chosen = c.cals.map(id => c.avail.find(a => a.id === id)).filter(Boolean);
+  const rest = c.avail.filter(a => !c.cals.includes(a.id));
+  document.getElementById('calList').innerHTML = chosen.map(a => {
+    const g = c.tags[a.id] || { c:0, i:'cal' }, open = calEditing === a.id;
+    return `<div class="calrow">
+        <button class="calrow-main" data-caledit="${esc(a.id)}" aria-expanded="${open}" aria-label="${trf('Cambiar la etiqueta de {name}', {name:esc(a.title)})}">
+          <span class="ctag tg-${g.c}">${tagIcon(g.i)}${esc(a.title)}</span>${a.src ? `<span class="calrow-src">${esc(a.src)}</span>` : ''}
+        </button>
+        <button class="calrow-x" data-caloff="${esc(a.id)}" aria-label="${trf('Dejar de importar {name}', {name:esc(a.title)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>${open ? `<div class="caledit">
+        <p class="lib-note">${tr('Color')}</p>
+        <div class="swatches" role="group" aria-label="${tr('Color')}">${CAL_COLOR_NAMES.map((nm, i) =>
+          `<button class="swatch dot tg-${i}" data-calcolor="${i}" aria-pressed="${g.c === i}" aria-label="${tr(nm)}"></button>`).join('')}</div>
+        <p class="lib-note">${tr('Icono')}</p>
+        <div class="swatches" role="group" aria-label="${tr('Icono')}">${CAL_ICONS.map(ic =>
+          `<button class="swatch tg-${g.c}" data-calicon="${ic}" aria-pressed="${g.i === ic}" aria-label="${tr(CAL_ICON_NAMES[ic])}">${tagIcon(ic)}</button>`).join('')}</div>
+      </div>` : ''}`;
+  }).join('');
+  const more = document.getElementById('btnCalMore'), moreList = document.getElementById('calMore');
+  const moreOpen = calMoreOpen || !chosen.length;
+  more.hidden = !rest.length || !chosen.length;
+  more.textContent = trf('Añadir un calendario ({n} más)', {n:rest.length});
+  more.setAttribute('aria-expanded', String(calMoreOpen));
+  moreList.hidden = !moreOpen || !rest.length;
+  moreList.innerHTML = rest.map(a => `<button class="chip" data-cal="${esc(a.id)}">${esc(a.title)}${a.src ? ` · ${esc(a.src)}` : ''}</button>`).join('');
+  if(!c.avail.length) document.getElementById('calList').innerHTML = `<span class="lib-note">${tr('No hay calendarios en este móvil.')}</span>`;
   let status = '';
   if(c.status === 'denied') status = tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.');
   else if(c.status === 'error') status = tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.');
@@ -2733,13 +2949,38 @@ document.getElementById('btnCalSync').addEventListener('click', async () => {
   try{ await calLoadList(api); persist(); }catch(e){ console.error('Calendario', e); }
   await calSync(true);
 });
-document.getElementById('calList').addEventListener('click', e => {
+let calEditing = null, calMoreOpen = false;
+document.getElementById('btnCalMore').addEventListener('click', () => { calMoreOpen = !calMoreOpen; renderCalSettings(); });
+document.getElementById('calMore').addEventListener('click', e => {
   const b = e.target.closest('[data-cal]'); if(!b) return;
   const c = state.calendar, id = b.dataset.cal;
-  c.cals = c.cals.includes(id) ? c.cals.filter(x => x !== id) : [...c.cals, id];
+  if(!c.cals.includes(id)){ ensureCalTag(id); c.cals = [...c.cals, id]; }
+  calMoreOpen = false;
   persist(); renderCalSettings(); calSync(true);
 });
-document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') calSync(false); });
+document.getElementById('calList').addEventListener('click', e => {
+  const c = state.calendar;
+  const off = e.target.closest('[data-caloff]');
+  if(off){
+    c.cals = c.cals.filter(x => x !== off.dataset.caloff);
+    if(calEditing === off.dataset.caloff) calEditing = null;
+    persist(); renderCalSettings(); calSync(true); return;
+  }
+  const ed = e.target.closest('[data-caledit]');
+  if(ed){ calEditing = calEditing === ed.dataset.caledit ? null : ed.dataset.caledit; renderCalSettings(); return; }
+  const col = e.target.closest('[data-calcolor]'), ic = e.target.closest('[data-calicon]');
+  if(!(col || ic) || !calEditing) return;
+  ensureCalTag(calEditing);
+  if(col) c.tags[calEditing].c = +col.dataset.calcolor;
+  if(ic) c.tags[calEditing].i = ic.dataset.calicon;
+  persist(); renderCalSettings(); renderCal(); renderTasks();
+});
+/* Al volver a la app se lee sin esperar los 5 minutos (si acabas de cambiar
+   un nombre en el calendario, lo esperas ver ya); con la app abierta, cada 5. */
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') calSync(Date.now() - (state.calendar?.last || 0) > CAL_RESUME_GAP);
+});
+setInterval(() => { if(document.visibilityState === 'visible') calSync(false); }, CAL_MIN_GAP);
 
 /* ---------- render ---------- */
 /* una cuchara: llena, media o vacía. Vacía = contorno, no relleno claro:
@@ -3442,36 +3683,136 @@ function renderPatterns(){
   el.innerHTML = out;
 }
 
-let calMonth = new Date();
-function renderCal(){
-  const y = calMonth.getFullYear(), m = calMonth.getMonth();
-  document.getElementById('calLabel').textContent =
-    calMonth.toLocaleDateString(LOCALE(),{month:'long',year:'numeric'});
-  const first = new Date(y, m, 1);
-  const offset = (first.getDay() + 6) % 7;            // semana empieza en lunes
-  const total = new Date(y, m+1, 0).getDate();
-  const typical = typicalBudget();
-  const mk = n => `${y}-${String(m+1).padStart(2,'0')}-${String(n).padStart(2,'0')}`;
+/* Calendario: vista de mes o de semana (settings.calView). calRef es el día
+   de referencia que comparten las dos: hoy al abrir, el último día tocado o
+   enfocado, y el que dejan las flechas. Cambiar de vista no lo mueve. */
+let calRef = todayKey();
+const calIsWeek = () => state.settings.calView === 'semana';
+const CAL_WEEKDAYS = ['L','M','X','J','V','S','D'];
+const CAL_BAR_TOP = 32, CAL_LANE = 26, CAL_LANES = 2;
+/* Días seguidos se juntan en una barra solo si son el mismo elemento: el
+   mismo evento del calendario del móvil o la misma serie de repetición. Dos
+   tareas distintas con el mismo nombre siguen separadas. */
+const calSrcKey = t => t.cal ? `c:${t.cal.cid}:${t.cal.k.split('@')[0]}` : t.series ? `s:${t.series}` : `t:${t.id}`;
+const calColor = t => { const g = t.cal && calTag(t.cal.cid); return `${t.cal ? ' cal' : ''}${g ? ` tg-${g.c}` : ''}`; };
+const calDayTasks = k => (state.days[k]?.tasks || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+function calDayInfo(k, typical, est){
+  const { planned } = dayLoad(k);
+  const heavy = planned > typical;
+  const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
+  const bleedEst = !bleed && est.has(k);
+  const tasks = calDayTasks(k);
+  const date = fmtDate(k).replace(/^([^,\d]+),/, '$1').replace(/^./, c => c.toUpperCase());
+  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(', por encima de tu media') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
+  const cls = [k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''), heavy ? 'heavy' : '', bleed ? 'bleed' : '', bleedEst ? 'bleed-est' : ''].filter(Boolean).join(' ');
+  return { tasks, label, cls, marks: '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2))) };
+}
+function calWeekLabel(a, b){
+  const A = new Date(a + 'T12:00:00'), B = new Date(b + 'T12:00:00');
+  const mon = d => d.toLocaleDateString(LOCALE(), {month:'short'}).replace('.', '');
+  if(A.getFullYear() !== B.getFullYear()) return `${A.getDate()} ${mon(A)} ${A.getFullYear()} – ${B.getDate()} ${mon(B)} ${B.getFullYear()}`;
+  if(A.getMonth() !== B.getMonth()) return `${A.getDate()} ${mon(A)} – ${B.getDate()} ${mon(B)} ${B.getFullYear()}`;
+  return `${A.getDate()} – ${B.getDate()} ${mon(B)} ${B.getFullYear()}`;
+}
+/* Carriles de una semana: cada tramo ocupa el primer carril libre en todos sus
+   días. Caben CAL_LANES; si un día tiene más, el último carril de ese día se
+   convierte en "+N más". Un tramo que pisa un día desbordado se esconde entero
+   y cuenta en el "+N" de cada uno de sus días: nada desaparece sin aviso. */
+function calLayoutWeek(segs){
+  segs.sort((a, b) => a.c0 - b.c0 || (b.c1 - b.c0) - (a.c1 - a.c0) || a.time.localeCompare(b.time));
+  const lanes = [], cols = s => Array.from({length: s.c1 - s.c0 + 1}, (_, i) => s.c0 + i);
+  segs.forEach(s => {
+    let l = 0; while(lanes[l] && cols(s).some(c => lanes[l].has(c))) l++;
+    lanes[l] = lanes[l] || new Set(); cols(s).forEach(c => lanes[l].add(c));
+    s.lane = l; s.hidden = l >= CAL_LANES;
+  });
+  for(let changed = true; changed;){
+    changed = false;
+    const over = new Set(); segs.forEach(s => { if(s.hidden) cols(s).forEach(c => over.add(c)); });
+    segs.forEach(s => { if(!s.hidden && s.lane === CAL_LANES - 1 && cols(s).some(c => over.has(c))){ s.hidden = true; changed = true; } });
+  }
+  const more = Array(7).fill(0);
+  segs.forEach(s => { if(s.hidden) cols(s).forEach(c => more[c]++); });
+  return more;
+}
+function renderCalMonth(typical){
+  const ref = new Date(calRef + 'T12:00:00');
+  const y = ref.getFullYear(), m = ref.getMonth();
+  document.getElementById('calLabel').textContent = ref.toLocaleDateString(LOCALE(), {month:'long', year:'numeric'});
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7;            // semana empieza en lunes
+  const total = new Date(y, m + 1, 0).getDate();
+  const mk = n => `${y}-${String(m + 1).padStart(2, '0')}-${String(n).padStart(2, '0')}`;
   const est = estBleedDays(mk(1), mk(total));
+  const info = [];
+  for(let n = 1; n <= total; n++) info[n] = calDayInfo(mk(n), typical, est);
+  const runs = []; let open = new Map();
+  for(let n = 1; n <= total; n++){
+    const next = new Map();
+    info[n].tasks.forEach(t => {
+      const key = calSrcKey(t); let r = open.get(key);
+      if(r && r.end === n - 1 && !next.has(key)){ r.end = n; r.done = r.done && !!t.done; }
+      else{ r = { key, start:n, end:n, name:calClean(t.name), color:calColor(t), done:!!t.done, time:t.time || '' }; runs.push(r); }
+      next.set(key, r);
+    });
+    open = next;
+  }
+  // Un tramo que sigue en el mes de al lado lleva el borde recto en ese lado.
+  const hasKey = (k, key) => calDayTasks(k).some(t => calSrcKey(t) === key);
+  runs.forEach(r => {
+    r.prev = r.start === 1 && hasKey(shiftKey(mk(1), -1), r.key);
+    r.next = r.end === total && hasKey(shiftKey(mk(total), 1), r.key);
+  });
+  const rows = Math.ceil((offset + total) / 7);
+  const segs = Array.from({length: rows}, () => []);
+  runs.forEach(r => {
+    for(let n = r.start; n <= r.end;){
+      const i = offset + n - 1, c0 = i % 7, e = Math.min(r.end, n + 6 - c0);
+      segs[Math.floor(i / 7)].push({ r, c0, c1: c0 + e - n, time: r.time, fl: n > r.start || r.prev, fr: e < r.end || r.next });
+      n = e + 1;
+    }
+  });
+  const pos = (c0, span, fl, fr, top) =>
+    `left:calc(${c0} * 100% / 7 + ${fl ? 0 : 2}px);width:calc(${span} * 100% / 7 - ${(fl ? 0 : 2) + (fr ? 0 : 2)}px);top:${top}px`;
   let html = '';
-  for(let i=0;i<offset;i++) html += '<div class="cell blank"></div>';
-  for(let n=1;n<=total;n++){
-    const k = mk(n);
-    const { planned } = dayLoad(k);
-    const heavy = planned > typical;
-    const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
-    const bleedEst = !bleed && est.has(k);
-    const marks = '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2)));
-    const cls = [
-      k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''),
-      heavy ? 'heavy' : '',
-      bleed ? 'bleed' : '',
-      bleedEst ? 'bleed-est' : ''
-    ].join(' ');
-    const label = `${fmtDate(k)}${planned ? trf(', {n} cucharas', {n:fmtN(planned)}) : ''}${heavy ? tr(', por encima de tu media') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
-    html += `<button class="cell ${cls}" data-day="${k}" aria-label="${label}">${n}<span class="load">${marks}</span></button>`;
+  for(let w = 0; w < rows; w++){
+    let cells = '';
+    for(let c = 0; c < 7; c++){
+      const n = w * 7 + c - offset + 1;
+      if(n < 1 || n > total){ cells += '<div class="cell blank" aria-hidden="true"></div>'; continue; }
+      const d = info[n];
+      cells += `<button class="cell ${d.cls}" data-day="${mk(n)}" aria-label="${d.label}"><span class="dn">${n}</span><span class="load">${d.marks}</span></button>`;
+    }
+    const more = calLayoutWeek(segs[w]);
+    const bars = segs[w].filter(s => !s.hidden).map(s =>
+      `<span class="cbar${s.r.color}${s.r.done ? ' done' : ''}${s.fl ? ' fl' : ''}${s.fr ? ' fr' : ''}" style="${pos(s.c0, s.c1 - s.c0 + 1, s.fl, s.fr, CAL_BAR_TOP + s.lane * CAL_LANE)}">${esc(s.r.name)}</span>`).join('')
+      + more.map((k, c) => k ? `<span class="cbar-more" style="${pos(c, 1, false, false, CAL_BAR_TOP + (CAL_LANES - 1) * CAL_LANE)}">${trf('+{n} más', {n:k})}</span>` : '').join('');
+    html += `<div class="wk">${cells}<div class="cbars" aria-hidden="true">${bars}</div></div>`;
   }
   document.getElementById('calGrid').innerHTML = html;
+  return est;
+}
+function renderCalWeek(typical){
+  const start = shiftKey(calRef, -((new Date(calRef + 'T12:00:00').getDay() + 6) % 7)), end = shiftKey(start, 6);
+  document.getElementById('calLabel').textContent = calWeekLabel(start, end);
+  const est = estBleedDays(start, end);
+  document.getElementById('calWeek').innerHTML = CAL_WEEKDAYS.map((letter, i) => {
+    const k = shiftKey(start, i), d = calDayInfo(k, typical, est);
+    const chips = d.tasks.length
+      ? d.tasks.map(t => `<span class="wchip${calColor(t)}${t.done ? ' done' : ''}">${esc(String(t.name).trim())}</span>`).join('')
+      : `<span class="wnone">${tr('Nada planificado')}</span>`;
+    return `<button class="wrow ${d.cls}" data-day="${k}" aria-label="${d.label}"><span class="wd"><small>${tr(letter)}</small><b>${+k.slice(8)}</b></span><span class="wchips">${chips}</span><span class="load">${d.marks}</span></button>`;
+  }).join('');
+  return est;
+}
+function renderCal(){
+  const week = calIsWeek();
+  document.querySelectorAll('[data-calview]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.calview === 'semana') === week)));
+  document.getElementById('calMonthView').hidden = week;
+  document.getElementById('calWeekView').hidden = !week;
+  [['calPrev', week ? 'Semana anterior' : 'Mes anterior'], ['calNext', week ? 'Semana siguiente' : 'Mes siguiente']].forEach(([id, s]) => {
+    const b = document.getElementById(id); b.dataset.i18nAria = s; b.setAttribute('aria-label', tr(s));
+  });
+  const est = week ? renderCalWeek(typicalBudget()) : renderCalMonth(typicalBudget());
   const leg = document.getElementById('calLegendCiclo');
   leg.hidden = !state.cycleEnabled;
   leg.textContent = !state.cycleEnabled ? ''
@@ -3537,11 +3878,17 @@ document.getElementById('tabs').addEventListener('click', e => {
 });
 
 function openDialog(dlg){
+  dlg.querySelectorAll('.info-btn').forEach(b => { b.setAttribute('aria-expanded', 'false'); document.getElementById(b.dataset.info).hidden = true; });
   dlg.showModal();
   const sheet = dlg.querySelector('.sheet');
   if(sheet){ sheet.setAttribute('tabindex','-1'); sheet.focus({preventScroll:true}); }
 }
 
+document.addEventListener('click', e => {
+  const b = e.target.closest('.info-btn'); if(!b) return;
+  const p = document.getElementById(b.dataset.info), open = p.hidden;
+  p.hidden = !open; b.setAttribute('aria-expanded', String(open));
+});
 function removeSeriesEverywhere(seriesKey){
   Object.keys(state.days).forEach(k => {
     state.days[k].tasks = state.days[k].tasks.filter(x => !(x.series === seriesKey && !x.done));
@@ -3814,7 +4161,14 @@ const tCostOut = document.getElementById('tCost');
 const tTime = document.getElementById('tTime');
 const tTimeEnd = document.getElementById('tTimeEnd');
 const tSave = document.getElementById('tSave');
-let tCost = 2, tKind = 'gasto';
+let tCost = 2, tKind = 'gasto', tAccumOn = false, tAccumStep = 1, tLibOn = true;
+/* La racha es una propiedad de la actividad de la librería (la misma casilla
+   que en su editor): aquí se carga al elegir o escribir un nombre que ya existe. */
+function tAccumLoad(name){
+  const it = name ? libItem(name) : null;
+  if(!it) return;
+  tAccumOn = !!it.accum; tAccumStep = it.accumStep || 1;
+}
 let taskDate = todayKey();
 let editingTask = null;
 /* No se comparan como texto porque para la app el día no cambia a
@@ -3837,11 +4191,15 @@ function tSync(){
     ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
   const nameV = tName.value.trim();
   const l = nameV ? learned(nameV) : null;
-  const lib = nameV ? libItem(nameV) : null;
-  const accumOn = !editingTask && tKind === 'gasto' && lib && lib.accum;
-  const streak = accumOn ? accumStreak(nameV, taskDate) : 0;
+  const accumOn = tKind === 'gasto' && tLibOn && tAccumOn;
+  const streak = accumOn && nameV ? accumStreak(nameV, taskDate) : 0;
+  document.getElementById('tLibOn').checked = tLibOn;
+  document.getElementById('tAccumField').hidden = tKind === 'recarga' || !tLibOn;
+  document.getElementById('tAccumOn').checked = tAccumOn;
+  document.getElementById('tAccumStepRow').hidden = !tAccumOn;
+  document.getElementById('tAccumOut').textContent = fmtN(tAccumStep);
   document.getElementById('tLearned').textContent =
-    (accumOn && streak > 0) ? trf('Llevas {n} días seguidos: hoy +{bonus}', {n:streak, bonus:fmtN(streak * (lib.accumStep || 1))})
+    (accumOn && streak > 0) ? trf('Llevas {n} días seguidos: hoy +{bonus}', {n:streak, bonus:fmtN(streak * tAccumStep)})
     : (l && l.avg != null) ? trf('Sueles {verbo} {n}', {verbo:tr(l.avg < 0 ? 'recuperar' : 'gastar'), n:fmtN(Math.abs(l.avg))})
     : (l && l.gated) ? tr('No aprende de esta actividad · Premium') : '';
 }
@@ -3851,7 +4209,16 @@ document.getElementById('tKind').addEventListener('click', e => {
 });
 document.getElementById('tMinus').addEventListener('click', () => { tCost = Math.max(0, tCost-1); tSync(); });
 document.getElementById('tPlus').addEventListener('click', () => { tCost = Math.min(12, tCost+1); tSync(); });
-tName.addEventListener('input', tSync);
+tName.addEventListener('input', () => { tAccumLoad(tName.value.trim()); tSync(); });
+document.getElementById('tLibOn').addEventListener('change', e => { tLibOn = e.target.checked; tSync(); });
+document.getElementById('tAccumOn').addEventListener('change', e => {
+  if(e.target.checked && !requirePremium(tr('Que el gasto suba solo con los días seguidos es una función de Spoony Premium.'))){
+    e.target.checked = false; return;
+  }
+  tAccumOn = e.target.checked; tSync();
+});
+document.getElementById('tAccumMinus').addEventListener('click', () => { tAccumStep = Math.max(1, tAccumStep-1); tSync(); });
+document.getElementById('tAccumPlus').addEventListener('click', () => { tAccumStep = Math.min(6, tAccumStep+1); tSync(); });
 const DOW = ['L','M','X','J','V','S','D'];   // 0 = lunes
 let repMode = 'once', repDays = new Set(), repWeeks = 4;
 const mondayIndex = d => (d.getDay() + 6) % 7;
@@ -3907,7 +4274,7 @@ function expandDates(startKey){
 function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto'; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tAccumOn = false; tAccumStep = 1; tLibOn = true; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.getElementById('tCalNote').hidden = true;
   document.querySelector('#dlgTask h2').textContent = tr('Añadir tarea');
@@ -3932,7 +4299,10 @@ function openTaskEdit(taskId, dateKey = todayKey()){
   calNote.hidden = !t.cal;
   tName.value = t.name;
   tKind = t.est < 0 ? 'recarga' : 'gasto';
+  tAccumOn = false; tAccumStep = 1; tAccumLoad(t.name); tLibOn = !t.noLib;
+  // con racha, el campo enseña el coste base: el aumento de cada día se suma al guardar
   tCost = Math.abs(t.est);
+  if(tKind === 'gasto' && tLibOn && tAccumOn) tCost = Math.max(0, tCost - accumStreak(t.name, dateKey) * tAccumStep);
   tTime.value = t.time || '';
   tTimeEnd.value = t.timeEnd || '';
   tTimeSync();
@@ -4060,7 +4430,7 @@ document.getElementById('libListClose').addEventListener('click', () => dlgLibLi
 document.getElementById('taskSuggest').addEventListener('click', e => {
   const b = e.target.closest('[data-sug]'); if(!b) return;
   const c = +b.dataset.cost;
-  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tSync();
+  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tAccumLoad(b.dataset.sug); tSync();
   document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', x === b));
 });
 document.getElementById('tName').addEventListener('input', () => {
@@ -4077,6 +4447,16 @@ document.getElementById('tDelete').addEventListener('click', () => {
     save(); dlgTask.close(); renderAll();
   });
 });
+/* Guarda en la librería la casilla de racha y devuelve lo que suma cada día.
+   Sin Premium no se puede activar (lo frena la casilla), pero una actividad que
+   ya la tenía la conserva. */
+function tApplyAccum(name, est){
+  if(!tLibOn) return () => 0;
+  record(name, est, null);
+  const on = tKind === 'gasto' && tAccumOn, step = tAccumStep, it = libItem(name);
+  if(it){ it.accum = on; it.accumStep = step; }
+  return k => on && it ? accumStreak(name, k) * step : 0;
+}
 tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
   if(badTimeRange()){ tTimeSync(); tTimeEnd.focus(); return; }
@@ -4086,30 +4466,43 @@ tSave.addEventListener('click', () => {
   if(editingTask){
     const t = day(taskDate).tasks.find(x => x.id === editingTask);
     if(t){
-      t.name = name; t.est = est; t.time = time; t.timeEnd = timeEnd;
+      const key = calSrcKey(t);
+      const accum = tApplyAccum(name, est);
+      t.name = name; t.time = time; t.timeEnd = timeEnd;
+      if(tLibOn) delete t.noLib; else t.noLib = true;
       if(t.cal){
         t.cal.noCost = false; delete t.cal.estimated; delete t.cal.gone;
         if(t.cal.changed){ Object.assign(t.cal, t.cal.changed); delete t.cal.changed; }
       }
+      /* Una tarea que ocupa varios días es un solo elemento: lo que se cambia
+         en uno se cambia en los demás. Las ya hechas no se tocan (tienen su
+         coste real) y en los eventos del móvil cada día conserva su hora. */
+      const group = [];
+      if(!key.startsWith('t:')) Object.entries(state.days).forEach(([k, d]) => d.tasks.forEach(x => {
+        if(x === t || x.done || calSrcKey(x) !== key) return;
+        x.name = name;
+        if(tLibOn) delete x.noLib; else x.noLib = true;
+        if(x.cal){ x.cal.noCost = false; delete x.cal.estimated; delete x.cal.gone; }
+        else{ x.time = time; x.timeEnd = timeEnd; }
+        group.push([k, x]);
+      }));
+      // los nombres van primero: la racha de cada día cuenta los días anteriores por nombre
+      t.est = est + accum(taskDate);
+      group.forEach(([k, x]) => { x.est = est + accum(k); });
     }
-    record(name, est, null);
     save(); dlgTask.close(); renderAll();
     if(dlgDay.open) renderDaySheet();
     return;
   }
   const dates = expandDates(taskDate);
   const series = dates.length > 1 ? uid() : null;
-  const lib = libItem(name);
-  const accumOn = tKind === 'gasto' && lib && lib.accum;
-  const step = lib && lib.accumStep ? lib.accumStep : 1;
+  const accum = tApplyAccum(name, est);
   /* dentro del forEach cada fecha ya ve en state.days las que se acaban de
      insertar en las iteraciones anteriores (van en orden cronológico), así
      que la racha se va encadenando sola a lo largo de toda la serie. */
   dates.forEach(k => {
-    const bonus = accumOn ? accumStreak(name, k) * step : 0;
-    day(k).tasks.push({ id:uid(), series, name, est: est + bonus, real:null, done:false, recovery:null, time, timeEnd });
+    day(k).tasks.push({ id:uid(), series, name, est: est + accum(k), real:null, done:false, recovery:null, time, timeEnd, ...(tLibOn ? {} : { noLib:true }) });
   });
-  record(name, est, null);
   save(); dlgTask.close(); renderAll();
   if(dlgDay.open) renderDaySheet();
 });
@@ -4122,10 +4515,10 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     t.done = !t.done;
-    if(t.done){ t.real = t.est; if(!t.cal?.noCost) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
+    if(t.done){ t.real = t.est; if(!t.cal?.noCost && !t.noLib) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
     else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item && !t.cal?.noCost) item.samples.pop();
+      if(item && !t.cal?.noCost && !t.noLib) item.samples.pop();
       t.real = null;
       collapsedTasks.delete(t.id);
     }
@@ -4162,10 +4555,10 @@ document.getElementById('taskList').addEventListener('click', e => {
     if(t.cal?.noCost){
       // Primer coste que se le pone a un evento del calendario: recién ahora es un dato que aprender.
       t.cal.noCost = false;
-      record(t.name, t.real, t.real);
+      if(!t.noLib) record(t.name, t.real, t.real);
     }else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item && item.samples.length){ item.samples[item.samples.length-1] = t.real; }
+      if(item && item.samples.length && !t.noLib){ item.samples[item.samples.length-1] = t.real; }
     }
     save(); renderAll();
     if(t.est < 0) closeAdjustPanel(t.id);
@@ -4472,12 +4865,23 @@ document.getElementById('tplNameSave').addEventListener('click', () => {
 });
 
 /* ---------- calendar ---------- */
-document.getElementById('calPrev').addEventListener('click', () => {
-  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCal();
+/* En mes, la flecha lleva a hoy si cae en ese mes y si no al día 1. */
+function calStep(dir){
+  if(calIsWeek()){ calRef = shiftKey(calRef, 7 * dir); renderCal(); return; }
+  const r = new Date(calRef + 'T12:00:00');
+  const first = localDateKey(new Date(r.getFullYear(), r.getMonth() + dir, 1));
+  calRef = todayKey().slice(0, 7) === first.slice(0, 7) ? todayKey() : first;
+  renderCal();
+}
+document.getElementById('calPrev').addEventListener('click', () => calStep(-1));
+document.getElementById('calNext').addEventListener('click', () => calStep(1));
+document.querySelector('.cal-view').addEventListener('click', e => {
+  const b = e.target.closest('[data-calview]'); if(!b || b.dataset.calview === state.settings.calView) return;
+  state.settings.calView = b.dataset.calview; save(); renderCal();
 });
-document.getElementById('calNext').addEventListener('click', () => {
-  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCal();
-});
+['calGrid', 'calWeek'].forEach(id => document.getElementById(id).addEventListener('focusin', e => {
+  const c = e.target.closest('[data-day]'); if(c) calRef = c.dataset.day;
+}));
 
 const dlgDay = document.getElementById('dlgDay');
 let selectedDay = todayKey();
@@ -4517,7 +4921,7 @@ function renderDaySheet(){
   document.getElementById('dLockedNote').hidden = editable;
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
-    ? d.tasks.map(t => `<div class="mini">
+    ? d.tasks.map(t => `<div class="mini${t.cal && editable && !t.done ? ' tap' : ''}">
         <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${t.cal && editable && !t.done
           ? `<button class="linkbtn inline" data-dedit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">${esc(t.name)}</button>`
           : esc(t.name)}${t.done?` · ${tr('hecha')}`:''}${t.cal ? `<br><span class="task-meta">${calNotes(t).join(' · ')}</span>` : ''}</span>
@@ -4553,10 +4957,10 @@ function renderDayCycleCard(k, notFuture){
   paintScale('dCycPain', log ? log.pain : null);
   paintScale('dCycIntensity', log ? log.bleedingIntensity : null);
 }
-document.getElementById('calGrid').addEventListener('click', e => {
+['calGrid', 'calWeek'].forEach(id => document.getElementById(id).addEventListener('click', e => {
   const c = e.target.closest('[data-day]'); if(!c) return;
-  selectedDay = c.dataset.day; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay);
-});
+  calRef = selectedDay = c.dataset.day; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay);
+}));
 document.getElementById('dAddCycle').addEventListener('click', () => { dCycleOpen = true; renderDaySheet(); });
 document.getElementById('dAdd').addEventListener('click', () => {
   if(!dayEditAllowed(selectedDay)){ requirePremium(dLockReason(selectedDay)); return; }
@@ -4969,11 +5373,12 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const peakPromptOff = state.settings.peakPromptOff;
   const savedDayStartHour = state.settings.dayStartHour;   // cuándo empieza tu día es rutina, no historial: sobrevive al borrado
   const savedLang = state.settings.lang;   // el idioma es preferencia, no historial: sobrevive al borrado
+  const calView = state.settings.calView;   // la vista del calendario también
   const cycleEnabled = state.cycleEnabled;    // tener el módulo activo es preferencia; los registros sí se borran
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
   const finEnabled = state.finEnabled;
-  state = { v:1, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, lang:savedLang},
+  state = { v:2, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, lang:savedLang, calView},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   if(prevSync) state.sync = prevSync;
   if(prevCal) state.calendar = { ...prevCal, seen:{} };   // qué calendarios lees es preferencia; lo ya importado se borra con el historial
@@ -5303,6 +5708,10 @@ function normalize(s){
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
   if(s.settings.dayStartHour == null) s.settings.dayStartHour = DAY_START_HOUR_DEFAULT;
   if(s.settings.lang == null) s.settings.lang = LANG_DEFAULT;
+  // v2: vista del calendario (mes | semana). Lo que viene de v1 abre en mes,
+  // que es lo que había; cualquier otro valor también.
+  if(!(s.v >= 2)){ s.settings.calView = 'mes'; s.v = 2; }
+  if(s.settings.calView !== 'semana') s.settings.calView = 'mes';
   // Quien ya tenía historial antes de que existiera esta pantalla no debe
   // encontrársela de sorpresa (predictibilidad): solo se muestra sin pedirlo
   // a quien instala la app de cero (o restaura un backup con días ya apuntados).
@@ -5315,6 +5724,13 @@ function normalize(s){
   cl.avail = Array.isArray(cl.avail) ? cl.avail.filter(x => x && typeof x.id === 'string') : [];
   if(!cl.seen || typeof cl.seen !== 'object' || Array.isArray(cl.seen)) cl.seen = {};
   cl.last = Number.isFinite(+cl.last) ? +cl.last : 0;
+  if(!cl.tags || typeof cl.tags !== 'object' || Array.isArray(cl.tags)) cl.tags = {};
+  Object.keys(cl.tags).forEach(id => {
+    const g = cl.tags[id];
+    if(!g || typeof g !== 'object' || !(g.c >= 0 && g.c <= 5) || !CAL_ICONS.includes(g.i)) delete cl.tags[id];
+    else g.c = Math.round(g.c);
+  });
+  { const st = state; state = s; cl.cals.forEach(ensureCalTag); state = st; }
   return s;
 }
 
