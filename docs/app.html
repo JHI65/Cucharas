@@ -768,7 +768,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="dow" aria-hidden="true"><span data-i18n="L">L</span><span data-i18n="M">M</span><span data-i18n="X">X</span><span data-i18n="J">J</span><span data-i18n="V">V</span><span data-i18n="S">S</span><span data-i18n="D">D</span></div>
         <div id="calGrid"></div>
       </div>
-      <p class="legend" data-i18n="Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.</p>
+      <p class="legend" data-i18n="Cada marca son dos cucharas. Los días que pasan de tus cucharas (las de su check-in o, si no hay, tu máximo) llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días que pasan de tus cucharas (las de su check-in o, si no hay, tu máximo) llevan raya alta en vez de punto, y en otro color.</p>
     </div>
     <div id="calWeekView" hidden>
       <div class="cal-full wlist" id="calWeek"></div>
@@ -1174,6 +1174,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span></div>
         <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
       </label>
+      <p class="info-text" id="tAccumHint" hidden data-i18n="Se activa cuando la tarea se repite en varios días.">Se activa cuando la tarea se repite en varios días.</p>
       <div class="stepper" id="tAccumStepRow" hidden>
         <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="tAccumOut">1</output>
@@ -1739,7 +1740,8 @@ const EN = {
  " · recuperación {lab}": " · recovery {lab}",
  " · recuperación {lab}, va a más": " · recovery {lab}, getting longer",
  ", con sangrado": ", bleeding",
- ", por encima de tu media": ", above your average",
+ ", por encima de tu máximo": ", above your maximum",
+ ", por encima de tus cucharas de ese día": ", above that day's spoons",
  ", sangrado estimado": ", estimated bleeding",
  "¿Actualizar tu margen a {n}%?": "Update your margin to {n}%?",
  "¿Borrar \"{name}\"?": "Delete \"{name}\"?",
@@ -1828,7 +1830,7 @@ const EN = {
  "Borrar mi cuenta": "Delete my account",
  "Borrar tarea": "Delete task",
  "Borrar todo": "Delete everything",
- "Cada marca son dos cucharas. Los días por encima de tu media llevan raya alta en vez de punto, y en otro color.": "Each mark is two spoons. Days above your average get a tall dash instead of a dot, in another colour.",
+ "Cada marca son dos cucharas. Los días que pasan de tus cucharas (las de su check-in o, si no hay, tu máximo) llevan raya alta en vez de punto, y en otro color.": "Each mark is two spoons. Days that go over your spoons (the ones from their check-in or, if none, your maximum) get a tall dash instead of a dot, in another colour.",
  "Calendario": "Calendar",
  "Cambia el rosa de fábrica por el tono que prefieras.": "Swap the default pink for whichever shade you prefer.",
  "Cambia entre tus gastos fijos, los variables de este mes y el historial de meses anteriores.": "Switch between your fixed expenses, this month's variable ones, and the history of past months.",
@@ -2151,6 +2153,7 @@ const EN = {
  "Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.": "Each day in a row you log it, its cost rises a bit more than the day before. As soon as you skip a day, the streak ends and it starts over from the base cost.",
  "Sube con los días seguidos": "Rises with consecutive days",
  "Info": "Info",
+ "Se activa cuando la tarea se repite en varios días.": "Turns on when the task repeats over several days.",
  "Info: sube con los días seguidos": "Info: rises with consecutive days",
  "Añadir a «Cuánto cuesta cada actividad»": "Add to «How much each activity costs»",
  "Info: añadir a Cuánto cuesta cada actividad": "Info: add to How much each activity costs",
@@ -3696,16 +3699,19 @@ const CAL_BAR_TOP = 32, CAL_LANE = 26, CAL_LANES = 2;
 const calSrcKey = t => t.cal ? `c:${t.cal.cid}:${t.cal.k.split('@')[0]}` : t.series ? `s:${t.series}` : `t:${t.id}`;
 const calColor = t => { const g = t.cal && calTag(t.cal.cid); return `${t.cal ? ' cal' : ''}${g ? ` tg-${g.c}` : ''}`; };
 const calDayTasks = k => (state.days[k]?.tasks || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-function calDayInfo(k, typical, est){
+function calDayInfo(k, est){
   const { planned } = dayLoad(k);
-  const heavy = planned > typical;
+  /* El límite de un día son las cucharas que apuntaste en su check-in; si no hay, tu máximo. */
+  const max = state.settings.max, dd = state.days[k];
+  const ci = dd && dd.budget != null && !dd.budgetUnanswered ? dd.budget : null;
+  const heavy = planned > (ci ?? max);
   const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
   const bleedEst = !bleed && est.has(k);
   const tasks = calDayTasks(k);
   const date = fmtDate(k).replace(/^([^,\d]+),/, '$1').replace(/^./, c => c.toUpperCase());
-  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(', por encima de tu media') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
+  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(ci != null ? ', por encima de tus cucharas de ese día' : ', por encima de tu máximo') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
   const cls = [k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''), heavy ? 'heavy' : '', bleed ? 'bleed' : '', bleedEst ? 'bleed-est' : ''].filter(Boolean).join(' ');
-  return { tasks, label, cls, marks: '<i class="lm"></i>'.repeat(Math.min(5, Math.ceil(planned / 2))) };
+  return { tasks, label, cls, marks: '<i class="lm"></i>'.repeat(Math.max(0, Math.min(Math.ceil(max / 2), Math.ceil(planned / 2)))) };
 }
 function calWeekLabel(a, b){
   const A = new Date(a + 'T12:00:00'), B = new Date(b + 'T12:00:00');
@@ -3735,7 +3741,7 @@ function calLayoutWeek(segs){
   segs.forEach(s => { if(s.hidden) cols(s).forEach(c => more[c]++); });
   return more;
 }
-function renderCalMonth(typical){
+function renderCalMonth(){
   const ref = new Date(calRef + 'T12:00:00');
   const y = ref.getFullYear(), m = ref.getMonth();
   document.getElementById('calLabel').textContent = ref.toLocaleDateString(LOCALE(), {month:'long', year:'numeric'});
@@ -3744,7 +3750,7 @@ function renderCalMonth(typical){
   const mk = n => `${y}-${String(m + 1).padStart(2, '0')}-${String(n).padStart(2, '0')}`;
   const est = estBleedDays(mk(1), mk(total));
   const info = [];
-  for(let n = 1; n <= total; n++) info[n] = calDayInfo(mk(n), typical, est);
+  for(let n = 1; n <= total; n++) info[n] = calDayInfo(mk(n), est);
   const runs = []; let open = new Map();
   for(let n = 1; n <= total; n++){
     const next = new Map();
@@ -3791,12 +3797,12 @@ function renderCalMonth(typical){
   document.getElementById('calGrid').innerHTML = html;
   return est;
 }
-function renderCalWeek(typical){
+function renderCalWeek(){
   const start = shiftKey(calRef, -((new Date(calRef + 'T12:00:00').getDay() + 6) % 7)), end = shiftKey(start, 6);
   document.getElementById('calLabel').textContent = calWeekLabel(start, end);
   const est = estBleedDays(start, end);
   document.getElementById('calWeek').innerHTML = CAL_WEEKDAYS.map((letter, i) => {
-    const k = shiftKey(start, i), d = calDayInfo(k, typical, est);
+    const k = shiftKey(start, i), d = calDayInfo(k, est);
     const chips = d.tasks.length
       ? d.tasks.map(t => `<span class="wchip${calColor(t)}${t.done ? ' done' : ''}">${esc(String(t.name).trim())}</span>`).join('')
       : `<span class="wnone">${tr('Nada planificado')}</span>`;
@@ -3812,7 +3818,7 @@ function renderCal(){
   [['calPrev', week ? 'Semana anterior' : 'Mes anterior'], ['calNext', week ? 'Semana siguiente' : 'Mes siguiente']].forEach(([id, s]) => {
     const b = document.getElementById(id); b.dataset.i18nAria = s; b.setAttribute('aria-label', tr(s));
   });
-  const est = week ? renderCalWeek(typicalBudget()) : renderCalMonth(typicalBudget());
+  const est = week ? renderCalWeek() : renderCalMonth();
   const leg = document.getElementById('calLegendCiclo');
   leg.hidden = !state.cycleEnabled;
   leg.textContent = !state.cycleEnabled ? ''
@@ -4161,11 +4167,18 @@ const tCostOut = document.getElementById('tCost');
 const tTime = document.getElementById('tTime');
 const tTimeEnd = document.getElementById('tTimeEnd');
 const tSave = document.getElementById('tSave');
-let tCost = 2, tKind = 'gasto', tAccumOn = false, tAccumStep = 1, tLibOn = true;
+let tCost = 2, tKind = 'gasto', tAccumOn = false, tAccumStep = 1, tLibOn = false, tLibTouched = false;
 /* La racha es una propiedad de la actividad de la librería (la misma casilla
    que en su editor): aquí se carga al elegir o escribir un nombre que ya existe. */
+/* La subida solo tiene sentido en una tarea de varios días: al repetirla, o si ya es de una serie o de un evento largo. */
+function tMulti(){
+  if(!editingTask) return expandDates(taskDate).length > 1;
+  const t = day(taskDate).tasks.find(x => x.id === editingTask);
+  const key = t && calSrcKey(t);
+  return !!t && !key.startsWith('t:') && Object.values(state.days).filter(d => d.tasks.some(x => calSrcKey(x) === key)).length > 1;
+}
 function tAccumLoad(name){
-  const it = name ? libItem(name) : null;
+  const it = name && tLibOn ? libItem(name) : null;
   if(!it) return;
   tAccumOn = !!it.accum; tAccumStep = it.accumStep || 1;
 }
@@ -4191,10 +4204,13 @@ function tSync(){
     ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
   const nameV = tName.value.trim();
   const l = nameV ? learned(nameV) : null;
-  const accumOn = tKind === 'gasto' && tLibOn && tAccumOn;
+  const accumOn = tKind === 'gasto' && tAccumOn;
   const streak = accumOn && nameV ? accumStreak(nameV, taskDate) : 0;
   document.getElementById('tLibOn').checked = tLibOn;
-  document.getElementById('tAccumField').hidden = tKind === 'recarga' || !tLibOn;
+  document.getElementById('tAccumField').hidden = tKind === 'recarga';
+  const canAccum = tMulti() || tAccumOn;
+  document.getElementById('tAccumOn').disabled = !canAccum;
+  document.getElementById('tAccumHint').hidden = canAccum || tKind === 'recarga';
   document.getElementById('tAccumOn').checked = tAccumOn;
   document.getElementById('tAccumStepRow').hidden = !tAccumOn;
   document.getElementById('tAccumOut').textContent = fmtN(tAccumStep);
@@ -4209,8 +4225,13 @@ document.getElementById('tKind').addEventListener('click', e => {
 });
 document.getElementById('tMinus').addEventListener('click', () => { tCost = Math.max(0, tCost-1); tSync(); });
 document.getElementById('tPlus').addEventListener('click', () => { tCost = Math.min(12, tCost+1); tSync(); });
-tName.addEventListener('input', () => { tAccumLoad(tName.value.trim()); tSync(); });
-document.getElementById('tLibOn').addEventListener('change', e => { tLibOn = e.target.checked; tSync(); });
+/* Por defecto una tarea nueva no entra en la librería; si el nombre ya está en ella, sigue aprendiendo salvo que la persona toque la casilla. */
+tName.addEventListener('input', () => {
+  const v = tName.value.trim();
+  if(!editingTask && !tLibTouched) tLibOn = !!libItem(v);
+  tAccumLoad(v); tSync();
+});
+document.getElementById('tLibOn').addEventListener('change', e => { tLibOn = e.target.checked; tLibTouched = true; tSync(); });
 document.getElementById('tAccumOn').addEventListener('change', e => {
   if(e.target.checked && !requirePremium(tr('Que el gasto suba solo con los días seguidos es una función de Spoony Premium.'))){
     e.target.checked = false; return;
@@ -4235,6 +4256,8 @@ function repSync(){
   }
   document.getElementById('wOut').textContent = repWeeks;
   document.getElementById('wLabel').textContent = tr(repWeeks === 1 ? 'semana' : 'semanas');
+  if(!tMulti()){ tAccumOn = false; tAccumLoad(tName.value.trim()); }
+  tSync();
 }
 document.getElementById('repMode').addEventListener('click', e => {
   const b = e.target.closest('[data-rep]'); if(!b) return;
@@ -4274,7 +4297,7 @@ function expandDates(startKey){
 function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
-  tName.value = ''; tCost = 2; tKind = 'gasto'; tAccumOn = false; tAccumStep = 1; tLibOn = true; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
+  tName.value = ''; tCost = 2; tKind = 'gasto'; tAccumOn = false; tAccumStep = 1; tLibOn = false; tLibTouched = false; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
   document.getElementById('tCalNote').hidden = true;
   document.querySelector('#dlgTask h2').textContent = tr('Añadir tarea');
@@ -4299,10 +4322,11 @@ function openTaskEdit(taskId, dateKey = todayKey()){
   calNote.hidden = !t.cal;
   tName.value = t.name;
   tKind = t.est < 0 ? 'recarga' : 'gasto';
-  tAccumOn = false; tAccumStep = 1; tAccumLoad(t.name); tLibOn = !t.noLib;
+  tAccumOn = false; tAccumStep = 1; tLibOn = !t.noLib; tAccumLoad(t.name);
+  if(!tLibOn){ tAccumOn = !!t.accum; tAccumStep = t.accum || 1; }
   // con racha, el campo enseña el coste base: el aumento de cada día se suma al guardar
   tCost = Math.abs(t.est);
-  if(tKind === 'gasto' && tLibOn && tAccumOn) tCost = Math.max(0, tCost - accumStreak(t.name, dateKey) * tAccumStep);
+  if(tKind === 'gasto' && tAccumOn) tCost = Math.max(0, tCost - accumStreak(t.name, dateKey) * tAccumStep);
   tTime.value = t.time || '';
   tTimeEnd.value = t.timeEnd || '';
   tTimeSync();
@@ -4430,7 +4454,7 @@ document.getElementById('libListClose').addEventListener('click', () => dlgLibLi
 document.getElementById('taskSuggest').addEventListener('click', e => {
   const b = e.target.closest('[data-sug]'); if(!b) return;
   const c = +b.dataset.cost;
-  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tAccumLoad(b.dataset.sug); tSync();
+  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tLibOn = true; tLibTouched = false; tAccumLoad(b.dataset.sug); tSync();
   document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', x === b));
 });
 document.getElementById('tName').addEventListener('input', () => {
@@ -4451,11 +4475,16 @@ document.getElementById('tDelete').addEventListener('click', () => {
    Sin Premium no se puede activar (lo frena la casilla), pero una actividad que
    ya la tenía la conserva. */
 function tApplyAccum(name, est){
-  if(!tLibOn) return () => 0;
+  const on = tKind === 'gasto' && tAccumOn, step = tAccumStep;
+  if(!tLibOn) return k => on ? accumStreak(name, k) * step : 0;
   record(name, est, null);
-  const on = tKind === 'gasto' && tAccumOn, step = tAccumStep, it = libItem(name);
+  const it = libItem(name);
   if(it){ it.accum = on; it.accumStep = step; }
   return k => on && it ? accumStreak(name, k) * step : 0;
+}
+/* Sin librería la subida por días seguidos vive en la propia tarea (t.accum = cucharas por día). */
+function tAccumMark(x){
+  if(!tLibOn && tKind === 'gasto' && tAccumOn) x.accum = tAccumStep; else delete x.accum;
 }
 tSave.addEventListener('click', () => {
   const name = tName.value.trim(); if(!name){ tName.focus(); return; }
@@ -4470,6 +4499,7 @@ tSave.addEventListener('click', () => {
       const accum = tApplyAccum(name, est);
       t.name = name; t.time = time; t.timeEnd = timeEnd;
       if(tLibOn) delete t.noLib; else t.noLib = true;
+      tAccumMark(t);
       if(t.cal){
         t.cal.noCost = false; delete t.cal.estimated; delete t.cal.gone;
         if(t.cal.changed){ Object.assign(t.cal, t.cal.changed); delete t.cal.changed; }
@@ -4482,6 +4512,7 @@ tSave.addEventListener('click', () => {
         if(x === t || x.done || calSrcKey(x) !== key) return;
         x.name = name;
         if(tLibOn) delete x.noLib; else x.noLib = true;
+        tAccumMark(x);
         if(x.cal){ x.cal.noCost = false; delete x.cal.estimated; delete x.cal.gone; }
         else{ x.time = time; x.timeEnd = timeEnd; }
         group.push([k, x]);
@@ -4501,7 +4532,9 @@ tSave.addEventListener('click', () => {
      insertar en las iteraciones anteriores (van en orden cronológico), así
      que la racha se va encadenando sola a lo largo de toda la serie. */
   dates.forEach(k => {
-    day(k).tasks.push({ id:uid(), series, name, est: est + accum(k), real:null, done:false, recovery:null, time, timeEnd, ...(tLibOn ? {} : { noLib:true }) });
+    const nt = { id:uid(), series, name, est: est + accum(k), real:null, done:false, recovery:null, time, timeEnd, ...(tLibOn ? {} : { noLib:true }) };
+    tAccumMark(nt);
+    day(k).tasks.push(nt);
   });
   save(); dlgTask.close(); renderAll();
   if(dlgDay.open) renderDaySheet();
