@@ -1511,7 +1511,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <button class="add" id="dAddCycle" style="margin-top:9px" hidden data-i18n="Añadir registro de ciclo a este día">Añadir registro de ciclo a este día</button>
     <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
       <h2 data-i18n="Ciclo">Ciclo</h2>
-      <p data-i18n="Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.">Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
+      <p id="dCycPastHint" data-i18n="Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.">Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
+      <p id="dCycFutureHint" hidden data-i18n="Si sabes o prevés que este día habrá sangrado, puedes apuntarlo por adelantado. No cuenta para la media de tus ciclos hasta que el día llegue.">Si sabes o prevés que este día habrá sangrado, puedes apuntarlo por adelantado. No cuenta para la media de tus ciclos hasta que el día llegue.</p>
       <div class="field">
         <label data-i18n="Sangrado">Sangrado</label>
         <div class="chips" id="dCycBleed" role="group" data-i18n-aria="Sangrado" aria-label="Sangrado">
@@ -2124,6 +2125,7 @@ const EN = {
  "semanas": "weeks",
  "Sí": "Yes",
  "Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.": "If you remember how this day went, you can log it even though it's already past.",
+ "Si sabes o prevés que este día habrá sangrado, puedes apuntarlo por adelantado. No cuenta para la media de tus ciclos hasta que el día llegue.": "If you know or expect this day will have bleeding, you can log it ahead of time. It doesn't count toward your cycle average until the day arrives.",
  "Si te encuentras bien, puedes desactivar el margen ese día desde «¿Con cuántas cucharas te levantas?».": "If you're feeling fine, you can turn off the margin that day from \"How many spoons do you wake up with?\".",
  "Si te ves con energía, usa hoy las cucharas que normalmente se reservan por el ciclo.": "If you're feeling up to it, use today the spoons that are normally set aside for the cycle.",
  "Sigue el número a tu ritmo si te ayuda. Puedes parar cuando quieras.": "Follow the number at your own pace if it helps. You can stop whenever you want.",
@@ -3302,11 +3304,15 @@ const shiftKey = (k, n) => {
 const daysBetween = (a, b) =>
   Math.round((new Date(b+'T12:00:00') - new Date(a+'T12:00:00')) / 86400000);
 
-/* Un inicio de ciclo no es cualquier día de sangrado: es el primero de una
+/* Los días futuros apuntados (previstos a mano) se enseñan en el calendario y
+   llevan margen, pero no cuentan como ciclo medido: ni para la media, ni para
+   el patrón, ni para la próxima estimación, hasta que llegan a ser hoy.
+
+   Un inicio de ciclo no es cualquier día de sangrado: es el primero de una
    racha, o sea el que viene precedido de un día sin sangrado o sin registro. */
 function cycleStarts(){
   return (state.cycleLogs || [])
-    .filter(l => l.bleeding)
+    .filter(l => l.bleeding && l.date <= todayKey())
     .map(l => l.date)
     .sort()
     .filter(k => { const p = cycleLog(shiftKey(k, -1)); return !(p && p.bleeding); });
@@ -3323,7 +3329,7 @@ function cycleDayOn(k){
    de ese ciclo en concreto, en vez de un número fijo de manual. */
 function bleedRunFrom(startKey){
   let n = 0, k = startKey;
-  while(n < 30){
+  while(n < 30 && k <= todayKey()){
     const l = cycleLog(k);
     if(!l || !l.bleeding) break;
     n++; k = shiftKey(k, 1);
@@ -4967,21 +4973,23 @@ function renderDaySheet(){
   const note = document.getElementById('dNote');
   note.value = d.note || '';
   note.readOnly = !editable;
-  renderDayCycleCard(k, past || isToday);
+  renderDayCycleCard(k);
 }
-/* Registro de ciclo retroactivo: el mismo campo que "Registro de hoy" pero
-   sobre el día que se esté mirando en el calendario, no solo hoy. No se
-   ofrece en días futuros porque no tiene sentido apuntar un sangrado que
-   todavía no ha pasado. Empieza siempre plegado tras un botón, como
+/* Registro de ciclo de cualquier día: el mismo campo que "Registro de hoy"
+   pero sobre el día que se esté mirando en el calendario, pasado o futuro,
+   y solo si la sección de ciclo está activada. Empieza siempre plegado tras un botón, como
    "Añadir tarea a este día", para no mostrar de golpe un dato de salud que
    la mayoría de días no hace falta tocar. */
-function renderDayCycleCard(k, notFuture){
-  const show = !!state.cycleEnabled && notFuture;
+function renderDayCycleCard(k){
+  const show = !!state.cycleEnabled;
   const btn = document.getElementById('dAddCycle');
   const card = document.getElementById('dCycleCard');
   btn.hidden = !show || dCycleOpen;
   card.hidden = !show || !dCycleOpen;
   if(card.hidden) return;
+  const future = k > todayKey();
+  document.getElementById('dCycPastHint').hidden = future;
+  document.getElementById('dCycFutureHint').hidden = !future;
   const log = cycleLog(k);
   const bleeding = log ? log.bleeding : null;
   document.querySelectorAll('#dCycBleed .chip').forEach(c =>
