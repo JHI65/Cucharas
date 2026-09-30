@@ -363,7 +363,11 @@ textarea{
    con la tira de tareas. Se marca en su lugar toda la celda, en Ciruela —el
    mismo color que ya usa el borde de "hoy"—, para que se distinga de un
    vistazo. Estimado usa el mismo tinte pero solo de borde, a rayas. */
-.cell.bleed,.wrow.bleed{background:color-mix(in srgb, var(--accent) 22%, var(--surface));color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.cal-drop{flex:none;width:12px;height:12px;margin-top:3px;fill:var(--accent)}
+.wd b .cal-drop{margin:0 0 0 3px;vertical-align:1px}
+/* Ojo: el día llega a tus cucharas o está cerca. Solo forma y tinta suave, sin el color de "por encima". */
+.cal-eye{flex:none;width:13px;height:13px;margin-top:3px;fill:var(--ink-soft)}
+.wd b .cal-eye{margin:0 0 0 3px;vertical-align:1px}
 .cell.bleed-est,.wrow.bleed-est{outline:1.5px dashed var(--accent);outline-offset:-2px}
 /* Foco dentro de la celda, por encima de las barras: hacia fuera lo taparían
    las celdas vecinas. */
@@ -660,6 +664,9 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <path d="M10 1c4.4 0 7 3.6 7 8s-2.6 8-7 8-7-3.6-7-8 2.6-8 7-8z"/>
     <rect x="8" y="16" width="4" height="23" rx="2"/>
   </symbol>
+  <symbol id="eye" viewBox="0 0 24 24">
+    <path fill-rule="evenodd" d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 11.2a4.2 4.2 0 1 1 0-8.4 4.2 4.2 0 0 1 0 8.4zm0-2.4a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6z"/>
+  </symbol>
   <symbol id="drop" viewBox="0 0 24 24">
     <path d="M12 2C12 2 5 11.6 5 16.2A7 7 0 0 0 19 16.2C19 11.6 12 2 12 2z"/>
   </symbol>
@@ -775,6 +782,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <p class="legend" data-i18n="Cada marca son dos cucharas.">Cada marca son dos cucharas.</p>
     </div>
     <p class="legend" id="calLegendCiclo" hidden></p>
+    <p class="legend" id="calLegendOjo" hidden data-i18n="El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.">El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.</p>
     <div class="card" id="patterns"></div>
   </section>
 
@@ -1530,6 +1538,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="scale" id="dCycIntensity"></div>
         <div class="scale-lab"><span data-i18n="Muy leve">Muy leve</span><span data-i18n="Muy fuerte">Muy fuerte</span></div>
       </div>
+      <button class="add" id="dCycDone" data-i18n="Listo">Listo</button>
     </div>
     <div class="field" style="margin-top:18px">
       <label for="dNote" data-i18n="Nota">Nota</label>
@@ -1814,6 +1823,10 @@ const EN = {
  "Añadir gasto variable": "Add variable expense",
  "Añadir más actividades a la librería es una función de Spoony Premium.": "Adding more activities to the library is a Spoony Premium feature.",
  "Añadir registro de ciclo a este día": "Add a cycle log to this day",
+ "Ciclo apuntado en este día — editar": "Cycle logged for this day — edit",
+ "Listo": "Done",
+ ", cerca del límite de tus cucharas": ", close to your spoon limit",
+ "El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.": "The eye marks a day when what's planned reaches your spoons or is close to them.",
  "Añadir tarea": "Add task",
  "Añadir tarea a este día": "Add a task to this day",
  "Añadir un gasto": "Adding an expense",
@@ -2014,8 +2027,8 @@ const EN = {
  "Lo has fijado tú · sueles {verb} {n}": "You've set it yourself · you usually {verb} {n}",
  "Lo que te cuesta": "What it costs you",
  "Los días después de un pico sensorial ({n} caso{s}), {frase}.": "On the days after a sensory peak ({n} case{s}), {frase}.",
- "Los días teñidos en Ciruela son sangrado apuntado.": "Days tinted in Plum are logged bleeding.",
- "Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.": "Days tinted in Plum are logged bleeding. The dashed border is estimated bleeding, not logged: it's an estimate from your cycles, not a certainty.",
+ "La gotita junto al número es sangrado apuntado.": "The little drop next to the number is logged bleeding.",
+ "La gotita junto al número es sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.": "The little drop next to the number is logged bleeding. The dashed border is estimated bleeding, not logged: it's an estimate from your cycles, not a certainty.",
  "Los últimos días apenas se diferencian entre sí. Cuando el rango se estrecha, suele ser información útil.": "The last few days barely differ from each other. When the range narrows, that's usually useful information.",
  "Lútea": "Luteal",
  "M": "T",
@@ -3705,19 +3718,25 @@ const CAL_BAR_TOP = 32, CAL_LANE = 26, CAL_LANES = 2;
 const calSrcKey = t => t.cal ? `c:${t.cal.cid}:${t.cal.k.split('@')[0]}` : t.series ? `s:${t.series}` : `t:${t.id}`;
 const calColor = t => { const g = t.cal && calTag(t.cal.cid); return `${t.cal ? ' cal' : ''}${g ? ` tg-${g.c}` : ''}`; };
 const calDayTasks = k => (state.days[k]?.tasks || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+/* Un día está "al límite" cuando lo previsto llega al 80 % de tus cucharas sin pasarlas; pasarlas ya lo marca la barra alta. */
+const CAL_EDGE = 0.8;
 function calDayInfo(k, est){
   const { planned } = dayLoad(k);
   /* El límite de un día son las cucharas que apuntaste en su check-in; si no hay, tu máximo. */
   const max = state.settings.max, dd = state.days[k];
   const ci = dd && dd.budget != null && !dd.budgetUnanswered ? dd.budget : null;
-  const heavy = planned > (ci ?? max);
+  const limit = ci ?? max;
+  const heavy = planned > limit;
+  const edge = !heavy && planned > 0 && planned >= limit * CAL_EDGE;
   const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
   const bleedEst = !bleed && est.has(k);
   const tasks = calDayTasks(k);
   const date = fmtDate(k).replace(/^([^,\d]+),/, '$1').replace(/^./, c => c.toUpperCase());
-  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(ci != null ? ', por encima de tus cucharas de ese día' : ', por encima de tu máximo') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
-  const cls = [k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''), heavy ? 'heavy' : '', bleed ? 'bleed' : '', bleedEst ? 'bleed-est' : ''].filter(Boolean).join(' ');
-  return { tasks, label, cls, marks: '<i class="lm"></i>'.repeat(Math.max(0, Math.min(Math.ceil(max / 2), Math.ceil(planned / 2)))) };
+  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(ci != null ? ', por encima de tus cucharas de ese día' : ', por encima de tu máximo') : ''}${edge ? tr(', cerca del límite de tus cucharas') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
+  const cls = [k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''), heavy ? 'heavy' : '', bleedEst ? 'bleed-est' : ''].filter(Boolean).join(' ');
+  const drop = (edge ? '<svg class="cal-eye" viewBox="0 0 24 24" aria-hidden="true"><use href="#eye"/></svg>' : '')
+    + (bleed ? '<svg class="cal-drop" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop"/></svg>' : '');
+  return { tasks, label, cls, drop, marks: '<i class="lm"></i>'.repeat(Math.max(0, Math.min(Math.ceil(max / 2), Math.ceil(planned / 2)))) };
 }
 function calWeekLabel(a, b){
   const A = new Date(a + 'T12:00:00'), B = new Date(b + 'T12:00:00');
@@ -3792,7 +3811,7 @@ function renderCalMonth(){
       const n = w * 7 + c - offset + 1;
       if(n < 1 || n > total){ cells += '<div class="cell blank" aria-hidden="true"></div>'; continue; }
       const d = info[n];
-      cells += `<button class="cell ${d.cls}" data-day="${mk(n)}" aria-label="${d.label}"><span class="dn">${n}</span><span class="load">${d.marks}</span></button>`;
+      cells += `<button class="cell ${d.cls}" data-day="${mk(n)}" aria-label="${d.label}"><span class="dn">${n}</span>${d.drop}<span class="load">${d.marks}</span></button>`;
     }
     const more = calLayoutWeek(segs[w]);
     const bars = segs[w].filter(s => !s.hidden).map(s =>
@@ -3812,7 +3831,7 @@ function renderCalWeek(){
     const chips = d.tasks.length
       ? d.tasks.map(t => `<span class="wchip${calColor(t)}${t.done ? ' done' : ''}">${esc(String(t.name).trim())}</span>`).join('')
       : `<span class="wnone">${tr('Nada planificado')}</span>`;
-    return `<button class="wrow ${d.cls}" data-day="${k}" aria-label="${d.label}"><span class="wd"><small>${tr(letter)}</small><b>${+k.slice(8)}</b></span><span class="wchips">${chips}</span><span class="load">${d.marks}</span></button>`;
+    return `<button class="wrow ${d.cls}" data-day="${k}" aria-label="${d.label}"><span class="wd"><small>${tr(letter)}</small><b>${+k.slice(8)}${d.drop}</b></span><span class="wchips">${chips}</span><span class="load">${d.marks}</span></button>`;
   }).join('');
   return est;
 }
@@ -3829,8 +3848,9 @@ function renderCal(){
   leg.hidden = !state.cycleEnabled;
   leg.textContent = !state.cycleEnabled ? ''
     : est.size
-      ? tr('Los días teñidos en Ciruela son sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.')
-      : tr('Los días teñidos en Ciruela son sangrado apuntado.');
+      ? tr('La gotita junto al número es sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.')
+      : tr('La gotita junto al número es sangrado apuntado.');
+  document.getElementById('calLegendOjo').hidden = !document.querySelector('#s-cal .cal-eye');
 }
 function renderOverCost(){
   const el = document.getElementById('overCostGrid');
@@ -4985,6 +5005,7 @@ function renderDayCycleCard(k){
   const btn = document.getElementById('dAddCycle');
   const card = document.getElementById('dCycleCard');
   btn.hidden = !show || dCycleOpen;
+  btn.textContent = tr(cycleLog(k) ? 'Ciclo apuntado en este día — editar' : 'Añadir registro de ciclo a este día');
   card.hidden = !show || !dCycleOpen;
   if(card.hidden) return;
   const future = k > todayKey();
@@ -5002,6 +5023,12 @@ function renderDayCycleCard(k){
   const c = e.target.closest('[data-day]'); if(!c) return;
   calRef = selectedDay = c.dataset.day; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay);
 }));
+/* Al terminar de apuntar (dolor contestado y, si hay sangrado, su intensidad)
+   el bloque se pliega solo; "Listo" lo pliega antes si no se quiere rellenar todo. */
+function dCycFoldIfComplete(l){
+  if(l.pain != null && (!l.bleeding || l.bleedingIntensity != null)) dCycleOpen = false;
+}
+document.getElementById('dCycDone').addEventListener('click', () => { dCycleOpen = false; renderDaySheet(); });
 document.getElementById('dAddCycle').addEventListener('click', () => { dCycleOpen = true; renderDaySheet(); });
 document.getElementById('dAdd').addEventListener('click', () => {
   if(!dayEditAllowed(selectedDay)){ requirePremium(dLockReason(selectedDay)); return; }
@@ -5315,18 +5342,21 @@ document.getElementById('dCycBleed').addEventListener('click', e => {
   const l = cycleLogFor(selectedDay);
   l.bleeding = b.dataset.bleed === 'si';
   if(!l.bleeding) l.bleedingIntensity = null;
+  dCycFoldIfComplete(l);
   save(); renderDaySheet(); renderCycle(); renderMeter();
 });
 document.getElementById('dCycIntensity').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return;
   const l = cycleLogFor(selectedDay);
   l.bleedingIntensity = l.bleedingIntensity === +b.dataset.v ? null : +b.dataset.v;
+  dCycFoldIfComplete(l);
   save(); renderDaySheet(); renderCycle();
 });
 document.getElementById('dCycPain').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return;
   const l = cycleLogFor(selectedDay);
   l.pain = l.pain === +b.dataset.v ? null : +b.dataset.v;
+  dCycFoldIfComplete(l);
   save(); renderDaySheet(); renderCycle(); renderMeter();
 });
 
