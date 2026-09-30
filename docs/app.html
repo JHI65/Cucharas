@@ -286,6 +286,11 @@ textarea{
 .cal-nav strong{font-size:17px;text-align:center}
 .cal-full{margin:0 calc(-1 * var(--pad))}
 #calMonthView,#calWeekView{touch-action:pan-y pinch-zoom}
+/* Al cambiar de mes o semana, el contenido entra desde el lado hacia el que se avanza. Respeta prefers-reduced-motion vía la regla global. */
+@keyframes calInNext{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes calInPrev{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+.cal-in-next{animation:calInNext .24s ease-out}
+.cal-in-prev{animation:calInPrev .24s ease-out}
 .dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding-bottom:6px;border-bottom:1px solid var(--line)}
 .dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
 .wk{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:90px;border-bottom:1px solid var(--line)}
@@ -4959,11 +4964,17 @@ document.getElementById('tplNameSave').addEventListener('click', () => {
 /* ---------- calendar ---------- */
 /* En mes, la flecha lleva a hoy si cae en ese mes y si no al día 1. */
 function calStep(dir){
-  if(calIsWeek()){ calRef = shiftKey(calRef, 7 * dir); renderCal(); return; }
-  const r = new Date(calRef + 'T12:00:00');
-  const first = localDateKey(new Date(r.getFullYear(), r.getMonth() + dir, 1));
-  calRef = todayKey().slice(0, 7) === first.slice(0, 7) ? todayKey() : first;
+  if(calIsWeek()) calRef = shiftKey(calRef, 7 * dir);
+  else{
+    const r = new Date(calRef + 'T12:00:00');
+    const first = localDateKey(new Date(r.getFullYear(), r.getMonth() + dir, 1));
+    calRef = todayKey().slice(0, 7) === first.slice(0, 7) ? todayKey() : first;
+  }
   renderCal();
+  const v = document.getElementById(calIsWeek() ? 'calWeekView' : 'calMonthView'), cls = dir > 0 ? 'cal-in-next' : 'cal-in-prev';
+  v.classList.remove('cal-in-next', 'cal-in-prev'); void v.offsetWidth;
+  v.classList.add(cls);
+  v.addEventListener('animationend', () => v.classList.remove(cls), { once:true });
 }
 document.getElementById('calPrev').addEventListener('click', () => calStep(-1));
 document.getElementById('calNext').addEventListener('click', () => calStep(1));
