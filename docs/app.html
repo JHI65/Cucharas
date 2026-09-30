@@ -181,6 +181,15 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .arow .chip{padding:7px 11px;font-size:14px}
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
+/* Ajustes como en el móvil: una lista de secciones; al tocar una se ve solo esa, con un botón para volver. */
+.setnav{margin-top:8px}
+.setnav-item{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:0 14px;
+  background:transparent;border:none;border-radius:var(--r-row);font:inherit;font-size:17px;color:var(--ink);text-align:left;position:relative}
+.setnav-item+.setnav-item::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--line)}
+.setnav-item .ic{flex:none;color:var(--ink-soft)}
+.setback{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 0;margin-top:4px;background:none;border:none;font:inherit;font-size:16px;color:var(--accent)}
+.setsec > .libsec:focus{outline:none}
+#s-set.set-open .setsec-cur > .libsec{font-size:24px;font-weight:600;color:var(--ink);margin:4px 0 12px}
 .scale{display:flex;gap:7px}
 .scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:17px}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
@@ -3928,6 +3937,62 @@ document.addEventListener('visibilitychange', () => {
   if(document.hidden && currentTab === 'hoy'){ collapseOpenTasks(); renderTasks(); }
 });
 
+/* ---------- ajustes por secciones ---------- */
+/* Cada título (.libsec) con su grupo pasa a ser una sección; la portada es la lista de títulos. */
+const setScreen = document.getElementById('s-set');
+const setSecs = [];
+let setCur = null;
+(() => {
+  const head = setScreen.querySelector('header.top');
+  const kids = [...setScreen.children];
+  kids.forEach((el, i) => {
+    let wrap = null, title = null;
+    if(el.matches('#calGroup, #accountGroup')){ wrap = el; title = el.querySelector('.libsec'); }
+    else if(el.matches('p.libsec')){
+      title = el; wrap = document.createElement('div');
+      el.before(wrap); wrap.append(el);
+      const g = kids[i + 1]; if(g && g.matches('.group')) wrap.append(g);
+    }
+    if(!wrap) return;
+    wrap.classList.add('setsec'); wrap.dataset.sec = setSecs.length;
+    setSecs.push({ wrap, title });
+  });
+  const nav = document.createElement('div');
+  nav.className = 'group setnav';
+  nav.innerHTML = setSecs.map((x, i) => {
+    const key = x.title.getAttribute('data-i18n');
+    return `<button type="button" class="setnav-item" data-setsec="${i}"><span${key ? ` data-i18n="${esc(key)}"` : ''}>${esc(x.title.textContent)}</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
+  }).join('');
+  const back = document.createElement('button');
+  back.type = 'button'; back.className = 'setback'; back.id = 'setBack'; back.hidden = true;
+  back.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg><span data-i18n="Ajustes">Ajustes</span>';
+  head.after(nav); head.before(back);
+  setSecs.forEach(x => x.title.tabIndex = -1);
+  nav.addEventListener('click', e => { const b = e.target.closest('[data-setsec]'); if(b) setOpen(+b.dataset.setsec); });
+  back.addEventListener('click', () => setOpen(null));
+  /* calendario y cuenta se esconden según el móvil o la sesión: su entrada en la lista, igual */
+  const obs = new MutationObserver(setNavVisibility);
+  setSecs.forEach(x => obs.observe(x.wrap, { attributes:true, attributeFilter:['hidden'] }));
+  setNavVisibility();
+  setOpen(null, false);
+})();
+function setNavVisibility(){
+  setSecs.forEach((x, i) => { document.querySelector(`.setnav [data-setsec="${i}"]`).hidden = x.wrap.hidden; });
+  if(setCur != null && setSecs[setCur].wrap.hidden) setOpen(null, false);
+}
+function setOpen(i, focus = true){
+  const prev = setCur;
+  setCur = i;
+  setScreen.classList.toggle('set-open', i != null);
+  setScreen.querySelector('header.top').hidden = i != null;
+  document.querySelector('.setnav').hidden = i != null;
+  document.getElementById('setBack').hidden = i == null;
+  setSecs.forEach((x, j) => { x.wrap.classList.toggle('setsec-cur', j === i); x.wrap.style.display = j === i ? '' : 'none'; });
+  window.scrollTo(0, 0);
+  if(!focus) return;
+  if(i != null) setSecs[i].title.focus();
+  else if(prev != null) document.querySelector(`.setnav [data-setsec="${prev}"]`)?.focus();
+}
 document.getElementById('tabs').addEventListener('click', e => {
   const b = e.target.closest('button[data-go]'); if(!b) return;
   if(currentTab === 'hoy' && b.dataset.go !== 'hoy') collapseOpenTasks();
@@ -3937,6 +4002,7 @@ document.getElementById('tabs').addEventListener('click', e => {
   document.querySelectorAll('#tabs button').forEach(x => x.removeAttribute('aria-current'));
   b.setAttribute('aria-current','page');
   if(currentTab === 'fin') openFinTab('variables');
+  if(currentTab === 'set') setOpen(null, false);
   window.scrollTo(0,0);
   renderAll();
   const tourOpen = !document.getElementById('tour').hidden;
@@ -4081,6 +4147,8 @@ function renderTourStep(){
   // Sin desplazamiento suave: un movimiento largo en pantalla es un evento
   // sensorial. Salta directo y solo si el elemento no se ve entero.
   const el = step.sel ? document.querySelector(step.sel) : null;
+  const sec = el && el.closest('.setsec');
+  if(sec) setOpen(+sec.dataset.sec, false);
   if(el){
     const r = el.getBoundingClientRect();
     if(r.top < 60 || r.bottom > window.innerHeight - 120) el.scrollIntoView({block:'center'});
