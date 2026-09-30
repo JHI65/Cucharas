@@ -285,6 +285,7 @@ textarea{
 .cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-cell);width:44px;height:44px;padding:0;display:grid;place-items:center;color:var(--accent)}
 .cal-nav strong{font-size:17px;text-align:center}
 .cal-full{margin:0 calc(-1 * var(--pad))}
+#calMonthView,#calWeekView{touch-action:pan-y pinch-zoom}
 .dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding-bottom:6px;border-bottom:1px solid var(--line)}
 .dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
 .wk{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:90px;border-bottom:1px solid var(--line)}
@@ -4963,6 +4964,24 @@ function calStep(dir){
 }
 document.getElementById('calPrev').addEventListener('click', () => calStep(-1));
 document.getElementById('calNext').addEventListener('click', () => calStep(1));
+/* Deslizar en horizontal sobre el calendario = mes o semana anterior/siguiente.
+   Solo cuenta un gesto claramente horizontal y largo; las flechas siguen igual. */
+(() => {
+  let x0 = 0, y0 = 0, on = false;
+  ['calMonthView', 'calWeekView'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('touchstart', e => {
+      on = e.touches.length === 1;
+      if(on){ x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
+    }, { passive:true });
+    el.addEventListener('touchend', e => {
+      if(!on) return; on = false;
+      const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      if(Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy) * 1.5) calStep(dx < 0 ? 1 : -1);
+    }, { passive:true });
+    el.addEventListener('touchcancel', () => { on = false; }, { passive:true });
+  });
+})();
 document.querySelector('.cal-view').addEventListener('click', e => {
   const b = e.target.closest('[data-calview]'); if(!b || b.dataset.calview === state.settings.calView) return;
   state.settings.calView = b.dataset.calview; save(); renderCal();
