@@ -187,6 +187,8 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
   background:transparent;border:none;border-radius:var(--r-row);font:inherit;font-size:17px;color:var(--ink);text-align:left;position:relative}
 .setnav-item+.setnav-item::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--line)}
 .setnav-item .ic{flex:none;color:var(--ink-soft)}
+.setnav-label{display:flex;align-items:center;gap:12px}
+.setnav-ico{flex:none;width:22px;height:22px;color:var(--accent)}
 .setback{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 0;margin-top:4px;background:none;border:none;font:inherit;font-size:16px;color:var(--accent)}
 .setsec > .libsec:focus{outline:none}
 #s-set.set-open .setsec-cur > .libsec{font-size:24px;font-weight:600;color:var(--ink);margin:4px 0 12px}
@@ -3941,6 +3943,18 @@ document.addEventListener('visibilitychange', () => {
 /* Cada título (.libsec) con su grupo pasa a ser una sección; la portada es la lista de títulos. */
 const setScreen = document.getElementById('s-set');
 const setSecs = [];
+/* iconos de línea, mismo trazo que la barra de pestañas; los puntos rellenos llevan fill propio */
+const SET_ICON = {
+  'Idioma · Language':'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+  'Tus cucharas':'<g transform="rotate(35 12 12)"><ellipse cx="12" cy="6.8" rx="3.9" ry="4.6"/><rect x="10.9" y="11.4" width="2.2" height="10.2" rx="1.1"/></g>',
+  'Ciclo':'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
+  'Finanzas':'<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+  'Cómo se ve':'<path d="M12 3a9 9 0 0 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><g fill="currentColor" stroke="none"><circle cx="7.5" cy="12" r="1.2"/><circle cx="9.5" cy="7.5" r="1.2"/><circle cx="14.5" cy="7.5" r="1.2"/></g>',
+  'Calendario del móvil':'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/>',
+  'Ayuda':'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.5a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none"/>',
+  'Tu cuenta (opcional)':'<path d="M7 18.5h10.5a4 4 0 0 0 .6-8A6 6 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5z"/>',
+  'Tus datos':'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/>'
+};
 let setCur = null;
 (() => {
   const head = setScreen.querySelector('header.top');
@@ -3960,8 +3974,8 @@ let setCur = null;
   const nav = document.createElement('div');
   nav.className = 'group setnav';
   nav.innerHTML = setSecs.map((x, i) => {
-    const key = x.title.getAttribute('data-i18n');
-    return `<button type="button" class="setnav-item" data-setsec="${i}"><span${key ? ` data-i18n="${esc(key)}"` : ''}>${esc(x.title.textContent)}</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
+    const key = x.title.getAttribute('data-i18n'), ico = SET_ICON[key || x.title.textContent] || '';
+    return `<button type="button" class="setnav-item" data-setsec="${i}"><span class="setnav-label">${ico ? `<svg class="setnav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg>` : ''}<span${key ? ` data-i18n="${esc(key)}"` : ''}>${esc(x.title.textContent)}</span></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
   }).join('');
   const back = document.createElement('button');
   back.type = 'button'; back.className = 'setback'; back.id = 'setBack'; back.hidden = true;
