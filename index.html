@@ -418,6 +418,9 @@ textarea{
 .info-text ol{margin:0;padding-left:1.4em}
 .info-text li{margin:0 0 8px}
 .field label.row{display:flex;margin-bottom:0;font-size:inherit;color:inherit;border-bottom:none}
+/* casillas de la hoja de tarea: mismo texto que el resto de etiquetas del formulario */
+.field label.row.chk{min-height:44px;padding:4px 0;font-size:14px;color:var(--ink-soft);cursor:pointer}
+.field label.row.chk input[type=checkbox]{accent-color:var(--accent)}
 /* Los chips de tamaño de texto ("Normal / Grande / Muy grande") y los de
    Activado / Desactivado no caben junto al texto en 390 pt: el bloque no se
    encoge (flex:0 0 auto), estrangulaba el título a una palabra por línea y el
@@ -1202,25 +1205,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <span class="lib-note" id="tLearned"></span>
       </div>
     </div>
-    <div class="field" id="tLibField">
-      <label class="row" style="cursor:pointer">
-        <div><strong data-i18n="Añadir a «Cuánto cuesta cada actividad»">Añadir a «Cuánto cuesta cada actividad»</strong></div>
-        <input type="checkbox" id="tLibOn" data-i18n-aria="Añadir a «Cuánto cuesta cada actividad»" aria-label="Añadir a «Cuánto cuesta cada actividad»" style="flex:0 0 auto;width:20px;height:20px">
-      </label>
-    </div>
-    <div class="field" id="tAccumField">
-      <label class="row" style="cursor:pointer">
-        <div><strong data-i18n="Sube con los días seguidos">Sube con los días seguidos</strong><span class="premium-tag" data-i18n="Premium">Premium</span></div>
-        <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
-      </label>
-      <p class="info-text" id="tAccumHint" hidden data-i18n="Se activa cuando la tarea se repite en varios días.">Se activa cuando la tarea se repite en varios días.</p>
-      <div class="stepper" id="tAccumStepRow" hidden>
-        <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        <output id="tAccumOut">1</output>
-        <button id="tAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
-        <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
-      </div>
-    </div>
     <div class="field-row">
       <div class="field">
         <label for="tTime" data-i18n="Hora inicio">Hora inicio</label>
@@ -1246,6 +1230,24 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <output id="wOut">4</output>
         <button id="wPlus" data-i18n-aria="Más semanas" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
         <span class="lib-note" id="wLabel">semanas</span>
+      </div>
+    </div>
+    <div class="field" id="tLibField">
+      <label class="row chk">
+        <div><span data-i18n="Añadir a «Cuánto cuesta cada actividad»">Añadir a «Cuánto cuesta cada actividad»</span></div>
+        <input type="checkbox" id="tLibOn" data-i18n-aria="Añadir a «Cuánto cuesta cada actividad»" aria-label="Añadir a «Cuánto cuesta cada actividad»" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+    </div>
+    <div class="field" id="tAccumField">
+      <label class="row chk">
+        <div><span data-i18n="Sube con los días seguidos">Sube con los días seguidos</span><span class="premium-tag" data-i18n="Premium">Premium</span></div>
+        <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
+      </label>
+      <div class="stepper" id="tAccumStepRow" hidden>
+        <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+        <output id="tAccumOut">1</output>
+        <button id="tAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
       </div>
     </div>
     <div class="bigrow" id="tDeleteRow" hidden>
@@ -2208,7 +2210,6 @@ const EN = {
  "Cada día seguido que la apuntes, su gasto sube un poco más que el anterior. En cuanto un día no la apuntas, se acaba la racha y vuelve a empezar desde el coste base.": "Each day in a row you log it, its cost rises a bit more than the day before. As soon as you skip a day, the streak ends and it starts over from the base cost.",
  "Sube con los días seguidos": "Rises with consecutive days",
  "Info": "Info",
- "Se activa cuando la tarea se repite en varios días.": "Turns on when the task repeats over several days.",
  "Info: sube con los días seguidos": "Info: rises with consecutive days",
  "Añadir a «Cuánto cuesta cada actividad»": "Add to «How much each activity costs»",
  "Info: añadir a Cuánto cuesta cada actividad": "Info: add to How much each activity costs",
@@ -4353,10 +4354,8 @@ function tSync(){
   const accumOn = tKind === 'gasto' && tAccumOn;
   const streak = accumOn && nameV ? accumStreak(nameV, taskDate) : 0;
   document.getElementById('tLibOn').checked = tLibOn;
-  document.getElementById('tAccumField').hidden = tKind === 'recarga';
-  const canAccum = tMulti() || tAccumOn;
-  document.getElementById('tAccumOn').disabled = !canAccum;
-  document.getElementById('tAccumHint').hidden = canAccum || tKind === 'recarga';
+  /* solo aparece cuando la tarea ocupa más de un día (o ya tenía la subida activada) */
+  document.getElementById('tAccumField').hidden = tKind === 'recarga' || !(tMulti() || tAccumOn);
   document.getElementById('tAccumOn').checked = tAccumOn;
   document.getElementById('tAccumStepRow').hidden = !tAccumOn;
   document.getElementById('tAccumOut').textContent = fmtN(tAccumStep);
