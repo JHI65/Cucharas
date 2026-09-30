@@ -398,6 +398,8 @@ textarea{
 .row .chips{margin:0;flex:0 0 auto}
 .info-btn{min-height:44px;padding:0 8px 0 0}
 .info-text{margin:0 0 12px;font-size:14px;color:var(--ink-soft)}
+.info-text ol{margin:0;padding-left:1.4em}
+.info-text li{margin:0 0 8px}
 .field label.row{display:flex;margin-bottom:0;font-size:inherit;color:inherit;border-bottom:none}
 /* Los chips de tamaño de texto ("Normal / Grande / Muy grande") y los de
    Activado / Desactivado no caben junto al texto en 390 pt: el bloque no se
@@ -1003,10 +1005,22 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="group">
     <div class="row" id="calConnectRow">
       <div><strong data-i18n="Importar eventos del calendario">Importar eventos del calendario</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.">Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.</p>
-        <p id="calHintIOS" hidden data-i18n="Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.">Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.</p>
         <p id="calHintAndroid" hidden data-i18n="Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.">Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.</p>
         <p class="notice" id="calMsg" role="status" hidden></p></div>
       <button class="btn" id="btnCalConnect" data-i18n="Conectar">Conectar</button>
+    </div>
+    <div class="row" id="calGuideIOS" hidden>
+      <div><strong data-i18n="Cómo sincronizar Google Calendar en iPhone">Cómo sincronizar Google Calendar en iPhone</strong>
+        <p data-i18n="Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.">Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.</p>
+        <button type="button" class="linkbtn info-btn" data-info="calGuideIOSSteps" aria-expanded="false" aria-controls="calGuideIOSSteps" data-i18n="Ver los pasos">Ver los pasos</button>
+        <div class="info-text" id="calGuideIOSSteps" hidden><ol>
+        <li data-i18n="Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.">Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.</li>
+        <li data-i18n="Activa el interruptor de Calendarios y toca Guardar.">Activa el interruptor de Calendarios y toca Guardar.</li>
+        <li data-i18n="Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.">Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.</li>
+        <li data-i18n="Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».">Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».</li>
+        <li data-i18n="Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.">Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.</li>
+        <li data-i18n="Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.">Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.</li>
+        </ol></div></div>
     </div>
     <div class="row" id="calManageRow" hidden>
       <div><strong data-i18n="Calendarios que se importan">Calendarios que se importan</strong>
@@ -1825,6 +1839,15 @@ const EN = {
  "Añadir registro de ciclo a este día": "Add a cycle log to this day",
  "Ciclo apuntado en este día — editar": "Cycle logged for this day — edit",
  "Listo": "Done",
+ "Cómo sincronizar Google Calendar en iPhone": "How to sync Google Calendar on iPhone",
+ "Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.": "Spoony reads the iPhone's calendar, so your Google Calendar has to get there first.",
+ "Ver los pasos": "See the steps",
+ "Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.": "iPhone Settings → Calendar → Accounts → Add Account → Google. Sign in with your account.",
+ "Activa el interruptor de Calendarios y toca Guardar.": "Turn on the Calendars switch and tap Save.",
+ "Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.": "Open Apple's Calendar app and check that your Google events show up. If they don't show up there, Spoony won't see them either. It can take a few minutes.",
+ "Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».": "Come back to Spoony. If you haven't yet, tap Connect and allow access. Then pick the Google calendar under “Add a calendar” and tap “Update now”.",
+ "Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.": "If one specific Google calendar is missing, it may not be set to sync with your phone: check it on Google Calendar's calendar sync page, from a browser.",
+ "Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.": "If Spoony says it has no permission: iPhone Settings → Spoony → Calendars → Full Access.",
  ", cerca del límite de tus cucharas": ", close to your spoon limit",
  "El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.": "The eye marks a day when what's planned reaches your spoons or is close to them.",
  "Añadir tarea": "Add task",
@@ -2279,7 +2302,6 @@ const EN = {
  "Calendario del móvil": "Phone calendar",
  "Importar eventos del calendario": "Import calendar events",
  "Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.": "Brings in your calendar events so you can assign spoons to them. It only reads: Spoony never changes or deletes anything in your calendar.",
- "Para ver aquí tu Google Calendar, añade tu cuenta de Google en Ajustes del iPhone → Calendario → Cuentas.": "To see your Google Calendar here, add your Google account in iPhone Settings → Calendar → Accounts.",
  "Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.": "Your Google calendars show up here if the account is added on the phone.",
  "Conectar": "Connect",
  "Calendarios que se importan": "Calendars to import",
@@ -2903,7 +2925,7 @@ function renderCalSettings(){
   const platform = window.Capacitor.getPlatform();
   document.getElementById('calConnectRow').hidden = c.enabled;
   document.getElementById('calManageRow').hidden = !c.enabled;
-  document.getElementById('calHintIOS').hidden = platform !== 'ios';
+  document.getElementById('calGuideIOS').hidden = platform !== 'ios';
   document.getElementById('calHintAndroid').hidden = platform !== 'android';
   if(!c.enabled) return;
   const chosen = c.cals.map(id => c.avail.find(a => a.id === id)).filter(Boolean);
