@@ -2856,7 +2856,8 @@ async function calSync(force){
           }
           return true;
         }
-        if(ce.noCost && !t.done){ dirty = true; return false; }
+        /* se olvida también en seen: si el evento o su calendario vuelven, tiene que volver a entrar */
+        if(ce.noCost && !t.done){ delete c.seen[ce.k]; dirty = true; return false; }
         if(!ce.gone && c.cals.includes(ce.cid)){ ce.gone = true; dirty = true; }
         return true;
       });
