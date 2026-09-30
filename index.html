@@ -4233,6 +4233,9 @@ function tMulti(){
   const key = t && calSrcKey(t);
   return !!t && !key.startsWith('t:') && Object.values(state.days).filter(d => d.tasks.some(x => calSrcKey(x) === key)).length > 1;
 }
+/* Una tarea propia aprende de lo que cuesta salvo que se le quite; una importada del calendario, solo si la persona lo activa. */
+const taskLib = t => t.cal ? t.noLib === false : !t.noLib;
+function setTaskLib(t){ if(t.cal) t.noLib = !tLibOn; else if(tLibOn) delete t.noLib; else t.noLib = true; }
 function tAccumLoad(name){
   const it = name && tLibOn ? libItem(name) : null;
   if(!it) return;
@@ -4378,7 +4381,7 @@ function openTaskEdit(taskId, dateKey = todayKey()){
   calNote.hidden = !t.cal;
   tName.value = t.name;
   tKind = t.est < 0 ? 'recarga' : 'gasto';
-  tAccumOn = false; tAccumStep = 1; tLibOn = !t.noLib; tAccumLoad(t.name);
+  tAccumOn = false; tAccumStep = 1; tLibOn = taskLib(t); tAccumLoad(t.name);
   if(!tLibOn){ tAccumOn = !!t.accum; tAccumStep = t.accum || 1; }
   // con racha, el campo enseña el coste base: el aumento de cada día se suma al guardar
   tCost = Math.abs(t.est);
@@ -4554,7 +4557,7 @@ tSave.addEventListener('click', () => {
       const key = calSrcKey(t);
       const accum = tApplyAccum(name, est);
       t.name = name; t.time = time; t.timeEnd = timeEnd;
-      if(tLibOn) delete t.noLib; else t.noLib = true;
+      setTaskLib(t);
       tAccumMark(t);
       if(t.cal){
         t.cal.noCost = false; delete t.cal.estimated; delete t.cal.gone;
@@ -4567,7 +4570,7 @@ tSave.addEventListener('click', () => {
       if(!key.startsWith('t:')) Object.entries(state.days).forEach(([k, d]) => d.tasks.forEach(x => {
         if(x === t || x.done || calSrcKey(x) !== key) return;
         x.name = name;
-        if(tLibOn) delete x.noLib; else x.noLib = true;
+        setTaskLib(x);
         tAccumMark(x);
         if(x.cal){ x.cal.noCost = false; delete x.cal.estimated; delete x.cal.gone; }
         else{ x.time = time; x.timeEnd = timeEnd; }
@@ -4604,10 +4607,10 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     t.done = !t.done;
-    if(t.done){ t.real = t.est; if(!t.cal?.noCost && !t.noLib) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
+    if(t.done){ t.real = t.est; if(!t.cal?.noCost && taskLib(t)) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
     else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item && !t.cal?.noCost && !t.noLib) item.samples.pop();
+      if(item && !t.cal?.noCost && taskLib(t)) item.samples.pop();
       t.real = null;
       collapsedTasks.delete(t.id);
     }
@@ -4644,10 +4647,10 @@ document.getElementById('taskList').addEventListener('click', e => {
     if(t.cal?.noCost){
       // Primer coste que se le pone a un evento del calendario: recién ahora es un dato que aprender.
       t.cal.noCost = false;
-      if(!t.noLib) record(t.name, t.real, t.real);
+      if(taskLib(t)) record(t.name, t.real, t.real);
     }else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item && item.samples.length && !t.noLib){ item.samples[item.samples.length-1] = t.real; }
+      if(item && item.samples.length && taskLib(t)){ item.samples[item.samples.length-1] = t.real; }
     }
     save(); renderAll();
     if(t.est < 0) closeAdjustPanel(t.id);
