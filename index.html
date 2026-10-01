@@ -1780,6 +1780,8 @@ const DAY_START_HOUR_DEFAULT = 4;
    una función global t() quedaría tapada silenciosamente dentro de
    cualquier .map(t => ...) de tareas. */
 const EN = {
+ "Aún no suma": "Not counted yet",
+ "Contar {name} en el total": "Count {name} in the total",
  "La siguiente ya se hizo antes: {name}": "The next one was already done: {name}",
  " · recuperación {lab}": " · recovery {lab}",
  " · recuperación {lab}, va a más": " · recovery {lab}, getting longer",
@@ -3270,13 +3272,16 @@ function ensureFinanzas(){
    revertir los "solo este mes". Si la app ha estado cerrada varios meses,
    se recorre uno a uno: los fijos no han cambiado mientras tanto y los
    variables de los meses saltados quedan vacíos, que es lo correcto. */
+/* Solo suma lo que tiene el check. Los gastos guardados antes de que existiera
+   el check no llevan el campo y siguen sumando, para no cambiar sus totales. */
+const finCounts = g => g.pagado !== false;
 function checkMonthRollover(){
   ensureFinanzas();
   const f = state.finanzas;
   const nowKey = monthKey();
   while(f.mesActual !== nowKey){
-    const fijosSnapshot = f.gastosFijos.map(g => ({ nombre:g.nombre, importe: g.overrideMes ?? g.importe }));
-    const variablesSnapshot = f.gastosVariables.map(g => ({ nombre:g.nombre, importe:g.importe }));
+    const fijosSnapshot = f.gastosFijos.filter(finCounts).map(g => ({ nombre:g.nombre, importe: g.overrideMes ?? g.importe }));
+    const variablesSnapshot = f.gastosVariables.filter(finCounts).map(g => ({ nombre:g.nombre, importe:g.importe }));
     const totalFijos = fijosSnapshot.reduce((a,g)=>a+g.importe,0);
     const totalVariables = variablesSnapshot.reduce((a,g)=>a+g.importe,0);
     const [y,m] = f.mesActual.split('-').map(Number);
@@ -3285,18 +3290,25 @@ function checkMonthRollover(){
       fijos:fijosSnapshot, variables:variablesSnapshot,
       totalFijos, totalVariables, total: totalFijos + totalVariables
     });
-    f.gastosFijos.forEach(g => { g.overrideMes = null; });
-    f.gastosVariables = [];
+    f.gastosFijos.forEach(g => { g.overrideMes = null; g.pagado = false; });
+    f.gastosVariables = f.gastosVariables.filter(g => !finCounts(g));
     f.mesActual = nextMonthKey(f.mesActual);
   }
 }
 function finRow(g, tipo){
   const importe = tipo === 'fijo' ? (g.overrideMes ?? g.importe) : g.importe;
   const note = (tipo === 'fijo' && g.overrideMes != null) ? tr('Solo este mes') : '';
-  return `<button class="lib" data-fin="${g.id}">
-      <span><span class="lib-name">${esc(g.nombre)}</span>${note ? `<br><span class="lib-note">${note}</span>` : ''}</span>
+  const on = finCounts(g);
+  const notes = [note, on ? '' : tr('Aún no suma')].filter(Boolean).join(' · ');
+  return `<div class="task">
+      <button class="check ${on?'on':''}" data-finpaid="${g.id}" aria-pressed="${on}" aria-label="${trf('Contar {name} en el total', {name:esc(g.nombre)})}">
+        <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
+      </button>
+      <button class="task-body" data-fin="${g.id}" aria-label="${trf('Editar {name}', {name:esc(g.nombre)})}">
+        <span class="task-name">${esc(g.nombre)}</span>${notes ? `<span class="task-meta">${notes}</span>` : ''}
+      </button>
       <span class="cost">${fmtMoney(importe)}</span>
-    </button>`;
+    </div>`;
 }
 function renderFin(){
   checkMonthRollover();
@@ -3307,8 +3319,8 @@ function renderFin(){
   document.getElementById('finVariablesList').innerHTML = f.gastosVariables.length
     ? `<div class="group">${f.gastosVariables.map(g => finRow(g,'variable')).join('')}</div>`
     : `<div class="empty">${tr('Todavía no hay gastos variables este mes.')}</div>`;
-  const totalFijos = f.gastosFijos.reduce((a,g)=>a+(g.overrideMes ?? g.importe),0);
-  const totalVariables = f.gastosVariables.reduce((a,g)=>a+g.importe,0);
+  const totalFijos = f.gastosFijos.filter(finCounts).reduce((a,g)=>a+(g.overrideMes ?? g.importe),0);
+  const totalVariables = f.gastosVariables.filter(finCounts).reduce((a,g)=>a+g.importe,0);
   document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
   document.getElementById('finTotalVariables').textContent = fmtMoney(totalVariables);
   document.getElementById('finTotalMesFijos').textContent = fmtMoney(totalFijos + totalVariables);
@@ -4878,14 +4890,19 @@ function openGasto(tipo, item){
 }
 document.getElementById('btnAddFijo').addEventListener('click', () => openGasto('fijo', null));
 document.getElementById('btnAddVariable').addEventListener('click', () => openGasto('variable', null));
-document.getElementById('finFijosList').addEventListener('click', e => {
+function finListClick(e, tipo){
+  const list = tipo === 'fijo' ? state.finanzas.gastosFijos : state.finanzas.gastosVariables;
+  const c = e.target.closest('[data-finpaid]');
+  if(c){
+    const g = list.find(x => x.id === c.dataset.finpaid);
+    if(g){ g.pagado = !finCounts(g); save(); renderFin(); }
+    return;
+  }
   const b = e.target.closest('[data-fin]'); if(!b) return;
-  openGasto('fijo', state.finanzas.gastosFijos.find(g => g.id === b.dataset.fin));
-});
-document.getElementById('finVariablesList').addEventListener('click', e => {
-  const b = e.target.closest('[data-fin]'); if(!b) return;
-  openGasto('variable', state.finanzas.gastosVariables.find(g => g.id === b.dataset.fin));
-});
+  openGasto(tipo, list.find(g => g.id === b.dataset.fin));
+}
+document.getElementById('finFijosList').addEventListener('click', e => finListClick(e, 'fijo'));
+document.getElementById('finVariablesList').addEventListener('click', e => finListClick(e, 'variable'));
 document.getElementById('gCancel').addEventListener('click', () => dlgGasto.close());
 document.getElementById('gSave').addEventListener('click', () => {
   const nombre = gName.value.trim(); if(!nombre){ gName.focus(); return; }
@@ -4898,11 +4915,11 @@ document.getElementById('gSave').addEventListener('click', () => {
       if(gScope === 'mes') gEditing.overrideMes = importe;
       else { gEditing.importe = importe; gEditing.overrideMes = null; }
     }else{
-      f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null });
+      f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null, pagado:false });
     }
   }else{
     if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; }
-    else f.gastosVariables.push({ id:uid(), nombre, importe });
+    else f.gastosVariables.push({ id:uid(), nombre, importe, pagado:false });
   }
   save(); dlgGasto.close(); renderFin();
 });
