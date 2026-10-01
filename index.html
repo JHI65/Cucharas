@@ -1780,6 +1780,7 @@ const DAY_START_HOUR_DEFAULT = 4;
    una función global t() quedaría tapada silenciosamente dentro de
    cualquier .map(t => ...) de tareas. */
 const EN = {
+ "La siguiente ya se hizo antes: {name}": "The next one was already done: {name}",
  " · recuperación {lab}": " · recovery {lab}",
  " · recuperación {lab}, va a más": " · recovery {lab}, getting longer",
  ", con sangrado": ", bleeding",
@@ -3153,13 +3154,17 @@ function renderTasks(){
     el.innerHTML = `<div class="empty">${tr('Nada apuntado. Añade solo lo que de verdad va a pasar hoy.')}</div>`;
     return;
   }
-  el.innerHTML = '<div class="group">' + d.tasks.map(t => {
+  el.innerHTML = '<div class="group">' + d.tasks.map((t, i) => {
     const cost = t.real ?? t.est;
     const dep = cost < 0;
     const l = learned(t.name);
     const notes = calNotes(t);
     if(t.series) notes.push(tr('Se repite'));
     if(dep) notes.push(tr('Recarga'));
+    /* con solo hora de inicio no hay fin que ordene: se avisa si la siguiente ya se hizo antes */
+    const nx = d.tasks[i + 1];
+    if(t.time && !t.timeEnd && nx && nx.done && (!t.done || (t.doneAt && nx.doneAt && nx.doneAt < t.doneAt)))
+      notes.push(trf('La siguiente ya se hizo antes: {name}', {name:nx.name}));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
     else if(!t.done && !dep && l && l.gated) notes.push(tr('No aprende de esta actividad · Premium'));
     const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
@@ -4693,6 +4698,7 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     t.done = !t.done;
+    if(t.done) t.doneAt = Date.now(); else delete t.doneAt;
     if(t.done){ t.real = t.est; if(!t.cal?.noCost && taskLib(t)) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
     else{
       const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
