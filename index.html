@@ -3156,7 +3156,9 @@ function renderTasks(){
     el.innerHTML = `<div class="empty">${tr('Nada apuntado. Añade solo lo que de verdad va a pasar hoy.')}</div>`;
     return;
   }
-  el.innerHTML = '<div class="group">' + d.tasks.map((t, i) => {
+  /* de más temprano a más tarde; las que no tienen hora van al final, en el orden en que se añadieron */
+  const list = [...d.tasks].sort((a, b) => (a.time ? 0 : 1) - (b.time ? 0 : 1) || (a.time && b.time ? a.time.localeCompare(b.time) : 0));
+  el.innerHTML = '<div class="group">' + list.map((t, i) => {
     const cost = t.real ?? t.est;
     const dep = cost < 0;
     const l = learned(t.name);
@@ -3164,7 +3166,7 @@ function renderTasks(){
     if(t.series) notes.push(tr('Se repite'));
     if(dep) notes.push(tr('Recarga'));
     /* con solo hora de inicio no hay fin que ordene: se avisa si la siguiente ya se hizo antes (sin marca de hora = hecha antes de que se guardara) */
-    const nx = d.tasks[i + 1];
+    const nx = list[i + 1];
     if(t.time && !t.timeEnd && nx && nx.done && (!t.done || (t.doneAt && (!nx.doneAt || nx.doneAt < t.doneAt))))
       notes.push(trf('La siguiente ya se hizo antes: {name}', {name:nx.name}));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
