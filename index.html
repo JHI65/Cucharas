@@ -3163,9 +3163,9 @@ function renderTasks(){
     const notes = calNotes(t);
     if(t.series) notes.push(tr('Se repite'));
     if(dep) notes.push(tr('Recarga'));
-    /* con solo hora de inicio no hay fin que ordene: se avisa si la siguiente ya se hizo antes */
+    /* con solo hora de inicio no hay fin que ordene: se avisa si la siguiente ya se hizo antes (sin marca de hora = hecha antes de que se guardara) */
     const nx = d.tasks[i + 1];
-    if(t.time && !t.timeEnd && nx && nx.done && (!t.done || (t.doneAt && nx.doneAt && nx.doneAt < t.doneAt)))
+    if(t.time && !t.timeEnd && nx && nx.done && (!t.done || (t.doneAt && (!nx.doneAt || nx.doneAt < t.doneAt))))
       notes.push(trf('La siguiente ya se hizo antes: {name}', {name:nx.name}));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
     else if(!t.done && !dep && l && l.gated) notes.push(tr('No aprende de esta actividad · Premium'));
