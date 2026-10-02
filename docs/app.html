@@ -358,7 +358,13 @@ textarea{
 .calrow-main{flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:none;border:none;padding:8px 0;text-align:left;min-height:44px;color:var(--ink)}
 .calrow-main .ctag{font-size:15px;padding:3px 11px 3px 8px}
 .calrow-main .ctag svg{width:16px;height:16px}
-.calrow-src{font-size:13px;color:var(--ink-soft)}
+.calrow-src{font-size:13px;color:var(--ink-soft);overflow-wrap:anywhere;min-width:0}
+/* Con el texto ampliado, un correo largo ("nombre@gmail.com") no cabe en una línea y, al no poder partirse,
+   ensanchaba toda la tarjeta: el texto y las líneas se salían del borde. Aquí el correo baja de línea
+   donde haga falta y la columna de texto puede encogerse en vez de crecer. */
+#calMore .chip{max-width:100%;text-align:left;overflow-wrap:anywhere;border-radius:18px}
+.row:has(#calList) > div:first-child{min-width:0}
+#calSrcLine{margin-top:8px}
 .calrow-x{flex:none;width:44px;height:44px;display:grid;place-items:center;background:none;border:none;color:var(--ink-soft)}
 .caledit{padding:4px 0 12px}
 .caledit p{margin:6px 0 6px}
@@ -395,7 +401,15 @@ textarea{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
 .mini button{background:none;border:none;color:var(--ink-soft);font-size:15px;padding:0 4px;line-height:1;display:grid;place-items:center}
 .mini .use{padding:6px 2px}
-.mini .linkbtn.inline{display:inline;padding:0;font-size:inherit}
+.mini .linkbtn.inline{display:inline;padding:0;font-size:inherit;text-align:left}
+/* Nombres largos: la columna del nombre ocupa todo lo que deja el coste, alineada a la izquierda y
+   baja de línea (incluso una palabra larga o una URL); el coste y la X no se encogen. */
+.mini-main{flex:1 1 auto;min-width:0;text-align:left;overflow-wrap:anywhere}
+.mini-main .task-meta{margin-top:3px}
+/* Las notas van en fila que baja de línea nota a nota: "Toca para asignar cucharas" ya no se parte
+   con "cucharas" suelto ni queda un separador colgando al final de la línea. */
+.nts{display:flex;flex-wrap:wrap;align-items:center;gap:2px 9px}
+.nt{max-width:100%}
 /* Toda la tarjeta de un evento importado abre el editor: el botón del nombre
    (el que lee el lector de pantalla y se alcanza con teclado) extiende su zona
    táctil a la tarjeta entera. El de quitar queda por encima y sigue siendo suyo. */
@@ -1023,6 +1037,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div id="calGroup" hidden>
     <p class="libsec" data-i18n="Calendario del móvil">Calendario del móvil</p>
     <div class="group">
+    <div class="row" id="calGoogleRow" hidden>
+      <div><strong data-i18n="Conectar con Google Calendar">Conectar con Google Calendar</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.">Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.</p></div>
+      <button class="btn" id="btnCalGoogle" data-i18n="Conectar con Google">Conectar con Google</button>
+    </div>
     <div class="row" id="calConnectRow">
       <div><strong data-i18n="Importar eventos del calendario">Importar eventos del calendario</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.">Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.</p>
         <p id="calHintAndroid" hidden data-i18n="Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.">Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.</p>
@@ -1045,11 +1063,13 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="row" id="calManageRow" hidden>
       <div><strong data-i18n="Calendarios que se importan">Calendarios que se importan</strong>
         <p data-i18n="Se importan los eventos de hoy y de los próximos 12 meses. Los de todo el día entran sin hora. Si cambias el nombre de un evento en tu calendario, cambia también aquí, salvo que lo hayas renombrado en Spoony. Se actualiza al abrir la app y cada pocos minutos. Toca un calendario para cambiar su etiqueta. Las tareas ya importadas se quedan aunque desconectes.">Se importan los eventos de hoy y de los próximos 12 meses. Los de todo el día entran sin hora. Si cambias el nombre de un evento en tu calendario, cambia también aquí, salvo que lo hayas renombrado en Spoony. Se actualiza al abrir la app y cada pocos minutos. Toca un calendario para cambiar su etiqueta. Las tareas ya importadas se quedan aunque desconectes.</p>
+        <p class="lib-note" id="calSrcLine"></p>
         <div class="calrows" id="calList"></div>
         <button class="btn" id="btnCalMore" aria-expanded="false"></button>
         <div class="chips" id="calMore" hidden role="group" data-i18n-aria="Calendarios que puedes añadir" aria-label="Calendarios que puedes añadir"></div>
         <p class="notice" id="calStatus" role="status" hidden></p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn" id="btnCalReauth" hidden data-i18n="Volver a conectar con Google">Volver a conectar con Google</button>
           <button class="btn" id="btnCalSync" data-i18n="Actualizar ahora">Actualizar ahora</button>
           <button class="btn" id="btnCalOff" data-i18n="Desconectar">Desconectar</button>
         </div></div>
@@ -2309,6 +2329,15 @@ const EN = {
  "Coste estimado": "Estimated cost",
  "Ya no está en tu calendario": "No longer in your calendar",
  "Cambiado en tu calendario: {detalle}": "Changed in your calendar: {detalle}",
+ "Conectar con Google Calendar": "Connect Google Calendar",
+ "Conectar con Google": "Connect with Google",
+ "Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.": "Spoony reads your Google Calendar directly, without going through the iPhone's calendar, so new events arrive when you open the app. It's read-only: nothing is changed or deleted.",
+ "Importar tu Google Calendar es una función de Spoony Premium.": "Importing your Google Calendar is a Spoony Premium feature.",
+ "Origen: Google Calendar": "Source: Google Calendar",
+ "Origen: calendario del móvil": "Source: phone calendar",
+ "Volver a conectar con Google": "Reconnect with Google",
+ "Hay que volver a conectar con Google: el permiso caducó o se quitó.": "You need to reconnect with Google: the permission expired or was removed.",
+ "Google no ha dado el permiso. Puedes volver a intentarlo.": "Google didn't grant the permission. You can try again.",
  "sin hora": "no time",
  "Sin coste": "No cost",
  "Evento sin título": "Untitled event",
@@ -2834,6 +2863,7 @@ function ensureCalTag(id){
   let color = 0; while(used.has(color) && color < 5) color++;
   c.tags[id] = { c: color, i: 'cal' };
 }
+const metaHtml = a => `<span class="task-meta nts">${a.map(x => `<span class="nt">${x}</span>`).join('')}</span>`;
 function calNotes(t){
   const c = t.cal; if(!c) return [];
   const n = [calTagHtml(c.cid)];
@@ -2850,8 +2880,150 @@ function calNotes(t){
   }
   return n;
 }
+/* ---------- Google Calendar directo (iOS) ----------
+   iOS solo baja los eventos nuevos de Google a su calendario cuando se abre la
+   app Calendario, así que Spoony no los veía hasta entonces. Con esto pide los
+   eventos a la API de Google (solo lectura) y se salta ese paso. Es otra fuente
+   para calSync: devuelve los eventos con la misma forma que el plugin del móvil.
+   Flujo OAuth con PKCE y sin secreto, en el navegador de la app (Google no deja
+   usar un WebView). Los tokens van en su propia clave local: nunca en state,
+   que se exporta y se sube a la nube.
+   Vacío = la opción no aparece. Es el ID de cliente OAuth de tipo iOS, y su
+   esquema inverso tiene que estar también en ios/App/App/Info.plist. */
+const GCAL_CLIENT_ID = '547585605378-3vjian3gls5frfp21p5ab3m0vh4m1kep.apps.googleusercontent.com';
+const GCAL_KEY = 'spoony:gcal', GCAL_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+const gcalConfigured = () => GCAL_CLIENT_ID.endsWith('.apps.googleusercontent.com');
+const gcalScheme = () => 'com.googleusercontent.apps.' + GCAL_CLIENT_ID.replace('.apps.googleusercontent.com', '');
+const gcalRedirect = () => gcalScheme() + ':/oauth2redirect';
+let gcalTok = (() => { try{ return JSON.parse(localStorage.getItem(GCAL_KEY)); }catch(e){ return null; } })();
+const gcalStore = t => { gcalTok = t; try{ t ? localStorage.setItem(GCAL_KEY, JSON.stringify(t)) : localStorage.removeItem(GCAL_KEY); }catch(e){} };
+const b64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const randStr = n => b64url(crypto.getRandomValues(new Uint8Array(n)));
+async function pkcePair(){
+  const verifier = randStr(48);
+  if(!crypto.subtle) return { verifier, challenge: verifier, method: 'plain' };
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  return { verifier, challenge: b64url(new Uint8Array(hash)), method: 'S256' };
+}
+async function gcalTokenCall(params){
+  const r = await fetch('https://oauth2.googleapis.com/token', { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_id: GCAL_CLIENT_ID, ...params }) });
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw Object.assign(new Error(j.error_description || j.error || String(r.status)), { code: j.error === 'invalid_grant' ? 'reauth' : 'error' });
+  return j;
+}
+async function gcalAccess(force){
+  if(!gcalTok?.rt) throw Object.assign(new Error('sin sesión de Google'), { code:'reauth' });
+  if(!force && gcalTok.at && Date.now() < gcalTok.exp - 60000) return gcalTok.at;
+  const j = await gcalTokenCall({ grant_type:'refresh_token', refresh_token: gcalTok.rt });
+  gcalStore({ rt: gcalTok.rt, at: j.access_token, exp: Date.now() + (+j.expires_in || 3600) * 1000 });
+  return gcalTok.at;
+}
+async function gcalGet(path, params, retried){
+  const u = new URL('https://www.googleapis.com/calendar/v3' + path);
+  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v));
+  const r = await fetch(u, { headers:{ Authorization: 'Bearer ' + await gcalAccess(retried) } });
+  if(r.status === 401 && !retried) return gcalGet(path, params, true);
+  if(r.ok) return r.json();
+  const reason = (await r.json().catch(() => ({}))).error?.errors?.[0]?.reason || '';
+  throw Object.assign(new Error('Google Calendar ' + r.status), { code: r.status === 401 ? 'reauth' : r.status === 403 && !/rate/i.test(reason) ? 'denied' : 'error' });
+}
+async function gcalPages(path, params){
+  const out = []; let pageToken;
+  for(let i = 0; i < 20; i++){
+    const j = await gcalGet(path, pageToken ? { ...params, pageToken } : params);
+    out.push(...(j.items || [])); pageToken = j.nextPageToken;
+    if(!pageToken) break;
+  }
+  return out;
+}
+/* Un evento de todo el día llega como fecha (el fin es exclusivo): se pasa a
+   medianoche local, que es lo que espera allDayKeys. Los que la persona ha
+   rechazado se tratan como cancelados: no son suyos. */
+const gcalEvent = (ev, cid) => {
+  const s = ev.start || {}, e = ev.end || {};
+  const declined = (ev.attendees || []).some(a => a.self && a.responseStatus === 'declined');
+  const out = { id: ev.id, calendarId: cid, title: ev.summary || '', status: ev.status === 'cancelled' || declined ? 'canceled' : 'confirmed', isAllDay: !!s.date };
+  if(s.date){
+    out.startDate = new Date(s.date + 'T00:00:00').getTime();
+    out.endDate = new Date((e.date || s.date) + 'T00:00:00').getTime();
+  }else{
+    out.startDate = Date.parse(s.dateTime);
+    out.endDate = Date.parse(e.dateTime || s.dateTime);
+  }
+  return out;
+};
+const gcalApiImpl = {
+  async listCalendars(){
+    const items = await gcalPages('/users/me/calendarList', { maxResults: 250, minAccessRole: 'reader' });
+    return { result: items.map(x => ({ id: x.id, title: x.summaryOverride || x.summary, source: { title: 'Google' }, primary: !!x.primary })) };
+  },
+  async listEventsInRange({ from, to }){
+    const lists = await Promise.all(state.calendar.cals.map(cid =>
+      gcalPages('/calendars/' + encodeURIComponent(cid) + '/events', {
+        timeMin: new Date(from).toISOString(), timeMax: new Date(to).toISOString(),
+        singleEvents: true, orderBy: 'startTime', maxResults: 2500, showDeleted: false
+      }).then(items => items.map(ev => gcalEvent(ev, cid)))));
+    return { result: lists.flat().filter(ev => Number.isFinite(ev.startDate)) };
+  }
+};
+const calIsGoogle = () => state.calendar?.source === 'google';
+const calApi = () => calIsGoogle() ? (gcalConfigured() && gcalTok?.rt ? gcalApiImpl : null) : nativeCalendar();
+function gcalForget(){
+  const t = gcalTok?.rt; gcalStore(null);
+  if(t) fetch('https://oauth2.googleapis.com/revoke', { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body: new URLSearchParams({ token: t }) }).catch(() => {});
+}
+async function gcalConnect(){
+  if(!requirePremium(tr('Importar tu Google Calendar es una función de Spoony Premium.'))) return;
+  const browser = nativeBrowser(); if(!browser || !gcalConfigured()) return;
+  showCalMsg('');
+  try{
+    const { verifier, challenge, method } = await pkcePair(), st = randStr(16);
+    localStorage.setItem(GCAL_KEY + ':pending', JSON.stringify({ verifier, st }));
+    const q = new URLSearchParams({ client_id: GCAL_CLIENT_ID, redirect_uri: gcalRedirect(), response_type:'code', scope: GCAL_SCOPE,
+      code_challenge: challenge, code_challenge_method: method, state: st, access_type:'offline', prompt:'consent' });
+    await browser.open({ url: 'https://accounts.google.com/o/oauth2/v2/auth?' + q });
+  }catch(e){
+    console.error('Calendario', e);
+    showCalMsg(tr('No se pudo abrir la pantalla de inicio de sesión.'));
+  }
+}
+async function gcalComplete(url){
+  nativeBrowser()?.close().catch(() => {});
+  const c = state.calendar, p = new URLSearchParams((url.split('?')[1] || '').split('#')[0]);
+  let pend = null; try{ pend = JSON.parse(localStorage.getItem(GCAL_KEY + ':pending')); localStorage.removeItem(GCAL_KEY + ':pending'); }catch(e){}
+  const fail = status => { c.status = status; persist(); showCalMsg(calStatusText()); renderCalSettings(); };
+  if(p.get('error') || !p.get('code') || !pend || p.get('state') !== pend.st) return fail('denied');
+  try{
+    const j = await gcalTokenCall({ grant_type:'authorization_code', code: p.get('code'), code_verifier: pend.verifier, redirect_uri: gcalRedirect() });
+    if(!j.refresh_token) throw new Error('Google no devolvió refresh_token');
+    gcalStore({ rt: j.refresh_token, at: j.access_token, exp: Date.now() + (+j.expires_in || 3600) * 1000 });
+    /* Al pasar del calendario del móvil a Google, los ids cambian: se vuelven a elegir
+       los calendarios que se llamaban igual (con su etiqueta), o el principal. */
+    const switching = c.source !== 'google';
+    const old = c.cals.map(id => ({ title: calTitle(id), tag: c.tags[id] }));
+    c.source = 'google'; c.enabled = true;
+    if(switching){ c.cals = []; c.avail = []; }
+    const list = await calLoadList(gcalApiImpl);
+    if(switching){
+      let pick = c.avail.filter(a => old.some(o => o.title && o.title === a.title));
+      if(!pick.length){ const main = list.find(x => x.primary); if(main) pick = c.avail.filter(a => a.id === String(main.id)); }
+      pick.forEach(a => {
+        const o = old.find(x => x.title === a.title);
+        if(o?.tag) c.tags[a.id] = { ...o.tag };
+        ensureCalTag(a.id); c.cals.push(a.id);
+      });
+    }
+    c.status = 'ok'; persist(); renderCalSettings(); calSyncSoon();
+  }catch(e){
+    console.error('Calendario', e);
+    fail(e.code === 'reauth' ? 'reauth' : 'error');
+  }
+}
+nativeOn('App', 'appUrlOpen', data => { if(gcalConfigured() && data.url && data.url.startsWith(gcalScheme() + ':')) gcalComplete(data.url); });
+
 async function calSync(force){
-  const c = state.calendar, api = nativeCalendar();
+  const c = state.calendar, api = calApi();
   if(!c || !api || !c.enabled || !c.cals.length || !isPremium() || calBusy) return false;
   if(!force && Date.now() - c.last < CAL_MIN_GAP) return false;
   calBusy = true;
@@ -2876,6 +3048,23 @@ async function calSync(force){
         if(ev.isAllDay) allDayKeys(start, end).forEach(dk => add(dk, { allDay:true }));
         else add(calDayKey(start), { time:hhmm(start), timeEnd: end > start ? hhmm(end) : null });
       });
+    /* Tareas importadas desde la otra fuente (móvil <-> Google): sus ids no valen, así que se
+       reconocen por día, título y hora y se reasignan, para no duplicar lo que ya tiene coste. */
+    const srcTag = calIsGoogle() ? 'g' : 'd', claimed = new Set();
+    const imported = Object.keys(state.days).filter(k => k >= startKey && k <= endKey)
+      .flatMap(dk => state.days[dk].tasks.filter(t => t.cal).map(t => [dk, t.cal]));
+    imported.forEach(([, ce]) => { if((ce.src || 'd') === srcTag) claimed.add(ce.k); });
+    const same = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+    imported.forEach(([dk, ce]) => {
+      if((ce.src || 'd') === srcTag) return;
+      for(const [k, ev] of incoming){
+        if(claimed.has(k) || ev.dk !== dk || !same(ev.title, ce.title) || ev.time !== ce.time || ev.timeEnd !== ce.timeEnd) continue;
+        claimed.add(k); delete c.seen[ce.k]; c.seen[k] = dk;
+        Object.assign(ce, { k, cid: ev.cid });
+        if(srcTag === 'g') ce.src = 'g'; else delete ce.src;
+        dirty = true; break;
+      }
+    });
     const have = new Set();
     Object.keys(state.days).filter(k => k >= startKey && k <= endKey).forEach(dk => {
       const d = state.days[dk];
@@ -2910,6 +3099,7 @@ async function calSync(force){
       const l = libItem(ev.title);
       const cal = { k, cid:ev.cid, title:ev.title, time:ev.time, timeEnd:ev.timeEnd };
       if(ev.allDay) cal.allDay = true;
+      if(calIsGoogle()) cal.src = 'g';
       let est = 0;
       if(l){ est = learned(ev.title).suggest; cal.estimated = true; } else cal.noCost = true;
       day(ev.dk).tasks.push({ id:uid(), series:null, name:ev.title, est, real:null, done:false, recovery:null, time:ev.time, timeEnd:ev.timeEnd, cal });
@@ -2918,7 +3108,7 @@ async function calSync(force){
     Object.keys(c.seen).forEach(k => { if(c.seen[k] < startKey) delete c.seen[k]; });
     c.status = 'ok';
   }catch(e){
-    c.status = /denied|permission|permiso/i.test(String((e && e.message) || e)) ? 'denied' : 'error';
+    c.status = e?.code === 'reauth' ? 'reauth' : e?.code === 'denied' || /denied|permission|permiso/i.test(String((e && e.message) || e)) ? 'denied' : 'error';
     console.error('Calendario', e);
   }finally{
     calBusy = false;
@@ -2936,6 +3126,7 @@ async function calLoadList(api){
     id:String(x.id), title:x.title || x.internalTitle || tr('Calendario sin nombre'),
     src:(x.source && x.source.title) || x.accountName || '' }));
   c.cals = c.cals.filter(id => c.avail.some(a => a.id === id));
+  return result || [];
 }
 const showCalMsg = t => { const el = document.getElementById('calMsg'); el.textContent = t; el.hidden = !t; };
 function renderCalSettings(){
@@ -2944,9 +3135,13 @@ function renderCalSettings(){
   g.hidden = !api; if(!api) return;
   const c = state.calendar;
   const platform = window.Capacitor.getPlatform();
+  const google = c.source === 'google';
+  document.getElementById('calGoogleRow').hidden = c.enabled || !gcalConfigured() || platform !== 'ios';
   document.getElementById('calConnectRow').hidden = c.enabled;
   document.getElementById('calManageRow').hidden = !c.enabled;
-  document.getElementById('calGuideIOS').hidden = platform !== 'ios';
+  document.getElementById('calGuideIOS').hidden = platform !== 'ios' || (c.enabled && google);
+  document.getElementById('calSrcLine').textContent = tr(google ? 'Origen: Google Calendar' : 'Origen: calendario del móvil');
+  document.getElementById('btnCalReauth').hidden = !(google && c.status === 'reauth');
   document.getElementById('calHintAndroid').hidden = platform !== 'android';
   if(!c.enabled) return;
   const chosen = c.cals.map(id => c.avail.find(a => a.id === id)).filter(Boolean);
@@ -2975,13 +3170,18 @@ function renderCalSettings(){
   moreList.hidden = !moreOpen || !rest.length;
   moreList.innerHTML = rest.map(a => `<button class="chip" data-cal="${esc(a.id)}">${esc(a.title)}${a.src ? ` · ${esc(a.src)}` : ''}</button>`).join('');
   if(!c.avail.length) document.getElementById('calList').innerHTML = `<span class="lib-note">${tr('No hay calendarios en este móvil.')}</span>`;
-  let status = '';
-  if(c.status === 'denied') status = tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.');
-  else if(c.status === 'error') status = tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.');
-  else if(!c.cals.length) status = tr('Elige al menos un calendario para importar sus eventos.');
-  else if(c.last) status = trf('Última lectura: {hora}.', { hora: hhmm(c.last) });
+  const status = calStatusText();
   const el = document.getElementById('calStatus');
   el.textContent = status; el.hidden = !status;
+}
+function calStatusText(){
+  const c = state.calendar, google = c.source === 'google';
+  if(c.status === 'denied') return tr(google ? 'Google no ha dado el permiso. Puedes volver a intentarlo.' : 'Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.');
+  if(c.status === 'reauth') return tr('Hay que volver a conectar con Google: el permiso caducó o se quitó.');
+  if(c.status === 'error') return tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.');
+  if(!c.cals.length) return tr('Elige al menos un calendario para importar sus eventos.');
+  if(c.last) return trf('Última lectura: {hora}.', { hora: hhmm(c.last) });
+  return '';
 }
 async function calConnect(){
   if(!requirePremium(tr('Importar el calendario del móvil es una función de Spoony Premium.'))) return;
@@ -2993,6 +3193,7 @@ async function calConnect(){
       showCalMsg(tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.'));
       return;
     }
+    if(state.calendar.source === 'google'){ gcalForget(); state.calendar.source = 'device'; state.calendar.cals = []; state.calendar.avail = []; }
     await calLoadList(api);
     state.calendar.enabled = true; state.calendar.status = 'ok';
     persist(); renderCalSettings();
@@ -3003,14 +3204,17 @@ async function calConnect(){
 }
 document.getElementById('btnCalConnect').addEventListener('click', calConnect);
 document.getElementById('btnCalOff').addEventListener('click', () => {
+  if(calIsGoogle()) gcalForget();
   state.calendar.enabled = false; persist(); showCalMsg(''); renderCalSettings();
 });
 document.getElementById('btnCalSync').addEventListener('click', async () => {
-  const api = nativeCalendar(); if(!api) return;
+  const api = calApi(); if(!api) return;
   showCalMsg('');
   try{ await calLoadList(api); persist(); }catch(e){ console.error('Calendario', e); }
   await calSync(true);
 });
+document.getElementById('btnCalGoogle').addEventListener('click', gcalConnect);
+document.getElementById('btnCalReauth').addEventListener('click', gcalConnect);
 let calEditing = null, calMoreOpen = false;
 /* se espera un momento tras cada toque: así se pueden marcar varios calendarios seguidos y se leen todos a la vez */
 let calSoonT = null;
@@ -3171,7 +3375,7 @@ function renderTasks(){
       notes.push(trf('La siguiente ya se hizo antes: {name}', {name:nx.name}));
     if(!t.done && !dep && l && l.avg != null && l.avg > t.est + 0.5) notes.push(trf('sueles gastar {n}', {n:fmtN(l.avg)}));
     else if(!t.done && !dep && l && l.gated) notes.push(tr('No aprende de esta actividad · Premium'));
-    const meta = notes.length ? `<span class="task-meta">${notes.join(' · ')}</span>` : '';
+    const meta = notes.length ? metaHtml(notes) : '';
     const isOpen = t.done && !collapsedTasks.has(t.id);
     const timeTag = t.time ? `<span class="task-time">${esc(fmtTaskTime(t))}</span> ` : '';
     const body = t.done
@@ -5149,9 +5353,9 @@ function renderDaySheet(){
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
     ? d.tasks.map(t => `<div class="mini${t.cal && editable && !t.done ? ' tap' : ''}">
-        <span>${t.time?`${esc(fmtTaskTime(t))} · `:''}${t.cal && editable && !t.done
+        <span class="mini-main">${t.time?`${esc(fmtTaskTime(t))} · `:''}${t.cal && editable && !t.done
           ? `<button class="linkbtn inline" data-dedit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">${esc(t.name)}</button>`
-          : esc(t.name)}${t.done?` · ${tr('hecha')}`:''}${t.cal ? `<br><span class="task-meta">${calNotes(t).join(' · ')}</span>` : ''}</span>
+          : esc(t.name)}${t.done?` · ${tr('hecha')}`:''}${t.cal ? metaHtml(calNotes(t)) : ''}</span>
         <span class="cost">${t.cal?.noCost ? tr('Sin coste') : `${fmtN(+(t.real ?? t.est) || 0)}
           <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>`}
           ${editable ? `<button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>` : ''}
@@ -5959,6 +6163,7 @@ function normalize(s){
   if(!s.calendar || typeof s.calendar !== 'object' || Array.isArray(s.calendar)) s.calendar = {};
   const cl = s.calendar;
   cl.enabled = !!cl.enabled;
+  cl.source = cl.source === 'google' ? 'google' : 'device';
   cl.cals = Array.isArray(cl.cals) ? cl.cals.filter(x => typeof x === 'string') : [];
   cl.avail = Array.isArray(cl.avail) ? cl.avail.filter(x => x && typeof x.id === 'string') : [];
   if(!cl.seen || typeof cl.seen !== 'object' || Array.isArray(cl.seen)) cl.seen = {};

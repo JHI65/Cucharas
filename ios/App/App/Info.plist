@@ -44,6 +44,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				<string>com.googleusercontent.apps.547585605378-3vjian3gls5frfp21p5ab3m0vh4m1kep</string>
 			</array>
 		</dict>
 	</array>
