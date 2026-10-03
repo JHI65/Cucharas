@@ -365,6 +365,12 @@ evidentes y eso es una barrera real para este público.
       (solo lectura, solo de los calendarios que elige la persona). Los eventos se leen en el
       dispositivo; entran en la copia en la nube solo como tareas, igual que cualquier otra tarea.
       Google Play: `READ_CALENDAR` es un permiso sensible, justificarlo en la declaración.
+- [ ] Pagos con el móvil (Finanzas, Premium, opcional): mencionarlo en la política de privacidad y
+      en las fichas. Android: acceso a notificaciones (`NotificationListenerService`); recibe todas,
+      descarta las que no son de Google Wallet y de esas solo guarda importe y comercio, en el
+      dispositivo. Play Console: justificarlo en el formulario de seguridad de datos. iOS: acción de
+      Atajos "Añadir gasto en Spoony", sin acceso a Cartera ni al banco. Probar con un pago real en
+      ambos sistemas (en Android, que el aviso de Wallet traiga importe y comercio).
 - [ ] Icono de 1024×1024. El actual es un PNG de 180px incrustado en el HTML.
 - [ ] Buscar "Spoony" en ambas tiendas y en OEPM/EUIPO antes de invertir en la ficha.
 - [ ] Costes: Apple 99 USD/año, Google 25 USD pago único. Para iOS hace falta un Mac con

@@ -76,7 +76,12 @@ input,select,textarea{font:inherit;color:inherit}
    pantalla, así que sin margen arriba el título de cada pestaña quedaba
    pegado al reloj del sistema (visto en el simulador de iOS). Es 0 en un
    navegador de escritorio, donde no hay barra de estado. */
-.app{max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) var(--pad) calc(104px + env(safe-area-inset-bottom))}
+.app{max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) var(--pad) 0}
+/* Hueco final como elemento real y no como padding: en WebKit el padding de
+   un contenedor con zoom no siempre cuenta para el scroll y la barra flotante
+   acababa tapando el último botón (el check-out, ya hecho, no se podía volver
+   a abrir). Un hijo con altura propia sí cuenta siempre. */
+.tabs-gap{height:calc(124px + env(safe-area-inset-bottom));flex:none}
 .screen{display:none}
 .screen.on{display:block}
 
@@ -348,7 +353,7 @@ textarea{
 .tg-1{--tg:var(--tg1)}.tg-2{--tg:var(--tg2)}.tg-3{--tg:var(--tg3)}.tg-4{--tg:var(--tg4)}.tg-5{--tg:var(--tg5)}
 /* Texto al 60% del tono: al 75% el Ámbar se quedaba en 4,1:1. */
 .cbar[class*="tg-"],.wchip[class*="tg-"]{background:color-mix(in srgb, var(--tg) 18%, var(--surface));color:color-mix(in srgb, var(--tg) 60%, var(--ink))}
-.ctag{display:inline-flex;align-items:center;gap:5px;padding:1px 8px 1px 6px;border-radius:999px;
+.ctag{display:inline-flex;max-width:100%;overflow-wrap:anywhere;align-items:center;gap:5px;padding:1px 8px 1px 6px;border-radius:999px;
   background:color-mix(in srgb, var(--tg) 20%, var(--surface));color:var(--ink);font-size:12px;line-height:1.5;vertical-align:1px}
 .ctag svg{width:12px;height:12px;flex:none;color:var(--tg)}
 /* Ajustes: solo los calendarios elegidos, cada uno en su fila con su etiqueta. */
@@ -1005,6 +1010,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <button class="chip" data-fin="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
       </div>
     </div>
+    <div class="row" id="finCardRow" hidden>
+      <div><strong data-i18n="Apuntar pagos con Apple Pay">Apuntar pagos con Apple Pay</strong><p data-i18n="Cada pago con el iPhone o el Apple Watch se añade solo a Gastos variables, sin abrir la app. Se prepara una vez en Atajos.">Cada pago con el iPhone o el Apple Watch se añade solo a Gastos variables, sin abrir la app. Se prepara una vez en Atajos.</p></div>
+      <button class="btn" id="btnCardGuide" data-i18n="Ver cómo">Ver cómo</button>
+    </div>
+    <div class="row" id="finWalletRow" hidden>
+      <div><strong data-i18n="Apuntar pagos con Google Wallet">Apuntar pagos con Google Wallet</strong><p data-i18n="Cada pago con el móvil se añade solo a Gastos variables, sin abrir la app. Se activa una vez.">Cada pago con el móvil se añade solo a Gastos variables, sin abrir la app. Se activa una vez.</p></div>
+      <button class="btn" id="btnWalletGuide" data-i18n="Ver cómo">Ver cómo</button>
+    </div>
     </div>
 
     <p class="libsec" data-i18n="Cómo se ve">Cómo se ve</p>
@@ -1035,30 +1048,12 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <div id="calGroup" hidden>
-    <p class="libsec" data-i18n="Calendario del móvil">Calendario del móvil</p>
+    <p class="libsec" data-i18n="Calendario">Calendario</p>
     <div class="group">
     <div class="row" id="calGoogleRow" hidden>
-      <div><strong data-i18n="Conectar con Google Calendar">Conectar con Google Calendar</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.">Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.</p></div>
-      <button class="btn" id="btnCalGoogle" data-i18n="Conectar con Google">Conectar con Google</button>
-    </div>
-    <div class="row" id="calConnectRow">
-      <div><strong data-i18n="Importar eventos del calendario">Importar eventos del calendario</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.">Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.</p>
-        <p id="calHintAndroid" hidden data-i18n="Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.">Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.</p>
+      <div><strong data-i18n="Conectar con Google Calendar">Conectar con Google Calendar</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.">Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.</p>
         <p class="notice" id="calMsg" role="status" hidden></p></div>
-      <button class="btn" id="btnCalConnect" data-i18n="Conectar">Conectar</button>
-    </div>
-    <div class="row" id="calGuideIOS" hidden>
-      <div><strong data-i18n="Cómo sincronizar Google Calendar en iPhone">Cómo sincronizar Google Calendar en iPhone</strong>
-        <p data-i18n="Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.">Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.</p>
-        <button type="button" class="linkbtn info-btn" data-info="calGuideIOSSteps" aria-expanded="false" aria-controls="calGuideIOSSteps" data-i18n="Ver los pasos">Ver los pasos</button>
-        <div class="info-text" id="calGuideIOSSteps" hidden><ol>
-        <li data-i18n="Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.">Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.</li>
-        <li data-i18n="Activa el interruptor de Calendarios y toca Guardar.">Activa el interruptor de Calendarios y toca Guardar.</li>
-        <li data-i18n="Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.">Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.</li>
-        <li data-i18n="Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».">Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».</li>
-        <li data-i18n="Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.">Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.</li>
-        <li data-i18n="Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.">Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.</li>
-        </ol></div></div>
+      <button class="btn" id="btnCalGoogle" data-i18n="Conectar con Google">Conectar con Google</button>
     </div>
     <div class="row" id="calManageRow" hidden>
       <div><strong data-i18n="Calendarios que se importan">Calendarios que se importan</strong>
@@ -1140,6 +1135,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <input type="file" id="fileIn" accept="application/json" hidden>
   </section>
 
+  <div class="tabs-gap" aria-hidden="true"></div>
 </div>
 
 <nav class="tabs" id="tabs">
@@ -1473,6 +1469,60 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </dialog>
 
 <!-- ===== Detalle de día ===== -->
+<dialog id="dlgCardGuide">
+  <div class="sheet">
+    <h2 data-i18n="Apuntar pagos con Apple Pay">Apuntar pagos con Apple Pay</h2>
+    <p class="hint" data-i18n="Cada vez que pagues acercando el iPhone o el Apple Watch al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.">Cada vez que pagues acercando el iPhone o el Apple Watch al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.</p>
+    <p class="hint" data-i18n="Se prepara una sola vez en la app Atajos de Apple. Son unos dos minutos:">Se prepara una sola vez en la app Atajos de Apple. Son unos dos minutos:</p>
+    <div class="info-text"><ol>
+      <li data-i18n="Abre la app Atajos y ve a la pestaña Automatización.">Abre la app Atajos y ve a la pestaña Automatización.</li>
+      <li data-i18n="Toca «Nueva automatización» (o el + de arriba) y elige «Cartera».">Toca «Nueva automatización» (o el + de arriba) y elige «Cartera».</li>
+      <li data-i18n="Marca las tarjetas que quieras y elige «Ejecutar inmediatamente». Si no quieres un aviso en cada pago, desactiva «Notificar al ejecutar». Toca «Siguiente».">Marca las tarjetas que quieras y elige «Ejecutar inmediatamente». Si no quieres un aviso en cada pago, desactiva «Notificar al ejecutar». Toca «Siguiente».</li>
+      <li data-i18n="Elige «Nueva automatización en blanco», toca «Añadir acción», busca «Spoony» y elige «Añadir gasto en Spoony».">Elige «Nueva automatización en blanco», toca «Añadir acción», busca «Spoony» y elige «Añadir gasto en Spoony».</li>
+      <li data-i18n="Toca «Importe» y elige «Entrada del atajo». Después toca «Entrada del atajo» y elige «Importe».">Toca «Importe» y elige «Entrada del atajo». Después toca «Entrada del atajo» y elige «Importe».</li>
+      <li data-i18n="Haz lo mismo con «Comercio»: elige «Entrada del atajo» y después «Comercio».">Haz lo mismo con «Comercio»: elige «Entrada del atajo» y después «Comercio».</li>
+      <li data-i18n="Toca «OK». Ya está: haz una compra y abre Spoony para comprobarlo.">Toca «OK». Ya está: haz una compra y abre Spoony para comprobarlo.</li>
+    </ol></div>
+    <p class="hint"><strong data-i18n="Qué tener en cuenta">Qué tener en cuenta</strong></p>
+    <div class="info-text"><ul>
+      <li data-i18n="Solo se apuntan los pagos con Apple Pay en tienda. Los de la tarjeta física o por internet no pasan por Atajos.">Solo se apuntan los pagos con Apple Pay en tienda. Los de la tarjeta física o por internet no pasan por Atajos.</li>
+      <li data-i18n="Los gastos llegan con el check puesto, así que suman al total. Puedes cambiarlos o borrarlos como cualquier otro.">Los gastos llegan con el check puesto, así que suman al total. Puedes cambiarlos o borrarlos como cualquier otro.</li>
+      <li data-i18n="Si un importe no se entiende, el gasto entra sin sumar y con el aviso «Revisa el importe».">Si un importe no se entiende, el gasto entra sin sumar y con el aviso «Revisa el importe».</li>
+      <li data-i18n="Spoony no se conecta con tu banco ni ve tus tarjetas: solo recibe el importe y el nombre del comercio que le pasa Atajos.">Spoony no se conecta con tu banco ni ve tus tarjetas: solo recibe el importe y el nombre del comercio que le pasa Atajos.</li>
+      <li data-i18n="Para dejar de usarlo, borra la automatización en Atajos.">Para dejar de usarlo, borra la automatización en Atajos.</li>
+      <li data-i18n="Necesita iOS 17 o posterior. Los nombres de los botones pueden cambiar un poco según la versión.">Necesita iOS 17 o posterior. Los nombres de los botones pueden cambiar un poco según la versión.</li>
+    </ul></div>
+    <div class="bigrow"><button class="primary" id="cardGuideClose" data-i18n="Entendido">Entendido</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgWalletGuide">
+  <div class="sheet">
+    <h2 data-i18n="Apuntar pagos con Google Wallet">Apuntar pagos con Google Wallet</h2>
+    <p class="hint" data-i18n="Cada vez que pagues con Google Wallet acercando el móvil al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.">Cada vez que pagues con Google Wallet acercando el móvil al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.</p>
+    <p class="hint" data-i18n="Para eso Spoony lee el aviso que Google Wallet muestra al pagar. Se activa una sola vez:">Para eso Spoony lee el aviso que Google Wallet muestra al pagar. Se activa una sola vez:</p>
+    <div class="info-text"><ol>
+      <li data-i18n="Toca «Dar acceso». Se abren los ajustes del móvil.">Toca «Dar acceso». Se abren los ajustes del móvil.</li>
+      <li data-i18n="Busca Spoony, activa «Permitir acceso a notificaciones» y confirma.">Busca Spoony, activa «Permitir acceso a notificaciones» y confirma.</li>
+      <li data-i18n="Vuelve a Spoony. Aquí debajo verás «Acceso dado».">Vuelve a Spoony. Aquí debajo verás «Acceso dado».</li>
+      <li data-i18n="Haz una compra con Google Wallet y abre Spoony para comprobarlo.">Haz una compra con Google Wallet y abre Spoony para comprobarlo.</li>
+    </ol></div>
+    <p class="hint" id="walletStatus" role="status"></p>
+    <div class="bigrow"><button class="btn" id="walletAccess" data-i18n="Dar acceso">Dar acceso</button></div>
+    <p class="hint"><strong data-i18n="Qué tener en cuenta">Qué tener en cuenta</strong></p>
+    <div class="info-text"><ul>
+      <li data-i18n="Android no deja dar acceso a una sola app, así que el móvil avisa de que Spoony podrá leer todas tus notificaciones. Spoony descarta todas menos las de Google Wallet, y de esas solo guarda el importe y el comercio. Nada sale del móvil.">Android no deja dar acceso a una sola app, así que el móvil avisa de que Spoony podrá leer todas tus notificaciones. Spoony descarta todas menos las de Google Wallet, y de esas solo guarda el importe y el comercio. Nada sale del móvil.</li>
+      <li data-i18n="Solo se apuntan los pagos que Google Wallet avisa con una notificación. Los de la tarjeta física o por internet no.">Solo se apuntan los pagos que Google Wallet avisa con una notificación. Los de la tarjeta física o por internet no.</li>
+      <li data-i18n="Los gastos llegan con el check puesto, así que suman al total. Puedes cambiarlos o borrarlos como cualquier otro.">Los gastos llegan con el check puesto, así que suman al total. Puedes cambiarlos o borrarlos como cualquier otro.</li>
+      <li data-i18n="Si un importe no se entiende, el gasto entra sin sumar y con el aviso «Revisa el importe».">Si un importe no se entiende, el gasto entra sin sumar y con el aviso «Revisa el importe».</li>
+      <li data-i18n="Si desactivas Finanzas, Spoony deja de apuntar pagos aunque el acceso siga dado.">Si desactivas Finanzas, Spoony deja de apuntar pagos aunque el acceso siga dado.</li>
+      <li data-i18n="Si el móvil cierra Spoony para ahorrar batería, puede que algún pago no se apunte.">Si el móvil cierra Spoony para ahorrar batería, puede que algún pago no se apunte.</li>
+      <li data-i18n="Para dejar de usarlo, toca «Quitar el acceso» y desactívalo en los ajustes del móvil.">Para dejar de usarlo, toca «Quitar el acceso» y desactívalo en los ajustes del móvil.</li>
+    </ul></div>
+    <div class="bigrow"><button class="primary" id="walletGuideClose" data-i18n="Entendido">Entendido</button></div>
+  </div>
+</dialog>
+
 <dialog id="dlgWhyMargin">
   <div class="sheet">
     <h2 data-i18n="¿Por qué se restan cucharas?">¿Por qué se restan cucharas?</h2>
@@ -1881,15 +1931,6 @@ const EN = {
  "Añadir registro de ciclo a este día": "Add a cycle log to this day",
  "Ciclo apuntado en este día — editar": "Cycle logged for this day — edit",
  "Listo": "Done",
- "Cómo sincronizar Google Calendar en iPhone": "How to sync Google Calendar on iPhone",
- "Spoony lee el calendario del iPhone, así que primero hay que pasar ahí tu Google Calendar.": "Spoony reads the iPhone's calendar, so your Google Calendar has to get there first.",
- "Ver los pasos": "See the steps",
- "Ajustes del iPhone → Calendario → Cuentas → Añadir cuenta → Google. Inicia sesión con tu cuenta.": "iPhone Settings → Calendar → Accounts → Add Account → Google. Sign in with your account.",
- "Activa el interruptor de Calendarios y toca Guardar.": "Turn on the Calendars switch and tap Save.",
- "Abre la app Calendario de Apple y comprueba que salen tus eventos de Google. Si no salen ahí, Spoony tampoco los verá. Puede tardar unos minutos.": "Open Apple's Calendar app and check that your Google events show up. If they don't show up there, Spoony won't see them either. It can take a few minutes.",
- "Vuelve a Spoony. Si aún no lo has hecho, toca Conectar y permite el acceso. Después elige el calendario de Google en «Añadir un calendario» y toca «Actualizar ahora».": "Come back to Spoony. If you haven't yet, tap Connect and allow access. Then pick the Google calendar under “Add a calendar” and tap “Update now”.",
- "Si falta un calendario concreto de Google, puede que no esté marcado para sincronizarse con el móvil: revísalo en la página de sincronización de calendarios de Google Calendar, desde el navegador.": "If one specific Google calendar is missing, it may not be set to sync with your phone: check it on Google Calendar's calendar sync page, from a browser.",
- "Si Spoony dice que no tiene permiso: Ajustes del iPhone → Spoony → Calendarios → Acceso completo.": "If Spoony says it has no permission: iPhone Settings → Spoony → Calendars → Full Access.",
  ", cerca del límite de tus cucharas": ", close to your spoon limit",
  "El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.": "The eye marks a day when what's planned reaches your spoons or is close to them.",
  "Añadir tarea": "Add task",
@@ -2050,6 +2091,46 @@ const EN = {
  "gastar": "spend",
  "gastas": "spend",
  "Gastos fijos": "Fixed expenses",
+ "Revisa el importe": "Check the amount",
+ "Pago con Apple Pay": "Apple Pay payment",
+ "Apuntar pagos con Google Wallet": "Log Google Wallet payments",
+ "Cada pago con el móvil se añade solo a Gastos variables, sin abrir la app. Se activa una vez.": "Every payment with your phone is added to Variable expenses on its own, without opening the app. You turn it on once.",
+ "Cada vez que pagues con Google Wallet acercando el móvil al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.": "Every time you pay with Google Wallet by holding your phone to the card reader, the expense is logged in Variable expenses. You don't need to open Spoony: you'll see it next time you do.",
+ "Para eso Spoony lee el aviso que Google Wallet muestra al pagar. Se activa una sola vez:": "To do this, Spoony reads the notification Google Wallet shows when you pay. You turn it on once:",
+ "Toca «Dar acceso». Se abren los ajustes del móvil.": "Tap “Give access”. Your phone's settings open.",
+ "Busca Spoony, activa «Permitir acceso a notificaciones» y confirma.": "Find Spoony, turn on “Allow notification access” and confirm.",
+ "Vuelve a Spoony. Aquí debajo verás «Acceso dado».": "Come back to Spoony. Below you'll see “Access given”.",
+ "Haz una compra con Google Wallet y abre Spoony para comprobarlo.": "Make a purchase with Google Wallet and open Spoony to check.",
+ "Android no deja dar acceso a una sola app, así que el móvil avisa de que Spoony podrá leer todas tus notificaciones. Spoony descarta todas menos las de Google Wallet, y de esas solo guarda el importe y el comercio. Nada sale del móvil.": "Android doesn't let you give access to just one app, so your phone warns that Spoony will be able to read all your notifications. Spoony discards everything except Google Wallet's, and from those it only keeps the amount and the merchant. Nothing leaves your phone.",
+ "Solo se apuntan los pagos que Google Wallet avisa con una notificación. Los de la tarjeta física o por internet no.": "Only payments that Google Wallet announces with a notification are logged. Physical card or online payments aren't.",
+ "Si desactivas Finanzas, Spoony deja de apuntar pagos aunque el acceso siga dado.": "If you turn off Finances, Spoony stops logging payments even if access is still given.",
+ "Si el móvil cierra Spoony para ahorrar batería, puede que algún pago no se apunte.": "If your phone closes Spoony to save battery, a payment might not be logged.",
+ "Para dejar de usarlo, toca «Quitar el acceso» y desactívalo en los ajustes del móvil.": "To stop, tap “Remove access” and turn it off in your phone's settings.",
+ "Dar acceso": "Give access",
+ "Quitar el acceso": "Remove access",
+ "Acceso dado. Los pagos de Google Wallet se apuntan solos.": "Access given. Google Wallet payments are logged on their own.",
+ "Sin acceso todavía.": "No access yet.",
+ "Pago con Google Wallet": "Google Wallet payment",
+ "Necesita iOS 17 o posterior. Los nombres de los botones pueden cambiar un poco según la versión.": "Requires iOS 17 or later. Button names may vary a little between versions.",
+ "Para dejar de usarlo, borra la automatización en Atajos.": "To stop, delete the automation in Shortcuts.",
+ "Spoony no se conecta con tu banco ni ve tus tarjetas: solo recibe el importe y el nombre del comercio que le pasa Atajos.": "Spoony doesn't connect to your bank or see your cards: it only gets the amount and the merchant name that Shortcuts passes on.",
+ "Si un importe no se entiende, el gasto entra sin sumar y con el aviso «Revisa el importe».": "If an amount can't be read, the expense comes in without counting and marked “Check the amount”.",
+ "Los gastos llegan con el check puesto, así que suman al total. Puedes cambiarlos o borrarlos como cualquier otro.": "Expenses arrive ticked, so they count towards the total. You can change or delete them like any other.",
+ "Solo se apuntan los pagos con Apple Pay en tienda. Los de la tarjeta física o por internet no pasan por Atajos.": "Only in-store Apple Pay payments are logged. Physical card or online payments don't go through Shortcuts.",
+ "Qué tener en cuenta": "Good to know",
+ "Toca «OK». Ya está: haz una compra y abre Spoony para comprobarlo.": "Tap “Done”. That's it: make a purchase and open Spoony to check.",
+ "Haz lo mismo con «Comercio»: elige «Entrada del atajo» y después «Comercio».": "Do the same with “Comercio”: choose “Shortcut Input” and then “Merchant”.",
+ "Toca «Importe» y elige «Entrada del atajo». Después toca «Entrada del atajo» y elige «Importe».": "Tap “Importe” and choose “Shortcut Input”. Then tap “Shortcut Input” and choose “Amount”.",
+ "Elige «Nueva automatización en blanco», toca «Añadir acción», busca «Spoony» y elige «Añadir gasto en Spoony».": "Choose “New Blank Automation”, tap “Add Action”, search for “Spoony” and choose “Añadir gasto en Spoony”.",
+ "Marca las tarjetas que quieras y elige «Ejecutar inmediatamente». Si no quieres un aviso en cada pago, desactiva «Notificar al ejecutar». Toca «Siguiente».": "Select the cards you want and choose “Run Immediately”. If you don't want an alert on every payment, turn off “Notify When Run”. Tap “Next”.",
+ "Toca «Nueva automatización» (o el + de arriba) y elige «Cartera».": "Tap “New Automation” (or the + at the top) and choose “Wallet”.",
+ "Abre la app Atajos y ve a la pestaña Automatización.": "Open the Shortcuts app and go to the Automation tab.",
+ "Se prepara una sola vez en la app Atajos de Apple. Son unos dos minutos:": "You set it up once in Apple's Shortcuts app. It takes about two minutes:",
+ "Cada vez que pagues acercando el iPhone o el Apple Watch al datáfono, el gasto se apunta solo en Gastos variables. No hace falta abrir Spoony: lo verás la próxima vez que entres.": "Every time you pay by holding your iPhone or Apple Watch to the card reader, the expense is logged in Variable expenses. You don't need to open Spoony: you'll see it next time you do.",
+ "Ver cómo": "See how",
+ "Entendido": "Got it",
+ "Cada pago con el iPhone o el Apple Watch se añade solo a Gastos variables, sin abrir la app. Se prepara una vez en Atajos.": "Every payment with your iPhone or Apple Watch is added to Variable expenses on its own, without opening the app. You set it up once in Shortcuts.",
+ "Apuntar pagos con Apple Pay": "Log Apple Pay payments",
  "Gastos variables": "Variable expenses",
  "Grande": "Large",
  "Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.": "Saves your data to the cloud too, and you can recover it on another phone. You need a (free) account and Spoony Premium.",
@@ -2347,12 +2428,7 @@ const EN = {
  "No se pudo leer el calendario. Inténtalo otra vez más tarde.": "Couldn't read the calendar. Try again later.",
  "Elige al menos un calendario para importar sus eventos.": "Pick at least one calendar to import its events.",
  "Última lectura: {hora}.": "Last read: {hora}.",
- "Importar el calendario del móvil es una función de Spoony Premium.": "Importing your phone's calendar is a Spoony Premium feature.",
  "Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.": "This comes from your calendar. Here you only set the cost: the event isn't changed.",
- "Calendario del móvil": "Phone calendar",
- "Importar eventos del calendario": "Import calendar events",
- "Trae los eventos de tu calendario para poder asignarles cucharas. Solo se lee: Spoony no cambia ni borra nada de tu calendario.": "Brings in your calendar events so you can assign spoons to them. It only reads: Spoony never changes or deletes anything in your calendar.",
- "Tus calendarios de Google aparecen aquí si la cuenta está añadida en el móvil.": "Your Google calendars show up here if the account is added on the phone.",
  "Conectar": "Connect",
  "Calendarios que se importan": "Calendars to import",
  "Se importan los eventos con hora de hoy y de los próximos 14 días. Los eventos de todo el día no se importan. Las tareas ya importadas se quedan aunque desconectes.": "Events with a time from today and the next 14 days are imported. All-day events are not. Tasks already imported stay even if you disconnect.",
@@ -3132,17 +3208,17 @@ const showCalMsg = t => { const el = document.getElementById('calMsg'); el.textC
 function renderCalSettings(){
   const g = document.getElementById('calGroup'); if(!g) return;
   const api = nativeCalendar();
-  g.hidden = !api; if(!api) return;
   const c = state.calendar;
   const platform = window.Capacitor.getPlatform();
   const google = c.source === 'google';
-  document.getElementById('calGoogleRow').hidden = c.enabled || !gcalConfigured() || platform !== 'ios';
-  document.getElementById('calConnectRow').hidden = c.enabled;
+  /* Solo se conecta con Google. Quien ya importaba el calendario del móvil
+     sigue viendo sus calendarios hasta que desconecte. */
+  const canGoogle = gcalConfigured() && platform === 'ios';
+  g.hidden = !api || (!c.enabled && !canGoogle); if(g.hidden) return;
+  document.getElementById('calGoogleRow').hidden = c.enabled || !canGoogle;
   document.getElementById('calManageRow').hidden = !c.enabled;
-  document.getElementById('calGuideIOS').hidden = platform !== 'ios' || (c.enabled && google);
   document.getElementById('calSrcLine').textContent = tr(google ? 'Origen: Google Calendar' : 'Origen: calendario del móvil');
   document.getElementById('btnCalReauth').hidden = !(google && c.status === 'reauth');
-  document.getElementById('calHintAndroid').hidden = platform !== 'android';
   if(!c.enabled) return;
   const chosen = c.cals.map(id => c.avail.find(a => a.id === id)).filter(Boolean);
   const rest = c.avail.filter(a => !c.cals.includes(a.id));
@@ -3183,26 +3259,6 @@ function calStatusText(){
   if(c.last) return trf('Última lectura: {hora}.', { hora: hhmm(c.last) });
   return '';
 }
-async function calConnect(){
-  if(!requirePremium(tr('Importar el calendario del móvil es una función de Spoony Premium.'))) return;
-  const api = nativeCalendar(); if(!api) return;
-  showCalMsg('');
-  try{
-    const r = window.Capacitor.getPlatform() === 'android' ? await api.requestReadOnlyCalendarAccess() : await api.requestFullCalendarAccess();
-    if(!r || r.result !== 'granted'){
-      showCalMsg(tr('Spoony no tiene permiso para leer tu calendario. Puedes darlo en los ajustes del móvil.'));
-      return;
-    }
-    if(state.calendar.source === 'google'){ gcalForget(); state.calendar.source = 'device'; state.calendar.cals = []; state.calendar.avail = []; }
-    await calLoadList(api);
-    state.calendar.enabled = true; state.calendar.status = 'ok';
-    persist(); renderCalSettings();
-  }catch(e){
-    console.error('Calendario', e);
-    showCalMsg(tr('No se pudo leer el calendario. Inténtalo otra vez más tarde.'));
-  }
-}
-document.getElementById('btnCalConnect').addEventListener('click', calConnect);
 document.getElementById('btnCalOff').addEventListener('click', () => {
   if(calIsGoogle()) gcalForget();
   state.calendar.enabled = false; persist(); showCalMsg(''); renderCalSettings();
@@ -3227,7 +3283,7 @@ document.getElementById('calMore').addEventListener('click', e => {
   const b = e.target.closest('[data-cal]'); if(!b) return;
   const c = state.calendar, id = b.dataset.cal;
   if(!c.cals.includes(id)){ ensureCalTag(id); c.cals = [...c.cals, id]; }
-  calMoreOpen = c.avail.length > c.cals.length;
+  calMoreOpen = false;
   persist(); renderCalSettings(); calSyncSoon();
 });
 document.getElementById('calList').addEventListener('click', e => {
@@ -3505,7 +3561,9 @@ function finRow(g, tipo){
   const importe = tipo === 'fijo' ? (g.overrideMes ?? g.importe) : g.importe;
   const note = (tipo === 'fijo' && g.overrideMes != null) ? tr('Solo este mes') : '';
   const on = finCounts(g);
-  const notes = [note, on ? '' : tr('Aún no suma')].filter(Boolean).join(' · ');
+  const card = (g.origen === 'applepay' || g.origen === 'wallet') && g.fecha
+    ? (g.origen === 'wallet' ? 'Google Wallet' : 'Apple Pay') + ' · ' + new Date(g.fecha).toLocaleDateString(LOCALE(), {day:'numeric', month:'short'}) : '';
+  const notes = [note, card, g.revisar ? tr('Revisa el importe') : '', on ? '' : tr('Aún no suma')].filter(Boolean).join(' · ');
   return `<div class="task">
       <button class="check ${on?'on':''}" data-finpaid="${g.id}" aria-pressed="${on}" aria-label="${trf('Contar {name} en el total', {name:esc(g.nombre)})}">
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
@@ -4174,7 +4232,7 @@ const SET_ICON = {
   'Ciclo':'<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>',
   'Finanzas':'<ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
   'Cómo se ve':'<path d="M12 3a9 9 0 0 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><g fill="currentColor" stroke="none"><circle cx="7.5" cy="12" r="1.2"/><circle cx="9.5" cy="7.5" r="1.2"/><circle cx="14.5" cy="7.5" r="1.2"/></g>',
-  'Calendario del móvil':'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/>',
+  'Calendario':'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/>',
   'Ayuda':'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.5a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none"/>',
   'Tu cuenta (opcional)':'<path d="M7 18.5h10.5a4 4 0 0 0 .6-8A6 6 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5z"/>',
   'Tus datos':'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/>'
@@ -5124,7 +5182,7 @@ document.getElementById('gSave').addEventListener('click', () => {
       f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null, pagado:false });
     }
   }else{
-    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; }
+    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; delete gEditing.revisar; }
     else f.gastosVariables.push({ id:uid(), nombre, importe, pagado:false });
   }
   save(); dlgGasto.close(); renderFin();
@@ -5657,16 +5715,102 @@ function applyFinUI(){
   const visible = enabled && isPremium();
   document.getElementById('tabFin').hidden = !visible;
   document.getElementById('finReplayRow').hidden = !visible;
+  const plat = window.Capacitor?.getPlatform?.();
+  document.getElementById('finCardRow').hidden = !visible || plat !== 'ios';
+  document.getElementById('finWalletRow').hidden = !visible || plat !== 'android';
+  if(plat === 'android') walletPlug()?.setEnabled({ enabled: visible }).catch(() => {});
   updateTabsCompact();
   document.querySelectorAll('#finPick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.fin === 'on') === visible));
   if(!visible && currentTab === 'fin') document.querySelector('#tabs [data-go="hoy"]').click();
 }
+/* ---------- pagos con Apple Pay (Atajos) ----------
+   La acción nativa "Añadir gasto en Spoony" (AddExpenseIntent.swift) corre
+   sin abrir la app y deja cada pago como un archivo en Library/SpoonyGastos.
+   Aquí se recogen al abrir o volver a la app: primero se guarda el gasto y
+   solo después se borra su archivo, así un cierre a medias no pierde nada
+   (y el id evita apuntarlo dos veces). */
+const CARD_DIR = 'SpoonyGastos';
+let _cardFs;
+const cardFs = () => _cardFs || (_cardFs = nativePlugin('Filesystem', ['readdir', 'readFile', 'deleteFile']));
+/* Cartera pasa el importe como texto con moneda: "12,50 €", "€12.50", "1.234,56 €". */
+function parseImporte(raw){
+  let v = String(raw ?? '').replace(/[^\d,.]/g, '');
+  if(!/\d/.test(v)) return null;
+  const dec = Math.max(v.lastIndexOf(','), v.lastIndexOf('.'));
+  if(dec >= 0){
+    const sep = v[dec], other = sep === ',' ? '.' : ',';
+    const thousandsOnly = v.length - dec - 1 === 3 && v.indexOf(sep) === dec && !v.includes(other);
+    v = thousandsOnly ? v.replace(/[.,]/g, '') : v.slice(0, dec).replace(/[.,]/g, '') + '.' + v.slice(dec + 1);
+  }
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? Math.round(n * 100) / 100 : null;
+}
+let cardBusy = false;
+async function importCardExpenses(){
+  if(cardBusy || !state.finEnabled || !isPremium()) return;
+  if(!['ios', 'android'].includes(window.Capacitor?.getPlatform?.())) return;
+  const fs = cardFs(); if(!fs) return;
+  cardBusy = true;
+  try{
+    let files;
+    try{ files = (await fs.readdir({ path:CARD_DIR, directory:'LIBRARY' })).files || []; }
+    catch(e){ return; }   // la carpeta no existe hasta el primer pago
+    const names = files.map(x => typeof x === 'string' ? x : x.name).filter(n => n && n.endsWith('.json'));
+    if(!names.length) return;
+    checkMonthRollover();
+    const f = state.finanzas;
+    let added = 0;
+    for(const name of names){
+      const path = CARD_DIR + '/' + name;
+      try{
+        const it = JSON.parse((await fs.readFile({ path, directory:'LIBRARY', encoding:'utf8' })).data);
+        if(it && it.id && !f.gastosVariables.some(g => g.cardId === it.id)){
+          const importe = parseImporte(it.importe);
+          const origen = it.origen === 'wallet' ? 'wallet' : 'applepay';
+          f.gastosVariables.push({
+            id:uid(), nombre:String(it.comercio || '').trim() || tr(origen === 'wallet' ? 'Pago con Google Wallet' : 'Pago con Apple Pay'),
+            importe: importe ?? 0, pagado: importe != null,
+            origen, fecha: it.fecha || new Date().toISOString(), cardId: it.id,
+            ...(importe == null ? { revisar:true } : {})
+          });
+          added++;
+          await save();
+        }
+        await fs.deleteFile({ path, directory:'LIBRARY' });
+      }catch(e){ console.error('Gasto con el móvil', e); }
+    }
+    if(added) renderFin();
+  }finally{ cardBusy = false; }
+}
+const dlgCardGuide = document.getElementById('dlgCardGuide');
+document.getElementById('btnCardGuide').addEventListener('click', () => openDialog(dlgCardGuide));
+document.getElementById('cardGuideClose').addEventListener('click', () => dlgCardGuide.close());
+/* Google Wallet (Android): PaymentListenerService lee el aviso de pago y
+   deja el mismo archivo en la cola; aquí solo se gestiona el acceso. */
+let _wallet;
+const walletPlug = () => _wallet || (_wallet = nativePlugin('SpoonyCard', ['status', 'setEnabled', 'openSettings']));
+const dlgWalletGuide = document.getElementById('dlgWalletGuide');
+async function renderWalletStatus(){
+  let granted = false;
+  try{ granted = !!(await walletPlug()?.status())?.granted; }catch(e){}
+  document.getElementById('walletStatus').textContent =
+    tr(granted ? 'Acceso dado. Los pagos de Google Wallet se apuntan solos.' : 'Sin acceso todavía.');
+  document.getElementById('walletAccess').textContent = tr(granted ? 'Quitar el acceso' : 'Dar acceso');
+}
+document.getElementById('btnWalletGuide').addEventListener('click', () => { renderWalletStatus(); openDialog(dlgWalletGuide); });
+document.getElementById('walletAccess').addEventListener('click', () => walletPlug()?.openSettings().catch(() => {}));
+document.getElementById('walletGuideClose').addEventListener('click', () => dlgWalletGuide.close());
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState !== 'visible') return;
+  importCardExpenses();
+  if(dlgWalletGuide.open) renderWalletStatus();
+});
 document.getElementById('finPick').addEventListener('click', e => {
   const b = e.target.closest('[data-fin]'); if(!b) return;
   if(b.dataset.fin === 'on' && !requirePremium(tr('Finanzas es una función de Spoony Premium.'))) return;
   state.finEnabled = b.dataset.fin === 'on';
-  applyFinUI(); save(); renderAll();
+  applyFinUI(); save(); renderAll(); importCardExpenses();
 });
 document.getElementById('cycleLen').addEventListener('change', e => {
   const n = parseInt(e.target.value, 10);
@@ -6087,6 +6231,8 @@ window.addEventListener('online', () => { if(auth && syncAllowed()) syncNow(); }
   ['dlgLib', 'lCancel'],
   ['dlgLibList', 'libListClose'],
   ['dlgWhyMargin', 'whyMarginClose'],
+  ['dlgCardGuide', 'cardGuideClose'],
+  ['dlgWalletGuide', 'walletGuideClose'],
   ['dlgCheckout', 'coCancel'],
   ['dlgPeak', 'peakNo'],
   ['dlgTpl', 'tplClose'],
@@ -6200,6 +6346,7 @@ function normalize(s){
   if(auth) startSyncForUser();
   else refreshRcEntitlement();
   calSync(false);
+  importCardExpenses();
 })();
 </script>
 </body>

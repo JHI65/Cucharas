@@ -30,6 +30,18 @@
             </intent-filter>
         </activity>
 
+        <!-- Pagos de Google Wallet (Premium, opcional). Solo funciona si la
+             persona da "Acceso a notificaciones" en los ajustes del sistema. -->
+        <service
+            android:name=".PaymentListenerService"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
