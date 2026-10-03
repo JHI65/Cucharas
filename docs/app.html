@@ -1054,6 +1054,13 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div><p id="colorHint" style="margin:0"></p></div>
       <button class="btn" id="btnColorReset" data-i18n="Restablecer">Restablecer</button>
     </div>
+    <div class="row" id="widgetTitlesRow" hidden>
+      <div><strong data-i18n="Nombres en el widget">Nombres en el widget</strong><p data-i18n="El widget de la pantalla de inicio pone «Tarea» en lugar del nombre. Si eliges mostrarlos, cualquiera que vea tu pantalla podrá leerlos.">El widget de la pantalla de inicio pone «Tarea» en lugar del nombre. Si eliges mostrarlos, cualquiera que vea tu pantalla podrá leerlos.</p></div>
+      <div class="chips" id="widgetTitlesPick" role="group" data-i18n-aria="Nombres en el widget" aria-label="Nombres en el widget">
+        <button class="chip" data-wtitles="off" aria-pressed="true" data-i18n="No mostrar">No mostrar</button>
+        <button class="chip" data-wtitles="on" aria-pressed="false" data-i18n="Mostrar">Mostrar</button>
+      </div>
+    </div>
     </div>
 
     <div id="calGroup" hidden>
@@ -2476,6 +2483,10 @@ const EN = {
  "Google no ha dado el permiso. Puedes volver a intentarlo.": "Google didn't grant the permission. You can try again.",
  "sin hora": "no time",
  "Sin coste": "No cost",
+ "Nombres en el widget": "Names in the widget",
+ "El widget de la pantalla de inicio pone «Tarea» en lugar del nombre. Si eliges mostrarlos, cualquiera que vea tu pantalla podrá leerlos.": "The home screen widget shows “Task” instead of the name. If you choose to show them, anyone who sees your screen can read them.",
+ "No mostrar": "Don't show",
+ "Mostrar": "Show",
  "Evento sin título": "Untitled event",
  "Calendario sin nombre": "Unnamed calendar",
  "No hay calendarios en este móvil.": "There are no calendars on this phone.",
@@ -2641,8 +2652,8 @@ function markChanged(){
   changeSeq++;
   if(auth && syncAllowed()){ clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
 }
-const save = () => { markChanged(); return store.set(state); };
-const persist = () => store.set(state);   // sin contar como cambio: para lo que llega de la nube
+const save = () => { markChanged(); widgetSoon(); return store.set(state); };
+const persist = () => { widgetSoon(); return store.set(state); };   // sin contar como cambio: para lo que llega de la nube
 /* state.calendar (qué calendarios se leen, ids de este móvil) tampoco se sube
    ni se exporta: los ids no valen en otro móvil. Las tareas ya importadas sí
    viajan, como cualquier otra tarea. */
@@ -3395,12 +3406,13 @@ function spoonRowHTML(left, total, marginAmount){
   }
   return html;
 }
-function renderMeter(){
-  const d = day();
+/* Cucharas que quedan en un día. La usan el contador de Hoy y el widget,
+   para que los dos digan siempre lo mismo. */
+function spoonsLeft(d, k){
   const budget = d.budget ?? 0;
-  const precaution = (d.budget != null && !d.marginOff) ? precautionReason(todayKey()) : null;
+  const precaution = (d.budget != null && !d.marginOff) ? precautionReason(k) : null;
   const effective = precaution
-    ? Math.max(1, Math.round(budget * (1 - marginPercentFor(todayKey(), precaution)/100)))
+    ? Math.max(1, Math.round(budget * (1 - marginPercentFor(k, precaution)/100)))
     : budget;
   const marginAmount = budget - effective;
   const done = d.tasks.filter(t=>t.done).map(t => t.real ?? t.est);
@@ -3410,7 +3422,11 @@ function renderMeter(){
      verdad (antes solo se mostraban, sin afectar al recuento). coste llega en
      negativo, así que sumarlo directamente es restar. */
   const extras = (d.extras || []).reduce((a,e)=>a+(e.coste||0), 0);
-  const left = budget - gasto + recarga - marginAmount + extras;
+  return { budget, effective, marginAmount, gasto, recarga, left: budget - gasto + recarga - marginAmount + extras };
+}
+function renderMeter(){
+  const d = day();
+  const { budget, effective, marginAmount, gasto, recarga, left } = spoonsLeft(d, todayKey());
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : `<span class="lib-note">${tr('Sin cucharas asignadas todavía.')}</span>`;
@@ -4257,6 +4273,9 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
   document.querySelectorAll('#peakAskPick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.peakask === 'off') === !!state.settings.peakPromptOff));
   document.getElementById('dayStartHourInput').value = state.settings.dayStartHour;
+  document.getElementById('widgetTitlesRow').hidden = !widgetSupported();
+  document.querySelectorAll('#widgetTitlesPick .chip').forEach(c =>
+    c.setAttribute('aria-pressed', (c.dataset.wtitles === 'on') === !!state.settings.widgetShowTitles));
   renderExportInfo();
   renderAccount();
   renderCalSettings();
@@ -5022,21 +5041,32 @@ tSave.addEventListener('click', () => {
 });
 
 /* ---------- task interactions ---------- */
+/* Marcar o desmarcar una tarea. La usan el check de la lista y los eventos del
+   widget, para que el resultado sea idéntico venga de donde venga. Devuelve
+   false si la tarea ya estaba así (repetir un evento no cambia nada). */
+function setTaskDone(t, done, at = Date.now()){
+  if(!!t.done === done) return false;
+  t.done = done;
+  if(done){
+    t.doneAt = at;
+    t.real = t.est;
+    if(!t.cal?.noCost && taskLib(t)) record(t.name, t.est, t.est);
+  }else{
+    delete t.doneAt;
+    const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
+    if(item && !t.cal?.noCost && taskLib(t)) item.samples.pop();
+    t.real = null;
+  }
+  collapsedTasks.delete(t.id);
+  return true;
+}
 document.getElementById('taskList').addEventListener('click', e => {
   const editBtn = e.target.closest('[data-edit]');
   if(editBtn){ openTaskEdit(editBtn.dataset.edit); return; }
   const tog = e.target.closest('[data-toggle]');
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
-    t.done = !t.done;
-    if(t.done) t.doneAt = Date.now(); else delete t.doneAt;
-    if(t.done){ t.real = t.est; if(!t.cal?.noCost && taskLib(t)) record(t.name, t.est, t.est); collapsedTasks.delete(t.id); }
-    else{
-      const item = state.library.find(l => l.name.toLowerCase() === t.name.toLowerCase());
-      if(item && !t.cal?.noCost && taskLib(t)) item.samples.pop();
-      t.real = null;
-      collapsedTasks.delete(t.id);
-    }
+    setTaskDone(t, !t.done);
     save(); renderAll(); return;
   }
   const trow = e.target.closest('[data-trow]');
@@ -6356,6 +6386,8 @@ function normalize(s){
   if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
   if(s.settings.dayStartHour == null) s.settings.dayStartHour = DAY_START_HOUR_DEFAULT;
+  // Sin títulos por defecto: el widget se ve sin desbloquear el móvil.
+  if(s.settings.widgetShowTitles !== true) s.settings.widgetShowTitles = false;
   if(s.settings.lang == null) s.settings.lang = LANG_DEFAULT;
   // v2: vista del calendario (mes | semana). Lo que viene de v1 abre en mes,
   // que es lo que había; cualquier otro valor también.
@@ -6385,6 +6417,94 @@ function normalize(s){
 }
 
 /* ---------- boot ---------- */
+/* ---------- widget de la pantalla de inicio ----------
+   El widget no puede leer este estado. La app le deja una foto mínima en el
+   almacén compartido (App Group): cucharas y tareas pendientes de hoy y de
+   mañana (mañana, para que al cambiar de día el widget no enseñe ayer), sin
+   finanzas ni ciclo, y sin nombres salvo que se active en Ajustes. El widget
+   solo apunta eventos "hecha"/"deshacer" en una cola; aquí se aplican con
+   setTaskDone(), la misma función que el check de la lista, y luego se borran.
+   Sin el plugin (navegador, Android por ahora) nada de esto hace nada. */
+let _widget;
+const nativeWidget = () => _widget || (_widget = nativePlugin('SpoonyWidgetBridge', ['writeSnapshot', 'drainEvents', 'ackEvents', 'reload']));
+function widgetSupported(){ return !!(window.Capacitor?.isNativePlatform?.() && window.Capacitor.getPlatform?.() === 'ios'); }
+const sortByTime = list => [...list].sort((a, b) => (a.time ? 0 : 1) - (b.time ? 0 : 1) || (a.time && b.time ? a.time.localeCompare(b.time) : 0));
+function widgetDay(k){
+  const d = state.days[k] || { budget:null, tasks:[], extras:[] };
+  const pending = sortByTime(d.tasks.filter(t => !t.done));
+  return {
+    budget: d.budget ?? null,
+    left: d.budget == null ? null : spoonsLeft(d, k).left,
+    doneCount: d.tasks.length - pending.length,
+    totalCount: d.tasks.length,
+    pendingCount: pending.length,
+    pending: pending.slice(0, 5).map(t => ({
+      id: t.id,
+      time: t.time || null,
+      cost: t.cal?.noCost ? null : (t.real ?? t.est),
+      ...(state.settings.widgetShowTitles ? { title: t.name } : {})
+    }))
+  };
+}
+async function writeWidget(){
+  const w = widgetSupported() && nativeWidget(); if(!w) return;
+  const k = todayKey(), k2 = tomorrowKey();
+  const snap = { v:1, lang: state.settings.lang === 'en' ? 'en' : 'es', dayStartHour: dayStartHour(),
+    showTitles: !!state.settings.widgetShowTitles, days: { [k]: widgetDay(k), [k2]: widgetDay(k2) } };
+  try{ await w.writeSnapshot({ json: JSON.stringify(snap) }); }catch(e){ console.error('Widget', e); }
+}
+var widgetTimer = null;   // var: save() puede llamar antes de llegar aquí
+function widgetSoon(){
+  if(!widgetSupported()) return;
+  clearTimeout(widgetTimer);
+  widgetTimer = setTimeout(writeWidget, 300);
+}
+let widgetBusy = false;
+async function applyWidgetEvents(){
+  const w = widgetSupported() && nativeWidget(); if(!w || widgetBusy) return;
+  widgetBusy = true;
+  try{
+    const r = await w.drainEvents({});
+    const evs = (r?.events || []).filter(e => e && typeof e.id === 'string' && typeof e.taskId === 'string'
+      && typeof e.date === 'string' && (e.type === 'done' || e.type === 'undo'));
+    if(!evs.length) return;
+    evs.sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    // Solo cuenta el último evento de cada tarea: "hecha" y luego "deshacer" es no tocarla.
+    const last = new Map();
+    evs.forEach(e => last.set(e.date + '|' + e.taskId, e));
+    let changed = false;
+    last.forEach(e => {
+      const t = state.days[e.date]?.tasks.find(x => x.id === e.taskId);
+      if(!t) return;   // borrada en la app mientras tanto
+      const at = Date.parse(e.at);
+      if(setTaskDone(t, e.type === 'done', Number.isFinite(at) ? at : Date.now())){
+        changed = true;
+        if(t.done) collapsedTasks.add(t.id);   // llega cerrada, como al reabrir la app
+      }
+    });
+    if(changed){ save(); renderAll(); }
+    clearTimeout(widgetTimer);
+    await writeWidget();   // la foto nueva antes de borrar la cola: el widget nunca se queda sin ninguna de las dos
+    await w.ackEvents({ ids: evs.map(e => e.id) });
+  }catch(e){ console.error('Widget', e); }
+  finally{ widgetBusy = false; }
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') applyWidgetEvents(); });
+nativeOn('App', 'appStateChange', d => { if(d.isActive) applyWidgetEvents(); });
+/* spoony://today abre Hoy; spoony://task/<id> abre esa tarea para editarla. */
+nativeOn('App', 'appUrlOpen', data => {
+  const m = /^spoony:\/\/(today|task\/([\w-]+))/.exec(data.url || '');
+  if(!m) return;
+  document.querySelector('#tabs button[data-go="hoy"]')?.click();
+  const t = m[2] && day().tasks.find(x => x.id === m[2]);
+  if(t && !t.done) openTaskEdit(t.id);
+});
+document.getElementById('widgetTitlesPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-wtitles]'); if(!b) return;
+  state.settings.widgetShowTitles = b.dataset.wtitles === 'on';
+  save(); renderAll();
+});
+
 (async function init(){
   const loaded = await store.get();
   if(loaded) state = loaded;
@@ -6407,6 +6527,8 @@ function normalize(s){
   else refreshRcEntitlement();
   calSync(false);
   importCardExpenses();
+  await applyWidgetEvents();
+  writeWidget();
 })();
 </script>
 </body>
