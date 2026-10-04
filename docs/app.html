@@ -847,23 +847,30 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .quick-add{flex:none;width:46px;height:46px;border-radius:50%;border:none;display:grid;place-items:center;
   background:color-mix(in srgb,var(--surface-2) 60%,var(--bg));color:var(--accent);padding:0}
 .quick-add svg{width:22px;height:22px}
-/* El número es lo más grande de la pantalla: se lee antes que nada. */
-.energy-count{margin:0 0 12px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
-.energy-count .big{font-size:80px;font-weight:800;letter-spacing:-0.04em}
-.energy-count .of{font-size:30px;font-weight:700;color:var(--spoon);margin-left:6px;letter-spacing:-0.02em}
+/* Número a la izquierda y cucharas a la derecha, en la misma franja: el
+   número sigue siendo lo más grande de la pantalla y la fila ya no ocupa
+   una banda propia. Las cucharas fluyen seguidas (sin el hueco de cada cinco)
+   y saltan de línea solas, así que vale igual para 6, 10, 15 o 20. */
+#s-hoy .meter{display:grid;grid-template-columns:fit-content(52%) 1fr;column-gap:18px;align-items:center}
+#s-hoy .meter > .energy-msg,#s-hoy .meter > .notice{grid-column:1 / -1}
+.energy-count{margin:0;line-height:1;white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums}
+.energy-count .big{font-size:68px;font-weight:800;letter-spacing:-0.04em}
+.energy-count .of{font-size:26px;font-weight:700;color:var(--spoon);margin-left:6px;letter-spacing:-0.02em}
 .energy-count .of b{color:var(--accent);font-weight:700}
-.energy-count .lab{display:block;margin-top:6px;font-size:19px;font-weight:400;color:var(--ink);letter-spacing:0}
+.energy-count .lab{display:block;margin-top:6px;font-size:17px;line-height:1.2;white-space:normal;font-weight:400;color:var(--ink);letter-spacing:0}
 .energy-count.overdrawn .big,.energy-count.overdrawn .lab{color:var(--alert)}
 .energy-count .none{font-size:17px;color:var(--ink-soft);line-height:1.5}
-#spoonRow{gap:8px 18px;margin:0 0 14px}
-#spoonRow .sgroup{gap:10px}
-#spoonRow .sp{width:21px;height:42px}
-/* Diez cucharas caben en una fila hasta 360 px; por debajo, o con el texto
-   ampliado, se encogen para no partirse en dos filas de cinco. */
-@media (max-width:360px){#spoonRow{gap:8px 14px}#spoonRow .sgroup{gap:7px}#spoonRow .sp{width:18px;height:36px}}
-:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #spoonRow{gap:8px 14px}
-:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #spoonRow .sgroup{gap:7px}
-:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #spoonRow .sp{width:18px;height:36px}
+#spoonRow{gap:8px 7px;margin:0;align-content:center}
+#spoonRow .sgroup{display:contents}
+#spoonRow .sp{width:16px;height:32px}
+#s-hoy .meter > .energy-msg{margin-top:16px}
+/* Con poco ancho (móvil pequeño o texto al 130 %) no caben al lado: las
+   cucharas vuelven debajo del número, como antes. */
+@media (max-width:360px){#s-hoy .meter{grid-template-columns:1fr}#spoonRow{margin-top:12px}}
+:root[data-text-scale="1.3"] #s-hoy .meter{grid-template-columns:1fr}
+:root[data-text-scale="1.3"] #spoonRow{margin-top:12px}
+:root[data-text-scale="1.15"] #spoonRow{gap:6px 5px}
+:root[data-text-scale="1.15"] #spoonRow .sp{width:14px;height:28px}
 .peak-btn span{text-wrap:balance}
 .energy-msg{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-block);
   background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
@@ -4459,7 +4466,8 @@ function renderMeter(){
   ic.innerHTML = `<use href="#${sunny ? 'i-sun' : 'spoon'}"/>`;
   ic.setAttribute('viewBox', sunny ? '0 0 24 24' : '0 0 20 40');
   ic.classList.toggle('low', !sunny);
-  const breakParts = untouched ? [tr('Un gran día para lo importante.')] : [trf('{n} gastadas', {n:fmtN(gasto)})];
+  /* Sin gasto todavía no hay desglose que dar: el mensaje queda en una línea. */
+  const breakParts = untouched ? [] : [trf('{n} gastadas', {n:fmtN(gasto)})];
   if(recarga) breakParts.push(trf('{n} recuperadas', {n:fmtN(recarga)}));
   if(marginAmount > 0) breakParts.push('<svg class="drop-ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop" fill="var(--accent)" opacity=".7"/></svg> ' +
     trf('{n} reservadas por el ciclo', {n:fmtN(marginAmount)}) +
