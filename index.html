@@ -1258,7 +1258,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="task-menu" id="taskMenu" hidden>
           <button id="btnTpl"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-doc"/></svg><span data-i18n="Días tipo">Días tipo</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
           <button id="btnLib"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="Gestionar actividades">Gestionar actividades</span></button>
-          <button id="btnMenuCal"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#t-cal"/></svg><span data-i18n="Ver calendario">Ver calendario</span></button>
         </div>
       </div>
     </div>
@@ -2631,7 +2630,6 @@ const EN = {
  "Has pasado de tus cucharas de hoy.": "You've gone over today's spoons.",
  "{n} reservadas por el ciclo": "{n} set aside for your cycle",
  "Gestionar actividades": "Manage activities",
- "Ver calendario": "See calendar",
  "Hoy: más opciones de tareas": "Today: more task options",
  "Hacer check-out": "Check out",
  "Registra cómo terminas el día.": "Log how you end the day.",
@@ -6055,8 +6053,6 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && !taskMenu.hidden){ setTaskMenu(false); btnTaskMenu.focus(); }
 });
-document.getElementById('btnMenuCal').addEventListener('click', () =>
-  document.querySelector('#tabs [data-go="cal"]').click());
 /* Pico sensorial: resta al instante, sin preguntar nada. Después, si no se ha
    desactivado, se ofrece —nunca se fuerza— un descanso de respiración. */
 document.getElementById('btnPeak').addEventListener('click', () => {
