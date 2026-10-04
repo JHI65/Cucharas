@@ -592,7 +592,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .chip[aria-pressed="true"] .premium-tag{color:#FFF8F9;border-color:#FFF8F9}
 
 /* ---- Check-in ---- */
-.ci-sheet{position:relative;min-height:65vh;padding-top:10px;transition:transform .2s ease}
+.ci-sheet{position:relative;padding-top:10px;transition:transform .2s ease}
 .ci-sheet h2{font-size:21px;font-weight:800;letter-spacing:-0.015em}
 .ci-sheet p.sub{font-size:14px;margin-bottom:8px}
 .ci-count{text-align:center;margin:18px 0 8px;font-variant-numeric:tabular-nums}
@@ -606,7 +606,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .ci-range::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-12px;border-radius:50%;
   background:#FFFFFF;border:1px solid var(--line);box-shadow:0 2px 6px rgba(60,30,40,.18)}
 .ci-range::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:#FFFFFF;border:1px solid var(--line);box-shadow:0 2px 6px rgba(60,30,40,.18)}
-.ci-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.ci-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px}
 .ci-chip{padding:10px 12px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px}
 .ci-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .ci-cycle{margin-bottom:14px;padding:14px 16px;border-radius:var(--r-block);background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
