@@ -50,8 +50,13 @@ html,body{
   margin:0;padding:0;min-height:100%;background:var(--bg);color-scheme:light;
   accent-color:var(--accent);
   scrollbar-width:none;
-  overflow-x:hidden;
 }
+/* overflow-x:hidden solo en html (pasa al viewport): si body también lo
+   llevara, body se volvería contenedor de scroll y la cabecera fija de Hoy
+   (position:sticky) dejaría de pegarse. En body basta clip, que no crea
+   contenedor de scroll. */
+html{overflow-x:hidden}
+body{overflow-x:clip}
 /* Barra de scroll invisible en toda la app, para que se sienta nativa: en
    iOS no hace falta (el indicador del sistema ya se oculta solo), pero en
    Chrome/desktop scrollbar-width:none no basta y deja la marca de siempre. */
@@ -829,6 +834,16 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .hoy-title{font-size:32px;font-weight:800;line-height:1.1;letter-spacing:-0.02em}
 #s-hoy .hoy-top .sub{font-size:14px;margin-top:3px}
 #s-hoy .meter{margin-top:4px}
+/* Cabecera de Hoy fija (hasta "Tareas"): solo la lista de tareas pasa por
+   debajo. Sube por la zona del reloj con su propio fondo para que las tareas
+   no asomen ahí. Solo se fija si deja sitio a la lista (pinHoyTop); con texto
+   grande en un móvil pequeño se queda como antes, desplazándose entera. */
+.hoy-pin.pinned{
+  position:sticky;top:0;z-index:5;background:var(--bg);
+  margin-top:calc(-1 * env(safe-area-inset-top));padding-top:env(safe-area-inset-top);padding-bottom:6px;
+}
+.hoy-pin.pinned::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;pointer-events:none;
+  background:linear-gradient(var(--bg),transparent)}
 .quick-add{flex:none;width:46px;height:46px;border-radius:50%;border:none;display:grid;place-items:center;
   background:color-mix(in srgb,var(--surface-2) 60%,var(--bg));color:var(--accent);padding:0}
 .quick-add svg{width:22px;height:22px}
@@ -1269,6 +1284,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
   <!-- ===== HOY ===== -->
   <section class="screen on" id="s-hoy">
+    <div class="hoy-pin" id="hoyPin">
     <header class="top hoy-top">
       <div>
         <h1 class="title hoy-title" data-i18n="Hoy">Hoy</h1>
@@ -1298,6 +1314,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
           <button id="btnLib"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="Gestionar actividades">Gestionar actividades</span></button>
         </div>
       </div>
+    </div>
     </div>
     <div id="taskList"></div>
     <button class="add" id="btnAddTask"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir tarea">Añadir tarea</span></button>
@@ -4457,6 +4474,7 @@ function renderMeter(){
   notice.hidden = !msg;
 
   checkCoNudge();
+  pinHoyTop();
 
   refreshEnergySheets();
 }
@@ -6704,6 +6722,19 @@ document.getElementById('coEnergy').addEventListener('click', e => {
 document.getElementById('coSensory').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
 });
+/* Fija la cabecera solo si debajo, hasta la barra, caben al menos ~2 tareas. */
+function pinHoyTop(){
+  const pin = document.getElementById('hoyPin');
+  if(!pin || currentTab !== 'hoy') return;
+  const wasPinned = pin.classList.contains('pinned');
+  pin.classList.remove('pinned');
+  const h = pin.getBoundingClientRect().height;
+  const navTop = document.getElementById('tabs').getBoundingClientRect().top;
+  const fits = navTop - h >= 140;
+  pin.classList.toggle('pinned', fits);
+  if(wasPinned !== fits && !fits) window.scrollTo(0, 0);
+}
+window.addEventListener('resize', pinHoyTop);
 function openCheckout(){
   const co = day().checkout;
   coEnergy = co ? co.energy : null;
