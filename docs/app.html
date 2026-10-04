@@ -3524,6 +3524,7 @@ const tr = s => (state.settings?.lang === 'en' && EN[s]) ? EN[s] : s;
    luego se sustituyen los valores. */
 const trf = (s, vars) => tr(s).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
 const LOCALE = () => state.settings?.lang === 'en' ? 'en-GB' : 'es-ES';
+const MAX_SPOONS = 16;
 let state = { v:2, days:{}, templates:[], library:[], settings:{ max:12, overCost:{...OVERCOST_DEFAULT}, peakCostPercent:PEAK_COST_PERCENT_DEFAULT, dayStartHour:DAY_START_HOUR_DEFAULT, lang:LANG_DEFAULT, calView:'mes' },
   finanzas:{ gastosFijos:[], gastosVariables:[], historial:[], mesActual:null }, finEnabled:false,
   cycleEnabled:false, avgCycleLength:28, marginPercent:20, cycleLogs:[] };
@@ -4391,7 +4392,7 @@ setInterval(() => { if(document.visibilityState === 'visible') calSync(false); }
    la diferencia es de forma, no solo de color. */
 function spoonSVG(halves, margin){
   const outline = '<use href="#spoon" fill="none" stroke="var(--spoon)" stroke-width="1.8"/>';
-  const drop = '<use href="#drop" x="11" y="1" width="8" height="8" fill="var(--accent)" opacity=".7"/>';
+  const drop = '<use href="#drop" x="6" y="4.8" width="8" height="8" fill="var(--accent)" opacity=".7"/>';
   /* las del margen se dibujan como la cuchara vacía (contorno + gota), aunque
      sí se puedan gastar: son un aviso visual, no un reflejo del gasto real. */
   if(margin) return `<svg class="sp" viewBox="0 0 20 40" aria-hidden="true">${outline}${drop}</svg>`;
@@ -7163,7 +7164,7 @@ document.getElementById('maxMinus').addEventListener('click', () => {
   state.settings.max = Math.max(4, state.settings.max-1); save(); renderAll();
 });
 document.getElementById('maxPlus').addEventListener('click', () => {
-  state.settings.max = Math.min(24, state.settings.max+1); save(); renderAll();
+  state.settings.max = Math.min(MAX_SPOONS, state.settings.max+1); save(); renderAll();
 });
 document.getElementById('peakMinus').addEventListener('click', () => {
   state.settings.peakCostPercent = Math.max(0, state.settings.peakCostPercent-5); save(); renderAll();
@@ -7989,6 +7990,7 @@ function normalize(s){
   if(!s.library || !s.library.length) s.library = SEED.map(x=>({...x,name:tr(x.name),samples:[]}));
   s.library.forEach(l => { if(!l.id) l.id = uid(); });
   if(!s.settings) s.settings = { max:12 };
+  if(s.settings.max > MAX_SPOONS) s.settings.max = MAX_SPOONS;
   if(!s.settings.overCost) s.settings.overCost = {...OVERCOST_DEFAULT};
   if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
