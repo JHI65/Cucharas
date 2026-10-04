@@ -626,14 +626,6 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   border:none;border-radius:var(--r-block);background:color-mix(in srgb,var(--surface-2) 30%,var(--bg))}
 .ci-actions{margin-top:8px}
 .ci-actions button{min-height:56px;font-size:17px}
-.ci-loading{display:none;position:absolute;inset:40px var(--pad) auto;flex-direction:column;gap:18px;padding-top:20px}
-.ci-loading span{height:22px;border-radius:11px;background:color-mix(in srgb,var(--line) 45%,var(--bg));animation:ciPulse 1s ease-in-out infinite alternate}
-.ci-loading span:nth-child(1){width:70%;margin:0 auto}
-.ci-loading span:nth-child(2){width:85%;margin:0 auto}
-.ci-loading span:nth-child(3){width:60%;margin-top:24px}
-.ci-sheet.is-loading .ci-body{visibility:hidden}
-.ci-sheet.is-loading .ci-loading{display:flex}
-@keyframes ciPulse{from{opacity:.55}to{opacity:1}}
 .ci-confirm{text-align:center;padding-top:10px}
 .ci-confirm-ic{width:56px;height:56px;margin:4px auto 14px;border-radius:50%;display:grid;place-items:center;
   background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));color:var(--accent)}
@@ -1686,7 +1678,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <input type="text" class="ci-note" id="ciNote" hidden placeholder="Añade una nota si la necesitas… (opcional)" data-i18n-ph="Añade una nota si la necesitas… (opcional)" data-i18n-aria="Nota (opcional)" aria-label="Nota (opcional)">
       <div class="bigrow ci-actions"><button id="ciSkip" data-i18n="Ahora no">Ahora no</button><button class="primary" id="ciSave" data-i18n="Empezar el día">Empezar el día</button></div>
     </div>
-    <div class="ci-loading" aria-hidden="true"><span></span><span></span><span></span></div>
   </div>
 </dialog>
 
@@ -5532,7 +5523,6 @@ function openCheckin(){
   document.getElementById('ciMarginRow').hidden = !precautionReason(todayKey());
   document.getElementById('ciMarginOff').checked = !!day().marginOff;
   document.getElementById('ciNote').value = day().checkinNote || '';
-  dlgCheckin.querySelector('.ci-sheet').classList.remove('is-loading');
   refreshPeakInfo(); ciSync();
   openDialog(dlgCheckin);
 }
@@ -5559,10 +5549,8 @@ document.getElementById('ciSave').addEventListener('click', () => {
   delete day().budgetUnanswered;
   ciKeepNote();
   save();
-  const sheet = dlgCheckin.querySelector('.ci-sheet');
-  sheet.classList.add('is-loading');
+  dlgCheckin.close();
   renderAll();
-  setTimeout(() => { dlgCheckin.close(); sheet.classList.remove('is-loading'); }, 450);
 });
 /* "Ahora no" (y tocar fuera): el día no se queda sin cucharas ni bloquea la
    app. Usa la media reciente y marca el día como no respondido. */
