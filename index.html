@@ -83,8 +83,9 @@ input,select,textarea{font:inherit;color:inherit}
    acababa tapando el último botón (el check-out, ya hecho, no se podía volver
    a abrir). Un hijo con altura propia sí cuenta siempre. Va fuera de .app
    (sin zoom) y sizeTabsGap() le da la altura real que ocupa la barra más un
-   margen; el calc es solo el valor de partida. */
-.tabs-gap{height:calc(124px + env(safe-area-inset-bottom));flex:none}
+   margen; el calc es el mínimo garantizado (barra + safe area + margen)
+   por si la medida llega tarde o mal en iOS. */
+.tabs-gap{height:max(var(--tabs-gap,0px),calc(68px * var(--text-scale,1) + 14px + env(safe-area-inset-bottom) + 16px));flex:none}
 .screen{display:none}
 .screen.on{display:block}
 
@@ -7079,10 +7080,12 @@ function applyTextScale(){
 function sizeTabsGap(){
   const r = document.getElementById('tabs').getBoundingClientRect();
   if(!r.height) return;
-  document.getElementById('tabsGap').style.height = Math.ceil(window.innerHeight - r.top + 24) + 'px';
+  document.documentElement.style.setProperty('--tabs-gap', Math.ceil(window.innerHeight - r.top + 16) + 'px');
 }
 new ResizeObserver(sizeTabsGap).observe(document.getElementById('tabs'));
 window.addEventListener('resize', sizeTabsGap);
+window.addEventListener('load', sizeTabsGap);
+if(window.visualViewport) visualViewport.addEventListener('resize', sizeTabsGap);
 document.getElementById('textScalePick').addEventListener('click', e => {
   const b = e.target.closest('[data-scale]'); if(!b) return;
   state.settings.textScale = +b.dataset.scale;
