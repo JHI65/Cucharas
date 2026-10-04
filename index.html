@@ -236,25 +236,31 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .add svg{width:18px;height:18px;flex:none}
 
 /* ---- Cierre del día ---- */
-.closer{
-  display:flex;align-items:center;flex-wrap:wrap;gap:12px 14px;
-  margin-top:30px;padding:14px;
-  background:var(--surface);border-radius:var(--radius);
-  box-shadow:0 6px 22px rgba(75,58,63,.08);
+/* El check-out ya no ocupa sitio en Hoy: por la noche (Ajustes → Check-out
+   nocturno) aparece esta tarjeta flotante sobre la barra, sin tapar la
+   pantalla ni robar el foco. "Más tarde" la aparta hasta la próxima vez que
+   se abra la app. */
+.co-nudge{
+  position:fixed;left:14px;right:14px;max-width:520px;margin:0 auto;z-index:20;
+  display:flex;align-items:center;flex-wrap:wrap;gap:10px 12px;padding:12px 12px 12px 14px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:0 8px 28px rgba(75,58,63,.16),0 2px 6px rgba(75,58,63,.10);
+  zoom:var(--text-scale,1);
+  animation:coNudgeIn .25s ease-out;
 }
-.closer-ic{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+.co-nudge[hidden]{display:none}
+@keyframes coNudgeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.closer-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
   background:color-mix(in srgb,var(--surface-2) 55%,var(--surface));color:var(--accent)}
-.closer-ic svg{width:26px;height:26px}
-.closer-text{flex:1 1 calc(100% - 60px);min-width:0}
-.closer-text strong{display:block;font-size:17px}
-.closer-text p{margin:2px 0 0;font-size:14px;color:var(--ink-soft)}
-.closer button{
-  flex:1 1 100%;padding:13px 16px;min-height:48px;
-  background:var(--accent);border:none;border-radius:var(--r-control);
-  color:var(--surface);font-size:16px;font-weight:600;
-}
-.closer.done button{background:var(--surface);border:1px solid var(--line);color:var(--accent);font-weight:400}
-/* Mismo lenguaje que .closer button (botón de bloque, borde sólido, texto
+.closer-ic svg{width:22px;height:22px}
+.co-nudge-text{flex:1 1 140px;min-width:0}
+.co-nudge-text strong{display:block;font-size:16px}
+.co-nudge-text p{margin:1px 0 0;font-size:14px;color:var(--ink-soft)}
+.co-nudge-actions{display:flex;gap:8px;margin-left:auto}
+.co-nudge-actions button{min-height:44px;padding:0 16px;border-radius:var(--r-control);font-size:15px;font-weight:600}
+.co-nudge-actions .co-nudge-now{background:var(--accent);border:none;color:var(--surface)}
+.co-nudge-actions .co-nudge-later{background:none;border:none;color:var(--accent);font-weight:400}
+/* Mismo lenguaje que los botones de bloque (borde sólido, texto
    Ciruela): una acción de un toque, no un enlace de texto suelto. */
 .peak-btn{
   display:flex;align-items:center;justify-content:center;gap:12px;
@@ -1085,7 +1091,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 /* Superelipse en toda la geometría de contenedor. Donde el navegador no conoce
    corner-shape la propiedad se ignora y queda el radio circular de siempre:
    no hay degradación funcional, solo una esquina menos. */
-.meter,.task,.adjust,.card,.breath-card,.empty,.add,.closer button,.peak-btn,.lib,.day,.group,
+.meter,.task,.adjust,.card,.breath-card,.empty,.add,.co-nudge,.co-nudge-actions button,.peak-btn,.lib,.day,.group,
 .cell,.btn,.scale button,.stepper button,.cal-nav button,.bigrow button,
 .mini,.ocgrid input,.ocgrid select,.field input[type=text],.field input[type=time],
 textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
@@ -1296,14 +1302,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div id="taskList"></div>
     <button class="add" id="btnAddTask"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir tarea">Añadir tarea</span></button>
 
-    <div class="closer" id="closer">
-      <span class="closer-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg></span>
-      <div class="closer-text">
-        <strong id="closerTitle">Check-out de hoy</strong>
-        <p id="closerHint">Registra cómo terminas el día.</p>
-      </div>
-      <button id="btnCheckout">Hacer check-out</button>
-    </div>
   </section>
 
   <!-- ===== CALENDARIO ===== -->
@@ -1446,6 +1444,20 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
           <option value="14">14:00</option>
           <option value="15">15:00</option>
           <option value="16">16:00</option>
+          <option value="17">17:00</option>
+          <option value="18">18:00</option>
+          <option value="19">19:00</option>
+          <option value="20">20:00</option>
+          <option value="21">21:00</option>
+          <option value="22">22:00</option>
+          <option value="23">23:00</option>
+        </select></label>
+      </div>
+    </div>
+    <div class="row">
+      <div><strong data-i18n="Check-out nocturno">Check-out nocturno</strong><p data-i18n="A partir de esta hora, Spoony te propone hacer el check-out si aún no lo has hecho.">A partir de esta hora, Spoony te propone hacer el check-out si aún no lo has hecho.</p></div>
+      <div class="ocgrid">
+        <label>h<select id="checkoutHourInput" data-i18n-aria="Hora del check-out" aria-label="Hora del check-out">
           <option value="17">17:00</option>
           <option value="18">18:00</option>
           <option value="19">19:00</option>
@@ -1655,6 +1667,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </div>
 <div class="tabs-gap" id="tabsGap" aria-hidden="true"></div>
 
+<div class="co-nudge" id="coNudge" role="dialog" aria-modal="false" aria-labelledby="coNudgeTitle" hidden>
+  <span class="closer-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg></span>
+  <div class="co-nudge-text">
+    <strong id="coNudgeTitle" data-i18n="Hacer check-out">Hacer check-out</strong>
+    <p data-i18n="¿Cómo terminas el día?">¿Cómo terminas el día?</p>
+  </div>
+  <div class="co-nudge-actions">
+    <button class="co-nudge-now" id="coNudgeNow" data-i18n="Ahora">Ahora</button>
+    <button class="co-nudge-later" id="coNudgeLater" data-i18n="Más tarde">Más tarde</button>
+  </div>
+</div>
 <nav class="tabs" id="tabs">
   <button data-go="hoy" aria-current="page">
     <svg viewBox="0 0 20 40" class="tab-spoon" fill="currentColor" stroke="none"><use href="#spoon"/></svg><span data-i18n="Hoy">Hoy</span></button>
@@ -2715,6 +2738,12 @@ const EN = {
  "Actividad": "Activity",
  "Hoy: más opciones de tareas": "Today: more task options",
  "Hacer check-out": "Check out",
+ "¿Cómo terminas el día?": "How are you ending the day?",
+ "Ahora": "Now",
+ "Más tarde": "Later",
+ "Check-out nocturno": "Evening check-out",
+ "A partir de esta hora, Spoony te propone hacer el check-out si aún no lo has hecho.": "From this time on, Spoony suggests checking out if you haven't yet.",
+ "Hora del check-out": "Check-out time",
  "Registra cómo terminas el día.": "Log how you end the day.",
  "Check-out hecho": "Check-out done",
  "Capacidad {n} de 5.": "Capacity {n} of 5.",
@@ -2969,7 +2998,7 @@ const EN = {
  "Días tipo": "Routine days",
  "Días tipo es una función de Spoony Premium.": "Routine days is a Spoony Premium feature.",
  "Dolor físico": "Physical pain",
- "Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.": "Two 1-to-5 scales: capacity you have left and how much noise, light and people you could take. No need to put a name to what you feel.",
+ "Por la noche, a la hora que elijas en Ajustes, Spoony te propone hacer el check-out. Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.": "In the evening, at the time you choose in Settings, Spoony suggests checking out. Two 1-to-5 scales: capacity you have left and how much noise, light and people you could take. No need to put a name to what you feel.",
  "Dos minutos. No hace falta poner nombre a lo que sientes: solo puntuar.": "Two minutes. No need to put a name to what you feel: just score it.",
  "Ducha": "Shower",
  "Ducha, compra, llamada…": "Shower, groceries, phone call…",
@@ -4427,13 +4456,7 @@ function renderMeter(){
   notice.textContent = msg;
   notice.hidden = !msg;
 
-  const co = d.checkout;
-  document.getElementById('closerTitle').textContent = tr(co ? 'Check-out hecho' : 'Check-out de hoy');
-  document.getElementById('closerHint').textContent = co
-    ? trf('Capacidad {n} de 5.', {n:co.energy})
-    : tr('Registra cómo terminas el día.');
-  document.getElementById('btnCheckout').textContent = tr(co ? 'Cambiar' : 'Hacer check-out');
-  document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
+  checkCoNudge();
 
   refreshEnergySheets();
 }
@@ -5259,6 +5282,7 @@ function renderAll(){ renderMeter(); renderTasks(); renderLib(); renderCal(); re
   document.querySelectorAll('#peakAskPick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.peakask === 'off') === !!state.settings.peakPromptOff));
   document.getElementById('dayStartHourInput').value = state.settings.dayStartHour;
+  document.getElementById('checkoutHourInput').value = checkoutHour();
   document.getElementById('widgetTitlesRow').hidden = !widgetSupported();
   document.querySelectorAll('#widgetTitlesPick .chip').forEach(c =>
     c.setAttribute('aria-pressed', (c.dataset.wtitles === 'on') === !!state.settings.widgetShowTitles));
@@ -5420,7 +5444,7 @@ const TOUR_STEPS = [
   { sel:'#btnPeak', title:'He tenido un pico sensorial ahora', body:'Este botón resta cucharas de golpe cuando el ruido, la luz o la gente te pasan por encima, y te ofrece un espacio de calma. Sin preguntas ni cronómetro.' },
   { sel:'#btnAddTask', title:'Las tareas del día', body:'Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcar la tarea como finalizada puedes corregir lo que costó de verdad: la app aprende de eso.' },
   { sel:'#btnTaskMenu', title:'Días tipo y actividades', body:'Este botón abre un menú. "Días tipo" guarda las tareas de un día con un nombre para volcarlas de una vez en otro día. "Gestionar actividades" es tu lista de actividades con lo que te cuesta cada una; cuando corriges lo que costó de verdad, la app aprende.' },
-  { sel:'#btnCheckout', title:'Cerrar el día', body:'Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
+  { sel:null, title:'Cerrar el día', body:'Por la noche, a la hora que elijas en Ajustes, Spoony te propone hacer el check-out. Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
   { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.' },
   { sel:'#tabs [data-go="set"]', nav:'set', title:'Ajustes', body:'Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.' },
   { sel:'#cyclePick', nav:'set', toggleKey:'cycleEnabled', toggleApply:'applyCycleUI', title:'Ciclo (opcional)', body:'Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
@@ -5831,7 +5855,7 @@ function renderEnOver(){
 }
 function openEnOver(){ renderEnOver(); openDialog(dlgEnOver); }
 document.getElementById('eoX').addEventListener('click', () => dlgEnOver.close());
-document.getElementById('eoCheckout').addEventListener('click', () => document.getElementById('btnCheckout').click());
+document.getElementById('eoCheckout').addEventListener('click', openCheckout);
 document.getElementById('eoScale').addEventListener('click', () => {
   dlgEnOver.close(); dlgEnergy.close();
   document.querySelector('#tabs [data-go="set"]').click();
@@ -6680,14 +6704,60 @@ document.getElementById('coEnergy').addEventListener('click', e => {
 document.getElementById('coSensory').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
 });
-document.getElementById('btnCheckout').addEventListener('click', () => {
+function openCheckout(){
   const co = day().checkout;
   coEnergy = co ? co.energy : null;
   coSensory = co ? co.sensory : null;
   coTriedSave = false;
   document.getElementById('coNote').value = co ? (co.note || '') : '';
   coSync(); openDialog(dlgCheckout);
+}
+
+/* Aviso nocturno: desde la hora elegida hasta que empieza el día siguiente,
+   solo en Hoy, solo si falta el check-out y nunca encima de la guía o de
+   otra hoja. "Ahora" y "Más tarde" lo apartan hasta que se vuelva a abrir la
+   app (o se pase a otra app y se vuelva). */
+const CHECKOUT_HOUR_DEFAULT = 21;
+const checkoutHour = () => state.settings?.checkoutHour ?? CHECKOUT_HOUR_DEFAULT;
+let coNudgeDismissed = false;
+function coNudgeDue(){
+  if(!state.settings.introSeen || day().checkout || currentTab !== 'hoy') return false;
+  const h = new Date().getHours();
+  return h >= checkoutHour() || h < dayStartHour();
+}
+function checkCoNudge(){
+  const el = document.getElementById('coNudge');
+  const due = !coNudgeDismissed && coNudgeDue();
+  if(!due){ el.hidden = true; return; }
+  if(!el.hidden) return;
+  if(!document.getElementById('tour').hidden || document.querySelector('dialog[open]')) return;
+  el.hidden = false;
+  placeCoNudge();
+}
+/* 10 px por encima de la barra. Se mide en vez de calcular: según el motor,
+   el zoom del tamaño de texto escala o no el "bottom" de un elemento fijo,
+   así que se prueban dos valores y se resuelve la proporción real. */
+function placeCoNudge(){
+  const el = document.getElementById('coNudge');
+  if(el.hidden) return;
+  const target = document.getElementById('tabs').getBoundingClientRect().top - 10;
+  el.style.bottom = '0px';
+  const y0 = el.getBoundingClientRect().bottom;
+  el.style.bottom = '100px';
+  const f = (y0 - el.getBoundingClientRect().bottom) / 100 || 1;
+  el.style.bottom = Math.max(0, (y0 - target) / f) + 'px';
+}
+window.addEventListener('resize', placeCoNudge);
+document.getElementById('coNudgeNow').addEventListener('click', () => {
+  coNudgeDismissed = true; checkCoNudge(); openCheckout();
 });
+document.getElementById('coNudgeLater').addEventListener('click', () => {
+  coNudgeDismissed = true; checkCoNudge();
+});
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){ coNudgeDismissed = false; checkCoNudge(); }
+});
+setInterval(checkCoNudge, 60000);
 document.getElementById('coCancel').addEventListener('click', () => dlgCheckout.close());
 document.getElementById('coX').addEventListener('click', () => document.getElementById('coCancel').click());
 sheetDragClose(dlgCheckout.querySelector('.co-sheet'), 'coCancel');
@@ -7038,6 +7108,11 @@ document.getElementById('peakAskPick').addEventListener('click', e => {
    —se está en Ajustes, no en Hoy—: si el nuevo "hoy" no tiene cucharas
    asignadas, el medidor ya lo dice solo cuando se vuelva a esa pestaña,
    igual que cualquier otro día sin check-in todavía. */
+document.getElementById('checkoutHourInput').addEventListener('change', e => {
+  const n = parseInt(e.target.value, 10);
+  state.settings.checkoutHour = Number.isFinite(n) ? Math.min(23, Math.max(0, n)) : CHECKOUT_HOUR_DEFAULT;
+  save(); renderAll();
+});
 document.getElementById('dayStartHourInput').addEventListener('change', e => {
   if(!requirePremium(tr('Elegir la hora en la que empieza tu día es una función de Spoony Premium.'))){
     e.target.value = state.settings.dayStartHour;
@@ -7498,6 +7573,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const overCost = state.settings.overCost;
   const peakCostPercent = state.settings.peakCostPercent;
   const peakPromptOff = state.settings.peakPromptOff;
+  const savedCheckoutHour = state.settings.checkoutHour;   // también es rutina
   const savedDayStartHour = state.settings.dayStartHour;   // cuándo empieza tu día es rutina, no historial: sobrevive al borrado
   const savedLang = state.settings.lang;   // el idioma es preferencia, no historial: sobrevive al borrado
   const calView = state.settings.calView;   // la vista del calendario también
@@ -7505,7 +7581,7 @@ document.getElementById('btnWipe').addEventListener('click', () => {
   const avgCycleLength = state.avgCycleLength;
   const marginPercent = state.marginPercent;
   const finEnabled = state.finEnabled;
-  state = { v:2, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, lang:savedLang, calView},
+  state = { v:2, days:{}, templates:[], library:SEED.map(s=>({...s,name:tr(s.name),id:uid(),samples:[]})), settings:{max:12, contrast, customColor, overCost, peakCostPercent, peakPromptOff, dayStartHour:savedDayStartHour, checkoutHour:savedCheckoutHour, lang:savedLang, calView},
     cycleEnabled, avgCycleLength, marginPercent, cycleLogs:[], finEnabled };
   if(prevSync) state.sync = prevSync;
   if(prevCal) state.calendar = { ...prevCal, seen:{} };   // qué calendarios lees es preferencia; lo ya importado se borra con el historial
@@ -7842,6 +7918,7 @@ function normalize(s){
   if(s.settings.peakCostPercent == null) s.settings.peakCostPercent = PEAK_COST_PERCENT_DEFAULT;
   if(s.settings.peakPromptOff == null) s.settings.peakPromptOff = false;
   if(s.settings.dayStartHour == null) s.settings.dayStartHour = DAY_START_HOUR_DEFAULT;
+  if(s.settings.checkoutHour == null) s.settings.checkoutHour = CHECKOUT_HOUR_DEFAULT;
   // Sin títulos por defecto: el widget se ve sin desbloquear el móvil.
   if(s.settings.widgetShowTitles !== true) s.settings.widgetShowTitles = false;
   if(s.settings.lang == null) s.settings.lang = LANG_DEFAULT;
