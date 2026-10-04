@@ -371,6 +371,23 @@ evidentes y eso es una barrera real para este público.
       dispositivo. Play Console: justificarlo en el formulario de seguridad de datos. iOS: acción de
       Atajos "Añadir gasto en Spoony", sin acceso a Cartera ni al banco. Probar con un pago real en
       ambos sistemas (en Android, que el aviso de Wallet traiga importe y comercio).
+- [ ] **Widget de pantalla de inicio (iOS, fase 1)** — código en el commit `e9a121b` (sin subir a
+      origin), sin probar en Xcode ni en dispositivo. Para mañana, en Xcode (`npx cap open ios`):
+      1. Añadir al target **App**: `SpoonyWidgetBridge.swift`, `WidgetShared.swift` y
+         `PrivacyInfo.xcprivacy` (de `ios/App/App/`). Sin esto el `SceneDelegate` no compila.
+      2. *File › New › Target › Widget Extension* llamada `SpoonyWidget` (sin Live Activity ni
+         Configuration App Intent); activar el esquema.
+      3. Target SpoonyWidget: iOS 17.0, versión 1.0 y build 29 (iguales a la app), equipo 5P2FSRLTVZ.
+      4. App Groups `group.com.spoony.app` en **App** y en **SpoonyWidget**.
+      5. Borrar los `.swift` y el `Assets.xcassets` de plantilla del widget (dejar el `Info.plist`);
+         añadir todo `ios/App/SpoonyWidget-src/` solo al target SpoonyWidget; marcar también
+         SpoonyWidget en el Target Membership de `WidgetShared.swift`.
+      6. Probar en simulador iOS 17+: círculo = marca hecha sin abrir la app y sale "Deshacer";
+         al abrir Spoony la tarea sale hecha; *Ajustes › Cómo se ve › Nombres en el widget* cambia
+         "Tarea" por el nombre. Antes, liberar disco (quedaban ~800 MB).
+      Conocido: el segmento vacío contra el fondo tiene contraste 1,4:1 (el límite para gráficos es
+      3:1; relleno contra vacío sí cumple, 4,4:1). Android (Glance, mismo contrato) queda para la
+      fase 2, tras probar iOS.
 - [ ] Icono de 1024×1024. El actual es un PNG de 180px incrustado en el HTML.
 - [ ] Buscar "Spoony" en ambas tiendas y en OEPM/EUIPO antes de invertir en la ficha.
 - [ ] Costes: Apple 99 USD/año, Google 25 USD pago único. Para iOS hace falta un Mac con
