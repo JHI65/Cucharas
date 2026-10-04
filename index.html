@@ -4551,6 +4551,7 @@ function renderTasks(){
       </div>`}
     </div>` : ''}`;
   }).join('') + '</div>';
+  pinHoyTop();
 }
 const ACT_ICONS = [
   [/gente|amig|social|famil|quedar|fiesta|people|friend|visit/, 'people'],
@@ -6421,13 +6422,18 @@ document.getElementById('taskList').addEventListener('click', e => {
   if(tog){
     const t = day().tasks.find(x => x.id === tog.dataset.toggle);
     setTaskDone(t, !t.done);
-    save(); renderAll(); return;
+    save(); renderAll();
+    if(t.done) revealTask(t.id);
+    return;
   }
   const trow = e.target.closest('[data-trow]');
   if(trow){
-    if(collapsedTasks.has(trow.dataset.trow)) collapsedTasks.delete(trow.dataset.trow);
+    const opening = collapsedTasks.has(trow.dataset.trow);
+    if(opening) collapsedTasks.delete(trow.dataset.trow);
     else collapsedTasks.add(trow.dataset.trow);
-    renderTasks(); return;
+    renderTasks();
+    if(opening) revealTask(trow.dataset.trow);
+    return;
   }
   const ent = e.target.closest('[data-ent]');
   if(ent){
@@ -6463,6 +6469,35 @@ document.getElementById('taskList').addEventListener('click', e => {
     if(t.est < 0) closeAdjustPanel(t.id);
   }
 });
+
+/* Al abrir el desplegable de una tarea, se desplaza lo justo para que quede
+   entero entre la cabecera fija de Hoy y la barra inferior. Si ya se ve
+   entero no se mueve. Si fila + desplegable no caben juntos, manda el
+   desplegable (la fila puede quedar bajo la cabecera); si ni el desplegable
+   cabe, se alinea su borde superior bajo la cabecera. */
+function revealTask(id){
+  const row = document.querySelector(`[data-trow="${id}"]`)?.closest('.task');
+  if(!row) return;
+  const panel = row.nextElementSibling?.classList.contains('adjust') ? row.nextElementSibling : null;
+  const pin = document.getElementById('hoyPin');
+  const topLimit = pin.classList.contains('pinned') ? pin.getBoundingClientRect().bottom : 8;
+  const bottomLimit = document.getElementById('tabs').getBoundingClientRect().top - 12;
+  const space = bottomLimit - topLimit;
+  const top = row.getBoundingClientRect().top;
+  const pTop = panel ? panel.getBoundingClientRect().top : top;
+  const bottom = (panel || row).getBoundingClientRect().bottom;
+  let delta = 0;
+  if(bottom - top <= space){
+    if(top < topLimit) delta = top - topLimit;
+    else if(bottom > bottomLimit) delta = bottom - bottomLimit;
+  }else if(bottom - pTop <= space){
+    if(pTop < topLimit) delta = pTop - topLimit;
+    else if(bottom > bottomLimit) delta = bottom - bottomLimit;
+  }else delta = pTop - topLimit;
+  if(Math.abs(delta) < 1) return;
+  const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollBy({top:delta, behavior:smooth ? 'smooth' : 'auto'});
+}
 
 /* Cierre automático del check-in al completarlo: para una tarea que resta
    cucharas, se cierra al elegir recuperación (el último dato que falta); para
@@ -6722,17 +6757,18 @@ document.getElementById('coEnergy').addEventListener('click', e => {
 document.getElementById('coSensory').addEventListener('click', e => {
   const b = e.target.closest('[data-v]'); if(!b) return; coSensory = +b.dataset.v; coSync();
 });
-/* Fija la cabecera solo si debajo, hasta la barra, caben al menos ~2 tareas. */
+/* Fija la cabecera solo si debajo, hasta la barra, caben al menos ~2 tareas
+   y, si hay algún desplegable de tarea abierto, ese desplegable entero. Si no
+   cabe, la cabecera se suelta mientras esté abierto (sin mover nada: sticky
+   no cambia el flujo) para que la barra nunca tape parte del desplegable. */
 function pinHoyTop(){
   const pin = document.getElementById('hoyPin');
   if(!pin || currentTab !== 'hoy') return;
-  const wasPinned = pin.classList.contains('pinned');
   pin.classList.remove('pinned');
   const h = pin.getBoundingClientRect().height;
   const navTop = document.getElementById('tabs').getBoundingClientRect().top;
-  const fits = navTop - h >= 140;
-  pin.classList.toggle('pinned', fits);
-  if(wasPinned !== fits && !fits) window.scrollTo(0, 0);
+  const panel = Math.max(0, ...[...document.querySelectorAll('#taskList .adjust')].map(p => p.getBoundingClientRect().height));
+  pin.classList.toggle('pinned', navTop - 12 - h >= Math.max(140, panel));
 }
 window.addEventListener('resize', pinHoyTop);
 function openCheckout(){
