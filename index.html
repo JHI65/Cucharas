@@ -597,8 +597,8 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .ci-sheet h2{font-size:21px;font-weight:800;letter-spacing:-0.015em}
 .ci-sheet p.sub{font-size:14px;margin-bottom:8px}
 .ci-count{text-align:center;margin:18px 0 8px;font-variant-numeric:tabular-nums}
-.ci-count span{display:block;font-size:48px;font-weight:800;line-height:1.05;color:var(--ink)}
-.ci-count small{display:block;margin-top:6px;font-size:16px;color:var(--ink-soft)}
+.ci-count span{display:block;font-size:64px;font-weight:800;line-height:1;letter-spacing:-0.02em;color:var(--accent)}
+.ci-count small{display:block;margin-top:8px;font-size:18px;font-weight:600;color:var(--accent)}
 .ci-range{-webkit-appearance:none;appearance:none;width:100%;height:28px;margin:6px 0 14px;background:none;--fill:50%}
 .ci-range::-webkit-slider-runnable-track{height:6px;border-radius:3px;
   background:linear-gradient(to right,var(--accent) var(--fill),color-mix(in srgb,var(--line) 40%,var(--bg)) var(--fill))}
@@ -607,8 +607,8 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .ci-range::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-12px;border-radius:50%;
   background:#FFFFFF;border:1px solid var(--line);box-shadow:0 2px 6px rgba(60,30,40,.18)}
 .ci-range::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:#FFFFFF;border:1px solid var(--line);box-shadow:0 2px 6px rgba(60,30,40,.18)}
-.ci-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px}
-.ci-chip{padding:10px 12px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px}
+.ci-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:24px}
+.ci-chip{padding:10px 12px;min-height:52px;border-radius:var(--r-block);border:1px solid var(--line);background:none;color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
 .ci-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
 .ci-cycle{margin-bottom:14px;padding:14px 16px;border-radius:var(--r-block);background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
 .ci-cycle-msg{display:flex;align-items:center;gap:16px}
@@ -3257,10 +3257,6 @@ const EN = {
  "Una cuchara es una unidad de energía. Cada día tienes un número distinto; las tareas gastan cucharas y descansar las recupera. La idea es de Christine Miserandino (teoría de las cucharas) y de Maja Toudal y Tony Attwood (Energy Accounting).": "A spoon is a unit of energy. Each day you have a different number; tasks spend spoons and resting recovers them. The idea comes from Christine Miserandino (spoon theory) and from Maja Toudal and Tony Attwood (Energy Accounting).",
  "Una estimación de cuándo llegará el siguiente sangrado, a partir de tus propios ciclos anteriores. Es para tu seguimiento, no para buscar ni evitar un embarazo.": "An estimate of when the next bleeding will arrive, based on your own past cycles. It's for your own tracking, not for trying for or avoiding pregnancy.",
  "Usar": "Use",
- "Poco · 25 %": "Low · 25 %",
- "Normal · 50 %": "Normal · 50 %",
- "Bien · 80 %": "Good · 80 %",
- "Máximo · 100 %": "Maximum · 100 %",
  "Sin cucharas": "No spoons",
  "Máximo": "Maximum",
  "Cucharas con las que te levantas": "Spoons you wake up with",
@@ -5492,8 +5488,10 @@ document.getElementById('btnFinReplay').addEventListener('click', () => {
 const dlgCheckin = document.getElementById('dlgCheckin');
 const ciRange = document.getElementById('ciRange');
 sheetDragClose(dlgCheckin.querySelector('.ci-sheet'), 'ciSkip');
-const CI_PRESETS = [['Poco · 25 %', 0.25], ['Normal · 50 %', 0.5], ['Bien · 80 %', 0.8], ['Máximo · 100 %', 1]];
-const ciPresetValue = p => p === 0.25 ? Math.max(1, Math.round(state.settings.max * p)) : Math.round(state.settings.max * p);
+/* Atajos en cucharas, calculados sobre el máximo de cada persona; con máximos
+   pequeños se quitan los repetidos en vez de mostrar dos botones iguales. */
+const CI_PRESETS = [0.25, 0.5, 2/3, 1];
+const ciPresetValues = max => [...new Set(CI_PRESETS.map(p => Math.max(1, Math.round(max * p))))].filter(v => v <= max);
 /* Palabra literal relativa al máximo de cada persona, no a un 12 fijo. */
 function ciWordFor(v){
   const max = state.settings.max, pct = max ? v / max : 0;
@@ -5529,8 +5527,8 @@ function refreshPeakInfo(){
 function openCheckin(){
   ciRange.max = state.settings.max;
   ciRange.value = day().budget ?? Math.round(state.settings.max * 0.65);
-  document.getElementById('ciPresets').innerHTML = CI_PRESETS
-    .map(([n, p]) => `<button type="button" class="ci-chip" data-ci="${ciPresetValue(p)}" aria-pressed="false">${tr(n)}</button>`).join('');
+  document.getElementById('ciPresets').innerHTML = ciPresetValues(state.settings.max)
+    .map(v => `<button type="button" class="ci-chip" data-ci="${v}" aria-pressed="false">${trf(v === 1 ? '{n} cuchara' : '{n} cucharas', {n:v})}</button>`).join('');
   document.getElementById('ciMarginRow').hidden = !precautionReason(todayKey());
   document.getElementById('ciMarginOff').checked = !!day().marginOff;
   document.getElementById('ciNote').value = day().checkinNote || '';
