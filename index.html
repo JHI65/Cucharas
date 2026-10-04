@@ -654,10 +654,6 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .en-row .en-text strong{display:block;font-size:16px;font-weight:500}
 .en-row .en-text small{display:block;margin-top:2px;font-size:14px;color:var(--ink-soft)}
 .en-row.static{cursor:default}
-.en-total{display:flex;align-items:center;gap:14px;margin-top:4px;padding:16px 0 18px;border-top:1px solid var(--line)}
-.en-total .en-num{flex:none;width:40px;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
-.en-total-lab{display:block;margin-bottom:8px;font-size:16px;color:var(--ink)}
-.en-spoons-sm svg{height:30px}
 .en-adjust{display:flex;align-items:center;gap:16px;width:100%;min-height:60px;padding:12px 18px;border:none;border-radius:var(--r-block);
   background:color-mix(in srgb,var(--surface-2) 45%,var(--bg));color:var(--accent);font-size:17px;font-weight:500;text-align:left}
 .en-adjust > svg:first-child{flex:none;width:16px;height:32px;fill:var(--spoon);transform:rotate(25deg)}
@@ -1746,10 +1742,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <p class="energy-count en-count" id="enCount"></p>
     <div class="spoons en-spoons" id="enRow" role="img"></div>
     <ul class="en-list" id="enList"></ul>
-    <div class="en-total">
-      <span class="en-num" id="enLeft"></span>
-      <div><span class="en-total-lab" data-i18n="Cucharas disponibles">Cucharas disponibles</span><div class="spoons en-spoons-sm" id="enLeftRow" aria-hidden="true"></div></div>
-    </div>
     <button class="en-adjust" id="enAdjust"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="Ajustar cucharas del día">Ajustar cucharas del día</span><svg class="act-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
   </div>
 </dialog>
@@ -5688,7 +5680,7 @@ function enRow(key, num, ic, title, sub){
 }
 function renderEnergy(){
   const d = day(), k = todayKey();
-  const { budget, effective, marginAmount, gasto, recarga, left } = spoonsLeft(d, k);
+  const { budget, marginAmount, gasto, recarga } = spoonsLeft(d, k);
   const count = document.getElementById('spoonCount');
   const c = document.getElementById('enCount');
   c.className = count.className + ' en-count'; c.innerHTML = count.innerHTML;
@@ -5708,8 +5700,6 @@ function renderEnergy(){
   if(gasto) rows.push(enRow(null, fmtSigned(-gasto), 'i-act', tr('Tareas hechas')));
   if(recarga) rows.push(enRow(null, fmtSigned(recarga), 'i-leaf', tr('Recargas')));
   document.getElementById('enList').innerHTML = rows.join('');
-  document.getElementById('enLeft').textContent = left < 0 ? `−${fmtN(Math.abs(left))}` : fmtN(left);
-  document.getElementById('enLeftRow').innerHTML = spoonRowHTML(left, Math.ceil(Math.max(effective, left, 0)));
 }
 function openEnergy(){
   if(day().budget == null){ openCheckin(); return; }
@@ -5737,6 +5727,7 @@ sheetDragClose(dlgEnergy.querySelector('.en-sheet'), 'enX');
 const dlgAdjust = document.getElementById('dlgAdjust');
 const adRange = document.getElementById('adRange');
 const AD_PRESETS = [['Sin energía', 0.25], ['Justo', 0.5], ['Bien', 0.8], ['De sobra', 1]];
+const adPresetValue = p => p === 0.25 ? Math.max(1, Math.round(state.settings.max * p)) : Math.round(state.settings.max * p);
 function adSync(){
   const v = +adRange.value, max = +adRange.max || 1;
   document.getElementById('adNum').textContent = v;
@@ -5749,7 +5740,7 @@ function openAdjust(){
   adRange.max = Math.max(max, day().budget ?? 0);
   adRange.value = day().budget ?? Math.round(max * 0.65);
   document.getElementById('adPresets').innerHTML = AD_PRESETS.map(([n, p]) => {
-    const v = ciPresetValue(p);
+    const v = adPresetValue(p);
     return `<button type="button" class="ad-chip" data-ad="${v}" aria-pressed="false"><b>${tr(n)}</b>${fmtN(v)}</button>`;
   }).join('');
   adSync(); openDialog(dlgAdjust);
