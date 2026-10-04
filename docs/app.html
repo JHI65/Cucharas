@@ -109,10 +109,6 @@ input,select,textarea{font:inherit;color:inherit}
 .count small{font-weight:400;font-size:15px;color:var(--ink-soft)}
 .overdrawn{color:var(--alert)}
 .notice{margin:9px 0 0;font-size:14px;color:var(--alert)}
-.extra-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-.extra-label{font-size:14px;color:var(--ink-soft)}
-.extra-block .count{color:var(--alert)}
-.spoons.over{--spoon:var(--alert)}
 
 .linkbtn{
   background:none;border:none;padding:6px 0;
@@ -935,6 +931,105 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .co-actions button{min-height:56px;font-size:17px}
 .co-actions #coCancel{border-color:var(--accent);color:var(--ink)}
 #dlgCheckout::backdrop{background:rgba(52,38,46,.45)}
+/* ---- Añadir tarea ---- */
+.tk-sheet{max-height:92vh;padding-top:10px;transition:transform .2s ease}
+.tk-sheet .sheet-head h2{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 6px}
+.tk-sheet .sheet-head p.sub{font-size:16px;margin:0 0 22px}
+
+.tk-search{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 16px;border-radius:16px;
+  background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));color:var(--ink-soft)}
+.tk-search svg{flex:none;width:22px;height:22px;color:var(--ink)}
+.tk-search input{flex:1;min-width:0;border:none;background:none;padding:12px 0;font-size:16px;outline:none;-webkit-appearance:none;appearance:none}
+.tk-search input::-webkit-search-cancel-button{display:none}
+.tk-sec{margin:22px 0 12px;font-size:17px;font-weight:500;color:var(--ink)}
+.tk-recent{display:flex;flex-wrap:wrap;gap:8px}
+.tk-chip,.tk-act{display:flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb,var(--line) 70%,var(--bg));
+  background:var(--surface);color:var(--ink);text-align:left;font-size:14.5px;line-height:1.25}
+.tk-chip{min-height:48px;padding:8px 12px;border-radius:16px}
+.tk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tk-act{min-height:62px;padding:8px 10px;border-radius:16px}
+.tk-act span,.tk-chip span{min-width:0;overflow-wrap:normal;hyphens:manual}
+.tk-chip svg,.tk-act svg{flex:none;width:22px;height:22px;color:var(--accent)}
+.tk-chip.dep svg,.tk-act.dep svg{color:var(--deposit)}
+.tk-none{margin:18px 0 0;font-size:15px;color:var(--ink-soft)}
+.tk-new{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;margin-top:22px;
+  border:1px solid var(--accent);border-radius:16px;background:none;color:var(--accent);font-size:17px;font-weight:500}
+.tk-new svg{width:22px;height:22px}
+.tk-help{display:flex;gap:14px;margin:20px 0 4px;padding:16px;border-radius:16px;
+  background:color-mix(in srgb,var(--surface-2) 25%,var(--bg))}
+.tk-help>svg{flex:none;width:28px;height:28px;color:#D9A441}
+.tk-help-t{margin:0 0 4px;font-size:15px;font-weight:500}
+.tk-help-b{margin:0 0 8px;font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.tk-link{border:none;background:none;padding:6px 0;min-height:32px;font-size:14px;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.tk-picked{display:flex;align-items:center;gap:16px;width:100%;padding:10px 16px 10px 10px;margin-bottom:14px;
+  border:1px solid color-mix(in srgb,var(--line) 70%,var(--bg));border-radius:18px;background:var(--surface);text-align:left;color:var(--ink)}
+.tk-picked-ic{flex:none;width:68px;height:68px;border-radius:16px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--surface-2) 40%,var(--bg));color:var(--accent)}
+.tk-picked-ic.dep{color:var(--deposit);background:color-mix(in srgb,var(--deposit) 10%,var(--bg))}
+.tk-picked-ic svg{width:30px;height:30px}
+.tk-picked-t{flex:1;min-width:0}
+.tk-picked-name{display:block;font-size:18px;font-weight:600}
+.tk-picked-cost{display:block;margin-top:3px;font-size:15px;color:var(--accent)}
+.tk-picked-cost.dep{color:var(--deposit)}
+.tk-chev{flex:none;width:20px;height:20px;color:var(--ink)}
+.tk-costcard{display:flex;align-items:center;gap:14px;padding:16px;margin-bottom:22px;border-radius:18px;
+  background:color-mix(in srgb,var(--surface-2) 25%,var(--bg))}
+.tk-costcard-sp{flex:none;width:22px;height:44px;fill:var(--accent) !important;transform:rotate(20deg)}
+.tk-costcard-t{flex:1;min-width:0}
+.tk-lab{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--ink);white-space:nowrap}
+.tk-sheet .field>label.tk-lab{display:flex;font-size:16px;color:var(--ink);margin-bottom:10px}
+.tk-info{border:none;background:none;padding:0;width:32px;height:32px;display:grid;place-items:center;color:var(--ink-soft)}
+.tk-info svg{width:20px;height:20px}
+.tk-costcard-n{display:block;font-size:22px;font-weight:600;color:var(--accent)}
+.tk-adjust{flex:none;max-width:42%;min-height:48px;padding:8px 12px;border:none;border-radius:14px;
+  background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));color:var(--accent);font-size:13.5px;line-height:1.3}
+.tk-name{display:flex !important;align-items:center;gap:14px;min-height:58px;padding:0 16px;margin:0 !important;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:16px;background:var(--surface);color:var(--accent)}
+.tk-name svg{flex:none;width:22px;height:22px}
+.tk-name input{flex:1;min-width:0;border:none !important;background:none !important;padding:14px 0 !important;font-size:17px;color:var(--ink);outline:none}
+.tk-sheet .field{margin-bottom:20px}
+.tk-sheet .field>label{font-size:16px;color:var(--ink)}
+.tk-seg{display:flex;gap:10px}
+.tk-seg button{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:8px 8px;white-space:nowrap;
+  border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));border-radius:999px;background:var(--surface);color:var(--ink);font-size:14.5px}
+.tk-seg button svg{flex:none;width:20px;height:20px;color:var(--accent)}
+.tk-seg button svg[viewBox="0 0 20 40"]{width:12px;height:24px;fill:currentColor;transform:rotate(20deg)}
+.tk-seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
+.tk-seg button[aria-pressed="true"] svg{color:#FFF8F9}
+.tk-stepper{gap:14px}
+.tk-stepper button{width:48px;height:46px;border-radius:14px;border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.tk-stepper output{min-width:34px;text-align:center;font-size:20px;font-variant-numeric:tabular-nums}
+.tk-unit{font-size:16px;color:var(--accent)}
+.tk-learned{display:block;margin-top:8px}
+.tk-learned:empty{display:none}
+.tk-infonote{margin:-8px 0 16px}
+.tk-more{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:0 16px;border:none;border-radius:14px;
+  background:color-mix(in srgb,var(--surface-2) 30%,var(--bg));color:var(--ink);font-size:16px;text-align:left}
+.tk-more svg{flex:none;width:20px;height:20px;color:var(--accent)}
+.tk-more span{flex:1}
+.tk-more .tk-more-chev{color:var(--ink);transition:transform .15s ease}
+.tk-more[aria-expanded="true"] .tk-more-chev{transform:rotate(180deg)}
+#tkMoreBody{padding-top:16px}
+.tk-sub{margin:0 0 10px;font-size:16px;color:var(--ink-soft)}
+.tk-times{gap:12px;margin-bottom:18px}
+.tk-time{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:54px;padding:0 12px 0 14px;
+  border:1px solid color-mix(in srgb,var(--line) 80%,var(--bg));border-radius:14px;background:var(--surface);color:var(--ink-soft);font-size:16px}
+.tk-time svg{flex:none;width:22px;height:22px;color:var(--accent)}
+.tk-time input{flex:1;min-width:0;border:none;background:none;padding:0;text-align:right;font:inherit;color:var(--ink);
+  -webkit-appearance:none;appearance:none;min-height:44px}
+.tk-time input::-webkit-date-and-time-value{text-align:right;margin:0}
+.tk-time input::-webkit-calendar-picker-indicator{display:none}
+.tk-sheet .tk-select{position:relative;display:flex;margin:0;align-items:center;gap:14px;min-height:56px;padding:0 16px;
+  border:1px solid color-mix(in srgb,var(--line) 80%,var(--bg));border-radius:14px;background:var(--surface)}
+.tk-select svg{flex:none;width:22px;height:22px;color:var(--accent)}
+.tk-select .tk-select-chev{color:var(--ink);pointer-events:none}
+.tk-select select{flex:1;min-width:0;border:none;background:none;padding:14px 0;font-size:16px;color:var(--ink);
+  -webkit-appearance:none;appearance:none;outline:none}
+#repDays,#repDur{margin-top:12px}
+.tk-save{display:block;width:100%;min-height:58px;margin-top:22px;border:none;border-radius:16px;
+  background:var(--accent);color:#FFF8F9;font-size:18px;font-weight:500}
+#tDeleteRow{margin-top:8px}
+#dlgTask::backdrop{background:rgba(52,38,46,.45)}
 /* ---- Pico sensorial (dlgPeak) ---- */
 .pk-sheet{padding-top:10px;transition:transform .2s ease}
 .pk-sheet h2{font-size:24px;font-weight:800;letter-spacing:-0.015em;margin:8px 0 10px}
@@ -1089,6 +1184,13 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <symbol id="t-work" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5h6v2M3.5 12.5h17"/></g></symbol>
   <symbol id="t-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></g></symbol>
   <symbol id="t-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></g></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5 4 20z"/><path d="M13.5 7l3 3"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></g></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5L12 15l5.5-5.5"/></g></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="15" rx="2.5"/><path d="M9 3.5h6v3H9zM9 12.5h6"/></g></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5h6M10 20.5h4M12 4.5a5.5 5.5 0 00-3.2 10c.5.4.7.9.7 1.5v.5h5V16c0-.6.2-1.1.7-1.5A5.5 5.5 0 0012 4.5z"/><path d="M12 1.5v1M4.5 4.5l.8.8M19.5 4.5l-.8.8M2 11h1M21 11h1"/></g></symbol>
   <symbol id="i-close" viewBox="0 0 24 24">
     <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
@@ -1131,13 +1233,6 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <p><strong id="energyLine1"></strong><span id="spoonBreak"></span></p>
       </div>
       <p class="notice" id="spoonNotice" hidden></p>
-      <div class="extra-block" id="overBlock" hidden>
-        <div class="meter-foot">
-          <span class="extra-label" data-i18n="Sobrestimulación">Sobrestimulación</span>
-          <span class="count" id="overCount"></span>
-        </div>
-        <div class="spoons over" id="overRow" role="img"></div>
-      </div>
     </div>
     <button class="peak-btn" id="btnPeak"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="He tenido un pico sensorial ahora">He tenido un pico sensorial ahora</span></button>
 
@@ -1690,82 +1785,138 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
 <!-- ===== Nueva tarea ===== -->
 <dialog id="dlgTask">
-  <div class="sheet">
-    <h2>Añadir tarea</h2>
-    <p class="sub">Elige de tu lista o escribe una nueva.</p>
-    <div class="chips" id="taskSuggest"></div>
-    <div class="field">
-      <label for="tName" data-i18n="Qué vas a hacer">Qué vas a hacer</label>
-      <input type="text" id="tName" placeholder="Ducha, compra, llamada…" data-i18n-ph="Ducha, compra, llamada…">
+  <div class="sheet tk-sheet">
+    <div class="sheet-grab" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <div><h2>Añadir tarea</h2>
+      <p class="sub">Elige una actividad de tu lista o escribe una nueva.</p></div>
+      <button class="sheet-x" id="tCancel" data-i18n-aria="Cerrar" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
-    <p class="lib-note" id="tCalNote" hidden style="margin:-8px 0 16px" data-i18n="Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.">Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.</p>
-    <div class="field">
-      <label data-i18n="Tipo">Tipo</label>
-      <div class="chips" id="tKind">
-        <button class="chip" data-kind="gasto" aria-pressed="true" data-i18n="Gasta cucharas">Gasta cucharas</button>
-        <button class="chip" data-kind="recarga" data-i18n="Recarga cucharas">Recarga cucharas</button>
-      </div>
-    </div>
-    <div class="field">
-      <label for="tCost" id="tCostLab">Cuánto crees que te va a costar</label>
-      <div class="stepper">
-        <button id="tMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        <output id="tCost">2</output>
-        <button id="tPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
-        <span class="lib-note" id="tLearned"></span>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label for="tTime" data-i18n="Hora inicio">Hora inicio</label>
-        <input type="time" id="tTime">
-      </div>
-      <div class="field">
-        <label for="tTimeEnd" data-i18n="Hora fin">Hora fin</label>
-        <input type="time" id="tTimeEnd" aria-describedby="tTimeMsg">
-      </div>
-    </div>
-    <p class="notice" id="tTimeMsg" role="status" hidden style="margin:0 0 16px" data-i18n="La hora de fin no puede ser anterior a la de inicio.">La hora de fin no puede ser anterior a la de inicio.</p>
-    <div class="field" id="repField">
-      <label data-i18n="Repetir">Repetir</label>
-      <div class="chips" id="repMode">
-        <button class="chip" data-rep="once" aria-pressed="true" data-i18n="Solo ese día">Solo ese día</button>
-        <button class="chip" data-rep="weekdays"><span data-i18n="De lunes a viernes">De lunes a viernes</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
-        <button class="chip" data-rep="daily"><span data-i18n="Todos los días">Todos los días</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
-        <button class="chip" data-rep="custom"><span data-i18n="Elegir días">Elegir días</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
-      </div>
-      <div class="chips" id="repDays" hidden></div>
-      <div class="stepper" id="repDur" hidden>
-        <button id="wMinus" data-i18n-aria="Menos semanas" aria-label="Menos semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        <output id="wOut">4</output>
-        <button id="wPlus" data-i18n-aria="Más semanas" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
-        <span class="lib-note" id="wLabel">semanas</span>
-      </div>
-    </div>
-    <div class="field" id="tLibField">
-      <label class="row chk">
-        <div><span data-i18n="Añadir a «Cuánto cuesta cada actividad»">Añadir a «Cuánto cuesta cada actividad»</span></div>
-        <input type="checkbox" id="tLibOn" data-i18n-aria="Añadir a «Cuánto cuesta cada actividad»" aria-label="Añadir a «Cuánto cuesta cada actividad»" style="flex:0 0 auto;width:20px;height:20px">
+
+    <div id="tkPick">
+      <label class="tk-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="search" id="tkSearch" placeholder="Buscar actividad…" data-i18n-ph="Buscar actividad…" data-i18n-aria="Buscar actividad…" aria-label="Buscar actividad…" autocomplete="off">
       </label>
-    </div>
-    <div class="field" id="tAccumField">
-      <label class="row chk">
-        <div><span data-i18n="Sube con los días seguidos">Sube con los días seguidos</span><span class="premium-tag" data-i18n="Premium">Premium</span></div>
-        <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
-      </label>
-      <div class="stepper" id="tAccumStepRow" hidden>
-        <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
-        <output id="tAccumOut">1</output>
-        <button id="tAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
-        <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
+      <div id="tkRecentBox">
+        <p class="tk-sec" data-i18n="Recientes">Recientes</p>
+        <div class="tk-recent" id="tkRecent"></div>
+      </div>
+      <div id="tkAllBox">
+        <p class="tk-sec" data-i18n="Todas las actividades">Todas las actividades</p>
+        <div class="tk-grid" id="tkAll"></div>
+      </div>
+      <p class="tk-none" id="tkNone" hidden></p>
+      <button class="tk-new" id="tkNew"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Escribir una tarea nueva">Escribir una tarea nueva</span></button>
+      <div class="tk-help">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bulb"/></svg>
+        <div>
+          <p class="tk-help-t" data-i18n="¿No encuentras una actividad?">¿No encuentras una actividad?</p>
+          <p class="tk-help-b" data-i18n="Puedes crear nuevas actividades o editar las existentes en Gestionar actividades.">Puedes crear nuevas actividades o editar las existentes en Gestionar actividades.</p>
+          <button class="tk-link" id="tkManage" data-i18n="Gestionar actividades">Gestionar actividades</button>
+        </div>
       </div>
     </div>
-    <div class="bigrow" id="tDeleteRow" hidden>
-      <button class="warn" id="tDelete" data-i18n="Borrar tarea">Borrar tarea</button>
-    </div>
-    <div class="bigrow">
-      <button id="tCancel" data-i18n="Cancelar">Cancelar</button>
-      <button class="primary" id="tSave" data-i18n="Añadir">Añadir</button>
+
+    <div id="tkForm" hidden>
+      <button class="tk-picked" id="tkPicked">
+        <span class="tk-picked-ic" id="tkPickedIc"></span>
+        <span class="tk-picked-t"><span class="tk-picked-name" id="tkPickedName"></span><span class="tk-picked-cost" id="tkPickedCost"></span></span>
+        <svg class="tk-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>
+      </button>
+      <div class="tk-costcard" id="tkCostCard">
+        <svg class="tk-costcard-sp" viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg>
+        <div class="tk-costcard-t">
+          <span class="tk-lab"><span id="tkCostCardLab">Coste estimado</span><button class="tk-info" data-tkinfo data-i18n-aria="Qué es el coste estimado" aria-label="Qué es el coste estimado"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg></button></span>
+          <span class="tk-costcard-n" id="tkCostCardN"></span>
+        </div>
+        <button class="tk-adjust" id="tkAdjust" data-i18n="Ajustar para esta tarea">Ajustar para esta tarea</button>
+      </div>
+
+      <div class="field" id="tkNameField">
+        <label class="tk-name">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pencil"/></svg>
+          <input type="text" id="tName" placeholder="¿Qué vas a hacer?" data-i18n-ph="¿Qué vas a hacer?" data-i18n-aria="¿Qué vas a hacer?" aria-label="¿Qué vas a hacer?">
+        </label>
+      </div>
+      <p class="lib-note" id="tCalNote" hidden style="margin:-8px 0 16px" data-i18n="Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.">Viene de tu calendario. Aquí solo pones el coste: el evento no se cambia.</p>
+      <div class="field" id="tkKindField">
+        <label data-i18n="Tipo">Tipo</label>
+        <div class="tk-seg" id="tKind">
+          <button data-kind="gasto" aria-pressed="true"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="Gasta cucharas">Gasta cucharas</span></button>
+          <button data-kind="recarga" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-leaf"/></svg><span data-i18n="Recarga cucharas">Recarga cucharas</span></button>
+        </div>
+      </div>
+      <div class="field" id="tkCostField">
+        <label class="tk-lab"><span id="tCostLab">Coste estimado</span><button class="tk-info" data-tkinfo data-i18n-aria="Qué es el coste estimado" aria-label="Qué es el coste estimado"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg></button></label>
+        <div class="stepper tk-stepper">
+          <button id="tMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+          <output id="tCost">2</output>
+          <button id="tPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+          <span class="tk-unit" id="tkUnit">cucharas</span>
+        </div>
+        <span class="lib-note tk-learned" id="tLearned"></span>
+      </div>
+      <p class="lib-note tk-infonote" id="tkInfoNote" hidden></p>
+
+      <button class="tk-more" id="tkMore" aria-expanded="false" aria-controls="tkMoreBody">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clip"/></svg>
+        <span data-i18n="Más opciones">Más opciones</span>
+        <svg class="tk-more-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-down"/></svg>
+      </button>
+      <div id="tkMoreBody" hidden>
+        <p class="tk-sub" data-i18n="Hora (opcional)">Hora (opcional)</p>
+        <div class="field-row tk-times">
+          <label class="tk-time">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>
+            <span data-i18n="Inicio">Inicio</span>
+            <input type="time" id="tTime" data-i18n-aria="Hora inicio" aria-label="Hora inicio">
+          </label>
+          <label class="tk-time">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>
+            <span data-i18n="Fin">Fin</span>
+            <input type="time" id="tTimeEnd" data-i18n-aria="Hora fin" aria-label="Hora fin" aria-describedby="tTimeMsg">
+          </label>
+        </div>
+        <p class="notice" id="tTimeMsg" role="status" hidden style="margin:0 0 16px" data-i18n="La hora de fin no puede ser anterior a la de inicio.">La hora de fin no puede ser anterior a la de inicio.</p>
+        <div class="field" id="repField">
+          <p class="tk-sub" data-i18n="Repetir">Repetir</p>
+          <label class="tk-select">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg>
+            <select id="repSel" data-i18n-aria="Repetir" aria-label="Repetir"></select>
+            <svg class="tk-select-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-down"/></svg>
+          </label>
+          <div class="chips" id="repDays" hidden></div>
+          <div class="stepper" id="repDur" hidden>
+            <button id="wMinus" data-i18n-aria="Menos semanas" aria-label="Menos semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+            <output id="wOut">4</output>
+            <button id="wPlus" data-i18n-aria="Más semanas" aria-label="Más semanas"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+            <span class="lib-note" id="wLabel">semanas</span>
+          </div>
+        </div>
+        <div class="field" id="tLibField">
+          <label class="row chk">
+            <div><span data-i18n="Añadir a «Cuánto cuesta cada actividad»">Añadir a «Cuánto cuesta cada actividad»</span></div>
+            <input type="checkbox" id="tLibOn" data-i18n-aria="Añadir a «Cuánto cuesta cada actividad»" aria-label="Añadir a «Cuánto cuesta cada actividad»" style="flex:0 0 auto;width:20px;height:20px">
+          </label>
+        </div>
+        <div class="field" id="tAccumField">
+          <label class="row chk">
+            <div><span data-i18n="Sube con los días seguidos">Sube con los días seguidos</span><span class="premium-tag" data-i18n="Premium">Premium</span></div>
+            <input type="checkbox" id="tAccumOn" data-i18n-aria="Sube con los días seguidos" aria-label="Sube con los días seguidos" style="flex:0 0 auto;width:20px;height:20px">
+          </label>
+          <div class="stepper" id="tAccumStepRow" hidden>
+            <button id="tAccumMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
+            <output id="tAccumOut">1</output>
+            <button id="tAccumPlus" data-i18n-aria="Más" aria-label="Más"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
+            <span class="lib-note" data-i18n="cucharas más por cada día seguido">cucharas más por cada día seguido</span>
+          </div>
+        </div>
+      </div>
+      <div class="bigrow" id="tDeleteRow" hidden>
+        <button class="warn" id="tDelete" data-i18n="Borrar tarea">Borrar tarea</button>
+      </div>
+      <button class="primary tk-save" id="tSave" data-i18n="Añadir tarea">Añadir tarea</button>
     </div>
   </div>
 </dialog>
@@ -2612,6 +2763,31 @@ const EN = {
  ", cerca del límite de tus cucharas": ", close to your spoon limit",
  "El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.": "The eye marks a day when what's planned reaches your spoons or is close to them.",
  "Añadir tarea": "Add task",
+ "Elige una actividad de tu lista o escribe una nueva.": "Pick an activity from your list or write a new one.",
+ "Revisa los detalles y añádela a tu día.": "Check the details and add it to your day.",
+ "Crea una tarea nueva para tu día.": "Create a new task for your day.",
+ "Buscar actividad…": "Search activity…",
+ "Recientes": "Recent",
+ "Todas las actividades": "All activities",
+ "Escribir una tarea nueva": "Write a new task",
+ "¿No encuentras una actividad?": "Can't find an activity?",
+ "Puedes crear nuevas actividades o editar las existentes en Gestionar actividades.": "You can create new activities or edit existing ones in Manage activities.",
+ "Recarga estimada": "Estimated recharge",
+ "Coste para esta tarea": "Cost for this task",
+ "Ajustar para esta tarea": "Adjust for this task",
+ "Qué es el coste estimado": "What the estimated cost is",
+ "¿Qué vas a hacer?": "What are you going to do?",
+ "Más opciones": "More options",
+ "Hora (opcional)": "Time (optional)",
+ "Inicio": "Start",
+ "Fin": "End",
+ "Gasta {n} cuchara": "Uses {n} spoon",
+ "Gasta {n} cucharas": "Uses {n} spoons",
+ "Recarga {n} cuchara": "Recharges {n} spoon",
+ "Recarga {n} cucharas": "Recharges {n} spoons",
+ "No hay ninguna actividad con ese nombre.": "No activity with that name.",
+ "Viene de la actividad en Gestionar actividades. Ajustarlo aquí solo cambia esta tarea.": "It comes from the activity in Manage activities. Adjusting it here only changes this task.",
+ "Lo que crees que te va a costar. Al terminar la tarea puedes poner lo que costó de verdad.": "What you think it will cost. When you finish the task you can enter what it really cost.",
  "Añadir tarea a este día": "Add a task to this day",
  "Añadir un gasto": "Adding an expense",
  "Aplicar desde ahora en adelante": "Apply from now on",
@@ -4167,20 +4343,6 @@ function renderMeter(){
   document.getElementById('btnCheckout').textContent = tr(co ? 'Cambiar' : 'Hacer check-out');
   document.getElementById('closer').className = 'closer' + (co ? ' done' : '');
 
-  /* Suma de todos los extras del día: picos sensoriales sueltos durante el
-     día y, si no hubo ninguno, la sobrestimulación que añade el check-out. */
-  const overTotal = -(d.extras || []).reduce((a,e)=>a+(e.coste||0), 0);
-  const overBlock = document.getElementById('overBlock');
-  if(overTotal){
-    const n = overTotal;
-    overBlock.hidden = false;
-    document.getElementById('overCount').textContent = `-${fmtN(n)}`;
-    const row = document.getElementById('overRow');
-    row.innerHTML = spoonRowHTML(n, n);
-    row.setAttribute('aria-label', trf('{n} cucharas de sobrestimulación', {n:fmtN(n)}));
-  }else{
-    overBlock.hidden = true;
-  }
   refreshEnergySheets();
 }
 function renderTasks(){
@@ -5614,10 +5776,11 @@ tTime.addEventListener('input', tTimeSync);
 tTimeEnd.addEventListener('input', tTimeSync);
 function tSync(){
   tCostOut.textContent = fmtN(tCost);
-  document.querySelectorAll('#tKind .chip').forEach(c =>
+  document.querySelectorAll('#tKind [data-kind]').forEach(c =>
     c.setAttribute('aria-pressed', c.dataset.kind === tKind));
-  document.getElementById('tCostLab').textContent = tr(tKind === 'recarga'
-    ? 'Cuántas cucharas te devuelve' : 'Cuánto crees que te va a costar');
+  document.getElementById('tCostLab').textContent = tr(tkMode === 'lib' ? 'Coste para esta tarea'
+    : tKind === 'recarga' ? 'Recarga estimada' : 'Coste estimado');
+  document.getElementById('tkUnit').textContent = tr(tCost === 1 ? 'cuchara' : 'cucharas');
   const nameV = tName.value.trim();
   const l = nameV ? learned(nameV) : null;
   const accumOn = tKind === 'gasto' && tAccumOn;
@@ -5659,8 +5822,9 @@ let repMode = 'once', repDays = new Set(), repWeeks = 4;
 const mondayIndex = d => (d.getDay() + 6) % 7;
 
 function repSync(){
-  document.querySelectorAll('#repMode .chip').forEach(c =>
-    c.setAttribute('aria-pressed', c.dataset.rep === repMode));
+  const prem = isPremium();
+  document.getElementById('repSel').innerHTML = REP_OPTS.map(([v, l]) =>
+    `<option value="${v}"${v === repMode ? ' selected' : ''}>${tr(l)}${v !== 'once' && !prem ? ' · ' + tr('Premium') : ''}</option>`).join('');
   const custom = repMode === 'custom';
   document.getElementById('repDays').hidden = !custom;
   document.getElementById('repDur').hidden = repMode === 'once';
@@ -5673,12 +5837,13 @@ function repSync(){
   if(!tMulti()){ tAccumOn = false; tAccumLoad(tName.value.trim()); }
   tSync();
 }
-document.getElementById('repMode').addEventListener('click', e => {
-  const b = e.target.closest('[data-rep]'); if(!b) return;
+const REP_OPTS = [['once','Solo ese día'],['weekdays','De lunes a viernes'],['daily','Todos los días'],['custom','Elegir días']];
+document.getElementById('repSel').addEventListener('change', e => {
+  const b = { dataset:{ rep:e.target.value } };
   /* Una tarea "cada día laborable, 4 semanas" ya planifica un mes entero
      desde hoy: sin esto, alguien gratis se saltaría "solo mañana" sin tocar
      el calendario para nada. */
-  if(b.dataset.rep !== 'once' && !requirePremium(tr('Las tareas que se repiten son una función de Spoony Premium.'))) return;
+  if(b.dataset.rep !== 'once' && !requirePremium(tr('Las tareas que se repiten son una función de Spoony Premium.'))){ e.target.value = repMode; return; }
   repMode = b.dataset.rep;
   if(repMode === 'custom' && !repDays.size) repDays.add(mondayIndex(new Date(taskDate+'T12:00:00')));
   repSync();
@@ -5708,24 +5873,96 @@ function expandDates(startKey){
   return out.length ? out : [startKey];
 }
 
+/* La hoja tiene tres vistas: elegir de la librería (pick), una actividad ya
+   elegida (lib: nombre, tipo y coste vienen de la librería) y una tarea
+   escrita a mano (new). Editar usa la vista de tarea escrita (edit). */
+let tkMode = 'pick', tkAdjusting = false, tkLibCost = 0;
+const tkEl = id => document.getElementById(id);
+const tkNorm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const tkSpoons = (kind, n) => trf(kind === 'recarga'
+  ? (n === 1 ? 'Recarga {n} cuchara' : 'Recarga {n} cucharas')
+  : (n === 1 ? 'Gasta {n} cuchara' : 'Gasta {n} cucharas'), {n:fmtN(n)});
+function tkSub(){
+  if(tkMode === 'edit') return tr('Cambia lo que haga falta.');
+  if(taskDate !== todayKey()) return trf('Empieza el {fecha}.', {fecha:fmtDate(taskDate)});
+  return tr(tkMode === 'lib' ? 'Revisa los detalles y añádela a tu día.'
+    : tkMode === 'new' ? 'Crea una tarea nueva para tu día.'
+    : 'Elige una actividad de tu lista o escribe una nueva.');
+}
+function tkMoreSet(open){
+  tkEl('tkMore').setAttribute('aria-expanded', open);
+  tkEl('tkMoreBody').hidden = !open;
+}
+function tkView(mode){
+  tkMode = mode;
+  const lib = mode === 'lib', pick = mode === 'pick';
+  tkEl('tkPick').hidden = !pick;
+  tkEl('tkForm').hidden = pick;
+  tkEl('tkPicked').hidden = !lib;
+  tkEl('tkCostCard').hidden = !lib || tkAdjusting;
+  tkEl('tkNameField').hidden = lib;
+  tkEl('tkKindField').hidden = lib;
+  tkEl('tkCostField').hidden = lib && !tkAdjusting;
+  tkEl('tLibField').hidden = lib;
+  tkEl('tkInfoNote').hidden = true;
+  document.querySelector('#dlgTask h2').textContent = tr(mode === 'edit' ? 'Editar tarea' : 'Añadir tarea');
+  document.querySelector('#dlgTask .sub').textContent = tkSub();
+  tSave.textContent = tr(mode === 'edit' ? 'Guardar' : 'Añadir tarea');
+  if(lib){
+    const it = libItem(tName.value.trim());
+    tkEl('tkPickedIc').className = 'tk-picked-ic' + (tKind === 'recarga' ? ' dep' : '');
+    tkEl('tkPickedIc').innerHTML = it ? actIconSvg(it) : '';
+    tkEl('tkPickedName').textContent = tName.value.trim();
+    tkEl('tkPickedCost').textContent = tkSpoons(tKind, tkLibCost);
+    tkEl('tkPickedCost').className = 'tk-picked-cost' + (tKind === 'recarga' ? ' dep' : '');
+    tkEl('tkCostCardLab').textContent = tr(tKind === 'recarga' ? 'Recarga estimada' : 'Coste estimado');
+    tkEl('tkCostCardN').textContent = trf(tkLibCost === 1 ? '{n} cuchara' : '{n} cucharas', {n:fmtN(tkLibCost)});
+  }
+  if(pick) tkRenderPick();
+  tSync();
+}
+/* Recientes: las actividades de la librería que aparecen en las tareas más cercanas a hoy. */
+function tkRecent(){
+  const out = [], today = todayKey();
+  const keys = Object.keys(state.days).filter(k => k <= today).sort().reverse();
+  for(const k of keys){
+    for(const x of [...state.days[k].tasks].reverse()){
+      const it = libItem(x.name);
+      if(it && !out.includes(it)) out.push(it);
+      if(out.length >= 3) return out;
+    }
+  }
+  return out;
+}
+const tkTile = (l, cls) => {
+  const dep = l.est < 0, n = Math.abs(learned(l.name).suggest);
+  return `<button class="${cls}${dep ? ' dep' : ''}" data-tklib="${l.id}" aria-label="${esc(l.name)}, ${esc(tkSpoons(dep ? 'recarga' : 'gasto', n))}">${actIconSvg(l)}<span>${esc(l.name)}</span></button>`;
+};
+function tkRenderPick(){
+  const q = tkNorm(tkEl('tkSearch').value.trim());
+  const all = byUse(state.library);
+  const shown = q ? all.filter(l => tkNorm(l.name).includes(q)) : all;
+  const recent = q ? [] : tkRecent();
+  tkEl('tkRecentBox').hidden = !recent.length;
+  tkEl('tkRecent').innerHTML = recent.map(l => tkTile(l, 'tk-chip')).join('');
+  tkEl('tkAllBox').hidden = !shown.length;
+  tkEl('tkAll').innerHTML = shown.map(l => tkTile(l, 'tk-act')).join('');
+  const none = tkEl('tkNone');
+  none.hidden = !!shown.length;
+  none.textContent = q ? tr('No hay ninguna actividad con ese nombre.') : tr('Todavía no hay actividades. Añade las que más se repiten en tu día.');
+}
 function openTaskSheet(dateKey){
   editingTask = null;
   taskDate = dateKey;
   tName.value = ''; tCost = 2; tKind = 'gasto'; tAccumOn = false; tAccumStep = 1; tLibOn = false; tLibTouched = false; tTime.value = ''; tTimeEnd.value = ''; tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
+  tkAdjusting = false;
+  tkEl('tkSearch').value = '';
   document.getElementById('tCalNote').hidden = true;
-  document.querySelector('#dlgTask h2').textContent = tr('Añadir tarea');
-  document.querySelector('#dlgTask .sub').textContent = dateKey === todayKey()
-    ? tr('Elige de tu lista o escribe una nueva.')
-    : trf('Empieza el {fecha}.', {fecha:fmtDate(dateKey)});
-  document.getElementById('taskSuggest').hidden = false;
   document.getElementById('repField').hidden = false;
   document.getElementById('tDeleteRow').hidden = true;
-  tSave.textContent = tr('Añadir');
-  const top = [...state.library].sort((a,b)=>b.samples.length-a.samples.length).slice(0,8);
-  document.getElementById('taskSuggest').innerHTML = top
-    .map(l => `<button class="chip" data-sug="${esc(l.name)}" data-cost="${learned(l.name).suggest}" aria-pressed="false">${esc(l.name)}</button>`).join('');
-  tSync(); repSync(); openDialog(dlgTask);
+  tkMoreSet(false);
+  tkView('pick'); repSync(); openDialog(dlgTask);
 }
 function openTaskEdit(taskId, dateKey = todayKey()){
   const t = day(dateKey).tasks.find(x => x.id === taskId);
@@ -5745,15 +5982,45 @@ function openTaskEdit(taskId, dateKey = todayKey()){
   tTimeEnd.value = t.timeEnd || '';
   tTimeSync();
   repMode = 'once'; repDays = new Set(); repWeeks = 4;
-  document.querySelector('#dlgTask h2').textContent = tr('Editar tarea');
-  document.querySelector('#dlgTask .sub').textContent = tr('Cambia lo que haga falta.');
-  document.getElementById('taskSuggest').hidden = true;
-  document.getElementById('taskSuggest').innerHTML = '';
+  tkAdjusting = false;
   document.getElementById('repField').hidden = true;
   document.getElementById('tDeleteRow').hidden = false;
-  tSave.textContent = tr('Guardar');
-  tSync(); openDialog(dlgTask);
+  tkMoreSet(true);
+  tkView('edit'); openDialog(dlgTask);
 }
+tkEl('tkSearch').addEventListener('input', tkRenderPick);
+tkEl('tkPick').addEventListener('click', e => {
+  const b = e.target.closest('[data-tklib]'); if(!b) return;
+  const l = state.library.find(x => x.id === b.dataset.tklib); if(!l) return;
+  const c = learned(l.name).suggest;
+  tName.value = l.name; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tkLibCost = tCost;
+  tLibOn = true; tLibTouched = false; tAccumLoad(l.name);
+  tkAdjusting = false;
+  tkView('lib');
+});
+tkEl('tkNew').addEventListener('click', () => {
+  tName.value = tkEl('tkSearch').value.trim();
+  tKind = 'gasto'; tCost = 2; tLibTouched = false; tLibOn = !!libItem(tName.value.trim());
+  tAccumOn = false; tAccumStep = 1; tAccumLoad(tName.value.trim());
+  tkAdjusting = false;
+  tkView('new');
+  tName.focus();
+});
+tkEl('tkPicked').addEventListener('click', () => { tkAdjusting = false; tkView('pick'); });
+tkEl('tkAdjust').addEventListener('click', () => { tkAdjusting = true; tkView('lib'); });
+tkEl('tkMore').addEventListener('click', () => tkMoreSet(tkEl('tkMoreBody').hidden));
+dlgTask.addEventListener('click', e => {
+  if(!e.target.closest('[data-tkinfo]')) return;
+  const n = tkEl('tkInfoNote');
+  n.textContent = tr(tkMode === 'lib'
+    ? 'Viene de la actividad en Gestionar actividades. Ajustarlo aquí solo cambia esta tarea.'
+    : 'Lo que crees que te va a costar. Al terminar la tarea puedes poner lo que costó de verdad.');
+  n.hidden = !n.hidden;
+});
+tkEl('tkManage').addEventListener('click', () => {
+  dlgTask.close();
+  renderLib(); actsShow('actsList', 0); openDialog(dlgLibList);
+});
 document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
 document.getElementById('btnQuickAdd').addEventListener('click', () => openTaskSheet(todayKey()));
 
@@ -5902,16 +6169,8 @@ const dlgLibList = document.getElementById('dlgLibList');
 sheetDragClose(dlgLibList.querySelector('.acts-sheet'), 'libListClose');
 document.getElementById('btnLib').addEventListener('click', () => { renderLib(); actsShow('actsList', 0); openDialog(dlgLibList); });
 document.getElementById('libListClose').addEventListener('click', () => dlgLibList.close());
-document.getElementById('taskSuggest').addEventListener('click', e => {
-  const b = e.target.closest('[data-sug]'); if(!b) return;
-  const c = +b.dataset.cost;
-  tName.value = b.dataset.sug; tKind = c < 0 ? 'recarga' : 'gasto'; tCost = Math.abs(c); tLibOn = true; tLibTouched = false; tAccumLoad(b.dataset.sug); tSync();
-  document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', x === b));
-});
-document.getElementById('tName').addEventListener('input', () => {
-  document.querySelectorAll('#taskSuggest .chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
-});
 document.getElementById('tCancel').addEventListener('click', () => dlgTask.close());
+sheetDragClose(dlgTask.querySelector('.tk-sheet'), 'tCancel');
 document.getElementById('tDelete').addEventListener('click', () => {
   if(!editingTask) return;
   const d = day(taskDate);
