@@ -550,6 +550,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
   max-height:85vh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
 }
+.sheet{transition:transform .2s ease}
 .sheet:focus{outline:none}
 .sheet h2{margin:0 0 4px;font-size:21px}
 .sheet p.sub{margin:0 0 18px;font-size:15px;color:var(--ink-soft)}
@@ -782,7 +783,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 
 /* ---- Días tipo ---- */
 .tpl-sheet{min-height:70vh;display:flex;flex-direction:column;padding-top:10px;transition:transform .2s ease}
-.sheet-grab{flex:none;width:40px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--line) 70%,var(--bg));margin:0 auto 16px}
+.sheet-grab{flex:none;box-sizing:content-box;width:40px;height:5px;padding:10px 40px;border-radius:3px;background:color-mix(in srgb,var(--line) 70%,var(--bg));background-clip:content-box;margin:-10px auto 6px;touch-action:none}
 .sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;touch-action:none}
 .tpl-sheet h2{font-size:28px;font-weight:800;letter-spacing:-0.01em}
 .sheet-x{flex:none;width:44px;height:44px;border-radius:50%;border:none;padding:0;display:grid;place-items:center;
@@ -6650,24 +6651,45 @@ document.getElementById('btnTpl').addEventListener('click', () => {
 });
 document.getElementById('tplClose').addEventListener('click', () => { dlgTpl.close(); renderAll(); });
 document.getElementById('tplX').addEventListener('click', () => document.getElementById('tplClose').click());
-/* Arrastrar hacia abajo desde el asa o la cabecera cierra la hoja, igual que
-   la X: el asa es una promesa de gesto y no puede ser solo decoración. */
+/* Arrastrar hacia abajo cierra la hoja, igual que la X: el asa es una promesa
+   de gesto y no puede ser solo decoración. Vale desde cualquier punto que no sea
+   un control (slider, campo) mientras la hoja esté arriba del todo. */
 function sheetDragClose(sheet, closeId){
-  let y0 = null, dy = 0;
+  if(sheet._dragWired) return;
+  sheet._dragWired = true;
+  const dlg = sheet.closest('dialog');
+  const close = () => {
+    const b = closeId && document.getElementById(closeId);
+    if(b) b.click();
+    else if(dlg.dispatchEvent(new Event('cancel', {cancelable:true}))) dlg.close();
+  };
+  const scrolled = el => { for(; el && el !== dlg; el = el.parentElement) if(el.scrollTop > 0) return true; return false; };
+  let x0 = 0, y0 = null, dy = 0, live = false;
+  const reset = () => { y0 = null; live = false; sheet.style.transition = ''; sheet.style.transform = ''; };
   sheet.addEventListener('touchstart', e => {
-    if(sheet.scrollTop > 0 || !e.target.closest('.sheet-grab, .sheet-head, .acts-bar') || e.target.closest('button')) return;
-    y0 = e.touches[0].clientY; dy = 0; sheet.style.transition = 'none';
+    y0 = null;
+    if(e.touches.length !== 1 || scrolled(e.target) || e.target.closest('input,textarea,select,[role=slider]')) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dy = 0; live = false;
   }, {passive:true});
   sheet.addEventListener('touchmove', e => {
     if(y0 == null) return;
-    dy = Math.max(0, e.touches[0].clientY - y0);
+    const ddx = e.touches[0].clientX - x0, ddy = e.touches[0].clientY - y0;
+    if(!live){
+      if(Math.abs(ddx) > Math.abs(ddy) || ddy < -6){ y0 = null; return; }
+      if(ddy < 8) return;
+      live = true; sheet.style.transition = 'none';
+    }
+    e.preventDefault();
+    dy = Math.max(0, ddy);
     sheet.style.transform = `translateY(${dy}px)`;
-  }, {passive:true});
+  }, {passive:false});
   sheet.addEventListener('touchend', () => {
     if(y0 == null) return;
-    y0 = null; sheet.style.transition = ''; sheet.style.transform = '';
-    if(dy > 90) document.getElementById(closeId).click();
+    const go = live && dy > 90;
+    reset();
+    if(go) close();
   });
+  sheet.addEventListener('touchcancel', reset);
 }
 sheetDragClose(dlgTpl.querySelector('.tpl-sheet'), 'tplClose');
 const dlgTplUse = document.getElementById('dlgTplUse');
@@ -7847,6 +7869,7 @@ document.getElementById('widgetTitlesPick').addEventListener('click', e => {
   await applyWidgetEvents();
   writeWidget();
 })();
+document.querySelectorAll('dialog > .sheet').forEach(sh => sheetDragClose(sh));
 </script>
 </body>
 </html>
