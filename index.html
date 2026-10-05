@@ -851,29 +851,27 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
    número sigue siendo lo más grande de la pantalla y la fila ya no ocupa
    una banda propia. Las cucharas fluyen seguidas (sin el hueco de cada cinco)
    y saltan de línea solas, así que vale igual para 6, 10, 15 o 20. */
-#s-hoy .meter{display:grid;grid-template-columns:fit-content(52%) 1fr;column-gap:18px;align-items:center}
+#s-hoy .meter{display:grid;grid-template-columns:fit-content(52%) 1fr;column-gap:12px;align-items:center}
 #s-hoy .meter > .energy-msg,#s-hoy .meter > .notice{grid-column:1 / -1}
 .energy-count{margin:0;line-height:1;white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums}
-.energy-count .big{font-size:68px;font-weight:800;letter-spacing:-0.04em}
-.energy-count .of{font-size:26px;font-weight:700;color:var(--spoon);margin-left:6px;letter-spacing:-0.02em}
+.energy-count .big{font-size:clamp(50px,15.6vw,68px);font-weight:800;letter-spacing:-0.04em}
+.energy-count .of{font-size:clamp(20px,6vw,26px);font-weight:700;color:var(--spoon);margin-left:6px;letter-spacing:-0.02em}
 .energy-count .of b{color:var(--accent);font-weight:700}
-.energy-count .lab{display:block;margin-top:6px;font-size:17px;line-height:1.2;white-space:normal;font-weight:400;color:var(--ink);letter-spacing:0}
+.energy-count .lab{display:block;margin-top:6px;font-size:clamp(13px,3.9vw,17px);line-height:1.2;white-space:normal;font-weight:400;color:var(--ink);letter-spacing:0}
 .energy-count.overdrawn .big,.energy-count.overdrawn .lab{color:var(--alert)}
 .energy-count .none{font-size:17px;color:var(--ink-soft);line-height:1.5}
-#spoonRow{gap:8px 7px;margin:0;align-content:center}
+/* Siempre 8 por fila (16 = dos filas): cada cuchara ocupa el ancho que haya,
+   hasta 22×44, así que se adapta a cualquier pantalla y tamaño de texto. */
+#spoonRow{display:grid;grid-template-columns:repeat(8,minmax(0,22px));gap:8px 4px;margin:0;align-content:center}
 #spoonRow .sgroup{display:contents}
-#spoonRow .sp{width:20px;height:40px}
-/* Móviles de ~390 de ancho: algo más pequeñas para que 15-16 quepan en dos filas de 8. */
-@media (max-width:400px){#spoonRow{column-gap:5px}#spoonRow .sp{width:17px;height:34px}}
+#spoonRow .sp{width:100%;height:auto;aspect-ratio:1/2}
 #s-hoy .meter > .energy-msg{margin-top:16px}
-/* Con poco ancho (móvil pequeño o texto al 130 %) no caben al lado: las
-   cucharas vuelven debajo del número, como antes. */
-@media (max-width:360px){#s-hoy .meter{grid-template-columns:1fr}#spoonRow{margin-top:12px}}
+/* Con el texto al 130 % no caben al lado: las cucharas van debajo del número. */
 :root[data-text-scale="1.3"] #s-hoy .meter{grid-template-columns:1fr}
 :root[data-text-scale="1.3"] #spoonRow{margin-top:12px}
-:root[data-text-scale="1.15"] #spoonRow{gap:6px 5px}
-:root[data-text-scale="1.15"] #spoonRow .sp{width:17px;height:34px}
 .peak-btn span{text-wrap:balance}
+.peak-btn .peak-short,.peak-btn.short .peak-long{display:none}
+.peak-btn.short .peak-short{display:inline}
 .energy-msg{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-block);
   background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
 .energy-ic{flex:none;width:28px;height:28px;color:var(--sun);fill:currentColor}
@@ -1312,7 +1310,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
       <p class="notice" id="spoonNotice" hidden></p>
     </div>
-    <button class="peak-btn" id="btnPeak"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span data-i18n="He tenido un pico sensorial ahora">He tenido un pico sensorial ahora</span></button>
+    <button class="peak-btn" id="btnPeak" data-i18n-aria="He tenido un pico sensorial ahora" aria-label="He tenido un pico sensorial ahora"><svg viewBox="0 0 20 40" aria-hidden="true"><use href="#spoon"/></svg><span class="peak-long" data-i18n="He tenido un pico sensorial ahora">He tenido un pico sensorial ahora</span><span class="peak-short" data-i18n="Pico sensorial">Pico sensorial</span></button>
 
     <div class="sectionhead tasks-head">
       <h2 data-i18n="Tareas">Tareas</h2>
@@ -3163,6 +3161,7 @@ const EN = {
  "Hay datos distintos en este móvil y en tu cuenta": "There's different data on this phone and in your account",
  "Hay datos distintos en este móvil y en tu cuenta. Hasta que elijas, no se sincroniza nada.": "There's different data on this phone and in your account. Nothing syncs until you choose.",
  "He tenido un pico sensorial ahora": "I've just had a sensory peak",
+ "Pico sensorial": "Sensory peak",
  "hecha": "done",
  "Historial": "History",
  "Hora en la que empieza el día": "Hour the day starts",
@@ -6772,9 +6771,17 @@ document.getElementById('coSensory').addEventListener('click', e => {
    y, si hay algún desplegable de tarea abierto, ese desplegable entero. Si no
    cabe, la cabecera se suelta mientras esté abierto (sin mover nada: sticky
    no cambia el flujo) para que la barra nunca tape parte del desplegable. */
+/* Si la frase larga no cabe en una línea, el botón dice solo "Pico sensorial". */
+function fitPeakLabel(){
+  const btn = document.getElementById('btnPeak'), long = btn.querySelector('.peak-long');
+  btn.classList.remove('short');
+  const lh = parseFloat(getComputedStyle(long).lineHeight) || 24;
+  btn.classList.toggle('short', long.getBoundingClientRect().height > lh * 1.5);
+}
 function pinHoyTop(){
   const pin = document.getElementById('hoyPin');
   if(!pin || currentTab !== 'hoy') return;
+  fitPeakLabel();
   pin.classList.remove('pinned');
   const h = pin.getBoundingClientRect().height;
   const navTop = document.getElementById('tabs').getBoundingClientRect().top;
