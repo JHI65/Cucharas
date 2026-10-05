@@ -863,6 +863,8 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 #spoonRow{gap:8px 7px;margin:0;align-content:center}
 #spoonRow .sgroup{display:contents}
 #spoonRow .sp{width:20px;height:40px}
+/* Móviles de ~390 de ancho: algo más pequeñas para que 15-16 quepan en dos filas de 8. */
+@media (max-width:400px){#spoonRow{column-gap:5px}#spoonRow .sp{width:17px;height:34px}}
 #s-hoy .meter > .energy-msg{margin-top:16px}
 /* Con poco ancho (móvil pequeño o texto al 130 %) no caben al lado: las
    cucharas vuelven debajo del número, como antes. */
