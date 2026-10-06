@@ -470,6 +470,93 @@ span.check{cursor:default}
 .dp-notes textarea{width:100%;min-height:110px;box-sizing:border-box;padding:14px 16px;border:none;border-radius:var(--r-block);
   background:color-mix(in srgb,var(--surface-2) 45%,var(--bg));color:var(--ink);font:inherit;font-size:16px;line-height:1.5;resize:none}
 #dCycleCard{margin-top:22px}
+/* ===== Finanzas: pocas cajas; jerarquía con tipografía, aire y filos finos. ===== */
+.fin-tabs button{font-size:15px;padding:0 4px}
+.cal-nav button:disabled{opacity:.35}
+.fin-hero{position:relative;margin:2px 0 18px;padding:4px 0 2px}
+.fin-wave{position:absolute;right:calc(-1 * var(--pad));top:-10px;width:62%;height:120px;fill:color-mix(in srgb,var(--accent) 8%,transparent);pointer-events:none}
+.fin-hero p{position:relative;margin:0}
+.fin-big{font-size:52px;line-height:1.05;font-weight:800;letter-spacing:-0.03em;color:var(--ink);font-variant-numeric:tabular-nums}
+.fin-big-lab{font-size:17px;color:var(--ink)}
+.fin-delta{display:inline-flex;align-items:center;gap:6px;margin-top:10px !important;padding:4px 12px;border-radius:999px;font-size:15px;
+  background:color-mix(in srgb,var(--surface-2) 60%,var(--bg));color:var(--ink-soft)}
+.fin-delta.down{background:color-mix(in srgb,var(--deposit) 12%,var(--bg));color:var(--deposit)}
+.fin-bar{display:block;height:12px;border-radius:999px;background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));overflow:hidden}
+.fin-bar > span{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.fin-bar.small{height:8px;margin:8px 0 6px}
+.fin-legend{margin-top:12px}
+.fin-legend p{display:grid;grid-template-columns:auto 1fr auto 48px;align-items:center;gap:10px;margin:0 0 6px;font-size:15px}
+.fin-legend b{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.fin-legend small{font-size:14px;color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%}
+.dot.fijo{background:var(--accent)}
+.dot.var{background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent)}
+.fin-budget,.fin-today{display:flex;align-items:center;gap:14px;width:100%;margin:18px 0 0;padding:14px 14px;border:none;border-radius:var(--r-block);
+  background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));color:var(--ink);text-align:left;font:inherit}
+.fin-budget-main{flex:1;min-width:0;display:block}
+/* Presupuesto: icono, título e importe arriba; la barra y el pie a todo el ancho. */
+#finBudget{display:grid;grid-template-columns:40px 1fr 18px;grid-template-areas:"ic top ch" "bar bar bar" "foot foot foot";column-gap:14px;row-gap:0}
+#finBudget .fin-ic{grid-area:ic}
+#finBudget .fin-budget-main{display:contents}
+#finBudget .fin-budget-top{grid-area:top;align-items:center}
+#finBudget .fin-bar{grid-area:bar;margin:12px 0 6px}
+#finBudget .fin-budget-foot{grid-area:foot}
+#finBudget .wchev{grid-area:ch}
+.fin-budget-top b{white-space:nowrap}
+.fin-budget-top,.fin-budget-foot{display:flex;justify-content:space-between;gap:10px}
+.fin-budget-top{font-size:16px}
+.fin-budget-top b{font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.fin-budget-foot{flex-wrap:wrap;font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.fin-budget-foot span{white-space:nowrap}
+.fin-h{margin:28px 0 8px;font-size:20px;font-weight:800;letter-spacing:-0.01em}
+.fin-h-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.fin-h-row .fin-h{margin-bottom:8px}
+.fin-h-total{font-size:20px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+#finHoyWrap .fin-h{margin-bottom:10px}
+#finHoyWrap .fin-today{margin-top:0}
+.fin-row{display:flex;align-items:center;gap:12px;width:100%;min-height:66px;padding:10px 0;margin:0;border:none;border-bottom:1px solid color-mix(in srgb,var(--line) 45%,var(--bg));
+  background:none;color:var(--ink);text-align:left;font:inherit}
+.fin-row:last-child{border-bottom:none}
+.fin-row.off .fin-amt{color:var(--ink-soft)}
+.fin-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));color:var(--accent)}
+.fin-ic svg{width:21px;height:21px}
+.fin-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px;background:none;border:none;padding:2px 0;text-align:left;color:inherit;font:inherit}
+.fin-name{font-size:16px;overflow-wrap:break-word}
+/* Texto al 130 %: el icono de cada fila es decorativo y se quita para que el nombre quepa. */
+:root[data-text-scale="1.3"] .fin-row .fin-ic{display:none}
+:root[data-text-scale="1.3"] .fin-tabs{gap:0;padding:3px}
+:root[data-text-scale="1.3"] .fin-tabs button{font-size:13px;padding:0 2px}
+.fin-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:13px;color:var(--ink-soft)}
+.fin-chip{padding:1px 8px;border-radius:999px;font-size:12px;background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));color:var(--ink-soft)}
+.fin-amt{flex:none;font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.fin-add-main{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;margin:4px 0 6px;border:none;border-radius:999px;
+  background:var(--accent);color:var(--surface);font-size:17px;font-weight:600;box-shadow:0 6px 18px rgba(75,58,63,.14)}
+.fin-add-main svg{width:20px;height:20px}
+.fin-donut-row{display:flex;align-items:center;gap:20px}
+.fin-donut{position:relative;flex:none;width:156px;height:156px}
+.fin-donut svg{width:100%;height:100%}
+.fin-donut-c{position:absolute;inset:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.fin-donut-c b{max-width:100%;font-size:16px;line-height:1.2;font-weight:800;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fin-donut-c small{font-size:12px;line-height:1.2;color:var(--ink-soft);max-width:70px}
+.fin-donut-legend{flex:1;min-width:0}
+.fin-donut-legend p{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin:0 0 8px;font-size:14px}
+.fin-donut-legend b{font-weight:600;font-variant-numeric:tabular-nums}
+@media (max-width:360px){.fin-donut-row{flex-direction:column;align-items:stretch}.fin-donut{margin:0 auto}}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .fin-donut-row{flex-direction:column;align-items:stretch}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .fin-donut{margin:0 auto 8px}
+.fin-evo{margin-top:26px;padding-top:4px;border-top:1px solid color-mix(in srgb,var(--line) 45%,var(--bg))}
+.fin-bars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:end;gap:12px;margin-top:6px}
+.fin-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.fin-col small{font-size:12px;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.fin-col span{display:block;flex:none;width:100%;max-width:44px;border-radius:10px;background:color-mix(in srgb,var(--surface-2) 75%,var(--bg))}
+.fin-col.on span{background:var(--accent)}
+.fin-col em{font-style:normal;font-size:13px;color:var(--ink-soft)}
+.fin-col.on em{color:var(--ink);font-weight:600}
+.fin-obs{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:12px 14px;border-radius:var(--r-block);
+  background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));font-size:15px}
+.fin-obs svg{flex:none;width:24px;height:24px;color:var(--accent)}
+.fin-obs.down svg{transform:scaleY(-1)}
+#finHistList .fin-ic svg{width:19px;height:19px}
 .dp-energy{position:relative;overflow:hidden;margin:0 0 24px;padding:20px 20px 18px;border-radius:var(--radius);
   background:color-mix(in srgb,var(--surface-2) 45%,var(--bg))}
 .dp-energy-wave{position:absolute;right:0;top:0;width:58%;height:100%;fill:color-mix(in srgb,var(--accent) 7%,transparent);pointer-events:none}
@@ -1318,6 +1405,11 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></g></symbol>
   <symbol id="i-pencil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5 4 20z"/><path d="M13.5 7l3 3"/></g></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 4.5h2.2l2.1 10.2h10.4l2-7.2H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="16.5" cy="19" r="1.4"/></g></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><g fill="currentColor"><ellipse cx="7" cy="9" rx="1.9" ry="2.4"/><ellipse cx="11" cy="6.3" rx="1.9" ry="2.4"/><ellipse cx="15.5" cy="6.8" rx="1.9" ry="2.4"/><ellipse cx="18.6" cy="10.6" rx="1.8" ry="2.2"/><path d="M12.4 11.5c2.7 0 5.6 4.1 5.6 6.2 0 1.6-1.3 2.4-2.8 2.1-1.2-.2-1.8-.8-2.8-.8s-1.8.6-3 .8c-1.6.3-2.9-.6-2.9-2.1 0-2.2 3.1-6.2 5.9-6.2z"/></g></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17l5.5-5.5 4 4 7.5-8"/><path d="M15.5 7.5h5v5"/></g></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A2.5 2.5 0 016.5 5H17v3"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><path d="M16 13.5h4"/></g></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="2.5"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4"/></g></symbol>
   <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></g></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></g></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5L12 15l5.5-5.5"/></g></symbol>
@@ -1458,29 +1550,68 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <section class="screen" id="s-fin">
     <header class="top">
       <h1 class="title" data-i18n="Finanzas">Finanzas</h1>
+      <p class="sub" data-i18n="Integradas en tu vida, sin distraer">Integradas en tu vida, sin distraer</p>
     </header>
-    <div class="chips" id="finTabs" role="group" data-i18n-aria="Vista de finanzas" aria-label="Vista de finanzas">
-      <button class="chip" data-fintab="fijos" aria-pressed="false" data-i18n="Gastos fijos">Gastos fijos</button>
-      <button class="chip" data-fintab="variables" aria-pressed="true" data-i18n="Gastos variables">Gastos variables</button>
-      <button class="chip" data-fintab="historial" aria-pressed="false" data-i18n="Historial">Historial</button>
+    <div class="cal-view fin-tabs" id="finTabs" role="group" data-i18n-aria="Vista de finanzas" aria-label="Vista de finanzas">
+      <button data-fintab="resumen" aria-pressed="true" data-i18n="Resumen">Resumen</button>
+      <button data-fintab="variables" aria-pressed="false" data-i18n="Variables">Variables</button>
+      <button data-fintab="fijos" aria-pressed="false" data-i18n="Fijos">Fijos</button>
+      <button data-fintab="historial" aria-pressed="false" data-i18n="Historial">Historial</button>
+    </div>
+
+    <div id="finResumen">
+      <div class="cal-nav">
+        <button id="finPrev" data-i18n-aria="Mes anterior" aria-label="Mes anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <strong id="finMonthLabel"></strong>
+        <button id="finNext" data-i18n-aria="Mes siguiente" aria-label="Mes siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
+      <div class="fin-hero">
+        <svg class="fin-wave" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120C45 120 60 50 100 50s55 45 100 10V120z"/><path d="M30 120C70 120 85 72 125 72s45 30 75 18V120z"/></svg>
+        <p class="fin-big" id="finTotal"></p>
+        <p class="fin-big-lab" id="finTotalLab"></p>
+        <p class="fin-delta" id="finDelta" hidden></p>
+      </div>
+      <div class="fin-split" id="finSplit">
+        <div class="fin-bar" aria-hidden="true"><span id="finSplitBar"></span></div>
+        <div class="fin-legend">
+          <p><i class="dot fijo"></i><span data-i18n="Gastos fijos">Gastos fijos</span><b id="finSplitF"></b><small id="finSplitFp"></small></p>
+          <p><i class="dot var"></i><span data-i18n="Gastos variables">Gastos variables</span><b id="finSplitV"></b><small id="finSplitVp"></small></p>
+        </div>
+      </div>
+      <button class="fin-budget" id="finBudget"></button>
+      <div id="finHoyWrap">
+        <h2 class="fin-h" data-i18n="Hoy">Hoy</h2>
+        <button class="fin-today" id="finHoy"></button>
+      </div>
+      <div class="fin-h-row">
+        <h2 class="fin-h" data-i18n="Últimos movimientos">Últimos movimientos</h2>
+        <button class="linkbtn" id="finSeeAll" data-i18n="Ver todos">Ver todos</button>
+      </div>
+      <div id="finRecent"></div>
+    </div>
+
+    <div id="finVariables" hidden>
+      <button class="fin-add-main" id="btnAddVariable"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir gasto">Añadir gasto</span></button>
+      <div class="fin-h-row"><h2 class="fin-h" data-i18n="Este mes">Este mes</h2><b class="fin-h-total" id="finTotalVariables"></b></div>
+      <div id="finVariablesList"></div>
+      <section class="fin-donut-wrap" id="finDonutWrap" hidden>
+        <h2 class="fin-h" data-i18n="En qué se va tu dinero">En qué se va tu dinero</h2>
+        <div class="fin-donut-row">
+          <div class="fin-donut" id="finDonut"></div>
+          <div class="fin-donut-legend" id="finDonutLegend"></div>
+        </div>
+      </section>
     </div>
 
     <div id="finFijos" hidden>
+      <div class="fin-h-row"><h2 class="fin-h" data-i18n="Gastos fijos">Gastos fijos</h2><b class="fin-h-total" id="finTotalFijos"></b></div>
       <div id="finFijosList"></div>
-      <button class="add" id="btnAddFijo" data-i18n="Añadir gasto fijo">Añadir gasto fijo</button>
-      <div class="card">
-        <p><span data-i18n="Total gastos fijos:">Total gastos fijos:</span> <strong id="finTotalFijos"></strong></p>
-        <p><span data-i18n="Total del mes (fijos + variables):">Total del mes (fijos + variables):</span> <strong id="finTotalMesFijos"></strong></p>
-      </div>
-    </div>
-
-    <div id="finVariables">
-      <div id="finVariablesList"></div>
-      <button class="add" id="btnAddVariable" data-i18n="Añadir gasto variable">Añadir gasto variable</button>
-      <div class="card">
-        <p><span data-i18n="Total gastos variables:">Total gastos variables:</span> <strong id="finTotalVariables"></strong></p>
-        <p><span data-i18n="Total del mes (fijos + variables):">Total del mes (fijos + variables):</span> <strong id="finTotalMesVariables"></strong></p>
-      </div>
+      <button class="dp-add" id="btnAddFijo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir gasto fijo">Añadir gasto fijo</span></button>
+      <section class="fin-evo" id="finEvo">
+        <h2 class="fin-h" data-i18n="Evolución del gasto">Evolución del gasto</h2>
+        <div class="fin-bars" id="finBars"></div>
+        <p class="fin-obs" id="finObs" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use id="finObsIc" href="#i-trend"/></svg><span id="finObsText"></span></p>
+      </section>
     </div>
 
     <div id="finHistorial" hidden>
@@ -2215,6 +2346,21 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 </dialog>
 
 <!-- ===== Gasto fijo/variable ===== -->
+<dialog id="dlgFinBudget">
+  <div class="sheet">
+    <h2 data-i18n="Presupuesto mensual">Presupuesto mensual</h2>
+    <p class="sub" data-i18n="Lo que quieres gastar como mucho cada mes, sumando fijos y variables.">Lo que quieres gastar como mucho cada mes, sumando fijos y variables.</p>
+    <div class="field">
+      <label for="fbAmount" data-i18n="Importe (€)">Importe (€)</label>
+      <input type="number" id="fbAmount" step="1" min="0" inputmode="decimal">
+    </div>
+    <div class="bigrow">
+      <button class="warn" id="fbRemove" data-i18n="Quitar">Quitar</button>
+      <button class="primary" id="fbSave" data-i18n="Guardar">Guardar</button>
+    </div>
+    <div class="bigrow"><button id="fbCancel" data-i18n="Cancelar">Cancelar</button></div>
+  </div>
+</dialog>
 <dialog id="dlgGasto">
   <div class="sheet">
     <h2 id="gTitle">Gasto</h2>
@@ -2225,6 +2371,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="field">
       <label for="gImporte" data-i18n="Importe (€)">Importe (€)</label>
       <input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal">
+    </div>
+    <div class="field" id="gCatField" hidden>
+      <label data-i18n="Categoría">Categoría</label>
+      <div class="chips" id="gCat" role="group" data-i18n-aria="Categoría" aria-label="Categoría"></div>
     </div>
     <div class="field" id="gScopeField" hidden>
       <label data-i18n="¿Cómo aplicamos el cambio?">¿Cómo aplicamos el cambio?</label>
@@ -3313,6 +3463,45 @@ const EN = {
  "Nombre": "Name",
  "Normal": "Normal",
  "Nota": "Note",
+ "Integradas en tu vida, sin distraer": "Part of your life, without distraction",
+ "Resumen": "Summary",
+ "Variables": "Variable",
+ "Fijos": "Fixed",
+ "Últimos movimientos": "Latest expenses",
+ "Ver todos": "See all",
+ "Añadir gasto": "Add expense",
+ "Este mes": "This month",
+ "En qué se va tu dinero": "Where your money goes",
+ "Evolución del gasto": "Spending over time",
+ "Categoría": "Category",
+ "Presupuesto mensual": "Monthly budget",
+ "Lo que quieres gastar como mucho cada mes, sumando fijos y variables.": "The most you want to spend each month, fixed and variable together.",
+ "Quitar": "Remove",
+ "Cada mes": "Every month",
+ "Manual": "Manual",
+ "gastado este mes": "spent this month",
+ "gastado ese mes": "spent that month",
+ "Igual que {mes}": "Same as {mes}",
+ "{p} % menos que {mes}": "{p}% less than {mes}",
+ "{p} % más que {mes}": "{p}% more than {mes}",
+ "{n} gastados": "{n} spent",
+ "{n} por encima": "{n} over",
+ "Añadir presupuesto mensual": "Add a monthly budget",
+ "Opcional. Para ver cuánto te queda.": "Optional. To see how much you have left.",
+ "{n} gasto registrado": "{n} expense logged",
+ "{n} gastos registrados": "{n} expenses logged",
+ "Ningún gasto registrado hoy": "No expenses logged today",
+ "Último gasto: {h} · {n}": "Last expense: {h} · {n}",
+ "gastos variables": "variable expenses",
+ "Has gastado lo mismo que el mes anterior.": "You've spent the same as last month.",
+ "Has gastado un {p} % menos que el mes anterior.": "You've spent {p}% less than last month.",
+ "Has gastado un {p} % más que el mes anterior.": "You've spent {p}% more than last month.",
+ "Alimentación": "Food",
+ "Salud": "Health",
+ "Ocio": "Leisure",
+ "Resumen, variables, fijos e historial": "Summary, variable, fixed and history",
+ "El resumen enseña lo gastado este mes; en Variables y Fijos apuntas y cambias gastos, y el historial guarda los meses anteriores.": "The summary shows what you've spent this month; in Variable and Fixed you log and change expenses, and history keeps previous months.",
+ "Opcional. Si lo pones, verás cuánto te queda este mes.": "Optional. If you set it, you'll see how much you have left this month.",
  "Día de ciclo: sueles tener menos energía.": "Cycle day: you usually have less energy.",
  "Día de ciclo.": "Cycle day.",
  "Cuesta {n} cuchara": "Costs {n} spoon",
@@ -4005,7 +4194,8 @@ const fmtN = n => {
   const s = String(Math.round(n*10)/10);
   return state.settings?.lang === 'en' ? s : s.replace('.', ',');
 };
-const fmtMoney = n => `${String(Math.round((n||0)*100)/100).replace('.', ',')} €`;
+const fmtMoney = n => { const v = Math.round((n||0)*100)/100, [i, d] = (Number.isInteger(v) ? String(v) : v.toFixed(2)).split('.');
+  return `${i.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}${d ? ',' + d : ''} €`; };
 function libItem(name){
   return state.library.find(l => l.name.toLowerCase() === name.toLowerCase());
 }
@@ -4758,7 +4948,7 @@ function checkMonthRollover(){
   const nowKey = monthKey();
   while(f.mesActual !== nowKey){
     const fijosSnapshot = f.gastosFijos.filter(finCounts).map(g => ({ nombre:g.nombre, importe: g.overrideMes ?? g.importe }));
-    const variablesSnapshot = f.gastosVariables.filter(finCounts).map(g => ({ nombre:g.nombre, importe:g.importe }));
+    const variablesSnapshot = f.gastosVariables.map(g => ({ nombre:g.nombre, importe:g.importe, cat:finCatOf(g), fecha:g.fecha || null, origen:g.origen || 'manual' }));
     const totalFijos = fijosSnapshot.reduce((a,g)=>a+g.importe,0);
     const totalVariables = variablesSnapshot.reduce((a,g)=>a+g.importe,0);
     const [y,m] = f.mesActual.split('-').map(Number);
@@ -4768,61 +4958,200 @@ function checkMonthRollover(){
       totalFijos, totalVariables, total: totalFijos + totalVariables
     });
     f.gastosFijos.forEach(g => { g.overrideMes = null; g.pagado = false; });
-    f.gastosVariables = f.gastosVariables.filter(g => !finCounts(g));
+    f.gastosVariables = [];
     f.mesActual = nextMonthKey(f.mesActual);
   }
 }
+/* Categorías de los gastos variables. Se deducen del nombre del comercio y se
+   pueden cambiar al editar. Colores solo de la paleta: granates y rosas,
+   naranjas suaves para distinguir en la gráfica. */
+const FIN_CATS = [
+  { id:'alim', name:'Alimentación', icon:'i-cart', color:'var(--accent)' },
+  { id:'salud', name:'Salud', icon:'i-heart-o', color:'color-mix(in srgb,var(--accent) 62%,var(--bg))' },
+  { id:'ocio', name:'Ocio', icon:'i-bag', color:'#E39A74' },
+  { id:'transporte', name:'Transporte', icon:'i-car', color:'#EDB794' },
+  { id:'otros', name:'Otros', icon:'i-box', color:'color-mix(in srgb,var(--accent) 28%,var(--bg))' },
+];
+const FIN_KW = [
+  ['salud', /farmac|veterin|m[eé]dic|cl[ií]nic|dent|hospital|[oó]ptic|fisio|salud/i],
+  ['transporte', /gasolin|repsol|cepsa|galp|\bbp\b|shell|renfe|metro|\bemt\b|\bbus\b|taxi|uber|cabify|bolt|parking|aparcam|peaje|transporte|cercan[ií]as/i],
+  ['alim', /mercadona|super|carrefour|lidl|\bd[ií]a\b|aldi|alcampo|eroski|hipercor|consum|ahorram|alimenta|fruter|panader|carnicer|ronghuan|caprabo|bonpreu/i],
+  ['ocio', /cine|teatro|concierto|\bbar\b|restaur|caf[eé]|cafeter|netflix|spotify|steam|librer|museo|ocio|burger|pizza|mcdonald|kfc/i],
+];
+const finGuessCat = name => (FIN_KW.find(([, re]) => re.test(name || '')) || ['otros'])[0];
+const finCatOf = g => FIN_CATS.some(c => c.id === g.cat) ? g.cat : finGuessCat(g.nombre);
+const finCat = id => FIN_CATS.find(c => c.id === id) || FIN_CATS[FIN_CATS.length - 1];
+const finIconVar = g => /veterin/i.test(g.nombre || '') ? 'i-paw' : finCat(finCatOf(g)).icon;
+const FIN_FIX_ICONS = [[/alquiler|hipoteca|comunidad|casa|piso/i, 'i-home'], [/gimnas|gym|deporte/i, 'i-dumbbell'],
+  [/internet|fibra|wifi|router/i, 'i-laptop'], [/m[oó]vil|tel[eé]fono|l[ií]nea/i, 'i-mobile'], [/luz|electric|agua|gas\b/i, 'i-bulb'],
+  [/seguro/i, 'i-doc'], [/coche|transporte|abono/i, 'i-car']];
+const finIconFix = g => (FIN_FIX_ICONS.find(([re]) => re.test(g.nombre || '')) || [, 'i-receipt'])[1];
+const finOrigin = g => g.origen === 'wallet' ? 'Google Wallet' : g.origen === 'applepay' ? 'Apple Pay' : tr('Manual');
+const finShortDate = iso => new Date(iso).toLocaleDateString(LOCALE(), {day:'numeric', month:'short'}).replace('.', '');
+const finIcon = id => `<span class="fin-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#${id}"/></svg></span>`;
+
 function finRow(g, tipo){
   const importe = tipo === 'fijo' ? (g.overrideMes ?? g.importe) : g.importe;
-  const note = (tipo === 'fijo' && g.overrideMes != null) ? tr('Solo este mes') : '';
   const on = finCounts(g);
-  const card = (g.origen === 'applepay' || g.origen === 'wallet') && g.fecha
-    ? (g.origen === 'wallet' ? 'Google Wallet' : 'Apple Pay') + ' · ' + new Date(g.fecha).toLocaleDateString(LOCALE(), {day:'numeric', month:'short'}) : '';
-  const notes = [note, card, g.revisar ? tr('Revisa el importe') : '', on ? '' : tr('Aún no suma')].filter(Boolean).join(' · ');
-  return `<div class="task">
-      <button class="check ${on?'on':''}" data-finpaid="${g.id}" aria-pressed="${on}" aria-label="${trf('Contar {name} en el total', {name:esc(g.nombre)})}">
+  const meta = tipo === 'fijo'
+    ? [g.overrideMes != null ? tr('Solo este mes') : tr('Cada mes'), on ? '' : tr('Aún no suma')]
+    : [g.fecha ? finShortDate(g.fecha) + ' · ' + finOrigin(g) : finOrigin(g), g.revisar ? tr('Revisa el importe') : ''];
+  const chip = tipo === 'fijo' ? '' : `<span class="fin-chip">${tr(finCat(finCatOf(g)).name)}</span>`;
+  /* Solo los fijos llevan el círculo de "pagado este mes"; los variables cuentan siempre. */
+  return `<div class="fin-row${tipo === 'fijo' && !on ? ' off' : ''}">
+      ${tipo === 'fijo' ? `<button class="check ${on?'on':''}" data-finpaid="${g.id}" aria-pressed="${on}" aria-label="${trf('Contar {name} en el total', {name:esc(g.nombre)})}">
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
+      </button>` : ''}
+      ${finIcon(tipo === 'fijo' ? finIconFix(g) : finIconVar(g))}
+      <button class="fin-body" data-fin="${g.id}" aria-label="${trf('Editar {name}', {name:esc(g.nombre)})}">
+        <span class="fin-name">${esc(g.nombre)}</span>
+        <span class="fin-meta">${meta.filter(Boolean).join(' · ')}${chip}</span>
       </button>
-      <button class="task-body" data-fin="${g.id}" aria-label="${trf('Editar {name}', {name:esc(g.nombre)})}">
-        <span class="task-name">${esc(g.nombre)}</span>${notes ? `<span class="task-meta">${notes}</span>` : ''}
-      </button>
-      <span class="cost">${fmtMoney(importe)}</span>
+      <span class="fin-amt">${fmtMoney(importe)}</span>
+      <svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>
     </div>`;
 }
+/* Datos de un mes: el actual en vivo; los anteriores, del historial. */
+let finMonth = null, finView = 'resumen';
+const prevMonthKey = k => { const [y, m] = k.split('-').map(Number); return m === 1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,'0')}`; };
+const finMonths = () => [...new Set([...state.finanzas.historial.map(h => `${h.year}-${String(h.month).padStart(2,'0')}`), state.finanzas.mesActual])].sort();
+function finMonthData(k){
+  const f = state.finanzas;
+  if(k === f.mesActual){
+    const fijos = f.gastosFijos.filter(finCounts).map(g => ({ ...g, importe: g.overrideMes ?? g.importe }));
+    const variables = f.gastosVariables;
+    const totalFijos = fijos.reduce((a, g) => a + g.importe, 0), totalVariables = variables.reduce((a, g) => a + g.importe, 0);
+    return { current:true, fijos, variables, totalFijos, totalVariables, total: totalFijos + totalVariables };
+  }
+  const [y, m] = k.split('-').map(Number);
+  const h = f.historial.find(x => x.year === y && x.month === m);
+  return h ? { current:false, fijos:h.fijos, variables:h.variables, totalFijos:h.totalFijos, totalVariables:h.totalVariables, total:h.total } : null;
+}
+const finMonthLabel = k => { const [y, m] = k.split('-').map(Number); return monthYear(m - 1, y); };
+const finMonthShort = k => new Date(k + '-15T12:00:00').toLocaleDateString(LOCALE(), {month:'short'}).replace('.', '');
+const pctOf = (a, b) => b ? Math.round(a / b * 100) : 0;
+
 function renderFin(){
   checkMonthRollover();
   const f = state.finanzas;
+  if(!finMonth || !finMonths().includes(finMonth)) finMonth = f.mesActual;
   document.getElementById('finFijosList').innerHTML = f.gastosFijos.length
-    ? `<div class="group">${f.gastosFijos.map(g => finRow(g,'fijo')).join('')}</div>`
-    : `<div class="empty">${tr('Todavía no hay gastos fijos.')}</div>`;
-  document.getElementById('finVariablesList').innerHTML = f.gastosVariables.length
-    ? `<div class="group">${f.gastosVariables.map(g => finRow(g,'variable')).join('')}</div>`
-    : `<div class="empty">${tr('Todavía no hay gastos variables este mes.')}</div>`;
-  const totalFijos = f.gastosFijos.filter(finCounts).reduce((a,g)=>a+(g.overrideMes ?? g.importe),0);
-  const totalVariables = f.gastosVariables.filter(finCounts).reduce((a,g)=>a+g.importe,0);
-  document.getElementById('finTotalFijos').textContent = fmtMoney(totalFijos);
-  document.getElementById('finTotalVariables').textContent = fmtMoney(totalVariables);
-  document.getElementById('finTotalMesFijos').textContent = fmtMoney(totalFijos + totalVariables);
-  document.getElementById('finTotalMesVariables').textContent = fmtMoney(totalFijos + totalVariables);
+    ? f.gastosFijos.map(g => finRow(g,'fijo')).join('')
+    : `<p class="dp-empty">${tr('Todavía no hay gastos fijos.')}</p>`;
+  const vars = [...f.gastosVariables].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+  document.getElementById('finVariablesList').innerHTML = vars.length
+    ? vars.map(g => finRow(g,'variable')).join('')
+    : `<p class="dp-empty">${tr('Todavía no hay gastos variables este mes.')}</p>`;
+  const cur = finMonthData(f.mesActual);
+  document.getElementById('finTotalFijos').textContent = fmtMoney(cur.totalFijos);
+  document.getElementById('finTotalVariables').textContent = fmtMoney(cur.totalVariables);
+  renderFinDonut(cur.variables, cur.totalVariables);
+  renderFinEvo();
+  renderFinResumen();
   renderFinHistorial();
 }
+function renderFinResumen(){
+  const f = state.finanzas, k = finMonth, d = finMonthData(k), months = finMonths();
+  document.getElementById('finMonthLabel').textContent = finMonthLabel(k);
+  document.getElementById('finPrev').disabled = months.indexOf(k) <= 0;
+  document.getElementById('finNext').disabled = months.indexOf(k) >= months.length - 1;
+  document.getElementById('finTotal').textContent = fmtMoney(d.total);
+  document.getElementById('finTotalLab').textContent = tr(d.current ? 'gastado este mes' : 'gastado ese mes');
+  const prev = finMonthData(prevMonthKey(k)), delta = document.getElementById('finDelta');
+  delta.hidden = !(prev && prev.total > 0);
+  if(!delta.hidden){
+    const pc = Math.round((d.total - prev.total) / prev.total * 100), mon = monthName(+prevMonthKey(k).split('-')[1] - 1);
+    delta.className = 'fin-delta' + (pc < 0 ? ' down' : '');
+    delta.innerHTML = pc === 0 ? esc(trf('Igual que {mes}', {mes:mon}))
+      : `<span aria-hidden="true">${pc < 0 ? '↓' : '↑'}</span> ${esc(trf(pc < 0 ? '{p} % menos que {mes}' : '{p} % más que {mes}', {p:Math.abs(pc), mes:mon}))}`;
+  }
+  document.getElementById('finSplitBar').style.width = `${pctOf(d.totalFijos, d.total)}%`;
+  document.getElementById('finSplit').hidden = !d.total;
+  document.getElementById('finSplitF').textContent = fmtMoney(d.totalFijos);
+  document.getElementById('finSplitV').textContent = fmtMoney(d.totalVariables);
+  document.getElementById('finSplitFp').textContent = `${pctOf(d.totalFijos, d.total)} %`;
+  document.getElementById('finSplitVp').textContent = `${d.total ? 100 - pctOf(d.totalFijos, d.total) : 0} %`;
+  const b = f.presupuesto, bud = document.getElementById('finBudget');
+  bud.innerHTML = b
+    ? `${finIcon('i-wallet')}<span class="fin-budget-main"><span class="fin-budget-top"><span>${tr('Presupuesto mensual')}</span><b>${fmtMoney(b)}</b></span>
+        <span class="fin-bar small"><span style="width:${Math.min(100, pctOf(d.total, b))}%"></span></span>
+        <span class="fin-budget-foot"><span>${esc(trf('{n} gastados', {n:fmtMoney(d.total)}))}</span><span>${esc(d.total <= b ? trf('{n} disponibles', {n:fmtMoney(b - d.total)}) : trf('{n} por encima', {n:fmtMoney(d.total - b)}))}</span></span></span>
+        <svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>`
+    : `${finIcon('i-wallet')}<span class="fin-budget-main"><span class="fin-budget-top"><span>${tr('Añadir presupuesto mensual')}</span></span><span class="fin-budget-foot"><span>${tr('Opcional. Para ver cuánto te queda.')}</span></span></span><svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>`;
+  // Hoy: solo en el mes actual
+  document.getElementById('finHoyWrap').hidden = !d.current;
+  if(d.current){
+    const today = todayKey();
+    const hoy = f.gastosVariables.filter(g => g.fecha && localDateKey(new Date(g.fecha)) === today)
+      .sort((a, b) => b.fecha.localeCompare(a.fecha));
+    const last = hoy[0];
+    document.getElementById('finHoy').innerHTML = `${finIcon('i-receipt')}<span class="fin-body"><span class="fin-name">${esc(hoy.length ? trf(hoy.length === 1 ? '{n} gasto registrado' : '{n} gastos registrados', {n:hoy.length}) : tr('Ningún gasto registrado hoy'))}</span>${last ? `<span class="fin-meta">${esc(trf('Último gasto: {h} · {n}', {h:new Date(last.fecha).toLocaleTimeString(LOCALE(), {hour:'2-digit', minute:'2-digit'}), n:fmtMoney(last.importe)}))}</span>` : ''}</span><svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>`;
+  }
+  const recent = d.current
+    ? [...f.gastosVariables].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).slice(0, 3)
+    : [...d.variables].slice(-3).reverse();
+  document.getElementById('finRecent').innerHTML = recent.length ? recent.map(g => {
+    const meta = g.fecha ? finOrigin(g) + ' · ' + finShortDate(g.fecha) : finOrigin(g);
+    const inner = `${finIcon(finIconVar(g))}<span class="fin-body"><span class="fin-name">${esc(g.nombre)}</span><span class="fin-meta">${esc(meta)}</span></span><span class="fin-amt">${fmtMoney(g.importe)}</span>`;
+    return d.current
+      ? `<button class="fin-row tap" data-fin="${g.id}" aria-label="${trf('Editar {name}', {name:esc(g.nombre)})}">${inner}<svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`
+      : `<div class="fin-row">${inner}</div>`;
+  }).join('') : `<p class="dp-empty">${tr('Todavía no hay gastos variables este mes.')}</p>`;
+  document.getElementById('finSeeAll').hidden = !d.current || !recent.length;
+}
+/* Donut de categorías: solo lo que suma, en la paleta de la app. */
+function renderFinDonut(vars, total){
+  const wrap = document.getElementById('finDonutWrap');
+  wrap.hidden = !total; if(!total) return;
+  const sums = FIN_CATS.map(c => ({ c, v: vars.filter(g => finCatOf(g) === c.id).reduce((a, g) => a + g.importe, 0) })).filter(x => x.v > 0);
+  const R = 43, C = 2 * Math.PI * R; let off = 0;
+  const arcs = sums.map(({ c, v }) => { const len = v / total * C;
+    const a = `<circle r="${R}" cx="50" cy="50" fill="none" stroke="${c.color}" stroke-width="11" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}"/>`; off += len; return a; }).join('');
+  document.getElementById('finDonut').innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(-90 50 50)">${arcs}</g></svg>
+    <span class="fin-donut-c"><b>${fmtMoney(total)}</b><small>${tr('gastos variables')}</small></span>`;
+  document.getElementById('finDonutLegend').innerHTML = sums.sort((a, b) => b.v - a.v).map(({ c, v }) =>
+    `<p><i class="dot" style="background:${c.color}"></i><span>${tr(c.name)}</span><b>${pctOf(v, total)} %</b></p>`).join('');
+}
+/* Barras de los últimos meses (hasta 6), con el mes actual destacado. */
+/* Altura en píxeles y desde cero: el porcentaje no se resolvía dentro de la
+   columna y todas las barras salían iguales. */
+const FIN_BAR_H = 120;
+function renderFinEvo(){
+  const months = finMonths().slice(-6), cur = state.finanzas.mesActual;
+  const data = months.map(k => ({ k, t: finMonthData(k)?.total || 0 }));
+  const max = Math.max(1, ...data.map(x => x.t));
+  document.getElementById('finEvo').hidden = data.length < 2;
+  document.getElementById('finBars').innerHTML = data.map(({ k, t }) =>
+    `<div class="fin-col${k === cur ? ' on' : ''}" role="img" aria-label="${esc(finMonthLabel(k))}: ${fmtMoney(t)}"><small>${fmtMoney(Math.round(t))}</small><span style="height:${Math.max(6, Math.round(t / max * FIN_BAR_H))}px"></span><em>${esc(finMonthShort(k))}</em></div>`).join('');
+  const prev = finMonthData(prevMonthKey(cur)), now = finMonthData(cur), obs = document.getElementById('finObs');
+  obs.hidden = !(prev && prev.total > 0);
+  if(!obs.hidden){
+    const pc = Math.round((now.total - prev.total) / prev.total * 100);
+    obs.classList.toggle('down', pc < 0);
+    document.getElementById('finObsIc').setAttribute('href', pc === 0 ? '#i-next' : '#i-trend');
+    document.getElementById('finObsText').textContent = pc === 0 ? tr('Has gastado lo mismo que el mes anterior.')
+      : trf(pc < 0 ? 'Has gastado un {p} % menos que el mes anterior.' : 'Has gastado un {p} % más que el mes anterior.', {p:Math.abs(pc)});
+  }
+}
 function openFinTab(view){
-  document.querySelectorAll('#finTabs .chip').forEach(c =>
+  finView = view;
+  document.querySelectorAll('#finTabs [data-fintab]').forEach(c =>
     c.setAttribute('aria-pressed', c.dataset.fintab === view));
-  document.getElementById('finFijos').hidden = view !== 'fijos';
-  document.getElementById('finVariables').hidden = view !== 'variables';
-  document.getElementById('finHistorial').hidden = view !== 'historial';
+  ['resumen', 'variables', 'fijos', 'historial'].forEach(v =>
+    document.getElementById('fin' + v[0].toUpperCase() + v.slice(1)).hidden = v !== view);
 }
 function renderFinHistorial(){
   const el = document.getElementById('finHistList');
   const hist = state.finanzas.historial;
   el.innerHTML = hist.length
-    ? `<div class="group">${[...hist].reverse().map(h => `<button class="lib" data-hist="${h.id}">
-        <span><span class="lib-name">${monthYear(h.month-1, h.year)}</span><br>
-          <span class="lib-note">${trf('Fijos {a} · Variables {b}', {a:fmtMoney(h.totalFijos), b:fmtMoney(h.totalVariables)})}</span></span>
-        <span class="cost">${fmtMoney(h.total)}</span>
-      </button>`).join('')}</div>`
-    : `<div class="empty">${tr('Todavía no hay meses cerrados.')}</div>`;
+    ? [...hist].reverse().map(h => `<button class="fin-row tap" data-hist="${h.id}">
+        ${finIcon('i-calendar')}
+        <span class="fin-body"><span class="fin-name">${monthYear(h.month-1, h.year).replace(/^./, c => c.toUpperCase())}</span>
+          <span class="fin-meta">${trf('Fijos {a} · Variables {b}', {a:fmtMoney(h.totalFijos), b:fmtMoney(h.totalVariables)})}</span></span>
+        <span class="fin-amt">${fmtMoney(h.total)}</span>
+        <svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>
+      </button>`).join('')
+    : `<p class="dp-empty">${tr('Todavía no hay meses cerrados.')}</p>`;
 }
 function histItemRow(g){
   return `<div class="lib"><span class="lib-name">${esc(g.nombre)}</span><span class="cost">${fmtMoney(g.importe)}</span></div>`;
@@ -5591,7 +5920,7 @@ document.getElementById('tabs').addEventListener('click', e => {
   document.getElementById('s-' + currentTab).classList.add('on');
   document.querySelectorAll('#tabs button').forEach(x => x.removeAttribute('aria-current'));
   b.setAttribute('aria-current','page');
-  if(currentTab === 'fin') openFinTab('variables');
+  if(currentTab === 'fin'){ finMonth = null; openFinTab('resumen'); }
   if(currentTab === 'set') setOpen(null, false);
   window.scrollTo(0,0);
   renderAll();
@@ -5670,9 +5999,9 @@ const CICLO_TOUR_STEPS = [
   { sel:'#cyclePattern', title:'Patrones', body:'Cuando tengas dos ciclos completos apuntados, aquí verás cómo suele cambiar tu gasto de cucharas en cada fase.' },
 ];
 const FIN_TOUR_STEPS = [
-  { sel:'#finTabs', title:'Fijos, variables e historial', body:'Cambia entre tus gastos fijos, los variables de este mes y el historial de meses anteriores.' },
-  { sel:'#btnAddVariable', title:'Añadir un gasto', body:'Apunta un gasto variable de este mes. Los fijos se añaden igual, desde su propia pestaña.' },
-  { sel:'#finVariables .card', title:'Total del mes', body:'Suma gastos fijos y variables para saber cuánto llevas gastado. Al cambiar de mes, este se archiva solo en el historial.' },
+  { sel:'#finTabs', title:'Resumen, variables, fijos e historial', body:'El resumen enseña lo gastado este mes; en Variables y Fijos apuntas y cambias gastos, y el historial guarda los meses anteriores.' },
+  { sel:'#finResumen .fin-hero', title:'Total del mes', body:'Suma gastos fijos y variables para saber cuánto llevas gastado. Al cambiar de mes, este se archiva solo en el historial.' },
+  { sel:'#finBudget', title:'Presupuesto mensual', body:'Opcional. Si lo pones, verás cuánto te queda este mes.' },
 ];
 let tourIdx = 0, tourSteps = [], tourReplay = false, tourSeenKey = 'introSeen', tourIsMain = true;
 
@@ -6856,8 +7185,20 @@ document.getElementById('gScope').addEventListener('click', e => {
   const b = e.target.closest('[data-scope]'); if(!b) return;
   gScope = b.dataset.scope; gScopeSync();
 });
+let gCatSel = 'otros';
+function gCatSync(){
+  document.getElementById('gCat').innerHTML = FIN_CATS.map(c =>
+    `<button class="chip" data-gcat="${c.id}" aria-pressed="${c.id === gCatSel}">${tr(c.name)}</button>`).join('');
+}
+document.getElementById('gCat').addEventListener('click', e => {
+  const b = e.target.closest('[data-gcat]'); if(!b) return;
+  gCatSel = b.dataset.gcat; gCatSync();
+});
 function openGasto(tipo, item){
   gType = tipo; gEditing = item; gScope = 'siempre';
+  gCatSel = item && tipo === 'variable' ? finCatOf(item) : 'otros';
+  document.getElementById('gCatField').hidden = tipo !== 'variable';
+  gCatSync();
   gName.value = item ? item.nombre : '';
   gImporte.value = item ? (tipo === 'fijo' ? (item.overrideMes ?? item.importe) : item.importe) : '';
   const tipoLab = tr(tipo === 'fijo' ? 'fijo' : 'variable');
@@ -6869,6 +7210,10 @@ function openGasto(tipo, item){
   document.getElementById('gDelete').hidden = !item;
   openDialog(dlgGasto);
 }
+gName.addEventListener('input', () => {
+  if(gType !== 'variable' || gEditing) return;
+  gCatSel = finGuessCat(gName.value); gCatSync();
+});
 document.getElementById('btnAddFijo').addEventListener('click', () => openGasto('fijo', null));
 document.getElementById('btnAddVariable').addEventListener('click', () => openGasto('variable', null));
 function finListClick(e, tipo){
@@ -6899,8 +7244,8 @@ document.getElementById('gSave').addEventListener('click', () => {
       f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null, pagado:false });
     }
   }else{
-    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; delete gEditing.revisar; }
-    else f.gastosVariables.push({ id:uid(), nombre, importe, pagado:false });
+    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; gEditing.cat = gCatSel; delete gEditing.revisar; }
+    else f.gastosVariables.push({ id:uid(), nombre, importe, cat:gCatSel, origen:'manual', fecha:new Date().toISOString() });
   }
   save(); dlgGasto.close(); renderFin();
 });
@@ -6916,6 +7261,26 @@ document.getElementById('finTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-fintab]'); if(!b) return;
   openFinTab(b.dataset.fintab);
 });
+document.getElementById('finRecent').addEventListener('click', e => finListClick(e, 'variable'));
+document.getElementById('finSeeAll').addEventListener('click', () => openFinTab('variables'));
+document.getElementById('finHoy').addEventListener('click', () => openFinTab('variables'));
+['finPrev', 'finNext'].forEach((id, i) => document.getElementById(id).addEventListener('click', () => {
+  const ms = finMonths(), j = ms.indexOf(finMonth) + (i ? 1 : -1);
+  if(ms[j]){ finMonth = ms[j]; renderFinResumen(); }
+}));
+const dlgFinBudget = document.getElementById('dlgFinBudget');
+document.getElementById('finBudget').addEventListener('click', () => {
+  document.getElementById('fbAmount').value = state.finanzas.presupuesto || '';
+  document.getElementById('fbRemove').hidden = !state.finanzas.presupuesto;
+  openDialog(dlgFinBudget);
+});
+document.getElementById('fbSave').addEventListener('click', () => {
+  const v = parseFloat(document.getElementById('fbAmount').value);
+  state.finanzas.presupuesto = Number.isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null;
+  save(); dlgFinBudget.close(); renderFin();
+});
+document.getElementById('fbRemove').addEventListener('click', () => { state.finanzas.presupuesto = null; save(); dlgFinBudget.close(); renderFin(); });
+document.getElementById('fbCancel').addEventListener('click', () => dlgFinBudget.close());
 document.getElementById('finHistList').addEventListener('click', e => {
   const b = e.target.closest('[data-hist]'); if(!b) return;
   const h = state.finanzas.historial.find(x => x.id === b.dataset.hist);
@@ -7679,7 +8044,7 @@ async function importCardExpenses(){
           f.gastosVariables.push({
             id:uid(), nombre:String(it.comercio || '').trim() || tr(origen === 'wallet' ? 'Pago con Google Wallet' : 'Pago con Apple Pay'),
             importe: importe ?? 0, pagado: importe != null,
-            origen, fecha: it.fecha || new Date().toISOString(), cardId: it.id,
+            origen, fecha: it.fecha || new Date().toISOString(), cardId: it.id, cat: finGuessCat(it.comercio),
             ...(importe == null ? { revisar:true } : {})
           });
           added++;
