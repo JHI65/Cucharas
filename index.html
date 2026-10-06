@@ -315,13 +315,13 @@ textarea{
    margen de la página (el mismo --pad, en negativo) para que cada día tenga
    todo el ancho posible y los nombres se lean enteros. Celdas planas separadas
    por líneas, sin cajas redondeadas, y sin transiciones. */
-.cal-view{display:flex;gap:10px;margin:16px 0 0}
-.cal-view button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);color:var(--ink);font-size:16px}
-/* Tinta sobre Rosa Algodón (7,5:1): Ciruela ahí se queda en 3,8:1. */
-.cal-view button[aria-pressed="true"]{background:var(--surface-2);font-weight:700}
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin:14px 0 12px}
-.cal-nav button{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-cell);width:44px;height:44px;padding:0;display:grid;place-items:center;color:var(--accent)}
-.cal-nav strong{font-size:17px;text-align:center}
+/* Selector Mes / Semana: una cápsula con la opción activa en Ciruela. */
+.cal-view{display:flex;gap:4px;margin:18px 0 0;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--surface-2) 55%,var(--bg))}
+.cal-view button{flex:1;min-height:44px;border:none;background:none;border-radius:999px;color:var(--ink);font-size:16px}
+.cal-view button[aria-pressed="true"]{background:var(--accent);color:var(--surface);font-weight:600;box-shadow:0 4px 12px rgba(75,58,63,.14)}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
+.cal-nav button{background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));border:none;border-radius:50%;width:44px;height:44px;padding:0;display:grid;place-items:center;color:var(--accent)}
+.cal-nav strong{font-size:19px;font-weight:700;letter-spacing:-0.01em;text-align:center}
 .cal-full{margin:0 calc(-1 * var(--pad))}
 #calMonthView,#calWeekView{touch-action:pan-y pinch-zoom}
 /* Al cambiar de mes o semana, el contenido entra desde el lado hacia el que se avanza. Respeta prefers-reduced-motion vía la regla global. */
@@ -329,43 +329,50 @@ textarea{
 @keyframes calInPrev{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
 .cal-in-next{animation:calInNext .24s ease-out}
 .cal-in-prev{animation:calInPrev .24s ease-out}
-.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding-bottom:6px;border-bottom:1px solid var(--line)}
+/* Mes: sin rejilla. Solo un filo muy suave entre semanas; el resto es aire. */
+.cal-full{padding:0 6px}
+.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding-bottom:8px}
 .dow span{text-align:center;font-size:13px;color:var(--ink-soft)}
-.wk{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:90px;border-bottom:1px solid var(--line)}
+.wk{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:92px;border-top:1px solid color-mix(in srgb,var(--line) 45%,var(--bg))}
 .cell{
   position:relative;display:flex;align-items:flex-start;gap:3px;width:100%;height:100%;min-width:0;margin:0;
-  padding:6px 4px 0 6px;border:none;border-right:1px solid var(--line);border-radius:0;
-  background:var(--surface);color:var(--ink);text-align:left;
-  font-size:15px;line-height:17px;font-variant-numeric:tabular-nums;
+  padding:7px 3px 0 5px;border:none;border-radius:14px;
+  background:none;color:var(--ink);text-align:left;
+  font-size:15px;line-height:24px;font-variant-numeric:tabular-nums;
 }
-.cell:nth-child(7){border-right:none}
-.cell.blank{background:var(--bg)}
-.dn{flex:none}
+.cell.blank{background:none}
+.dn{flex:none;height:24px;padding:0 2px;border-radius:999px}
 /* Las tareas del día son barras dentro de la fila de la semana, no dentro de
    la celda: así un mismo elemento en días seguidos es una sola barra. Van por
    encima de las celdas pero no reciben toques: tocar una barra es tocar el
    día que hay debajo. El texto completo va en el aria-label de la celda. */
 .cbars{position:absolute;inset:0;z-index:1;pointer-events:none}
-.cbar{position:absolute;display:block;padding:3px 6px;border-radius:6px;font-size:13px;line-height:18px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--surface-2);color:var(--ink)}
+.cbar{position:absolute;display:block;padding:2px 5px;border-radius:7px;font-size:12px;line-height:16px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));color:var(--ink)}
 .cbar.fl{border-top-left-radius:0;border-bottom-left-radius:0}
 .cbar.fr{border-top-right-radius:0;border-bottom-right-radius:0}
-.cbar-more{position:absolute;display:block;padding:0 4px;font-size:12px;line-height:13px;color:var(--ink)}
-.cbar.cal,.wchip.cal{background:color-mix(in srgb, var(--accent) 24%, var(--surface))}
+.cbar-more{position:absolute;display:block;padding:2px 5px;font-size:12px;line-height:16px;white-space:nowrap;color:var(--ink-soft)}
+.cbar.cal,.wchip.cal{background:color-mix(in srgb, var(--accent) 18%, var(--surface))}
 /* Hecha: tachado, no transparencia, que bajaría el texto de 4,5:1. */
 .cbar.done,.wchip.done{text-decoration:line-through}
-/* Semana: una fila por día, con los nombres enteros. */
-.wlist{border-top:1px solid var(--line)}
-.wrow{position:relative;display:flex;align-items:flex-start;gap:12px;width:100%;min-height:62px;margin:0;
-  padding:10px var(--pad);border:none;border-bottom:1px solid var(--line);border-radius:0;
-  background:var(--surface);color:var(--ink);text-align:left;font-variant-numeric:tabular-nums}
-.wd{flex:none;width:44px;display:flex;flex-direction:column;align-items:flex-start}
-.wd small{font-size:13px;line-height:16px;color:var(--ink-soft)}
-.wd b{font-size:22px;line-height:26px}
-.wchips{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-self:center}
-.wchip{padding:6px 12px;border-radius:10px;font-size:16px;line-height:20px;background:var(--surface-2);color:var(--ink);overflow-wrap:anywhere}
-.wnone{font-size:16px;line-height:20px;color:var(--ink-soft)}
-.wrow .load{flex:none;max-width:40px;align-self:center;margin:0}
+/* Semana: una fila por día, separadas por un filo suave. */
+.wlist{margin:0 -8px}
+.wrow{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:72px;margin:0;
+  padding:12px 8px;border:none;border-top:1px solid color-mix(in srgb,var(--line) 45%,var(--bg));border-radius:0;
+  background:none;color:var(--ink);text-align:left;font-variant-numeric:tabular-nums}
+.wrow:first-child{border-top:none}
+.wd{flex:none;width:46px;display:flex;flex-direction:column;align-items:flex-start}
+.wd small{font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.wd b{font-size:22px;line-height:28px;font-weight:700}
+.winds{flex:none;width:22px;display:flex;justify-content:center}
+.winds .cal-inds{flex-direction:column;gap:4px;margin:0}
+.wchips{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px}
+.wchip{padding:5px 11px;border-radius:10px;font-size:15px;line-height:20px;background:color-mix(in srgb,var(--surface-2) 70%,var(--bg));color:var(--ink);overflow-wrap:anywhere}
+.wchip.more{background:none;color:var(--ink-soft);padding-left:4px;padding-right:4px}
+.wnone{font-size:15px;line-height:20px;color:var(--ink-soft)}
+.wchev{flex:none;width:18px;height:18px;color:var(--ink-soft)}
+.wrow.today{border-radius:16px;background:color-mix(in srgb,var(--surface-2) 55%,var(--bg))}
+.wrow.today + .wrow{border-top-color:transparent}
 /* Etiquetas por calendario: un color y un icono que elige la persona. El texto
    va siempre en tinta para que se lea igual en cualquier tinte; el color lo
    llevan el fondo suave y el icono. Seis tonos que se distinguen entre sí
@@ -401,29 +408,78 @@ textarea{
 .swatch[aria-pressed="true"]{border:3px solid var(--tg)}
 .swatch.dot::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--tg)}
 #calMore{margin:8px 0 0}
-.cell.past,.wrow.past{color:var(--ink-soft);background:var(--bg)}
-/* Hoy: el número sobre Ciruela (5,2:1). Un borde se confundiría con el foco. */
-.cell.today .dn,.wrow.today .wd b{background:var(--accent);color:var(--surface);border-radius:999px;padding:0 5px;margin-left:-3px}
-/* Las marcas a la derecha del número. Si no caben en una línea (móvil
-   estrecho) bajan a otra por la derecha, sin tapar las barras. */
-.load{flex:1;min-width:0;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:flex-end;align-content:flex-start;gap:1px 2px;margin-top:3px}
-.lm{display:block;width:5px;height:5px;border-radius:50%;background:var(--spoon)}
-.heavy .lm{width:3px;height:11px;border-radius:1px;background:var(--alert)}
-/* Sangrado: el punto entre las cucharas resultó poco visible y se confundía
-   con la tira de tareas. Se marca en su lugar toda la celda, en Ciruela —el
-   mismo color que ya usa el borde de "hoy"—, para que se distinga de un
-   vistazo. Estimado usa el mismo tinte pero solo de borde, a rayas. */
-.cal-drop{flex:none;width:12px;height:12px;margin-top:3px;fill:var(--accent)}
-.wd b .cal-drop{margin:0 0 0 3px;vertical-align:1px}
-/* Ojo: el día llega a tus cucharas o está cerca. Solo forma y tinta suave, sin el color de "por encima". */
-.cal-eye{flex:none;width:13px;height:13px;margin-top:3px;fill:var(--ink-soft)}
-.wd b .cal-eye{margin:0 0 0 3px;vertical-align:1px}
-.cell.bleed-est,.wrow.bleed-est{outline:1.5px dashed var(--accent);outline-offset:-2px}
+.cell.past .dn,.wrow.past .wd b{color:var(--ink-soft)}
+/* Hoy: número sobre Ciruela (5,2:1) y la celda en una cápsula suave. */
+.cell.today{background:color-mix(in srgb,var(--surface-2) 45%,var(--bg));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent)}
+.cell.today .dn{min-width:24px;padding:0 4px;text-align:center;background:var(--accent);color:var(--surface);font-weight:700}
+.wrow.today .wd b{color:var(--accent)}
+/* Las tres señales del día, junto al número: raya (límite superado), ojo
+   (previsión alta) y gota (sangrado; hueca si es estimado). */
+.cal-inds{display:flex;align-items:center;gap:2px;height:24px;flex:none}
+.cal-over{display:block;width:11px;height:3px;border-radius:2px;background:var(--accent)}
+.cal-drop{flex:none;width:12px;height:12px;fill:var(--accent)}
+.cal-drop.est{fill:none;stroke:var(--accent);stroke-width:2.4}
+.cal-eye{flex:none;width:14px;height:14px;fill:var(--accent)}
+/* Leyenda: tres columnas discretas, sin hablar de cantidades. */
+.cal-legend{margin:22px 0 0;padding:16px;border-radius:var(--r-block);background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
+.cal-legend h2{margin:0 0 12px;font-size:16px;font-weight:700}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) .cbar-more .mm{display:none}
+.cal-legend-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:14px 12px}
+.cal-legend-items > div{display:flex;flex-direction:column;gap:2px;font-size:13px;line-height:1.3;color:var(--ink-soft)}
+.cal-legend-items > div[hidden]{display:none}
+.cal-legend-items strong{font-size:14px;font-weight:600;color:var(--ink)}
+.cal-legend .cal-inds{height:20px;margin-bottom:2px}
+#calLegendEst{margin-top:4px}
 /* Foco dentro de la celda, por encima de las barras: hacia fuera lo taparían
    las celdas vecinas. */
 .cell:focus-visible,.wrow:focus-visible{outline:none}
 .cell:focus-visible::after,.wrow:focus-visible::after{content:"";position:absolute;inset:0;z-index:2;border:3px solid var(--accent);pointer-events:none}
 .legend{font-size:13px;color:var(--ink-soft);margin:16px 0 0}
+/* Detalle de un día: pantalla completa, como una página más de la app. */
+#dlgDay{max-width:520px;height:100%;max-height:none;margin:0 auto}
+#dlgDay .sheet{min-height:100%;max-height:100%;box-sizing:border-box;border:none;border-radius:0;
+  padding:calc(env(safe-area-inset-top) + 12px) var(--pad) calc(32px + env(safe-area-inset-bottom))}
+.dp-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:10px;margin-bottom:22px}
+.dp-head h2{margin:0;font-size:20px;font-weight:700;text-align:center;letter-spacing:-0.01em;color:var(--ink)}
+#dMenu{min-width:min(290px,calc(100vw - 2 * var(--pad)))}
+#dMenu button{padding-top:8px;padding-bottom:8px;text-align:left}
+.dp-btn{width:44px;height:44px;border-radius:50%;border:none;padding:0;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));color:var(--accent)}
+.dp-btn svg{width:22px;height:22px}
+.dp-menu-wrap{position:relative}
+.dp-h{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-0.01em;color:var(--ink)}
+.dp-task{display:flex;align-items:center;gap:13px;min-height:68px;padding:10px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 45%,var(--bg))}
+.dp-body{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;background:none;border:none;padding:4px 0;color:inherit;font:inherit}
+.dp-name{font-size:17px;overflow-wrap:anywhere}
+.dp-time{font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.dp-task.done .dp-name{color:var(--ink-soft);text-decoration:line-through}
+span.check{cursor:default}
+.dp-cal{flex:none;width:20px;height:20px;color:var(--ink-soft)}
+.dp-cost{flex:none;font-size:19px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.dp-cost.dep{color:var(--deposit)}
+.dp-cost.none{font-size:14px;font-weight:400;color:var(--ink-soft)}
+.dp-task.done .dp-cost{color:var(--ink-soft)}
+.dp-cal[class*="tg-"]{color:var(--tg)}
+.dp-empty{margin:8px 0 4px;font-size:15px;color:var(--ink-soft)}
+.dp-add{display:flex;align-items:center;gap:10px;min-height:52px;margin:4px 0 0;padding:0 2px;border:none;background:none;color:var(--accent);font-size:17px}
+.dp-add svg{width:20px;height:20px}
+#dAddCycle svg{fill:currentColor}
+.dp-notes{margin-top:28px}
+.dp-notes .dp-h{font-size:18px;font-weight:700;margin-bottom:12px}
+.dp-notes .dp-h svg{width:24px;height:24px;color:var(--accent)}
+.dp-notes textarea{width:100%;min-height:110px;box-sizing:border-box;padding:14px 16px;border:none;border-radius:var(--r-block);
+  background:color-mix(in srgb,var(--surface-2) 45%,var(--bg));color:var(--ink);font:inherit;font-size:16px;line-height:1.5;resize:none}
+#dCycleCard{margin-top:22px}
+.dp-energy{position:relative;overflow:hidden;margin:0 0 24px;padding:20px 20px 18px;border-radius:var(--radius);
+  background:color-mix(in srgb,var(--surface-2) 45%,var(--bg))}
+.dp-energy-wave{position:absolute;right:0;top:0;width:58%;height:100%;fill:color-mix(in srgb,var(--accent) 7%,transparent);pointer-events:none}
+.dp-energy p{position:relative;margin:0}
+.dp-energy-lab{font-size:16px;color:var(--ink-soft)}
+.dp-energy-val{display:flex;align-items:center;gap:12px;margin:2px 0 6px !important;font-size:44px;line-height:1.1;font-weight:800;letter-spacing:-0.03em;color:var(--accent)}
+.dp-energy-val .cal-eye{width:30px;height:30px}
+.dp-energy-val .cal-over{width:24px;height:5px;border-radius:3px}
+.dp-energy-msg{font-size:16px;color:var(--ink)}
+.dp-energy-why{margin-top:4px !important;font-size:14px;color:var(--ink-soft)}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
 .mini button{background:none;border:none;color:var(--ink-soft);font-size:15px;padding:0 4px;line-height:1;display:grid;place-items:center}
@@ -1262,6 +1318,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></g></symbol>
   <symbol id="i-pencil" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 013 3L8 18.5 4 20z"/><path d="M13.5 7l3 3"/></g></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></g></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></g></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></g></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5L12 15l5.5-5.5"/></g></symbol>
   <symbol id="i-clip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="15" rx="2.5"/><path d="M9 3.5h6v3H9zM9 12.5h6"/></g></symbol>
@@ -1332,7 +1389,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <section class="screen" id="s-cal">
     <header class="top">
       <h1 class="title" data-i18n="Calendario">Calendario</h1>
-      <p class="sub" data-i18n="Toca un día para ver o planificar">Toca un día para ver o planificar</p>
+      <p class="sub" data-i18n="Tu energía a lo largo del tiempo">Tu energía a lo largo del tiempo</p>
     </header>
     <div class="cal-view" role="group" data-i18n-aria="Vista del calendario" aria-label="Vista del calendario">
       <button data-calview="mes" aria-pressed="true" data-i18n="Mes">Mes</button>
@@ -1348,14 +1405,18 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="dow" aria-hidden="true"><span data-i18n="L">L</span><span data-i18n="M">M</span><span data-i18n="X">X</span><span data-i18n="J">J</span><span data-i18n="V">V</span><span data-i18n="S">S</span><span data-i18n="D">D</span></div>
         <div id="calGrid"></div>
       </div>
-      <p class="legend" data-i18n="Cada marca son dos cucharas. Los días que pasan de tus cucharas (las de su check-in o, si no hay, tu máximo) llevan raya alta en vez de punto, y en otro color.">Cada marca son dos cucharas. Los días que pasan de tus cucharas (las de su check-in o, si no hay, tu máximo) llevan raya alta en vez de punto, y en otro color.</p>
     </div>
     <div id="calWeekView" hidden>
-      <div class="cal-full wlist" id="calWeek"></div>
-      <p class="legend" data-i18n="Cada marca son dos cucharas.">Cada marca son dos cucharas.</p>
+      <div class="wlist" id="calWeek"></div>
     </div>
-    <p class="legend" id="calLegendCiclo" hidden></p>
-    <p class="legend" id="calLegendOjo" hidden data-i18n="El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.">El ojo marca un día en el que lo previsto llega a tus cucharas o está cerca de ellas.</p>
+    <section class="cal-legend" aria-labelledby="calLegendTitle">
+      <h2 id="calLegendTitle" data-i18n="Cómo funciona">Cómo funciona</h2>
+      <div class="cal-legend-items">
+        <div><span class="cal-inds" aria-hidden="true"><i class="cal-over"></i></span><strong data-i18n="Límite superado">Límite superado</strong><span data-i18n="El día pasa de tu límite">El día pasa de tu límite</span></div>
+        <div><span class="cal-inds" aria-hidden="true"><svg class="cal-eye" viewBox="0 0 24 24"><use href="#eye"/></svg></span><strong data-i18n="Previsión alta">Previsión alta</strong><span data-i18n="Llega al 80 % o más del límite">Llega al 80 % o más del límite</span></div>
+        <div id="calLegendBleed"><span class="cal-inds" aria-hidden="true"><svg class="cal-drop" viewBox="0 0 24 24"><use href="#drop"/></svg></span><strong data-i18n="Sangrado">Sangrado</strong><span data-i18n="Día con sangrado apuntado">Día con sangrado apuntado</span><span id="calLegendEst" hidden data-i18n="Gota hueca: estimado">Gota hueca: estimado</span></div>
+      </div>
+    </section>
     <div class="card" id="patterns"></div>
   </section>
 
@@ -2466,13 +2527,28 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
 <dialog id="dlgDay">
   <div class="sheet">
-    <h2 id="dTitle"></h2>
-    <p class="sub" id="dSub"></p>
+    <div class="dp-head">
+      <button class="dp-btn" id="dClose" data-i18n-aria="Volver al calendario" aria-label="Volver al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
+      <h2 id="dTitle"></h2>
+      <div class="dp-menu-wrap">
+        <button class="dp-btn" id="dMenuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="dMenu" data-i18n-aria="Más opciones del día" aria-label="Más opciones del día"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-dots"/></svg></button>
+        <div class="task-menu" id="dMenu" hidden>
+          <button id="dTpl"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-doc"/></svg><span data-i18n="Usar un día tipo">Usar un día tipo</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
+          <button id="dAddCycle" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#drop"/></svg><span id="dAddCycleLab"></span></button>
+        </div>
+      </div>
+    </div>
+    <section class="dp-energy" id="dEnergy" hidden>
+      <svg class="dp-energy-wave" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120C45 120 55 40 95 40s55 60 105 20V120z"/><path d="M20 120C60 120 75 62 118 62s50 40 82 22V120z"/></svg>
+      <p class="dp-energy-lab" data-i18n="Energía estimada">Energía estimada</p>
+      <p class="dp-energy-val"><span id="dEnergyVal"></span><span id="dEnergyInd"></span></p>
+      <p class="dp-energy-msg" id="dEnergyMsg"></p>
+      <p class="dp-energy-why" id="dEnergyWhy"></p>
+    </section>
     <p class="sub" id="dLockedNote" hidden data-i18n="Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.">Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.</p>
+    <h3 class="dp-h" data-i18n="Tareas">Tareas</h3>
     <div id="dTasks"></div>
-    <button class="add" id="dAdd" data-i18n="Añadir tarea a este día">Añadir tarea a este día</button>
-    <button class="add" id="dTpl" style="margin-top:9px"><span data-i18n="Usar un día tipo">Usar un día tipo</span><span class="premium-tag" data-i18n="Premium">Premium</span></button>
-    <button class="add" id="dAddCycle" style="margin-top:9px" hidden data-i18n="Añadir registro de ciclo a este día">Añadir registro de ciclo a este día</button>
+    <button class="dp-add" id="dAdd"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir tarea">Añadir tarea</span></button>
     <div class="card" id="dCycleCard" style="margin-top:18px" hidden>
       <h2 data-i18n="Ciclo">Ciclo</h2>
       <p id="dCycPastHint" data-i18n="Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.">Si te acuerdas de cómo fue este día, puedes apuntarlo aunque ya haya pasado.</p>
@@ -2496,11 +2572,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
       <button class="add" id="dCycDone" data-i18n="Listo">Listo</button>
     </div>
-    <div class="field" style="margin-top:18px">
-      <label for="dNote" data-i18n="Nota">Nota</label>
-      <textarea id="dNote" placeholder="Qué pesó, qué ayudó, qué repetirías." data-i18n-ph="Qué pesó, qué ayudó, qué repetirías."></textarea>
-    </div>
-    <div class="bigrow"><button class="primary" id="dClose" data-i18n="Cerrar">Cerrar</button></div>
+    <section class="dp-notes">
+      <label class="dp-h" for="dNote"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-doc"/></svg><span data-i18n="Notas del día">Notas del día</span></label>
+      <textarea id="dNote" placeholder="¿Cómo te sientes hoy?&#10;Añade una nota…" data-i18n-ph="¿Cómo te sientes hoy?&#10;Añade una nota…"></textarea>
+    </section>
   </div>
 </dialog>
 
@@ -3177,7 +3252,7 @@ const EN = {
  "J": "T",
  "Justo": "Just enough",
  "L": "M",
- "La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.": "The load of every day in the month and the patterns that repeat, for example if a heavy day tends to be followed by a light one.",
+ "Tus tareas y eventos de cada día, por mes o por semana. Toca un día para ver su detalle o planificarlo.": "Your tasks and events for each day, by month or by week. Tap a day to see its details or plan it.",
  "La contraseña tiene que tener al menos 6 caracteres.": "The password needs to be at least 6 characters.",
  "La copia en la nube es una función de Spoony Premium.": "The cloud copy is a Spoony Premium feature.",
  "La hora de fin no puede ser anterior a la de inicio.": "The end time can't be earlier than the start time.",
@@ -3238,6 +3313,37 @@ const EN = {
  "Nombre": "Name",
  "Normal": "Normal",
  "Nota": "Note",
+ "Día de ciclo: sueles tener menos energía.": "Cycle day: you usually have less energy.",
+ "Día de ciclo.": "Cycle day.",
+ "Cuesta {n} cuchara": "Costs {n} spoon",
+ "Cuesta {n} cucharas": "Costs {n} spoons",
+ "Energía estimada": "Estimated energy",
+ "Alta": "High",
+ "Media": "Medium",
+ "Baja": "Low",
+ "Lo planificado pasa de lo estimado. Planifícalo con calma.": "What's planned goes over the estimate. Plan it calmly.",
+ "Día cargado, planifícalo con calma.": "Busy day, plan it calmly.",
+ "Lo planificado cabe en lo estimado.": "What's planned fits the estimate.",
+ "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "Vienes de un día cargado: puede que tengas menos energía que un {dia} habitual.": "You're coming off a busy day: you may have less energy than on a usual {dia}.",
+ "Vienes de {n} días cargados: puede que tengas menos energía que un {dia} habitual.": "You're coming off {n} busy days: you may have less energy than on a usual {dia}.",
+ "Según tus {dia} anteriores.": "Based on your previous {dia}.",
+ "Según tus últimos check-in.": "Based on your recent check-ins.",
+ "Tu energía a lo largo del tiempo": "Your energy over time",
+ "Cómo funciona": "How it works",
+ "Límite superado": "Limit exceeded",
+ "El día pasa de tu límite": "The day goes over your limit",
+ "Previsión alta": "High forecast",
+ "Llega al 80 % o más del límite": "Reaches 80% or more of the limit",
+ "Día con sangrado apuntado": "Day with bleeding logged",
+ "Gota hueca: estimado": "Hollow drop: estimated",
+ ", límite superado": ", limit exceeded",
+ ", previsión alta": ", high forecast",
+ "Volver al calendario": "Back to calendar",
+ "Más opciones del día": "More options for this day",
+ "Notas del día": "Notes for the day",
+ "¿Cómo te sientes hoy?\nAñade una nota…": "How are you feeling today?\nAdd a note…",
+ "Del calendario del móvil": "From your phone's calendar",
  "Nueva actividad": "New activity",
  "o con tu correo": "or with your email",
  "Ocultar detalle": "Hide detail",
@@ -5091,6 +5197,77 @@ function peakNextDayInsight(){
   return { n:diffs.length, avgDiff };
 }
 
+/* Energía estimada de un día que aún no tiene check-in. Es una estimación a
+   partir de tus propios datos, no una certeza:
+   - base: la media de tus check-in de ese mismo día de la semana (últimas 10
+     semanas, mínimo 3); si no los hay, la de tus check-in recientes;
+   - sobrecarga: los días cargados seguidos justo antes (lo hecho o previsto
+     llega al 80 % de su límite). Su efecto se aprende de tu historial (cuánto
+     bajan tus check-in tras días así, mínimo 3 casos); sin historial, un 10 %
+     menos por día cargado. Se cuentan como mucho 3 días;
+   - ciclo: en días con sangrado (apuntado o estimado) o el día previo
+     estimado, se aprende del historial con cuántas cucharas sueles empezar
+     esos días y si las tareas te cuestan más de lo previsto (coste real
+     frente al estimado), mínimo 3 días; y se reserva el mismo margen que en Hoy. */
+const EST_WEEKS = 10, EST_MIN_WD = 3, EST_MIN_ALL = 5, EST_MIN_CASES = 3, EST_STREAK_MAX = 3, EST_DEFAULT_DROP = 0.1;
+const ciOf = k => { const d = state.days[k]; return d && d.budget != null && !d.budgetUnanswered ? d.budget : null; };
+function energyModel(){
+  const today = todayKey(), max = state.settings.max;
+  const past = Object.keys(state.days).filter(k => k < today && ciOf(k) != null).sort();
+  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+  /* La base sale de días sin sangrado: el efecto del ciclo se suma aparte. */
+  const bled = k => state.cycleEnabled && !!cycleLog(k)?.bleeding;
+  const plain = past.filter(k => !bled(k));
+  const recent = plain.filter(k => k >= shiftKey(today, -30)).map(ciOf);
+  const general = recent.length >= EST_MIN_ALL ? avg(recent) : null;
+  const wdBase = k => {
+    const wd = new Date(k + 'T12:00:00').getDay(), from = shiftKey(today, -7 * EST_WEEKS);
+    const v = plain.filter(p => p >= from && p < k && new Date(p + 'T12:00:00').getDay() === wd).map(ciOf);
+    return v.length >= EST_MIN_WD ? { base:avg(v), by:'weekday' } : general != null ? { base:general, by:'general' } : null;
+  };
+  /* Carga de un día: lo gastado si ya pasó y se marcó algo; si no, lo previsto. */
+  const load = k => { const { planned, spent } = dayLoad(k); return k < today && spent > 0 ? spent : planned; };
+  const limitOf = k => ciOf(k) ?? wdBase(k)?.base ?? max;
+  const heavy = k => { const l = load(k); return l > 0 && l >= limitOf(k) * CAL_EDGE; };
+  const streak = k => { let n = 0; while(n < 7 && heavy(shiftKey(k, -(n + 1)))) n++; return n; };
+  const all = avg(plain.filter(k => k >= shiftKey(today, -120)).map(ciOf));
+  const cases = past.filter(k => k >= shiftKey(today, -120)).map(k => [k, streak(k)]).filter(([, n]) => n > 0)
+    .map(([k, n]) => (ciOf(k) - all) / Math.min(n, EST_STREAK_MAX));
+  const perDay = cases.length >= EST_MIN_CASES ? avg(cases) : null;
+  /* Ciclo, aprendido del historial (últimos 120 días). */
+  const hist = past.filter(k => k >= shiftKey(today, -120));
+  const cyc = hist.filter(bled);
+  const cdiffs = cyc.map(k => ciOf(k) - (wdBase(k)?.base ?? all));
+  const cycleDiff = state.cycleEnabled && cdiffs.length >= EST_MIN_CASES ? avg(cdiffs) : null;
+  const ratio = ks => { let r = 0, e = 0, n = 0;
+    ks.forEach(k => { const t = (state.days[k]?.tasks || []).filter(x => x.done && x.real != null && x.est > 0);
+      if(t.length){ n++; r += t.reduce((a, x) => a + x.real, 0); e += t.reduce((a, x) => a + x.est, 0); } });
+    return { n, v: e ? r / e : null }; };
+  const allDays = Object.keys(state.days).filter(k => k < today && k >= shiftKey(today, -120));
+  const rc = ratio(allDays.filter(bled)), ro = ratio(allDays.filter(k => !bled(k)));
+  const costFactor = state.cycleEnabled && rc.n >= EST_MIN_CASES && ro.n >= EST_MIN_ALL && rc.v && ro.v
+    ? Math.max(0.7, Math.min(1.6, rc.v / ro.v)) : 1;
+  return { max, wdBase, streak, perDay, cycleDiff, costFactor };
+}
+/* Día de ciclo para la estimación: sangrado apuntado, estimado o el día previo estimado. */
+const isCycleDay = k => state.cycleEnabled && (!!precautionReason(k) || estBleedDays(k, k).has(k));
+function estimateEnergy(k, m = energyModel()){
+  const b = m.wdBase(k); if(!b) return null;
+  const n = Math.min(m.streak(k), EST_STREAK_MAX);
+  const effect = n ? (m.perDay != null ? m.perDay : -b.base * EST_DEFAULT_DROP) * n : 0;
+  const cycle = isCycleDay(k);
+  const cDiff = cycle && m.cycleDiff != null ? m.cycleDiff : 0;
+  const woke = Math.max(0, Math.min(m.max, b.base + effect + cDiff));
+  /* Reserva del ciclo, igual que en Hoy (sangrado estimado cuenta como el porcentaje base). */
+  const reserve = cycle && !state.days[k]?.marginOff ? marginPercentFor(k, precautionReason(k) || 'estimada') / 100 : 0;
+  const value = Math.max(0, Math.round(reserve ? Math.max(1, woke * (1 - reserve)) : woke));
+  const factor = cycle ? m.costFactor : 1;
+  const pct = m.max ? value / m.max : 0;
+  return { value, by:b.by, streak:n, lower:effect <= -0.5, learned:m.perDay != null,
+    cycle, cycleLower: cDiff <= -0.5, cycleCost: factor >= 1.05, reserve: Math.round(reserve * 100), factor,
+    level: pct >= 0.65 ? 'Alta' : pct >= 0.375 ? 'Media' : 'Baja' };
+}
+
 function renderPatterns(){
   const el = document.getElementById('patterns');
   if(!isPremium()){
@@ -5148,7 +5325,7 @@ function renderPatterns(){
 let calRef = todayKey();
 const calIsWeek = () => state.settings.calView === 'semana';
 const CAL_WEEKDAYS = ['L','M','X','J','V','S','D'];
-const CAL_BAR_TOP = 32, CAL_LANE = 26, CAL_LANES = 2;
+const CAL_BAR_TOP = 38, CAL_LANE = 24, CAL_LANES = 2;
 /* Días seguidos se juntan en una barra solo si son el mismo elemento: el
    mismo evento del calendario del móvil o la misma serie de repetición. Dos
    tareas distintas con el mismo nombre siguen separadas. */
@@ -5157,23 +5334,28 @@ const calColor = t => { const g = t.cal && calTag(t.cal.cid); return `${t.cal ? 
 const calDayTasks = k => (state.days[k]?.tasks || []).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 /* Un día está "al límite" cuando lo previsto llega al 80 % de tus cucharas sin pasarlas; pasarlas ya lo marca la barra alta. */
 const CAL_EDGE = 0.8;
-function calDayInfo(k, est){
-  const { planned } = dayLoad(k);
-  /* El límite de un día son las cucharas que apuntaste en su check-in; si no hay, tu máximo. */
-  const max = state.settings.max, dd = state.days[k];
-  const ci = dd && dd.budget != null && !dd.budgetUnanswered ? dd.budget : null;
-  const limit = ci ?? max;
+function calDayInfo(k, est, m){
+  let { planned } = dayLoad(k);
+  /* El límite de un día son las cucharas de su check-in; si no hay y el día
+     no ha pasado, la energía estimada; si tampoco, tu máximo. */
+  const max = state.settings.max;
+  const ci = ciOf(k);
+  const e = ci == null && k >= todayKey() && m ? estimateEnergy(k, m) : null;
+  const limit = ci ?? e?.value ?? max;
+  if(e) planned = Math.round(planned * e.factor);
   const heavy = planned > limit;
   const edge = !heavy && planned > 0 && planned >= limit * CAL_EDGE;
   const bleed = state.cycleEnabled && !!(cycleLog(k) || {}).bleeding;
   const bleedEst = !bleed && est.has(k);
   const tasks = calDayTasks(k);
   const date = fmtDate(k).replace(/^([^,\d]+),/, '$1').replace(/^./, c => c.toUpperCase());
-  const label = `${date}${planned ? trf(planned === 1 ? ', {n} cuchara planificada' : ', {n} cucharas planificadas', {n:fmtN(planned)}) : ''}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(ci != null ? ', por encima de tus cucharas de ese día' : ', por encima de tu máximo') : ''}${edge ? tr(', cerca del límite de tus cucharas') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
-  const cls = [k === todayKey() ? 'today' : (k < todayKey() ? 'past' : ''), heavy ? 'heavy' : '', bleedEst ? 'bleed-est' : ''].filter(Boolean).join(' ');
-  const drop = (edge ? '<svg class="cal-eye" viewBox="0 0 24 24" aria-hidden="true"><use href="#eye"/></svg>' : '')
-    + (bleed ? '<svg class="cal-drop" viewBox="0 0 24 24" aria-hidden="true"><use href="#drop"/></svg>' : '');
-  return { tasks, label, cls, drop, marks: '<i class="lm"></i>'.repeat(Math.max(0, Math.min(Math.ceil(max / 2), Math.ceil(planned / 2)))) };
+  const label = `${date}${tasks.length ? ', ' + tasks.map(t => esc(t.name)).join(', ') : ''}${heavy ? tr(', límite superado') : ''}${edge ? tr(', previsión alta') : ''}${bleed ? tr(', con sangrado') : ''}${bleedEst ? tr(', sangrado estimado') : ''}`;
+  const cls = k === todayKey() ? 'today' : (k < todayKey() ? 'past' : '');
+  /* Solo tres señales, sin cantidades: el calendario es para planificar, no para medir. */
+  const inds = (heavy ? '<i class="cal-over"></i>' : '')
+    + (edge ? '<svg class="cal-eye" viewBox="0 0 24 24"><use href="#eye"/></svg>' : '')
+    + (bleed || bleedEst ? `<svg class="cal-drop${bleedEst ? ' est' : ''}" viewBox="0 0 24 24"><use href="#drop"/></svg>` : '');
+  return { tasks, label, cls, inds: inds ? `<span class="cal-inds" aria-hidden="true">${inds}</span>` : '' };
 }
 function calWeekLabel(a, b){
   const A = new Date(a + 'T12:00:00'), B = new Date(b + 'T12:00:00');
@@ -5211,8 +5393,8 @@ function renderCalMonth(){
   const total = new Date(y, m + 1, 0).getDate();
   const mk = n => `${y}-${String(m + 1).padStart(2, '0')}-${String(n).padStart(2, '0')}`;
   const est = estBleedDays(mk(1), mk(total));
-  const info = [];
-  for(let n = 1; n <= total; n++) info[n] = calDayInfo(mk(n), est);
+  const info = [], em = energyModel();
+  for(let n = 1; n <= total; n++) info[n] = calDayInfo(mk(n), est, em);
   const runs = []; let open = new Map();
   for(let n = 1; n <= total; n++){
     const next = new Map();
@@ -5248,12 +5430,12 @@ function renderCalMonth(){
       const n = w * 7 + c - offset + 1;
       if(n < 1 || n > total){ cells += '<div class="cell blank" aria-hidden="true"></div>'; continue; }
       const d = info[n];
-      cells += `<button class="cell ${d.cls}" data-day="${mk(n)}" aria-label="${d.label}"><span class="dn">${n}</span>${d.drop}<span class="load">${d.marks}</span></button>`;
+      cells += `<button class="cell ${d.cls}" data-day="${mk(n)}" aria-label="${d.label}"><span class="dn">${n}</span>${d.inds}</button>`;
     }
     const more = calLayoutWeek(segs[w]);
     const bars = segs[w].filter(s => !s.hidden).map(s =>
       `<span class="cbar${s.r.color}${s.r.done ? ' done' : ''}${s.fl ? ' fl' : ''}${s.fr ? ' fr' : ''}" style="${pos(s.c0, s.c1 - s.c0 + 1, s.fl, s.fr, CAL_BAR_TOP + s.lane * CAL_LANE)}">${esc(s.r.name)}</span>`).join('')
-      + more.map((k, c) => k ? `<span class="cbar-more" style="${pos(c, 1, false, false, CAL_BAR_TOP + (CAL_LANES - 1) * CAL_LANE)}">${trf('+{n} más', {n:k})}</span>` : '').join('');
+      + more.map((k, c) => k ? `<span class="cbar-more" style="${pos(c, 1, false, false, CAL_BAR_TOP + (CAL_LANES - 1) * CAL_LANE)}">${trf('+{n} más', {n:k}).replace(/^(\+\d+)(.*)$/, '$1<span class="mm">$2</span>')}</span>` : '').join('');
     html += `<div class="wk">${cells}<div class="cbars" aria-hidden="true">${bars}</div></div>`;
   }
   document.getElementById('calGrid').innerHTML = html;
@@ -5262,13 +5444,17 @@ function renderCalMonth(){
 function renderCalWeek(){
   const start = shiftKey(calRef, -((new Date(calRef + 'T12:00:00').getDay() + 6) % 7)), end = shiftKey(start, 6);
   document.getElementById('calLabel').textContent = calWeekLabel(start, end);
-  const est = estBleedDays(start, end);
+  const est = estBleedDays(start, end), em = energyModel();
   document.getElementById('calWeek').innerHTML = CAL_WEEKDAYS.map((letter, i) => {
-    const k = shiftKey(start, i), d = calDayInfo(k, est);
+    const k = shiftKey(start, i), d = calDayInfo(k, est, em);
+    const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'short'}).replace('.', '');
+    /* Hasta tres etiquetas; si hay más, "+N más" (el detalle del día las enseña todas). */
+    const shown = d.tasks.length > 3 ? d.tasks.slice(0, 2) : d.tasks;
     const chips = d.tasks.length
-      ? d.tasks.map(t => `<span class="wchip${calColor(t)}${t.done ? ' done' : ''}">${esc(String(t.name).trim())}</span>`).join('')
+      ? shown.map(t => `<span class="wchip${calColor(t)}${t.done ? ' done' : ''}">${esc(String(t.name).trim())}</span>`).join('')
+        + (d.tasks.length > shown.length ? `<span class="wchip more">${trf('+{n} más', {n:d.tasks.length - shown.length})}</span>` : '')
       : `<span class="wnone">${tr('Nada planificado')}</span>`;
-    return `<button class="wrow ${d.cls}" data-day="${k}" aria-label="${d.label}"><span class="wd"><small>${tr(letter)}</small><b>${+k.slice(8)}${d.drop}</b></span><span class="wchips">${chips}</span><span class="load">${d.marks}</span></button>`;
+    return `<button class="wrow ${d.cls}" data-day="${k}" aria-label="${d.label}"><span class="wd"><small>${esc(wd)}</small><b>${+k.slice(8)}</b></span><span class="winds">${d.inds}</span><span class="wchips">${chips}</span><svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
   }).join('');
   return est;
 }
@@ -5281,13 +5467,8 @@ function renderCal(){
     const b = document.getElementById(id); b.dataset.i18nAria = s; b.setAttribute('aria-label', tr(s));
   });
   const est = week ? renderCalWeek() : renderCalMonth();
-  const leg = document.getElementById('calLegendCiclo');
-  leg.hidden = !state.cycleEnabled;
-  leg.textContent = !state.cycleEnabled ? ''
-    : est.size
-      ? tr('La gotita junto al número es sangrado apuntado. El borde a rayas es sangrado estimado, no apuntado: es una estimación a partir de tus ciclos, no una certeza.')
-      : tr('La gotita junto al número es sangrado apuntado.');
-  document.getElementById('calLegendOjo').hidden = !document.querySelector('#s-cal .cal-eye');
+  document.getElementById('calLegendBleed').hidden = !state.cycleEnabled;
+  document.getElementById('calLegendEst').hidden = !est.size;
 }
 function renderOverCost(){
   const el = document.getElementById('overCostGrid');
@@ -5474,7 +5655,7 @@ const TOUR_STEPS = [
   { sel:'#btnAddTask', title:'Las tareas del día', body:'Apunta lo que de verdad va a pasar hoy y cuánto crees que te va a costar. Al marcar la tarea como finalizada puedes corregir lo que costó de verdad: la app aprende de eso.' },
   { sel:'#btnTaskMenu', title:'Días tipo y actividades', body:'Este botón abre un menú. "Días tipo" guarda las tareas de un día con un nombre para volcarlas de una vez en otro día. "Gestionar actividades" es tu lista de actividades con lo que te cuesta cada una; cuando corriges lo que costó de verdad, la app aprende.' },
   { sel:null, title:'Cerrar el día', body:'Por la noche, a la hora que elijas en Ajustes, Spoony te propone hacer el check-out. Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
-  { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'La carga de cada día del mes y los patrones que se repiten, por ejemplo si un día cargado suele ir seguido de otro flojo.' },
+  { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'Tus tareas y eventos de cada día, por mes o por semana. Toca un día para ver su detalle o planificarlo.' },
   { sel:'#tabs [data-go="set"]', nav:'set', title:'Ajustes', body:'Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.' },
   { sel:'#cyclePick', nav:'set', toggleKey:'cycleEnabled', toggleApply:'applyCycleUI', title:'Ciclo (opcional)', body:'Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
   { sel:'#finPick', nav:'set', toggleKey:'finEnabled', toggleApply:'applyFinUI', title:'Finanzas (opcional)', body:'Añade una pestaña para tus gastos fijos y variables del mes. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
@@ -5677,7 +5858,7 @@ function openCheckin(){
   ciRange.max = state.settings.max;
   ciRange.value = day().budget ?? Math.round(state.settings.max * 0.65);
   document.getElementById('ciPresets').innerHTML = ciPresetValues(state.settings.max)
-    .map(v => `<button type="button" class="ci-chip" data-ci="${v}" aria-pressed="false">${trf(v === 1 ? '{n} cuchara' : '{n} cucharas', {n:v})}</button>`).join('');
+    .map(v => `<button type="button" class="ci-chip" data-ci="${v}" aria-pressed="false" aria-label="${trf(v === 1 ? '{n} cuchara' : '{n} cucharas', {n:v})}, ${tr(ciWordFor(v))}">${v} ${tr(ciWordFor(v))}</button>`).join('');
   document.getElementById('ciMarginRow').hidden = !precautionReason(todayKey());
   document.getElementById('ciMarginOff').checked = !!day().marginOff;
   document.getElementById('ciNote').value = day().checkinNote || '';
@@ -7068,42 +7249,68 @@ function dLockReason(k){
     ? tr('Editar días ya pasados es una función de Spoony Premium.')
     : tr('Planificar más allá de mañana es una función de Spoony Premium.');
 }
+/* Coste de una tarea en el detalle del día: "−4" si gasta, "+2" si recarga. */
+function dpCost(t){
+  if(t.cal?.noCost) return `<span class="dp-cost none">${tr('Sin coste')}</span>`;
+  const c = +(t.real ?? t.est) || 0, dep = c < 0;
+  const lab = trf(dep ? (c === -1 ? 'Recarga {n} cuchara' : 'Recarga {n} cucharas') : (c === 1 ? 'Cuesta {n} cuchara' : 'Cuesta {n} cucharas'), {n:fmtN(Math.abs(c))});
+  return `<span class="dp-cost${dep ? ' dep' : ''}" role="img" aria-label="${lab}">${dep ? '+' : c > 0 ? '−' : ''}${fmtN(Math.abs(c))}</span>`;
+}
 function renderDaySheet(){
-  const k = selectedDay, d = day(k), past = k < todayKey(), isToday = k === todayKey();
+  const k = selectedDay, d = day(k);
   const editable = dayEditAllowed(k);
-  const { planned, spent } = dayLoad(k);
-  const typical = typicalBudget();
-  document.getElementById('dTitle').textContent =
-    isToday ? tr('Hoy') : fmtDate(k).replace(/^./, c => c.toUpperCase());
-  const sub = document.getElementById('dSub');
-  if(past || isToday){
-    sub.textContent = d.budget != null
-      ? trf('{spent} cucharas gastadas de {budget}', {spent, budget:d.budget})
-      : trf('{spent} cucharas gastadas', {spent});
-    sub.style.color = '';
-  }else{
-    sub.textContent = planned > typical
-      ? trf('{n} cucharas previstas. Tu media es {avg}.', {n:fmtN(planned), avg:fmtN(typical)})
-      : trf('{n} cucharas previstas de las {avg} que sueles tener.', {n:fmtN(planned), avg:fmtN(typical)});
-    sub.style.color = planned > typical ? 'var(--alert)' : '';
-  }
+  /* Sin cucharas ni cantidades: el detalle del día es para planificar. */
+  const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long'});
+  const dm = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {day:'numeric', month:'long'});
+  document.getElementById('dTitle').textContent = `${wd}, ${dm}`.replace(/^./, c => c.toUpperCase());
   document.getElementById('dLockedNote').hidden = editable;
+  renderDayEnergy(k);
+  /* Marcar como hecha solo tiene sentido hasta hoy; en días futuros el círculo es solo forma. */
+  const canCheck = editable && k <= todayKey();
   const list = document.getElementById('dTasks');
   list.innerHTML = d.tasks.length
-    ? d.tasks.map(t => `<div class="mini${t.cal && editable && !t.done ? ' tap' : ''}">
-        <span class="mini-main">${t.time?`${esc(fmtTaskTime(t))} · `:''}${t.cal && editable && !t.done
-          ? `<button class="linkbtn inline" data-dedit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">${esc(t.name)}</button>`
-          : esc(t.name)}${t.done?` · ${tr('hecha')}`:''}${t.cal ? metaHtml(calNotes(t)) : ''}</span>
-        <span class="cost">${t.cal?.noCost ? tr('Sin coste') : `${fmtN(+(t.real ?? t.est) || 0)}
-          <svg viewBox="0 0 20 40" fill="var(--spoon)"><use href="#spoon"/></svg>`}
-          ${editable ? `<button data-del="${t.id}" aria-label="${trf('Quitar {name}', {name:esc(t.name)})}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>` : ''}
-        </span>
-      </div>`).join('')
-    : `<div class="empty">${tr('Nada planificado para este día.')}</div>`;
+    ? calDayTasks(k).map(t => {
+        const check = canCheck
+          ? `<button class="check ${t.done?'on':''}" data-dtoggle="${t.id}" aria-label="${trf('{action} {name}', {action:tr(t.done?'Desmarcar':'Marcar'), name:esc(t.name)})}" aria-pressed="${t.done}"><svg viewBox="0 0 16 16"><use href="#tick"/></svg></button>`
+          : `<span class="check ${t.done?'on':''}" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#tick"/></svg></span>`;
+        const g = t.cal && calTag(t.cal.cid);
+        return `<div class="dp-task${t.done ? ' done' : ''}">
+          ${check}
+          ${t.done
+            ? `<span class="dp-body"><span class="dp-name">${esc(t.name)}</span>${t.time ? `<span class="dp-time">${esc(fmtTaskTime(t))}</span>` : ''}</span>`
+            : `<button class="dp-body" data-dedit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}"><span class="dp-name">${esc(t.name)}</span>${t.time ? `<span class="dp-time">${esc(fmtTaskTime(t))}</span>` : ''}</button>`}
+          ${dpCost(t)}
+          ${t.cal ? `<svg class="dp-cal${g ? ` tg-${g.c}` : ''}" viewBox="0 0 24 24" role="img" aria-label="${tr('Del calendario del móvil')}"><use href="#i-calendar"/></svg>` : ''}
+          ${t.done ? '' : '<svg class="wchev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg>'}
+        </div>`;
+      }).join('')
+    : `<p class="dp-empty">${tr('Nada planificado para este día.')}</p>`;
   const note = document.getElementById('dNote');
   note.value = d.note || '';
   note.readOnly = !editable;
   renderDayCycleCard(k);
+}
+/* Tarjeta de energía estimada: solo para hoy sin check-in y días futuros.
+   Una palabra, sin cantidades; la frase compara con lo planificado. */
+function renderDayEnergy(k){
+  const box = document.getElementById('dEnergy');
+  const e = k >= todayKey() && ciOf(k) == null ? estimateEnergy(k) : null;
+  box.hidden = !e; if(!e) return;
+  const planned = Math.round(dayLoad(k).planned * e.factor);
+  const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long'});
+  document.getElementById('dEnergyVal').textContent = tr(e.level);
+  const over = planned > e.value, edge = !over && planned > 0 && planned >= e.value * CAL_EDGE;
+  document.getElementById('dEnergyInd').innerHTML = over ? '<i class="cal-over" role="img" aria-label="' + tr('Límite superado') + '"></i>'
+    : edge ? `<svg class="cal-eye" viewBox="0 0 24 24" role="img" aria-label="${tr('Previsión alta')}"><use href="#eye"/></svg>` : '';
+  document.getElementById('dEnergyMsg').textContent = tr(over ? 'Lo planificado pasa de lo estimado. Planifícalo con calma.'
+    : edge ? 'Día cargado, planifícalo con calma.' : planned > 0 ? 'Lo planificado cabe en lo estimado.' : 'Todavía no hay nada planificado.');
+  const why = [];
+  if(e.streak && e.lower) why.push(trf(e.streak === 1 ? 'Vienes de un día cargado: puede que tengas menos energía que un {dia} habitual.' : 'Vienes de {n} días cargados: puede que tengas menos energía que un {dia} habitual.', {n:e.streak, dia:wd}));
+  if(e.cycle){
+    why.push(tr(e.cycleLower || e.cycleCost || e.reserve ? 'Día de ciclo: sueles tener menos energía.' : 'Día de ciclo.'));
+  }
+  if(!why.length) why.push(e.by === 'weekday' ? trf('Según tus {dia} anteriores.', {dia:wd.endsWith('s') ? wd : wd + 's'}) : tr('Según tus últimos check-in.'));
+  document.getElementById('dEnergyWhy').textContent = why.join(' ');
 }
 /* Registro de ciclo de cualquier día: el mismo campo que "Registro de hoy"
    pero sobre el día que se esté mirando en el calendario, pasado o futuro,
@@ -7115,7 +7322,7 @@ function renderDayCycleCard(k){
   const btn = document.getElementById('dAddCycle');
   const card = document.getElementById('dCycleCard');
   btn.hidden = !show || dCycleOpen;
-  btn.textContent = tr(cycleLog(k) ? 'Ciclo apuntado en este día — editar' : 'Añadir registro de ciclo a este día');
+  document.getElementById('dAddCycleLab').textContent = tr(cycleLog(k) ? 'Ciclo apuntado en este día — editar' : 'Añadir registro de ciclo a este día');
   card.hidden = !show || !dCycleOpen;
   if(card.hidden) return;
   const future = k > todayKey();
@@ -7149,17 +7356,23 @@ document.getElementById('dTpl').addEventListener('click', () => {
   openTpl(selectedDay);
 });
 document.getElementById('dTasks').addEventListener('click', e => {
-  const ed = e.target.closest('[data-dedit]');
-  if(ed && dayEditAllowed(selectedDay)){ openTaskEdit(ed.dataset.dedit, selectedDay); return; }
-  const b = e.target.closest('[data-del]'); if(!b || !dayEditAllowed(selectedDay)) return;
-  const d = day(selectedDay);
-  const t = d.tasks.find(x => x.id === b.dataset.del);
-  askDeleteTask(t, which => {
-    if(which === 'series') removeSeriesEverywhere(t.series);
-    else d.tasks = d.tasks.filter(x => x.id !== b.dataset.del);
-    save(); renderDaySheet(); renderAll();
-  });
+  const tog = e.target.closest('[data-dtoggle]');
+  if(tog){
+    const t = day(selectedDay).tasks.find(x => x.id === tog.dataset.dtoggle);
+    if(t && setTaskDone(t, !t.done)){ save(); renderDaySheet(); renderAll(); }
+    return;
+  }
+  const ed = e.target.closest('[data-dedit]'); if(!ed) return;
+  if(!dayEditAllowed(selectedDay)){ requirePremium(dLockReason(selectedDay)); return; }
+  openTaskEdit(ed.dataset.dedit, selectedDay);
 });
+/* Menú "…" del día: días tipo y registro de ciclo, como el menú de Hoy. */
+const dMenu = document.getElementById('dMenu'), dMenuBtn = document.getElementById('dMenuBtn');
+function setDayMenu(open){ dMenu.hidden = !open; dMenuBtn.setAttribute('aria-expanded', open); }
+dMenuBtn.addEventListener('click', () => setDayMenu(dMenu.hidden));
+dMenu.addEventListener('click', e => { if(e.target.closest('button')) setDayMenu(false); });
+dlgDay.addEventListener('click', e => { if(!dMenu.hidden && !e.target.closest('.dp-menu-wrap')) setDayMenu(false); });
+dlgDay.addEventListener('close', () => setDayMenu(false));
 let noteTimer;
 document.getElementById('dNote').addEventListener('input', e => {
   if(!dayEditAllowed(selectedDay)) return;
