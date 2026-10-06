@@ -5638,7 +5638,7 @@ function peakNextDayInsight(){
      estimado, se aprende del historial con cuántas cucharas sueles empezar
      esos días y si las tareas te cuestan más de lo previsto (coste real
      frente al estimado), mínimo 3 días; y se reserva el mismo margen que en Hoy. */
-const EST_WEEKS = 10, EST_MIN_WD = 3, EST_MIN_ALL = 5, EST_MIN_CASES = 3, EST_STREAK_MAX = 3, EST_DEFAULT_DROP = 0.1;
+const EST_WEEKS = 10, EST_MIN_WD = 3, EST_MIN_ALL = 5, EST_MIN_CASES = 3, EST_STREAK_MAX = 3, EST_DEFAULT_DROP = 0.15, EST_LOAD_DAY = 0.5;
 const ciOf = k => { const d = state.days[k]; return d && d.budget != null && !d.budgetUnanswered ? d.budget : null; };
 function energyModel(){
   const today = todayKey(), max = state.settings.max;
@@ -5657,7 +5657,8 @@ function energyModel(){
   /* Carga de un día: lo gastado si ya pasó y se marcó algo; si no, lo previsto. */
   const load = k => { const { planned, spent } = dayLoad(k); return k < today && spent > 0 ? spent : planned; };
   const limitOf = k => ciOf(k) ?? wdBase(k)?.base ?? max;
-  const heavy = k => { const l = load(k); return l > 0 && l >= limitOf(k) * CAL_EDGE; };
+  /* Un día de trabajo normal ya cansa: cuenta como cargado desde la mitad de la energía, no solo al límite. */
+  const heavy = k => { const l = load(k); return l > 0 && l >= Math.min(max, limitOf(k)) * EST_LOAD_DAY; };
   const streak = k => { let n = 0; while(n < 7 && heavy(shiftKey(k, -(n + 1)))) n++; return n; };
   const all = avg(plain.filter(k => k >= shiftKey(today, -120)).map(ciOf));
   const cases = past.filter(k => k >= shiftKey(today, -120)).map(k => [k, streak(k)]).filter(([, n]) => n > 0)
@@ -5682,17 +5683,21 @@ function energyModel(){
 const isCycleDay = k => state.cycleEnabled && (!!precautionReason(k) || estBleedDays(k, k).has(k));
 function estimateEnergy(k, m = energyModel()){
   const b = m.wdBase(k); if(!b) return null;
-  const n = Math.min(m.streak(k), EST_STREAK_MAX);
-  const effect = n ? (m.perDay != null ? m.perDay : -b.base * EST_DEFAULT_DROP) * n : 0;
+  const days = m.streak(k), n = Math.min(days, EST_STREAK_MAX);
   const cycle = isCycleDay(k);
   const cDiff = cycle && m.cycleDiff != null ? m.cycleDiff : 0;
-  const woke = Math.max(0, Math.min(m.max, b.base + effect + cDiff));
+  /* El cansancio se resta de lo que de verdad cabe (recortado al máximo). Lo
+     aprendido solo cuenta si pesa más que el mínimo: el check-in de la mañana
+     a menudo aún no refleja el cansancio acumulado. */
+  const start = Math.min(m.max, b.base + cDiff);
+  const effect = n ? Math.min(m.perDay ?? 0, -start * EST_DEFAULT_DROP) * n : 0;
+  const woke = Math.max(0, start + effect);
   /* Reserva del ciclo, igual que en Hoy (sangrado estimado cuenta como el porcentaje base). */
   const reserve = cycle && !state.days[k]?.marginOff ? marginPercentFor(k, precautionReason(k) || 'estimada') / 100 : 0;
   const value = Math.max(0, Math.round(reserve ? Math.max(1, woke * (1 - reserve)) : woke));
   const factor = cycle ? m.costFactor : 1;
   const pct = m.max ? value / m.max : 0;
-  return { value, by:b.by, streak:n, lower:effect <= -0.5, learned:m.perDay != null,
+  return { value, by:b.by, streak:days, lower:effect <= -0.5, learned:m.perDay != null,
     cycle, cycleLower: cDiff <= -0.5, cycleCost: factor >= 1.05, reserve: Math.round(reserve * 100), factor,
     level: pct >= 0.65 ? 'Alta' : pct >= 0.375 ? 'Media' : 'Baja' };
 }
