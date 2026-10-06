@@ -557,6 +557,38 @@ span.check{cursor:default}
 .fin-obs svg{flex:none;width:24px;height:24px;color:var(--accent)}
 .fin-obs.down svg{transform:scaleY(-1)}
 #finHistList .fin-ic svg{width:19px;height:19px}
+/* Hojas de Finanzas: título marcado, campos compactos con un prefijo (icono o €), chips con icono. */
+.fs-sheet .sheet-head{align-items:center;margin-bottom:6px}
+.fs-sheet h2{margin:0;font-size:24px;font-weight:800;letter-spacing:-0.01em;color:var(--ink)}
+.fs-sub{margin:0 0 20px;font-size:15px;line-height:1.45;color:var(--ink-soft)}
+.fs-field{margin:16px 0 0}
+.fs-field > label{display:block;margin:0 0 8px;font-size:15px;color:var(--ink)}
+.fs-input{display:flex;align-items:stretch;min-height:52px;border:1px solid color-mix(in srgb,var(--line) 70%,var(--bg));border-radius:14px;background:var(--surface);overflow:hidden}
+.fs-input:focus-within{border-color:var(--accent)}
+.fs-pre{flex:none;width:52px;display:grid;place-items:center;border-right:1px solid color-mix(in srgb,var(--line) 55%,var(--bg));color:var(--accent);font-size:19px;font-weight:600}
+.fs-pre svg{width:22px;height:22px}
+.fs-input input{flex:1;width:auto;min-width:0;margin:0;padding:0 14px;border:none;border-radius:0;background:none;font-size:17px;outline:none;-webkit-appearance:none;appearance:none}
+.fs-input input::-webkit-date-and-time-value{text-align:left}
+.fs-amount{max-width:240px}
+.fs-chips{display:flex;flex-wrap:wrap;gap:8px}
+.fs-chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px 0 13px;border:none;border-radius:999px;
+  background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));color:var(--ink);font-size:15px}
+.fs-chip svg{width:20px;height:20px;color:var(--accent)}
+.fs-chip[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.fs-chip[aria-pressed="true"] svg{color:var(--surface)}
+.fs-seg{display:flex;gap:10px}
+.fs-seg button{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border:1.5px solid transparent;border-radius:16px;
+  background:color-mix(in srgb,var(--surface-2) 50%,var(--bg));color:var(--ink);font-size:14px;line-height:1.25;text-align:left}
+.fs-seg button svg{flex:none;width:22px;height:22px;color:var(--accent)}
+.fs-seg button[aria-pressed="true"]{border-color:var(--accent);background:var(--surface)}
+.fs-note{display:flex;align-items:flex-start;gap:10px;margin:14px 0 0;padding:12px 14px;border-radius:14px;
+  background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.fs-note svg{flex:none;width:20px;height:20px;color:var(--accent)}
+.fs-actions{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.fs-actions button{min-height:54px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--ink);font-size:17px;font-weight:600}
+.fs-actions button.primary{border-color:var(--accent);background:var(--accent);color:var(--surface);box-shadow:0 6px 18px rgba(75,58,63,.14)}
+.fs-actions button.warn{border-color:color-mix(in srgb,var(--alert) 45%,var(--bg));color:var(--alert)}
+.fs-actions button[hidden]{display:none}
 .dp-energy{position:relative;overflow:hidden;margin:0 0 24px;padding:20px 20px 18px;border-radius:var(--radius);
   background:color-mix(in srgb,var(--surface-2) 45%,var(--bg))}
 .dp-energy-wave{position:absolute;right:0;top:0;width:58%;height:100%;fill:color-mix(in srgb,var(--accent) 7%,transparent);pointer-events:none}
@@ -2347,47 +2379,55 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
 <!-- ===== Gasto fijo/variable ===== -->
 <dialog id="dlgFinBudget">
-  <div class="sheet">
-    <h2 data-i18n="Presupuesto mensual">Presupuesto mensual</h2>
-    <p class="sub" data-i18n="Lo que quieres gastar como mucho cada mes, sumando fijos y variables.">Lo que quieres gastar como mucho cada mes, sumando fijos y variables.</p>
-    <div class="field">
+  <div class="sheet fs-sheet">
+    <div class="sheet-grab" aria-hidden="true"></div>
+    <div class="sheet-head"><h2 id="fbTitle"></h2><button class="sheet-x" id="fbX" data-i18n-aria="Cerrar" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <p class="fs-sub" data-i18n="Define cuánto quieres gastar al mes, sumando gastos fijos y variables.">Define cuánto quieres gastar al mes, sumando gastos fijos y variables.</p>
+    <div class="fs-field">
       <label for="fbAmount" data-i18n="Importe (€)">Importe (€)</label>
-      <input type="number" id="fbAmount" step="1" min="0" inputmode="decimal">
+      <div class="fs-input"><span class="fs-pre" aria-hidden="true">€</span><input type="number" id="fbAmount" step="1" min="0" inputmode="decimal" placeholder="0,00"></div>
     </div>
-    <div class="bigrow">
-      <button class="warn" id="fbRemove" data-i18n="Quitar">Quitar</button>
-      <button class="primary" id="fbSave" data-i18n="Guardar">Guardar</button>
+    <p class="fs-note"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bulb"/></svg><span data-i18n="Este presupuesto te ayudará a tener una mejor visión de tus gastos, sin agobios.">Este presupuesto te ayudará a tener una mejor visión de tus gastos, sin agobios.</span></p>
+    <div class="fs-actions">
+      <button class="primary" id="fbSave" data-i18n="Guardar presupuesto">Guardar presupuesto</button>
+      <button id="fbCancel" data-i18n="Cancelar">Cancelar</button>
+      <button class="warn" id="fbRemove" data-i18n="Quitar presupuesto">Quitar presupuesto</button>
     </div>
-    <div class="bigrow"><button id="fbCancel" data-i18n="Cancelar">Cancelar</button></div>
   </div>
 </dialog>
 <dialog id="dlgGasto">
-  <div class="sheet">
-    <h2 id="gTitle">Gasto</h2>
-    <div class="field">
+  <div class="sheet fs-sheet">
+    <div class="sheet-grab" aria-hidden="true"></div>
+    <div class="sheet-head"><h2 id="gTitle">Gasto</h2><button class="sheet-x" id="gX" data-i18n-aria="Cerrar" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <div class="fs-field">
       <label for="gName" data-i18n="Nombre">Nombre</label>
-      <input type="text" id="gName" placeholder="Alquiler, luz, gimnasio…" data-i18n-ph="Alquiler, luz, gimnasio…">
+      <div class="fs-input"><span class="fs-pre" aria-hidden="true"><svg viewBox="0 0 24 24"><use id="gNameIc" href="#i-receipt"/></svg></span><input type="text" id="gName" placeholder="Alquiler, luz, gimnasio…" data-i18n-ph="Alquiler, luz, gimnasio…"></div>
     </div>
-    <div class="field">
+    <div class="fs-field">
       <label for="gImporte" data-i18n="Importe (€)">Importe (€)</label>
-      <input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal">
+      <div class="fs-input fs-amount"><span class="fs-pre" aria-hidden="true">€</span><input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal" placeholder="0,00"></div>
     </div>
-    <div class="field" id="gCatField" hidden>
-      <label data-i18n="Categoría">Categoría</label>
-      <div class="chips" id="gCat" role="group" data-i18n-aria="Categoría" aria-label="Categoría"></div>
+    <div class="fs-field" id="gCatField" hidden>
+      <label id="gCatLab" data-i18n="Categoría">Categoría</label>
+      <div class="fs-chips" id="gCat" role="group" aria-labelledby="gCatLab"></div>
     </div>
-    <div class="field" id="gScopeField" hidden>
-      <label data-i18n="¿Cómo aplicamos el cambio?">¿Cómo aplicamos el cambio?</label>
-      <div class="chips" id="gScope">
-        <button class="chip" data-scope="siempre" aria-pressed="true" data-i18n="Aplicar desde ahora en adelante">Aplicar desde ahora en adelante</button>
-        <button class="chip" data-scope="mes" aria-pressed="false" data-i18n="Solo este mes">Solo este mes</button>
+    <div class="fs-field" id="gDateField" hidden>
+      <label for="gDate" data-i18n="Fecha">Fecha</label>
+      <div class="fs-input"><span class="fs-pre" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-calendar"/></svg></span><input type="date" id="gDate"></div>
+    </div>
+    <div class="fs-field" id="gScopeField" hidden>
+      <label id="gScopeLab" data-i18n="¿Cómo aplicamos el cambio?">¿Cómo aplicamos el cambio?</label>
+      <div class="fs-seg" id="gScope" role="group" aria-labelledby="gScopeLab">
+        <button data-scope="siempre" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="Aplicar desde ahora en adelante">Aplicar desde ahora en adelante</span></button>
+        <button data-scope="mes" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><span data-i18n="Solo este mes">Solo este mes</span></button>
       </div>
+      <p class="fs-note"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span id="gScopeNote"></span></p>
     </div>
-    <div class="bigrow">
-      <button class="warn" id="gDelete" data-i18n="Borrar">Borrar</button>
-      <button class="primary" id="gSave" data-i18n="Guardar">Guardar</button>
+    <div class="fs-actions">
+      <button class="primary" id="gSave"></button>
+      <button id="gCancel" data-i18n="Cancelar">Cancelar</button>
+      <button class="warn" id="gDelete" data-i18n="Borrar gasto">Borrar gasto</button>
     </div>
-    <div class="bigrow"><button id="gCancel" data-i18n="Cancelar">Cancelar</button></div>
   </div>
 </dialog>
 
@@ -3463,6 +3503,15 @@ const EN = {
  "Nombre": "Name",
  "Normal": "Normal",
  "Nota": "Note",
+ "Define cuánto quieres gastar al mes, sumando gastos fijos y variables.": "Set how much you want to spend per month, fixed and variable together.",
+ "Este presupuesto te ayudará a tener una mejor visión de tus gastos, sin agobios.": "This budget helps you see your spending more clearly, without pressure.",
+ "Guardar presupuesto": "Save budget",
+ "Quitar presupuesto": "Remove budget",
+ "Borrar gasto": "Delete expense",
+ "Fecha": "Date",
+ "Guardar gasto": "Save expense",
+ "El cambio solo se aplicará a este mes.": "The change only applies to this month.",
+ "El cambio se aplicará en todos los meses futuros.": "The change applies to all future months.",
  "Integradas en tu vida, sin distraer": "Part of your life, without distraction",
  "Resumen": "Summary",
  "Variables": "Variable",
@@ -7178,8 +7227,10 @@ const gName = document.getElementById('gName');
 const gImporte = document.getElementById('gImporte');
 let gType = 'fijo', gEditing = null, gScope = 'siempre';
 function gScopeSync(){
-  document.querySelectorAll('#gScope .chip').forEach(c =>
+  document.querySelectorAll('#gScope [data-scope]').forEach(c =>
     c.setAttribute('aria-pressed', c.dataset.scope === gScope));
+  document.getElementById('gScopeNote').textContent = tr(gScope === 'mes'
+    ? 'El cambio solo se aplicará a este mes.' : 'El cambio se aplicará en todos los meses futuros.');
 }
 document.getElementById('gScope').addEventListener('click', e => {
   const b = e.target.closest('[data-scope]'); if(!b) return;
@@ -7188,7 +7239,13 @@ document.getElementById('gScope').addEventListener('click', e => {
 let gCatSel = 'otros';
 function gCatSync(){
   document.getElementById('gCat').innerHTML = FIN_CATS.map(c =>
-    `<button class="chip" data-gcat="${c.id}" aria-pressed="${c.id === gCatSel}">${tr(c.name)}</button>`).join('');
+    `<button class="fs-chip" data-gcat="${c.id}" aria-pressed="${c.id === gCatSel}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${c.icon}"/></svg>${tr(c.name)}</button>`).join('');
+  gIconSync();
+}
+/* Icono del campo nombre: la categoría en variables, lo que sugiera el nombre en fijos. */
+function gIconSync(){
+  document.getElementById('gNameIc').setAttribute('href', '#' + (gType === 'variable'
+    ? (/veterin/i.test(gName.value) ? 'i-paw' : finCat(gCatSel).icon) : finIconFix({ nombre:gName.value })));
 }
 document.getElementById('gCat').addEventListener('click', e => {
   const b = e.target.closest('[data-gcat]'); if(!b) return;
@@ -7207,13 +7264,30 @@ function openGasto(tipo, item){
     : trf('Añadir gasto {tipo}', {tipo:tipoLab});
   document.getElementById('gScopeField').hidden = !(tipo === 'fijo' && item);
   gScopeSync();
+  /* Fecha de un variable: solo dentro del mes en curso, hasta hoy. */
+  const dateField = document.getElementById('gDateField'), gDate = document.getElementById('gDate');
+  dateField.hidden = tipo !== 'variable';
+  gDate.min = state.finanzas.mesActual + '-01'; gDate.max = todayKey();
+  gDate.value = item?.fecha ? localDateKey(new Date(item.fecha)) : todayKey();
+  document.getElementById('gSave').textContent = tr(item ? 'Guardar cambios' : 'Guardar gasto');
   document.getElementById('gDelete').hidden = !item;
+  document.getElementById('gCancel').hidden = !!item;
+  gIconSync();
   openDialog(dlgGasto);
 }
 gName.addEventListener('input', () => {
-  if(gType !== 'variable' || gEditing) return;
-  gCatSel = finGuessCat(gName.value); gCatSync();
+  if(gType === 'variable' && !gEditing){ gCatSel = finGuessCat(gName.value); gCatSync(); }
+  else gIconSync();
 });
+/* Fecha elegida → ISO: hoy con la hora actual; otro día a mediodía. */
+function gDateIso(prev){
+  const v = document.getElementById('gDate').value;
+  if(!v) return prev || new Date().toISOString();
+  if(prev && localDateKey(new Date(prev)) === v) return prev;
+  return v === todayKey() ? new Date().toISOString() : new Date(v + 'T12:00:00').toISOString();
+}
+document.getElementById('gX').addEventListener('click', () => dlgGasto.close());
+sheetDragClose(dlgGasto.querySelector('.fs-sheet'), 'gX');
 document.getElementById('btnAddFijo').addEventListener('click', () => openGasto('fijo', null));
 document.getElementById('btnAddVariable').addEventListener('click', () => openGasto('variable', null));
 function finListClick(e, tipo){
@@ -7244,8 +7318,8 @@ document.getElementById('gSave').addEventListener('click', () => {
       f.gastosFijos.push({ id:uid(), nombre, importe, overrideMes:null, pagado:false });
     }
   }else{
-    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; gEditing.cat = gCatSel; delete gEditing.revisar; }
-    else f.gastosVariables.push({ id:uid(), nombre, importe, cat:gCatSel, origen:'manual', fecha:new Date().toISOString() });
+    if(gEditing){ gEditing.nombre = nombre; gEditing.importe = importe; gEditing.cat = gCatSel; gEditing.fecha = gDateIso(gEditing.fecha); delete gEditing.revisar; }
+    else f.gastosVariables.push({ id:uid(), nombre, importe, cat:gCatSel, origen:'manual', fecha:gDateIso(null) });
   }
   save(); dlgGasto.close(); renderFin();
 });
@@ -7270,10 +7344,14 @@ document.getElementById('finHoy').addEventListener('click', () => openFinTab('va
 }));
 const dlgFinBudget = document.getElementById('dlgFinBudget');
 document.getElementById('finBudget').addEventListener('click', () => {
-  document.getElementById('fbAmount').value = state.finanzas.presupuesto || '';
-  document.getElementById('fbRemove').hidden = !state.finanzas.presupuesto;
+  const b = state.finanzas.presupuesto;
+  document.getElementById('fbTitle').textContent = tr(b ? 'Presupuesto mensual' : 'Añadir presupuesto mensual');
+  document.getElementById('fbAmount').value = b || '';
+  document.getElementById('fbRemove').hidden = !b;
   openDialog(dlgFinBudget);
 });
+document.getElementById('fbX').addEventListener('click', () => dlgFinBudget.close());
+sheetDragClose(dlgFinBudget.querySelector('.fs-sheet'), 'fbX');
 document.getElementById('fbSave').addEventListener('click', () => {
   const v = parseFloat(document.getElementById('fbAmount').value);
   state.finanzas.presupuesto = Number.isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null;
