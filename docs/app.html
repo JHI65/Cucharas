@@ -3601,6 +3601,9 @@ const EN = {
  "Día cargado, planifícalo con calma.": "Busy day, plan it calmly.",
  "Lo planificado cabe en lo estimado.": "What's planned fits the estimate.",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "La energía estimada coincidió con tu check-in en {n} de {total} días.": "The estimated energy matched your check-in on {n} of {total} days.",
+ "Cuando no coincidió, solías tener más energía de la estimada.": "When it did not match, you usually had more energy than estimated.",
+ "Cuando no coincidió, solías tener menos energía de la estimada.": "When it did not match, you usually had less energy than estimated.",
  "Los días de antes aún están vacíos: si les añades tareas, esta estimación puede cambiar.": "The days before are still empty: if you add tasks to them, this estimate may change.",
  "Según cómo te encontraste otras veces tras días parecidos.": "Based on how you felt other times after similar days.",
  "Los últimos días fueron cargados y el cansancio todavía puede notarse.": "The last few days were busy and you may still feel it.",
@@ -5629,18 +5632,16 @@ function peakNextDayInsight(){
   return { n:diffs.length, avgDiff };
 }
 
-/* Energía estimada de un día que aún no tiene check-in. Es una estimación a
-   partir de tus propios datos, no una certeza:
-   - base: la media de tus check-in de ese mismo día de la semana (últimas 10
-     semanas, mínimo 3); si no los hay, la de tus check-in recientes;
-   - sobrecarga: los días cargados seguidos justo antes (lo hecho o previsto
-     llega al 80 % de su límite). Su efecto se aprende de tu historial (cuánto
-     bajan tus check-in tras días así, mínimo 3 casos); sin historial, un 10 %
-     menos por día cargado. Se cuentan como mucho 3 días;
-   - ciclo: en días con sangrado (apuntado o estimado) o el día previo
-     estimado, se aprende del historial con cuántas cucharas sueles empezar
-     esos días y si las tareas te cuestan más de lo previsto (coste real
-     frente al estimado), mínimo 3 días; y se reserva el mismo margen que en Hoy. */
+/* Energía estimada de un día que aún no tiene check-in (solo se enseña en el
+   calendario, para organizarse). Es una estimación con tus propios datos:
+   - cansancio acumulado: cada uno de los 7 días anteriores suma lo cargado que
+     fue (lo hecho o previsto frente a tu energía), pesando menos cuanto más lejos;
+   - base descansada: tus check-in de ese día de la semana (o recientes),
+     corregidos por el cansancio con el que llegaste, para no contarlo dos veces;
+   - general: base menos un 22 % por unidad de cansancio (hasta un 65 %);
+   - historial: lo que apuntaste otros días con un cansancio parecido, que pesa
+     más cuantos más casos hay (hasta un 75 %);
+   - ciclo: diferencia aprendida en días de sangrado y el mismo margen que en Hoy. */
 const EST_WEEKS = 10, EST_MIN_WD = 3, EST_MIN_ALL = 5, EST_MIN_CASES = 3, EST_LOAD_DAY = 0.5,
   EST_FATIGUE_DAYS = 7, EST_DECAY = 0.7, EST_DROP_PER_F = 0.22, EST_DROP_MAX = 0.65;
 const ciOf = k => { const d = state.days[k]; return d && d.budget != null && !d.budgetUnanswered ? d.budget : null; };
@@ -5733,10 +5734,24 @@ function estimateEnergy(k, m = energyModel()){
   const reserve = cycle && !state.days[k]?.marginOff ? marginPercentFor(k, precautionReason(k) || 'estimada') / 100 : 0;
   const value = Math.max(0, Math.round(reserve ? Math.max(1, woke * (1 - reserve)) : woke));
   const factor = cycle ? m.costFactor : 1;
-  const pct = m.max ? value / m.max : 0;
-  return { value, by:b.by, streak:days, lower: woke - cDiff <= start - 0.5, learned: !!hist && f >= 0.5,
+  return { value, woke: Math.round(woke), by:b.by, streak:days, lower: woke - cDiff <= start - 0.5, learned: !!hist && f >= 0.5,
     cycle, cycleLower: cDiff <= -0.5, cycleCost: factor >= 1.05, reserve: Math.round(reserve * 100), factor,
-    level: pct >= 0.65 ? 'Alta' : pct >= 0.375 ? 'Media' : 'Baja' };
+    level: estLevel(value, m.max) };
+}
+const estLevel = (v, max) => { const pct = max ? v / max : 0; return pct >= 0.65 ? 'Alta' : pct >= 0.375 ? 'Media' : 'Baja'; };
+/* Comparación en Patrones: la última estimación del día (guardada en silencio
+   al hacer su check-in) frente a lo que apuntaste. Mínimo 7 días. */
+const NEED_EST = 7;
+function estAccuracyInsight(){
+  const max = state.settings.max;
+  const pairs = Object.keys(state.days).sort().slice(-90).map(k => [state.days[k].estSnap, ciOf(k)])
+    .filter(([e, ci]) => e && ci != null).map(([e, ci]) => [estLevel(e.v, max), estLevel(Math.min(max, ci), max)]);
+  if(pairs.length < NEED_EST) return null;
+  const rank = { Baja:0, Media:1, Alta:2 };
+  const hits = pairs.filter(([a, b]) => a === b).length;
+  const more = pairs.filter(([a, b]) => rank[b] > rank[a]).length, less = pairs.length - hits - more;
+  const misses = more + less;
+  return { n:pairs.length, hits, dir: misses >= 2 && more >= misses * 2 / 3 ? 'more' : misses >= 2 && less >= misses * 2 / 3 ? 'less' : null };
 }
 
 function renderPatterns(){
@@ -5786,6 +5801,11 @@ function renderPatterns(){
       : d >= 0.5 ? trf('sueles empezar con {n} {unidad} más que tu media', {n:fmtN(d), unidad:cuch(d)})
       : tr('no se nota una diferencia clara con tu media');
     out += `<p class="insight">${trf('Los días después de un pico sensorial ({n} caso{s}), {frase}.', {n:peaks.n, s:peaks.n===1?'':tr('s'), frase})}</p>`;
+  }
+  const acc = estAccuracyInsight();
+  if(acc){
+    out += `<p class="insight">${trf('La energía estimada coincidió con tu check-in en {n} de {total} días.', {n:acc.hits, total:acc.n})}${acc.dir
+      ? ' ' + tr(acc.dir === 'more' ? 'Cuando no coincidió, solías tener más energía de la estimada.' : 'Cuando no coincidió, solías tener menos energía de la estimada.') : ''}</p>`;
   }
   el.innerHTML = out;
 }
@@ -6354,6 +6374,11 @@ function ciKeepNote(){
   if(note) day().checkinNote = note; else delete day().checkinNote;
 }
 document.getElementById('ciSave').addEventListener('click', () => {
+  /* Guarda en silencio la última estimación del día, antes de que cuente el check-in. */
+  if(!day().estSnap && ciOf(todayKey()) == null){
+    const e = estimateEnergy(todayKey());
+    if(e) day().estSnap = { v:e.woke };
+  }
   day().budget = +ciRange.value;
   day().marginOff = ciMarginOff.checked;
   delete day().budgetUnanswered;
