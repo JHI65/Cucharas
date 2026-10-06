@@ -584,6 +584,21 @@ span.check{cursor:default}
 .fs-note{display:flex;align-items:flex-start;gap:10px;margin:14px 0 0;padding:12px 14px;border-radius:14px;
   background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));font-size:14px;line-height:1.45;color:var(--ink-soft)}
 .fs-note svg{flex:none;width:20px;height:20px;color:var(--accent)}
+.fs-label-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 8px}
+.fs-label-row label{font-size:15px;color:var(--ink)}
+.fs-label-row .linkbtn{padding:4px 0;font-size:14px}
+.fs-chip.new{background:none;border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--bg));color:var(--accent)}
+.fs-chip .premium-tag{margin-left:2px}
+.fs-catform{margin-top:14px;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--surface-2) 35%,var(--bg))}
+.fs-icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin:12px 0}
+.fs-icon{height:44px;border:none;border-radius:12px;background:none;color:var(--accent);display:grid;place-items:center;padding:0}
+.fs-icon svg{width:22px;height:22px}
+.fs-icon[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.fs-catform-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.fs-catform-actions button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--ink);font-size:15px;font-weight:600}
+.fs-catform-actions .primary{border-color:var(--accent);background:var(--accent);color:var(--surface)}
+.fs-catform-actions .warn{margin-right:auto;border-color:transparent;color:var(--alert);padding:0 4px}
+.fs-catform-actions button[hidden]{display:none}
 .fs-actions{display:flex;flex-direction:column;gap:12px;margin-top:26px}
 .fs-actions button{min-height:54px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--ink);font-size:17px;font-weight:600}
 .fs-actions button.primary{border-color:var(--accent);background:var(--accent);color:var(--surface);box-shadow:0 6px 18px rgba(75,58,63,.14)}
@@ -1640,7 +1655,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div id="finFijosList"></div>
       <button class="dp-add" id="btnAddFijo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir gasto fijo">Añadir gasto fijo</span></button>
       <section class="fin-evo" id="finEvo">
-        <h2 class="fin-h" data-i18n="Evolución del gasto">Evolución del gasto</h2>
+        <h2 class="fin-h" data-i18n="Evolución de los gastos fijos">Evolución de los gastos fijos</h2>
         <div class="fin-bars" id="finBars"></div>
         <p class="fin-obs" id="finObs" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use id="finObsIc" href="#i-trend"/></svg><span id="finObsText"></span></p>
       </section>
@@ -2408,8 +2423,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       <div class="fs-input fs-amount"><span class="fs-pre" aria-hidden="true">€</span><input type="number" id="gImporte" step="0.01" min="0" inputmode="decimal" placeholder="0,00"></div>
     </div>
     <div class="fs-field" id="gCatField" hidden>
-      <label id="gCatLab" data-i18n="Categoría">Categoría</label>
+      <div class="fs-label-row"><label id="gCatLab" data-i18n="Categoría">Categoría</label><button class="linkbtn" id="gCatEdit" hidden data-i18n="Editar categoría">Editar categoría</button></div>
       <div class="fs-chips" id="gCat" role="group" aria-labelledby="gCatLab"></div>
+      <div class="fs-catform" id="gCatForm" hidden>
+        <div class="fs-input"><span class="fs-pre" aria-hidden="true"><svg viewBox="0 0 24 24"><use id="gcfIc" href="#i-box"/></svg></span><input type="text" id="gcfName" maxlength="24" placeholder="Nombre de la categoría" data-i18n-ph="Nombre de la categoría" data-i18n-aria="Nombre de la categoría" aria-label="Nombre de la categoría"></div>
+        <div class="fs-icons" id="gcfIcons" role="group" data-i18n-aria="Icono" aria-label="Icono"></div>
+        <div class="fs-catform-actions">
+          <button class="warn" id="gcfDelete" hidden data-i18n="Borrar categoría">Borrar categoría</button>
+          <button id="gcfCancel" data-i18n="Cancelar">Cancelar</button>
+          <button class="primary" id="gcfSave"></button>
+        </div>
+      </div>
     </div>
     <div class="fs-field" id="gDateField" hidden>
       <label for="gDate" data-i18n="Fecha">Fecha</label>
@@ -3503,6 +3527,18 @@ const EN = {
  "Nombre": "Name",
  "Normal": "Normal",
  "Nota": "Note",
+ "Evolución de los gastos fijos": "Fixed expenses over time",
+ "Tus gastos fijos son iguales que el mes anterior.": "Your fixed expenses are the same as last month.",
+ "Tus gastos fijos son un {p} % más bajos que el mes anterior.": "Your fixed expenses are {p}% lower than last month.",
+ "Tus gastos fijos son un {p} % más altos que el mes anterior.": "Your fixed expenses are {p}% higher than last month.",
+ "Nueva categoría": "New category",
+ "Editar categoría": "Edit category",
+ "Guardar categoría": "Save category",
+ "Crear categoría": "Create category",
+ "Borrar categoría": "Delete category",
+ "Nombre de la categoría": "Category name",
+ "¿Borrar la categoría \"{name}\"? Sus gastos pasarán a Otros.": "Delete the category \"{name}\"? Its expenses will move to Other.",
+ "Las categorías propias son una función de Spoony Premium.": "Custom categories are a Spoony Premium feature.",
  "Define cuánto quieres gastar al mes, sumando gastos fijos y variables.": "Set how much you want to spend per month, fixed and variable together.",
  "Este presupuesto te ayudará a tener una mejor visión de tus gastos, sin agobios.": "This budget helps you see your spending more clearly, without pressure.",
  "Guardar presupuesto": "Save budget",
@@ -4971,6 +5007,7 @@ const monthYear = (i, y) => state.settings?.lang === 'en' ? `${MESES_EN[i]} ${y}
 function ensureFinanzas(){
   if(!state.finanzas) state.finanzas = { gastosFijos:[], gastosVariables:[], historial:[], mesActual:null };
   if(!state.finanzas.mesActual) state.finanzas.mesActual = monthKey();
+  if(!Array.isArray(state.finanzas.cats)) state.finanzas.cats = [];
   // Quien ya tenía gastos apuntados no debe encontrarse la pestaña
   // desaparecida al actualizar (predictibilidad); solo empieza apagada
   // para quien instala la app de cero.
@@ -5027,9 +5064,19 @@ const FIN_KW = [
   ['alim', /mercadona|super|carrefour|lidl|\bd[ií]a\b|aldi|alcampo|eroski|hipercor|consum|ahorram|alimenta|fruter|panader|carnicer|ronghuan|caprabo|bonpreu/i],
   ['ocio', /cine|teatro|concierto|\bbar\b|restaur|caf[eé]|cafeter|netflix|spotify|steam|librer|museo|ocio|burger|pizza|mcdonald|kfc/i],
 ];
-const finGuessCat = name => (FIN_KW.find(([, re]) => re.test(name || '')) || ['otros'])[0];
-const finCatOf = g => FIN_CATS.some(c => c.id === g.cat) ? g.cat : finGuessCat(g.nombre);
-const finCat = id => FIN_CATS.find(c => c.id === id) || FIN_CATS[FIN_CATS.length - 1];
+/* Categorías propias (Premium): van entre las fijas y "Otros", con un color de la paleta. */
+const FIN_CUSTOM_COLORS = ['#B9757F', '#D7A3B4', '#C98F6E', '#A8657A', '#E4B8A4', '#C7A0BF'];
+const FIN_CUSTOM_ICONS = ['i-home', 'i-eat', 'i-coffee', 'i-shirt', 'i-book', 'i-music', 'i-bus', 'i-paw', 'i-family', 'i-suitcase', 'i-dumbbell', 'i-laptop', 'i-heart', 'i-box'];
+const finCatsAll = () => [...FIN_CATS.slice(0, -1),
+  ...(state.finanzas?.cats || []).map((c, i) => ({ ...c, color: FIN_CUSTOM_COLORS[i % FIN_CUSTOM_COLORS.length], custom:true })),
+  FIN_CATS[FIN_CATS.length - 1]];
+const reEsc = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const finGuessCat = name => {
+  const own = (state.finanzas?.cats || []).find(c => c.name && new RegExp(reEsc(c.name), 'i').test(name || ''));
+  return own ? own.id : (FIN_KW.find(([, re]) => re.test(name || '')) || ['otros'])[0];
+};
+const finCatOf = g => finCatsAll().some(c => c.id === g.cat) ? g.cat : finGuessCat(g.nombre);
+const finCat = id => finCatsAll().find(c => c.id === id) || FIN_CATS[FIN_CATS.length - 1];
 const finIconVar = g => /veterin/i.test(g.nombre || '') ? 'i-paw' : finCat(finCatOf(g)).icon;
 const FIN_FIX_ICONS = [[/alquiler|hipoteca|comunidad|casa|piso/i, 'i-home'], [/gimnas|gym|deporte/i, 'i-dumbbell'],
   [/internet|fibra|wifi|router/i, 'i-laptop'], [/m[oó]vil|tel[eé]fono|l[ií]nea/i, 'i-mobile'], [/luz|electric|agua|gas\b/i, 'i-bulb'],
@@ -5152,7 +5199,7 @@ function renderFinResumen(){
 function renderFinDonut(vars, total){
   const wrap = document.getElementById('finDonutWrap');
   wrap.hidden = !total; if(!total) return;
-  const sums = FIN_CATS.map(c => ({ c, v: vars.filter(g => finCatOf(g) === c.id).reduce((a, g) => a + g.importe, 0) })).filter(x => x.v > 0);
+  const sums = finCatsAll().map(c => ({ c, v: vars.filter(g => finCatOf(g) === c.id).reduce((a, g) => a + g.importe, 0) })).filter(x => x.v > 0);
   const R = 43, C = 2 * Math.PI * R; let off = 0;
   const arcs = sums.map(({ c, v }) => { const len = v / total * C;
     const a = `<circle r="${R}" cx="50" cy="50" fill="none" stroke="${c.color}" stroke-width="11" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}"/>`; off += len; return a; }).join('');
@@ -5161,25 +5208,25 @@ function renderFinDonut(vars, total){
   document.getElementById('finDonutLegend').innerHTML = sums.sort((a, b) => b.v - a.v).map(({ c, v }) =>
     `<p><i class="dot" style="background:${c.color}"></i><span>${tr(c.name)}</span><b>${pctOf(v, total)} %</b></p>`).join('');
 }
-/* Barras de los últimos meses (hasta 6), con el mes actual destacado. */
+/* Barras de los últimos meses (hasta 6), solo con los gastos fijos; el mes actual destacado. */
 /* Altura en píxeles y desde cero: el porcentaje no se resolvía dentro de la
    columna y todas las barras salían iguales. */
 const FIN_BAR_H = 120;
 function renderFinEvo(){
   const months = finMonths().slice(-6), cur = state.finanzas.mesActual;
-  const data = months.map(k => ({ k, t: finMonthData(k)?.total || 0 }));
+  const data = months.map(k => ({ k, t: finMonthData(k)?.totalFijos || 0 }));
   const max = Math.max(1, ...data.map(x => x.t));
   document.getElementById('finEvo').hidden = data.length < 2;
   document.getElementById('finBars').innerHTML = data.map(({ k, t }) =>
     `<div class="fin-col${k === cur ? ' on' : ''}" role="img" aria-label="${esc(finMonthLabel(k))}: ${fmtMoney(t)}"><small>${fmtMoney(Math.round(t))}</small><span style="height:${Math.max(6, Math.round(t / max * FIN_BAR_H))}px"></span><em>${esc(finMonthShort(k))}</em></div>`).join('');
   const prev = finMonthData(prevMonthKey(cur)), now = finMonthData(cur), obs = document.getElementById('finObs');
-  obs.hidden = !(prev && prev.total > 0);
+  obs.hidden = !(prev && prev.totalFijos > 0);
   if(!obs.hidden){
-    const pc = Math.round((now.total - prev.total) / prev.total * 100);
+    const pc = Math.round((now.totalFijos - prev.totalFijos) / prev.totalFijos * 100);
     obs.classList.toggle('down', pc < 0);
     document.getElementById('finObsIc').setAttribute('href', pc === 0 ? '#i-next' : '#i-trend');
-    document.getElementById('finObsText').textContent = pc === 0 ? tr('Has gastado lo mismo que el mes anterior.')
-      : trf(pc < 0 ? 'Has gastado un {p} % menos que el mes anterior.' : 'Has gastado un {p} % más que el mes anterior.', {p:Math.abs(pc)});
+    document.getElementById('finObsText').textContent = pc === 0 ? tr('Tus gastos fijos son iguales que el mes anterior.')
+      : trf(pc < 0 ? 'Tus gastos fijos son un {p} % más bajos que el mes anterior.' : 'Tus gastos fijos son un {p} % más altos que el mes anterior.', {p:Math.abs(pc)});
   }
 }
 function openFinTab(view){
@@ -7238,22 +7285,72 @@ document.getElementById('gScope').addEventListener('click', e => {
 });
 let gCatSel = 'otros';
 function gCatSync(){
-  document.getElementById('gCat').innerHTML = FIN_CATS.map(c =>
-    `<button class="fs-chip" data-gcat="${c.id}" aria-pressed="${c.id === gCatSel}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${c.icon}"/></svg>${tr(c.name)}</button>`).join('');
+  document.getElementById('gCat').innerHTML = finCatsAll().map(c =>
+    `<button class="fs-chip" data-gcat="${c.id}" aria-pressed="${c.id === gCatSel}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${c.icon}"/></svg>${esc(c.custom ? c.name : tr(c.name))}</button>`).join('')
+    + `<button class="fs-chip new" id="gCatNew"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>${tr('Nueva categoría')}${isPremium() ? '' : `<span class="premium-tag">${tr('Premium')}</span>`}</button>`;
+  document.getElementById('gCatEdit').hidden = !finCat(gCatSel).custom;
   gIconSync();
 }
+/* Crear, cambiar o borrar una categoría propia, dentro de la misma hoja. */
+let gcfEditing = null, gcfIcon = 'i-box';
+function gcfOpen(cat){
+  gcfEditing = cat; gcfIcon = cat ? cat.icon : 'i-box';
+  document.getElementById('gcfName').value = cat ? cat.name : '';
+  document.getElementById('gcfSave').textContent = tr(cat ? 'Guardar categoría' : 'Crear categoría');
+  document.getElementById('gcfDelete').hidden = !cat;
+  gcfIconsSync();
+  document.getElementById('gCatForm').hidden = false;
+  document.getElementById('gcfName').focus();
+}
+function gcfIconsSync(){
+  document.getElementById('gcfIc').setAttribute('href', '#' + gcfIcon);
+  document.getElementById('gcfIcons').innerHTML = FIN_CUSTOM_ICONS.map(i =>
+    `<button class="fs-icon" data-gcfic="${i}" aria-pressed="${i === gcfIcon}" aria-label="${tr('Icono')}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#${i}"/></svg></button>`).join('');
+}
+const gcfClose = () => { document.getElementById('gCatForm').hidden = true; gcfEditing = null; };
+document.getElementById('gcfIcons').addEventListener('click', e => {
+  const b = e.target.closest('[data-gcfic]'); if(!b) return;
+  gcfIcon = b.dataset.gcfic; gcfIconsSync();
+});
+document.getElementById('gcfCancel').addEventListener('click', gcfClose);
+document.getElementById('gcfSave').addEventListener('click', () => {
+  const name = document.getElementById('gcfName').value.trim();
+  if(!name){ document.getElementById('gcfName').focus(); return; }
+  const cats = state.finanzas.cats;
+  if(gcfEditing){ const c = cats.find(x => x.id === gcfEditing.id); if(c){ c.name = name; c.icon = gcfIcon; } }
+  else{ const id = 'c_' + uid(); cats.push({ id, name, icon:gcfIcon }); gCatSel = id; }
+  save(); gcfClose(); gCatSync(); renderFin();
+});
+document.getElementById('gcfDelete').addEventListener('click', () => {
+  if(!gcfEditing || !confirm(trf('¿Borrar la categoría "{name}"? Sus gastos pasarán a Otros.', {name:gcfEditing.name}))) return;
+  const id = gcfEditing.id, f = state.finanzas;
+  f.cats = f.cats.filter(c => c.id !== id);
+  f.gastosVariables.forEach(g => { if(g.cat === id) g.cat = 'otros'; });
+  f.historial.forEach(h => h.variables.forEach(g => { if(g.cat === id) g.cat = 'otros'; }));
+  if(gCatSel === id) gCatSel = 'otros';
+  save(); gcfClose(); gCatSync(); renderFin();
+});
+document.getElementById('gCatEdit').addEventListener('click', () => {
+  const c = (state.finanzas.cats || []).find(x => x.id === gCatSel);
+  if(c && requirePremium(tr('Las categorías propias son una función de Spoony Premium.'))) gcfOpen(c);
+});
 /* Icono del campo nombre: la categoría en variables, lo que sugiera el nombre en fijos. */
 function gIconSync(){
   document.getElementById('gNameIc').setAttribute('href', '#' + (gType === 'variable'
     ? (/veterin/i.test(gName.value) ? 'i-paw' : finCat(gCatSel).icon) : finIconFix({ nombre:gName.value })));
 }
 document.getElementById('gCat').addEventListener('click', e => {
+  if(e.target.closest('#gCatNew')){
+    if(requirePremium(tr('Las categorías propias son una función de Spoony Premium.'))) gcfOpen(null);
+    return;
+  }
   const b = e.target.closest('[data-gcat]'); if(!b) return;
   gCatSel = b.dataset.gcat; gCatSync();
 });
 function openGasto(tipo, item){
   gType = tipo; gEditing = item; gScope = 'siempre';
   gCatSel = item && tipo === 'variable' ? finCatOf(item) : 'otros';
+  gcfClose();
   document.getElementById('gCatField').hidden = tipo !== 'variable';
   gCatSync();
   gName.value = item ? item.nombre : '';
