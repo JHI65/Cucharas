@@ -610,6 +610,7 @@ span.check{cursor:default}
 .dp-energy p{position:relative;margin:0}
 .dp-energy-lab{font-size:16px;color:var(--ink-soft)}
 .dp-energy-val{display:flex;align-items:center;gap:12px;margin:2px 0 6px !important;font-size:44px;line-height:1.1;font-weight:800;letter-spacing:-0.03em;color:var(--accent)}
+.dp-energy-val[hidden]{display:none}
 .dp-energy-val .cal-eye{width:30px;height:30px}
 .dp-energy-val .cal-over{width:24px;height:5px;border-radius:3px}
 .dp-energy-msg{font-size:16px;color:var(--ink)}
@@ -1174,7 +1175,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .tk-sheet .sheet-head h2{font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 6px}
 .tk-sheet .sheet-head p.sub{font-size:16px;margin:0 0 22px}
 
-.tk-search{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 16px;border-radius:16px;
+.tk-search{display:flex;align-items:center;gap:12px;min-height:50px;margin-top:22px;padding:0 16px;border-radius:16px;
   background:color-mix(in srgb,var(--surface-2) 35%,var(--bg));color:var(--ink-soft)}
 .tk-search svg{flex:none;width:22px;height:22px;color:var(--ink)}
 .tk-search input{flex:1;min-width:0;border:none;background:none;padding:12px 0;font-size:16px;outline:none;-webkit-appearance:none;appearance:none}
@@ -1190,7 +1191,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .tk-chip svg,.tk-act svg{flex:none;width:22px;height:22px;color:var(--accent)}
 .tk-chip.dep svg,.tk-act.dep svg{color:var(--deposit)}
 .tk-none{margin:18px 0 0;font-size:15px;color:var(--ink-soft)}
-.tk-new{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;margin-top:22px;
+.tk-new{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;margin:0;
   border:1px solid var(--accent);border-radius:16px;background:none;color:var(--accent);font-size:17px;font-weight:500}
 .tk-new svg{width:22px;height:22px}
 .tk-help{display:flex;gap:14px;margin:20px 0 4px;padding:16px;border-radius:16px;
@@ -2121,10 +2122,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <div id="tkPick">
-      <label class="tk-search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg>
-        <input type="search" id="tkSearch" placeholder="Buscar actividad…" data-i18n-ph="Buscar actividad…" data-i18n-aria="Buscar actividad…" aria-label="Buscar actividad…" autocomplete="off">
-      </label>
+      <button class="tk-new" id="tkNew"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Escribir una tarea nueva">Escribir una tarea nueva</span></button>
       <div id="tkRecentBox">
         <p class="tk-sec" data-i18n="Recientes">Recientes</p>
         <div class="tk-recent" id="tkRecent"></div>
@@ -2134,7 +2132,10 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         <div class="tk-grid" id="tkAll"></div>
       </div>
       <p class="tk-none" id="tkNone" hidden></p>
-      <button class="tk-new" id="tkNew"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Escribir una tarea nueva">Escribir una tarea nueva</span></button>
+      <label class="tk-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="search" id="tkSearch" placeholder="Buscar actividad…" data-i18n-ph="Buscar actividad…" data-i18n-aria="Buscar actividad…" aria-label="Buscar actividad…" autocomplete="off">
+      </label>
       <div class="tk-help">
         <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bulb"/></svg>
         <div>
@@ -2278,7 +2279,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="field">
       <label data-i18n="¿Cómo has llevado hoy el ruido, la luz y la gente?">¿Cómo has llevado hoy el ruido, la luz y la gente?</label>
       <div class="scale" id="coSensory"></div>
-      <div class="scale-lab"><span data-i18n="Nada">Nada</span><span data-i18n="Todo llevadero">Todo llevadero</span></div>
+      <div class="scale-lab"><span data-i18n="Muy mal">Muy mal</span><span data-i18n="Todo llevadero">Todo llevadero</span></div>
     </div>
     <div class="field">
       <label for="coNote" class="co-note-lab"><span data-i18n="Nota">Nota</span> · <span class="opt" data-i18n="opcional">opcional</span></label>
@@ -2755,7 +2756,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <section class="dp-energy" id="dEnergy" hidden>
       <svg class="dp-energy-wave" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120C45 120 55 40 95 40s55 60 105 20V120z"/><path d="M20 120C60 120 75 62 118 62s50 40 82 22V120z"/></svg>
       <p class="dp-energy-lab" data-i18n="Energía estimada">Energía estimada</p>
-      <p class="dp-energy-val"><span id="dEnergyVal"></span><span id="dEnergyInd"></span></p>
+      <p class="dp-energy-val" id="dEnergyValRow"><span id="dEnergyVal"></span><span id="dEnergyInd"></span></p>
       <p class="dp-energy-msg" id="dEnergyMsg"></p>
       <p class="dp-energy-why" id="dEnergyWhy"></p>
     </section>
@@ -3500,6 +3501,7 @@ const EN = {
  "Muy grande": "Extra large",
  "Muy justo": "Very tight",
  "Muy leve": "Very mild",
+ "Muy mal": "Very bad",
  "Nada": "None",
  "Nada apuntado todavía.": "Nothing logged yet.",
  "Nada apuntado. Añade solo lo que de verdad va a pasar hoy.": "Nothing logged. Add only what's really going to happen today.",
@@ -3599,6 +3601,8 @@ const EN = {
  "Día cargado, planifícalo con calma.": "Busy day, plan it calmly.",
  "Lo planificado cabe en lo estimado.": "What's planned fits the estimate.",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "Aún no hay suficientes check-in para estimarla.": "Not enough check-ins to estimate it yet.",
+ "Se calcula con tus check-in de días anteriores.": "It is calculated from your earlier check-ins.",
  "Vienes de un día cargado: puede que tengas menos energía que un {dia} habitual.": "You're coming off a busy day: you may have less energy than on a usual {dia}.",
  "Vienes de {n} días cargados: puede que tengas menos energía que un {dia} habitual.": "You're coming off {n} busy days: you may have less energy than on a usual {dia}.",
  "Según tus {dia} anteriores.": "Based on your previous {dia}.",
@@ -6940,6 +6944,7 @@ document.getElementById('tDelete').addEventListener('click', () => {
     if(which === 'series') removeSeriesEverywhere(t.series);
     else d.tasks = d.tasks.filter(x => x.id !== editingTask);
     save(); dlgTask.close(); renderAll();
+    if(dlgDay.open) renderDaySheet();
   });
 });
 /* Guarda en la librería la casilla de racha y devuelve lo que suma cada día.
@@ -7834,8 +7839,15 @@ function renderDaySheet(){
    Una palabra, sin cantidades; la frase compara con lo planificado. */
 function renderDayEnergy(k){
   const box = document.getElementById('dEnergy');
-  const e = k >= todayKey() && ciOf(k) == null ? estimateEnergy(k) : null;
-  box.hidden = !e; if(!e) return;
+  const open = k >= todayKey() && ciOf(k) == null;
+  const e = open ? estimateEnergy(k) : null;
+  box.hidden = !open; if(!open) return;
+  document.getElementById('dEnergyValRow').hidden = !e;
+  if(!e){
+    document.getElementById('dEnergyMsg').textContent = tr('Aún no hay suficientes check-in para estimarla.');
+    document.getElementById('dEnergyWhy').textContent = tr('Se calcula con tus check-in de días anteriores.');
+    return;
+  }
   const planned = Math.round(dayLoad(k).planned * e.factor);
   const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long'});
   document.getElementById('dEnergyVal').textContent = tr(e.level);
