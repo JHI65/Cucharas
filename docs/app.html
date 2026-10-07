@@ -187,17 +187,99 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
 .arow .chip{padding:7px 11px;font-size:14px}
 .cost.dep{color:var(--deposit)}
 .libsec{font-size:14px;color:var(--ink-soft);margin:24px 0 8px}
-/* Ajustes como en el móvil: una lista de secciones; al tocar una se ve solo esa, con un botón para volver. */
-.setnav{margin-top:8px}
-.setnav-item{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:0 14px;
-  background:transparent;border:none;border-radius:var(--r-row);font:inherit;font-size:17px;color:var(--ink);text-align:left;position:relative}
-.setnav-item+.setnav-item::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--line)}
-.setnav-item .ic{flex:none;color:var(--ink-soft)}
-.setnav-label{display:flex;align-items:center;gap:12px}
+/* Ajustes como en el móvil: una portada con grupos de secciones; al tocar una
+   se ve solo esa, con su título, una línea de qué hay dentro y "‹ Ajustes". */
+.setnav-group{margin-top:22px}
+.setnav-cap{margin:0 4px 8px;font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.setnav-item{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;padding:9px 12px 9px 14px;
+  background:transparent;border:none;border-radius:var(--r-row);font:inherit;color:var(--ink);text-align:left;position:relative}
+.setnav-item:not([hidden]) ~ .setnav-item::before{content:"";position:absolute;top:0;left:50px;right:0;height:1px;background:var(--line)}
+.setnav-item > .ic{flex:none;margin-left:auto;color:var(--ink-soft)}
 .setnav-ico{flex:none;width:22px;height:22px;color:var(--accent)}
+.setnav-txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.setnav-t{font-size:17px}
+.setnav-s{font-size:13.5px;color:var(--ink-soft)}
 .setback{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 8px 0 0;margin-top:4px;background:none;border:none;font:inherit;font-size:16px;color:var(--accent)}
 .setsec > .libsec:focus{outline:none}
-#s-set.set-open .setsec-cur > .libsec{font-size:24px;font-weight:600;color:var(--ink);margin:4px 0 12px}
+#s-set.set-open .setsec-cur > .libsec{font-size:30px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;color:var(--ink);margin:6px 0 6px}
+.setsub{margin:0 0 20px;font-size:16px;line-height:1.45;color:var(--ink-soft)}
+.setsec .group + .group,.setsec .group + .setinfo,.setsec .setinfo + .group{margin-top:14px}
+/* Tarjetas de Ajustes: más claras que el fondo, borde casi invisible y una
+   sombra muy suave; los separadores, finos y tenues. Con contraste Alto
+   vuelven el borde y las líneas marcadas de siempre. */
+#s-set{--set-sep:color-mix(in srgb,var(--line) 40%,transparent)}
+:root[data-contrast="alto"] #s-set{--set-sep:var(--line)}
+#s-set .group{border-radius:20px;padding:4px;background:color-mix(in srgb,var(--surface) 55%,#fff);
+  border:1px solid color-mix(in srgb,var(--line) 22%,transparent);
+  box-shadow:0 1px 2px rgba(90,40,55,.04),0 8px 24px rgba(90,40,55,.05)}
+:root[data-contrast="alto"] #s-set .group{border-color:var(--line);box-shadow:none}
+#s-set .group .row,#s-set .group .ocrow{border-bottom-color:var(--set-sep)}
+#s-set .setnav-item::before,#s-set .setlink::before,#s-set #langPick .chip::after{background:var(--set-sep) !important}
+#s-set .setnav-t{font-weight:500}
+#s-set .group .row,#s-set .group .ocrow{padding:16px}
+#s-set .row p{font-size:13.5px;line-height:1.4;margin-top:2px}
+#s-set .row strong{font-size:16px}
+/* Selector de hora: sin la "h" encima (el nombre ya lo lleva el selector) */
+#s-set .row > .ocgrid label{font-size:0;gap:0}
+#s-set .row > .ocgrid :is(select,input){font-size:16px;padding:10px 2px;border-radius:12px}
+#s-set .row strong + .premium-tag{display:table;margin:5px 0 3px}
+/* Coste de la sobrestimulación: casillas con relleno suave, como botones */
+#overCostGrid label{font-size:13px;gap:8px}
+#overCostGrid input{padding:12px 2px;font-size:16px;border-radius:12px;border-color:transparent;
+  background:color-mix(in srgb,var(--surface-2) 55%,var(--bg));color:var(--ink)}
+#overCostGrid input:focus{outline:2px solid var(--accent);outline-offset:1px}
+#s-set .stepper button{border-radius:12px}
+#s-set .row strong{font-weight:600}
+/* Elección de una entre varias (Idioma): filas con círculo, no chips. */
+#langPick{display:block;margin:0}
+#langPick .chip{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;padding:0 14px;border:none;border-radius:var(--r-row);
+  background:transparent;color:var(--ink);font-size:17px;text-align:left;position:relative}
+#langPick .chip + .chip::after{content:"";position:absolute;top:0;left:50px;right:0;height:1px;background:var(--line)}
+#langPick .chip::before{content:"";flex:none;width:22px;height:22px;box-sizing:border-box;border-radius:50%;border:1.6px solid var(--accent)}
+#langPick .chip[aria-pressed="true"]{background:transparent;color:var(--ink);font-weight:600}
+#langPick .chip[aria-pressed="true"]::before{background:radial-gradient(circle,var(--accent) 0 5px,transparent 5.5px)}
+/* Nota de contexto: sin borde, el tono de superficie basta para separarla. */
+.setinfo{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:color-mix(in srgb,var(--surface-2) 45%,var(--bg))}
+.setinfo p{margin:0;font-size:14.5px;line-height:1.45;color:var(--ink-soft)}
+.setinfo-ico{flex:none;width:22px;height:22px;margin-top:1px;color:var(--accent)}
+/* Interruptor: la posición del círculo es la señal, no solo el color. Sin animación. */
+.sw{flex:none;position:relative;width:51px;height:31px;padding:0;border:none;border-radius:999px;background:var(--line)}
+.sw::before{content:"";position:absolute;inset:-7px -4px}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.sw[aria-checked="true"]{background:var(--accent)}
+.sw[aria-checked="true"]::after{left:23px}
+#s-set .row:has(> .sw) > div:first-child{flex:1;min-width:0}
+/* Opciones en chips debajo del texto, a todo el ancho, como en el resto de la app. */
+#s-set .row:has(> .chips:not([hidden]), > .swatches){flex-wrap:wrap}
+#s-set .row:has(> .chips:not([hidden]), > .swatches) > div:first-child{flex:1 1 100%}
+#s-set .row:has(> .chips:not([hidden]), > .swatches) > :is(.chips,.swatches){flex:1 1 100%}
+/* Con el texto ampliado, el selector de hora y los botones − / + estrujaban la
+   descripción a una palabra por línea: pasan debajo del texto. */
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #s-set .row:has(> .stepper, > .ocgrid){flex-wrap:wrap}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #s-set .row:has(> .stepper, > .ocgrid) > div:first-child{flex:1 1 100%}
+:root:is([data-text-scale="1.15"],[data-text-scale="1.3"]) #s-set .row > .ocgrid{flex:0 0 120px}
+/* Color de la interfaz: unas muestras y una más para cualquier otro color (selector del sistema). */
+.cswes{display:flex;flex-wrap:wrap;gap:12px}
+.csw{position:relative;flex:none;width:40px;height:40px;padding:0;border-radius:50%;border:none;background:var(--c);cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.csw[aria-pressed="true"],.csw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
+.csw::before{content:"";position:absolute;inset:-2px}
+.csw-any{display:inline-block;overflow:hidden;background:conic-gradient(from 0deg,#c8566e,#c9873a,#8f9a3c,#4d8a6a,#4a77a6,#7b5ea7,#c8566e)}
+.csw-any.on{background:var(--c)}
+.csw-any input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:none;padding:0;cursor:pointer}
+/* Enlaces de lista (Ayuda, Tus datos, Finanzas): toda la fila es el botón. */
+.setlink{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;padding:10px 12px 10px 14px;background:transparent;border:none;
+  border-radius:var(--r-row);font:inherit;color:var(--ink);text-align:left;position:relative}
+.setlinks .setlink:not([hidden]) ~ .setlink::before{content:"";position:absolute;top:0;left:50px;right:0;height:1px;background:var(--line)}
+.group .row + .setlink::before,.group .setlink + .row::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--line)}
+.group .row:has(+ .setlink:not([hidden])){border-bottom:none}
+.setlink-ico{flex:none;width:22px;height:22px;color:var(--accent)}
+.setlink-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.setlink-txt strong{font-size:16.5px;font-weight:500}
+.setlink-txt small{font-size:13.5px;line-height:1.4;color:var(--ink-soft)}
+.setlink-chev{flex:none;margin-left:auto;color:var(--ink-soft)}
+.setlink.warn strong,.setlink.warn .setlink-ico{color:var(--alert)}
+.setabout p{margin:0;padding:14px;font-size:15.5px;line-height:1.5;color:var(--ink)}
 .scale{display:flex;gap:7px}
 .scale button{flex:1;padding:13px 0;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-cell);font-size:17px}
 .scale button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9}
@@ -1671,22 +1753,22 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   <section class="screen" id="s-set">
     <header class="top">
       <h1 class="title" data-i18n="Ajustes">Ajustes</h1>
-      <p class="sub" id="privacyLine" data-i18n="Tus datos no salen del teléfono">Tus datos no salen del teléfono</p>
+      <p class="sub" data-i18n="Personaliza Spoony a tu manera">Personaliza Spoony a tu manera</p>
     </header>
-    <p class="libsec">Idioma · Language</p>
+    <p class="libsec" data-i18n="Idioma · Language">Idioma · Language</p>
+    <p class="setsub" data-i18n="Elige el idioma de la app. Puedes cambiarlo cuando quieras.">Elige el idioma de la app. Puedes cambiarlo cuando quieras.</p>
     <div class="group">
-    <div class="row">
-      <div><strong>Idioma · Language</strong></div>
       <div class="chips" id="langPick" role="group" aria-label="Idioma · Language">
-        <button class="chip" data-lang="es" aria-pressed="false">Español</button>
-        <button class="chip" data-lang="en" aria-pressed="false">English</button>
+        <button class="chip" data-lang="es" aria-pressed="false" lang="es">Español</button>
+        <button class="chip" data-lang="en" aria-pressed="false" lang="en">English</button>
       </div>
     </div>
-    </div>
+    <div class="setinfo"><svg class="setinfo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg><p data-i18n="Al cambiar el idioma, toda la app cambia al momento.">Al cambiar el idioma, toda la app cambia al momento.</p></div>
     <p class="libsec" data-i18n="Tus cucharas">Tus cucharas</p>
+    <p class="setsub" data-i18n="Personaliza cómo funciona tu energía de cada día.">Personaliza cómo funciona tu energía de cada día.</p>
     <div class="group">
     <div class="row">
-      <div><strong data-i18n="Cuándo empieza tu día">Cuándo empieza tu día</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.">A qué hora se reinician tus cucharas. Si te acuestas tarde o trabajas de noche, súbela para que la madrugada siga contando como el día de ayer.</p></div>
+      <div><strong data-i18n="Cuándo empieza tu día">Cuándo empieza tu día</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="A qué hora se reinician tus cucharas. Súbela si te acuestas tarde o trabajas de noche.">A qué hora se reinician tus cucharas. Súbela si te acuestas tarde o trabajas de noche.</p></div>
       <div class="ocgrid">
         <!-- Opciones con texto fijo "04:00" en vez de <input type=time>: así el
              formato 24h queda garantizado sin depender de la región del móvil. -->
@@ -1719,7 +1801,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row">
-      <div><strong data-i18n="Check-out nocturno">Check-out nocturno</strong><p data-i18n="A partir de esta hora, Spoony te propone hacer el check-out si aún no lo has hecho.">A partir de esta hora, Spoony te propone hacer el check-out si aún no lo has hecho.</p></div>
+      <div><strong data-i18n="Check-out nocturno">Check-out nocturno</strong><p data-i18n="Desde esta hora, Spoony te propone hacer el check-out.">Desde esta hora, Spoony te propone hacer el check-out.</p></div>
       <div class="ocgrid">
         <label>h<select id="checkoutHourInput" data-i18n-aria="Hora del check-out" aria-label="Hora del check-out">
           <option value="17">17:00</option>
@@ -1732,6 +1814,8 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
         </select></label>
       </div>
     </div>
+    </div>
+    <div class="group">
     <div class="row">
       <div><strong data-i18n="Cucharas máximas">Cucharas máximas</strong><p data-i18n="El tope del día que mejor te representa.">El tope del día que mejor te representa.</p></div>
       <div class="stepper">
@@ -1741,7 +1825,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row">
-      <div><strong data-i18n="Coste de un pico sensorial">Coste de un pico sensorial</strong><p data-i18n='Qué porcentaje de las cucharas de hoy resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.'>Qué porcentaje de las cucharas de hoy resta el botón "He tenido un pico sensorial ahora", cada vez que lo tocas.</p></div>
+      <div><strong data-i18n="Coste de un pico sensorial">Coste de un pico sensorial</strong><p data-i18n="Qué porcentaje de las cucharas de hoy resta cada vez que lo marcas.">Qué porcentaje de las cucharas de hoy resta cada vez que lo marcas.</p></div>
       <div class="stepper">
         <button id="peakMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="peakOut"></output>
@@ -1749,12 +1833,15 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     <div class="row">
-      <div><strong data-i18n="Preguntar si necesitas un descanso">Preguntar si necesitas un descanso</strong><p data-i18n='Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso ("No volver a preguntar") o aquí, y volver a activarlo cuando quieras.'>Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso ("No volver a preguntar") o aquí, y volver a activarlo cuando quieras.</p></div>
-      <div class="chips" id="peakAskPick" role="group" data-i18n-aria="Preguntar si necesitas un descanso tras un pico sensorial" aria-label="Preguntar si necesitas un descanso tras un pico sensorial">
+      <div><strong id="peakAskLab" data-i18n="Preguntar si necesitas un descanso">Preguntar si necesitas un descanso</strong><p data-i18n="Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso o aquí.">Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso o aquí.</p></div>
+      <button type="button" class="sw" role="switch" aria-checked="false" data-sw="peakAskPick" aria-labelledby="peakAskLab"></button>
+      <div class="chips" id="peakAskPick" hidden role="group" data-i18n-aria="Preguntar si necesitas un descanso tras un pico sensorial" aria-label="Preguntar si necesitas un descanso tras un pico sensorial">
         <button class="chip" data-peakask="on" aria-pressed="false" data-i18n="Preguntar">Preguntar</button>
         <button class="chip" data-peakask="off" aria-pressed="false" data-i18n="No preguntar">No preguntar</button>
       </div>
     </div>
+    </div>
+    <div class="group">
     <div class="ocrow">
       <strong data-i18n="Coste de la sobrestimulación">Coste de la sobrestimulación</strong>
       <p data-i18n="Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.">Cuántas cucharas resta cada puntuación de tolerancia sensorial del check-out.</p>
@@ -1763,22 +1850,26 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <p class="libsec" data-i18n="Ciclo">Ciclo</p>
+    <p class="setsub" data-i18n="Una sección para apuntar sangrado y dolor, y su margen en tus cucharas.">Una sección para apuntar sangrado y dolor, y su margen en tus cucharas.</p>
     <div class="group">
-    <div class="row">
-      <div><strong data-i18n="Seguimiento del ciclo">Seguimiento del ciclo</strong><p data-i18n="Añade una sección para apuntar sangrado y dolor.">Añade una sección para apuntar sangrado y dolor.</p></div>
-      <div class="chips" id="cyclePick" role="group" data-i18n-aria="Seguimiento del ciclo" aria-label="Seguimiento del ciclo">
+    <div class="row" id="cycleRow">
+      <div><strong id="cycleLab" data-i18n="Seguimiento del ciclo">Seguimiento del ciclo</strong><p data-i18n="Añade una sección para apuntar sangrado y dolor.">Añade una sección para apuntar sangrado y dolor.</p></div>
+      <button type="button" class="sw" role="switch" aria-checked="false" data-sw="cyclePick" aria-labelledby="cycleLab"></button>
+      <div class="chips" id="cyclePick" hidden role="group" data-i18n-aria="Seguimiento del ciclo" aria-label="Seguimiento del ciclo">
         <button class="chip" data-cycle="on" aria-pressed="false" data-i18n="Activado">Activado</button>
         <button class="chip" data-cycle="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
       </div>
     </div>
+    </div>
+    <div class="group" id="cycleMore" hidden>
     <div class="row" id="cycleLenRow" hidden>
-      <div><strong data-i18n="Duración media del ciclo">Duración media del ciclo</strong><p data-i18n="En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.">En días. Se usa hasta que haya ciclos medidos; a partir de ahí manda tu media real.</p></div>
+      <div><strong data-i18n="Duración media del ciclo">Duración media del ciclo</strong><p data-i18n="En días. Cuando haya ciclos medidos, se usa tu media real.">En días. Cuando haya ciclos medidos, se usa tu media real.</p></div>
       <div class="ocgrid">
         <label><input type="number" id="cycleLen" step="1" min="15" max="60" inputmode="numeric" data-i18n-aria="Duración media del ciclo en días" aria-label="Duración media del ciclo en días"></label>
       </div>
     </div>
     <div class="row" id="cycleMarginRow" hidden>
-      <div><strong data-i18n="Margen de precaución">Margen de precaución</strong><p data-i18n="Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.">Porcentaje base que baja las cucharas del día cuando toca sangrado, apuntado o estimado. Si apuntas el dolor, el margen de ese día sube o baja a partir de este porcentaje.</p></div>
+      <div><strong data-i18n="Margen de precaución">Margen de precaución</strong><p data-i18n="Cuánto bajan tus cucharas los días de sangrado. Si apuntas dolor, se ajusta a partir de aquí.">Cuánto bajan tus cucharas los días de sangrado. Si apuntas dolor, se ajusta a partir de aquí.</p></div>
       <div class="stepper">
         <button id="marginMinus" data-i18n-aria="Menos" aria-label="Menos"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-minus"/></svg></button>
         <output id="marginOut"></output>
@@ -1788,14 +1879,17 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <p class="libsec" data-i18n="Finanzas">Finanzas</p>
+    <p class="setsub" data-i18n="Configura cómo funciona esta sección.">Configura cómo funciona esta sección.</p>
     <div class="group">
-    <div class="row">
-      <div><strong data-i18n="Seguimiento de finanzas">Seguimiento de finanzas</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Añade una pestaña para tus gastos fijos y variables del mes.">Añade una pestaña para tus gastos fijos y variables del mes.</p></div>
-      <div class="chips" id="finPick" role="group" data-i18n-aria="Seguimiento de finanzas" aria-label="Seguimiento de finanzas">
+    <div class="row" id="finRow">
+      <div><strong id="finLab" data-i18n="Seguimiento de finanzas">Seguimiento de finanzas</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Activa la sección de Finanzas en la app.">Activa la sección de Finanzas en la app.</p></div>
+      <button type="button" class="sw" role="switch" aria-checked="false" data-sw="finPick" aria-labelledby="finLab"></button>
+      <div class="chips" id="finPick" hidden role="group" data-i18n-aria="Seguimiento de finanzas" aria-label="Seguimiento de finanzas">
         <button class="chip" data-fin="on" aria-pressed="false" data-i18n="Activado">Activado</button>
         <button class="chip" data-fin="off" aria-pressed="true" data-i18n="Desactivado">Desactivado</button>
       </div>
     </div>
+    <button type="button" class="setlink" id="btnFinGo" hidden><span class="setlink-txt"><strong data-i18n="Gastos fijos y variables">Gastos fijos y variables</strong><small data-i18n="Abre tus gastos, tu presupuesto y tus categorías.">Abre tus gastos, tu presupuesto y tus categorías.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     <div class="row" id="finCardRow" hidden>
       <div><strong data-i18n="Apuntar pagos con Apple Pay">Apuntar pagos con Apple Pay</strong><p data-i18n="Cada pago con el iPhone o el Apple Watch se añade solo a Gastos variables, sin abrir la app. Se prepara una vez en Atajos.">Cada pago con el iPhone o el Apple Watch se añade solo a Gastos variables, sin abrir la app. Se prepara una vez en Atajos.</p></div>
       <button class="btn" id="btnCardGuide" data-i18n="Ver cómo">Ver cómo</button>
@@ -1807,6 +1901,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <p class="libsec" data-i18n="Cómo se ve">Cómo se ve</p>
+    <p class="setsub" data-i18n="Personaliza cómo se ve la app.">Personaliza cómo se ve la app.</p>
     <div class="group">
     <div class="row">
       <div><strong data-i18n="Tamaño del texto">Tamaño del texto</strong><p data-i18n="Sube el tamaño si te cuesta leer el texto normal.">Sube el tamaño si te cuesta leer el texto normal.</p></div>
@@ -1825,11 +1920,18 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
     <div class="row" id="colorPickRow">
       <div><strong data-i18n="Color de la interfaz">Color de la interfaz</strong><p data-i18n="Cambia el rosa de fábrica por el tono que prefieras.">Cambia el rosa de fábrica por el tono que prefieras.</p></div>
-      <input type="color" id="customColorPick" value="#9E5266" data-i18n-aria="Elegir color de la interfaz" aria-label="Elegir color de la interfaz">
+      <div class="swatches" id="colorSwatches" role="group" data-i18n-aria="Color de la interfaz" aria-label="Color de la interfaz">
+        <button type="button" class="csw" data-color="" style="--c:#9E5266" aria-pressed="false" data-i18n-aria="Rosa de Spoony" aria-label="Rosa de Spoony"></button>
+        <button type="button" class="csw" data-color="#a0573a" style="--c:#a0573a" aria-pressed="false" data-i18n-aria="Terracota" aria-label="Terracota"></button>
+        <button type="button" class="csw" data-color="#4d7360" style="--c:#4d7360" aria-pressed="false" data-i18n-aria="Verde salvia" aria-label="Verde salvia"></button>
+        <button type="button" class="csw" data-color="#48688f" style="--c:#48688f" aria-pressed="false" data-i18n-aria="Azul" aria-label="Azul"></button>
+        <button type="button" class="csw" data-color="#73588e" style="--c:#73588e" aria-pressed="false" data-i18n-aria="Lavanda" aria-label="Lavanda"></button>
+        <label class="csw csw-any" id="colorAny"><input type="color" id="customColorPick" value="#9E5266" data-i18n-aria="Elegir otro color" aria-label="Elegir otro color"></label>
+      </div>
     </div>
     <div class="row" id="colorInfoRow" hidden>
       <div><p id="colorHint" style="margin:0"></p></div>
-      <button class="btn" id="btnColorReset" data-i18n="Restablecer">Restablecer</button>
+      <button class="btn" id="btnColorReset" data-i18n="Volver al rosa de Spoony">Volver al rosa de Spoony</button>
     </div>
     <div class="row" id="widgetTitlesRow" hidden>
       <div><strong data-i18n="Nombres en el widget">Nombres en el widget</strong><p data-i18n="El widget de la pantalla de inicio pone «Tarea» en lugar del nombre. Si eliges mostrarlos, cualquiera que vea tu pantalla podrá leerlos.">El widget de la pantalla de inicio pone «Tarea» en lugar del nombre. Si eliges mostrarlos, cualquiera que vea tu pantalla podrá leerlos.</p></div>
@@ -1842,6 +1944,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
     <div id="calGroup" hidden>
     <p class="libsec" data-i18n="Calendario">Calendario</p>
+    <p class="setsub" data-i18n="Conecta los calendarios que se importan.">Conecta los calendarios que se importan.</p>
     <div class="group">
     <div class="row" id="calGoogleRow" hidden>
       <div><strong data-i18n="Conectar con Google Calendar">Conectar con Google Calendar</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.">Spoony lee tu Google Calendar directamente, sin pasar por el calendario del iPhone, así los eventos nuevos llegan al abrir la app. Solo se lee: no cambia ni borra nada.</p>
@@ -1866,26 +1969,22 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <p class="libsec" data-i18n="Ayuda">Ayuda</p>
-    <div class="group">
-    <div class="row">
-      <div><strong data-i18n="Cómo funciona la app">Cómo funciona la app</strong><p data-i18n="Vuelve a ver la explicación de cada parte, cuando quieras.">Vuelve a ver la explicación de cada parte, cuando quieras.</p></div>
-      <button class="btn" id="btnIntroReplay" data-i18n="Ver">Ver</button>
+    <p class="setsub" data-i18n="Vuelve a ver cómo funciona cada parte de Spoony.">Vuelve a ver cómo funciona cada parte de Spoony.</p>
+    <div class="group setlinks">
+    <button type="button" class="setlink" id="btnIntroReplay"><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg><span class="setlink-txt"><strong data-i18n="Cómo funciona la app">Cómo funciona la app</strong><small data-i18n="Vuelve a ver la explicación de cada parte, cuando quieras.">Vuelve a ver la explicación de cada parte, cuando quieras.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+    <button type="button" class="setlink" id="btnCicloReplay" hidden><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg><span class="setlink-txt"><strong data-i18n="Cómo funciona Ciclo">Cómo funciona Ciclo</strong><small data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+    <button type="button" class="setlink" id="btnFinReplay" hidden><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/></svg><span class="setlink-txt"><strong data-i18n="Cómo funciona Finanzas">Cómo funciona Finanzas</strong><small data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
-    <div class="row" id="cicloReplayRow" hidden>
-      <div><strong data-i18n="Cómo funciona Ciclo">Cómo funciona Ciclo</strong><p data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</p></div>
-      <button class="btn" id="btnCicloReplay" data-i18n="Ver">Ver</button>
-    </div>
-    <div class="row" id="finReplayRow" hidden>
-      <div><strong data-i18n="Cómo funciona Finanzas">Cómo funciona Finanzas</strong><p data-i18n="Vuelve a ver la guía de esta sección.">Vuelve a ver la guía de esta sección.</p></div>
-      <button class="btn" id="btnFinReplay" data-i18n="Ver">Ver</button>
-    </div>
-    <div class="row">
-      <div><strong data-i18n="Acerca de">Acerca de</strong><p data-i18n-html="Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.">Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.</p></div>
-    </div>
+
+    <p class="libsec" data-i18n="Acerca de Spoony">Acerca de Spoony</p>
+    <p class="setsub" data-i18n="Información y créditos.">Información y créditos.</p>
+    <div class="group setabout">
+      <p data-i18n-html="Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.">Spoony se basa en la teoría de las cucharas de Christine Miserandino y en el <em>Energy Accounting</em> de Maja Toudal y Tony Attwood.</p>
     </div>
 
     <div id="accountGroup" hidden>
-    <p class="libsec" data-i18n="Tu cuenta (opcional)">Tu cuenta (opcional)</p>
+    <p class="libsec" data-i18n="Tu cuenta">Tu cuenta</p>
+    <p class="setsub" data-i18n="Opcional: una copia de tus datos en la nube.">Opcional: una copia de tus datos en la nube.</p>
     <div class="group">
     <div class="row" id="accOutRow">
       <div><strong data-i18n="Copia en la nube">Copia en la nube</strong><span class="premium-tag" data-i18n="Premium">Premium</span><p data-i18n="Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.">Guarda tus datos también en la nube y los recuperas en otro móvil. Hace falta una cuenta (gratis) y Spoony Premium.</p><p class="notice" id="accOutMsg" hidden></p></div>
@@ -1911,20 +2010,13 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     </div>
 
     <p class="libsec" data-i18n="Tus datos">Tus datos</p>
-    <div class="group">
-    <div class="row">
-      <div><strong data-i18n="Copia de seguridad">Copia de seguridad</strong><p data-i18n="Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.">Guarda un archivo con todo tu historial. Sin cuenta, es la única copia fuera de este teléfono.</p><p id="exportInfo"></p></div>
-      <button class="btn" id="btnExport" data-i18n="Exportar">Exportar</button>
+    <p class="setsub" data-i18n="Guarda, recupera o borra lo que hay en Spoony.">Guarda, recupera o borra lo que hay en Spoony.</p>
+    <div class="group setlinks">
+    <button type="button" class="setlink" id="btnExport"><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v10M8 10l4 4 4-4"/><path d="M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg><span class="setlink-txt"><strong data-i18n="Exportar una copia">Exportar una copia</strong><small data-i18n="Descarga un archivo con todo tu historial.">Descarga un archivo con todo tu historial.</small><small id="exportInfo"></small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+    <button type="button" class="setlink" id="btnImport"><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14V4M8 8l4-4 4 4"/><path d="M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg><span class="setlink-txt"><strong data-i18n="Restaurar una copia">Restaurar una copia</strong><small data-i18n="Carga un archivo exportado antes.">Carga un archivo exportado antes.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+    <button type="button" class="setlink warn" id="btnWipe"><svg class="setlink-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 7h15M9.5 7V5.2c0-.7.5-1.2 1.2-1.2h2.6c.7 0 1.2.5 1.2 1.2V7M6.5 7l.8 11.3c.1.9.8 1.7 1.7 1.7h6c.9 0 1.6-.8 1.7-1.7L17.5 7M10 11v5M14 11v5"/></svg><span class="setlink-txt"><strong data-i18n="Borrar todo">Borrar todo</strong><small data-i18n="No se puede deshacer.">No se puede deshacer.</small></span><svg class="ic setlink-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
-    <div class="row">
-      <div><strong data-i18n="Restaurar">Restaurar</strong><p data-i18n="Carga un archivo exportado antes.">Carga un archivo exportado antes.</p></div>
-      <button class="btn" id="btnImport" data-i18n="Importar">Importar</button>
-    </div>
-    <div class="row">
-      <div><strong data-i18n="Borrar todo">Borrar todo</strong><p data-i18n="No se puede deshacer.">No se puede deshacer.</p></div>
-      <button class="btn warn" id="btnWipe" data-i18n="Borrar">Borrar</button>
-    </div>
-    </div>
+    <div class="setinfo"><svg class="setinfo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 5 6.3v5.2c0 4.3 3 7.7 7 9 4-1.3 7-4.7 7-9V6.3z"/><path d="M9 12l2 2 4-4"/></svg><p id="privacyLine" data-i18n="Tus datos no salen del teléfono">Tus datos no salen del teléfono</p></div>
     <input type="file" id="fileIn" accept="application/json" hidden>
   </section>
 
@@ -3601,6 +3693,51 @@ const EN = {
  "Día cargado, planifícalo con calma.": "Busy day, plan it calmly.",
  "Lo planificado cabe en lo estimado.": "What's planned fits the estimate.",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "A qué hora se reinician tus cucharas. Súbela si te acuestas tarde o trabajas de noche.": "At what time your spoons reset. Move it later if you go to bed late or work nights.",
+ "Desde esta hora, Spoony te propone hacer el check-out.": "From this time, Spoony suggests doing your check-out.",
+ "Qué porcentaje de las cucharas de hoy resta cada vez que lo marcas.": "What percentage of today's spoons it takes each time you log one.",
+ "Tras marcar un pico sensorial. Puedes desactivarlo desde el propio aviso o aquí.": "After logging a sensory peak. You can turn it off from the prompt itself or here.",
+ "En días. Cuando haya ciclos medidos, se usa tu media real.": "In days. Once there are measured cycles, your real average is used.",
+ "Cuánto bajan tus cucharas los días de sangrado. Si apuntas dolor, se ajusta a partir de aquí.": "How much your spoons drop on bleeding days. If you log pain, it adjusts from here.",
+ "Activa la sección de Finanzas en la app.": "Turns on the Finances section in the app.",
+ "Descarga un archivo con todo tu historial.": "Download a file with your whole history.",
+ "Personaliza Spoony a tu manera": "Make Spoony your own",
+ "Idioma · Language": "Idioma · Language",
+ "Elige el idioma de la app. Puedes cambiarlo cuando quieras.": "Choose the app language. You can change it whenever you like.",
+ "Al cambiar el idioma, toda la app cambia al momento.": "When you change the language, the whole app changes right away.",
+ "Personaliza cómo funciona tu energía de cada día.": "Adjust how your daily energy works.",
+ "Una sección para apuntar sangrado y dolor, y su margen en tus cucharas.": "A section to log bleeding and pain, and its margin on your spoons.",
+ "Configura cómo funciona esta sección.": "Set up how this section works.",
+ "Gastos fijos y variables": "Fixed and variable expenses",
+ "Abre tus gastos, tu presupuesto y tus categorías.": "Open your expenses, budget and categories.",
+ "Personaliza cómo se ve la app.": "Adjust how the app looks.",
+ "Rosa de Spoony": "Spoony pink",
+ "Terracota": "Terracotta",
+ "Verde salvia": "Sage green",
+ "Azul": "Blue",
+ "Lavanda": "Lavender",
+ "Elegir otro color": "Choose another color",
+ "Volver al rosa de Spoony": "Back to Spoony pink",
+ "Conecta los calendarios que se importan.": "Connect the calendars that get imported.",
+ "Vuelve a ver cómo funciona cada parte de Spoony.": "See again how each part of Spoony works.",
+ "Acerca de Spoony": "About Spoony",
+ "Información y créditos.": "Information and credits.",
+ "Opcional: una copia de tus datos en la nube.": "Optional: a copy of your data in the cloud.",
+ "Guarda, recupera o borra lo que hay en Spoony.": "Save, restore or delete what is in Spoony.",
+ "Exportar una copia": "Export a copy",
+ "Restaurar una copia": "Restore a copy",
+ "Mi Spoony": "My Spoony",
+ "Personaliza tu día": "Adjust your day",
+ "Seguimiento y margen": "Tracking and margin",
+ "Gastos y presupuesto": "Expenses and budget",
+ "Calendarios conectados": "Connected calendars",
+ "Apariencia y accesibilidad": "Appearance and accessibility",
+ "Texto, contraste y color": "Text, contrast and color",
+ "Español, English": "Español, English",
+ "Cuenta y datos": "Account and data",
+ "Exportar, restaurar y borrar": "Export, restore and delete",
+ "Guías de cada parte": "Guides for each part",
+ "Información y créditos": "Information and credits",
  "La energía estimada coincidió con tu check-in en {n} de {total} días.": "The estimated energy matched your check-in on {n} of {total} days.",
  "Cuando no coincidió, solías tener más energía de la estimada.": "When it did not match, you usually had more energy than estimated.",
  "Cuando no coincidió, solías tener menos energía de la estimada.": "When it did not match, you usually had less energy than estimated.",
@@ -6007,7 +6144,8 @@ document.addEventListener('visibilitychange', () => {
 });
 
 /* ---------- ajustes por secciones ---------- */
-/* Cada título (.libsec) con su grupo pasa a ser una sección; la portada es la lista de títulos. */
+/* Cada título (.libsec) con lo que le sigue hasta el siguiente pasa a ser una
+   sección; la portada es una lista agrupada de esas secciones. */
 const setScreen = document.getElementById('s-set');
 const setSecs = [];
 /* iconos de línea, mismo trazo que la barra de pestañas; los puntos rellenos llevan fill propio */
@@ -6019,31 +6157,41 @@ const SET_ICON = {
   'Cómo se ve':'<path d="M12 3a9 9 0 0 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><g fill="currentColor" stroke="none"><circle cx="7.5" cy="12" r="1.2"/><circle cx="9.5" cy="7.5" r="1.2"/><circle cx="14.5" cy="7.5" r="1.2"/></g>',
   'Calendario':'<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10.5h16"/>',
   'Ayuda':'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.5a2.4 2.4 0 1 1 3.3 2.2c-.6.3-.9.8-.9 1.4v.5"/><circle cx="12" cy="16.6" r="1" fill="currentColor" stroke="none"/>',
-  'Tu cuenta (opcional)':'<path d="M7 18.5h10.5a4 4 0 0 0 .6-8A6 6 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5z"/>',
+  'Acerca de Spoony':'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r="1" fill="currentColor" stroke="none"/>',
+  'Tu cuenta':'<path d="M7 18.5h10.5a4 4 0 0 0 .6-8A6 6 0 0 0 6.6 9.3 4.6 4.6 0 0 0 7 18.5z"/>',
   'Tus datos':'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/>'
 };
+/* Portada: grupos fijos, cada entrada con su línea de qué hay dentro. */
+const SET_NAV = [
+  ['Mi Spoony', [['Tus cucharas', 'Personaliza tu día'], ['Ciclo', 'Seguimiento y margen'], ['Finanzas', 'Gastos y presupuesto'], ['Calendario', 'Calendarios conectados']]],
+  ['Apariencia y accesibilidad', [['Cómo se ve', 'Texto, contraste y color'], ['Idioma · Language', 'Español, English']]],
+  ['Cuenta y datos', [['Tu cuenta', 'Copia en la nube'], ['Tus datos', 'Exportar, restaurar y borrar']]],
+  ['Ayuda', [['Ayuda', 'Guías de cada parte'], ['Acerca de Spoony', 'Información y créditos']]]
+];
 let setCur = null;
 (() => {
   const head = setScreen.querySelector('header.top');
-  const kids = [...setScreen.children];
-  kids.forEach((el, i) => {
-    let wrap = null, title = null;
-    if(el.matches('#calGroup, #accountGroup')){ wrap = el; title = el.querySelector('.libsec'); }
-    else if(el.matches('p.libsec')){
+  const isStart = el => el.matches('p.libsec, #calGroup, #accountGroup');
+  [...setScreen.children].forEach(el => {
+    if(!isStart(el)) return;
+    let wrap = el, title = el.querySelector?.('.libsec');
+    if(el.matches('p.libsec')){
       title = el; wrap = document.createElement('div');
-      el.before(wrap); wrap.append(el);
-      const g = kids[i + 1]; if(g && g.matches('.group')) wrap.append(g);
+      el.before(wrap);
+      let n = el.nextElementSibling;
+      wrap.append(el);
+      while(n && !isStart(n) && !n.matches('input[type=file]')){ const next = n.nextElementSibling; wrap.append(n); n = next; }
     }
-    if(!wrap) return;
     wrap.classList.add('setsec'); wrap.dataset.sec = setSecs.length;
-    setSecs.push({ wrap, title });
+    setSecs.push({ wrap, title, key: title.getAttribute('data-i18n') || title.textContent });
   });
   const nav = document.createElement('div');
-  nav.className = 'group setnav';
-  nav.innerHTML = setSecs.map((x, i) => {
-    const key = x.title.getAttribute('data-i18n'), ico = SET_ICON[key || x.title.textContent] || '';
-    return `<button type="button" class="setnav-item" data-setsec="${i}"><span class="setnav-label">${ico ? `<svg class="setnav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico}</svg>` : ''}<span${key ? ` data-i18n="${esc(key)}"` : ''}>${esc(x.title.textContent)}</span></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
-  }).join('');
+  nav.className = 'setnav';
+  nav.innerHTML = SET_NAV.map(([cap, items]) => `<div class="setnav-group"><p class="setnav-cap" data-i18n="${esc(cap)}">${esc(tr(cap))}</p><div class="group">${
+    items.map(([key, sub]) => {
+      const i = setSecs.findIndex(x => x.key === key); if(i < 0) return '';
+      return `<button type="button" class="setnav-item" data-setsec="${i}"><svg class="setnav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SET_ICON[key] || ''}</svg><span class="setnav-txt"><span class="setnav-t" data-i18n="${esc(key)}">${esc(tr(key))}</span><span class="setnav-s" data-i18n="${esc(sub)}">${esc(tr(sub))}</span></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`;
+    }).join('')}</div></div>`).join('');
   const back = document.createElement('button');
   back.type = 'button'; back.className = 'setback'; back.id = 'setBack'; back.hidden = true;
   back.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg><span data-i18n="Ajustes">Ajustes</span>';
@@ -6058,9 +6206,28 @@ let setCur = null;
   setOpen(null, false);
 })();
 function setNavVisibility(){
-  setSecs.forEach((x, i) => { document.querySelector(`.setnav [data-setsec="${i}"]`).hidden = x.wrap.hidden; });
+  setSecs.forEach((x, i) => { const b = document.querySelector(`.setnav [data-setsec="${i}"]`); if(b) b.hidden = x.wrap.hidden; });
+  document.querySelectorAll('.setnav-group').forEach(g => { g.hidden = ![...g.querySelectorAll('.setnav-item')].some(b => !b.hidden); });
   if(setCur != null && setSecs[setCur].wrap.hidden) setOpen(null, false);
 }
+/* Interruptores: dibujan un sí/no encima de los chips de siempre, que siguen
+   mandando (y escondidos). Así la lógica de cada ajuste no cambia. */
+const SW_KEY = { cyclePick:'cycle', finPick:'fin', peakAskPick:'peakask' };
+function syncSwitches(){
+  document.querySelectorAll('.sw[data-sw]').forEach(sw => {
+    const on = document.querySelector(`#${sw.dataset.sw} .chip[aria-pressed="true"]`);
+    const v = on ? on.dataset[SW_KEY[sw.dataset.sw]] : 'off';
+    sw.setAttribute('aria-checked', String(v === 'on'));
+  });
+}
+document.querySelectorAll('.sw[data-sw]').forEach(sw => {
+  sw.addEventListener('click', () => {
+    const want = sw.getAttribute('aria-checked') === 'true' ? 'off' : 'on';
+    const chip = [...document.querySelectorAll(`#${sw.dataset.sw} .chip`)].find(c => c.dataset[SW_KEY[sw.dataset.sw]] === want);
+    chip?.click(); syncSwitches();
+  });
+  new MutationObserver(syncSwitches).observe(document.getElementById(sw.dataset.sw), { attributes:true, subtree:true, attributeFilter:['aria-pressed'] });
+});
 function setOpen(i, focus = true){
   const prev = setCur;
   setCur = i;
@@ -6148,8 +6315,8 @@ const TOUR_STEPS = [
   { sel:null, title:'Cerrar el día', body:'Por la noche, a la hora que elijas en Ajustes, Spoony te propone hacer el check-out. Dos escalas del 1 al 5: capacidad que te queda y cuánto has aguantado de ruido, luz y gente. No hace falta poner nombre a lo que sientes.' },
   { sel:'#tabs [data-go="cal"]', title:'Calendario', body:'Tus tareas y eventos de cada día, por mes o por semana. Toca un día para ver su detalle o planificarlo.' },
   { sel:'#tabs [data-go="set"]', nav:'set', title:'Ajustes', body:'Color, contraste y tus datos: aquí los exportas o vuelves a ver esta guía.' },
-  { sel:'#cyclePick', nav:'set', toggleKey:'cycleEnabled', toggleApply:'applyCycleUI', title:'Ciclo (opcional)', body:'Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
-  { sel:'#finPick', nav:'set', toggleKey:'finEnabled', toggleApply:'applyFinUI', title:'Finanzas (opcional)', body:'Añade una pestaña para tus gastos fijos y variables del mes. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
+  { sel:'#cycleRow', nav:'set', toggleKey:'cycleEnabled', toggleApply:'applyCycleUI', title:'Ciclo (opcional)', body:'Añade una sección para apuntar sangrado y dolor, y baja el margen de cucharas del día en consecuencia. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
+  { sel:'#finRow', nav:'set', toggleKey:'finEnabled', toggleApply:'applyFinUI', title:'Finanzas (opcional)', body:'Añade una pestaña para tus gastos fijos y variables del mes. Apagado por defecto; lo activas aquí o más tarde, cuando quieras.' },
 ];
 /* Guías propias de Ciclo y Finanzas: se abren solas la primera vez que se
    entra en esa pestaña con el módulo ya activado, y se pueden repasar
@@ -8174,6 +8341,12 @@ function applyCustomColor(){
     return;
   }
   document.getElementById('customColorPick').value = hex || '#9E5266';
+  const preset = [...document.querySelectorAll('#colorSwatches button.csw')];
+  preset.forEach(b => b.setAttribute('aria-pressed', String((b.dataset.color || null) === (hex ? hex.toLowerCase() : null))));
+  const any = document.getElementById('colorAny');
+  const custom = !!hex && !preset.some(b => b.dataset.color === hex.toLowerCase());
+  any.classList.toggle('on', custom);
+  any.style.setProperty('--c', custom ? hex : '');
   const props = ['--accent','--spoon','--bg','--surface','--surface-2','--line','--glass'];
   if(!hex){
     props.forEach(p => root.removeProperty(p));
@@ -8205,14 +8378,20 @@ function applyCustomColor(){
 
   const textRatio = contrastRatio(accentHex, surfaceHex);
   const borderRatio = contrastRatio(lineHex, surfaceHex);
-  infoRow.hidden = false;
   const textOK = textRatio >= 4.5, borderOK = borderRatio >= 3;
+  infoRow.hidden = textOK && borderOK;
   document.getElementById('colorHint').textContent = textOK && borderOK
     ? ''
     : tr('Este color puede costar de leer. Prueba otro más oscuro o más saturado.');
 }
 document.getElementById('customColorPick').addEventListener('input', e => {
   state.settings.customColor = e.target.value;
+  applyCustomColor(); save();
+});
+document.getElementById('btnFinGo').addEventListener('click', () => document.querySelector('#tabs [data-go="fin"]').click());
+document.getElementById('colorSwatches').addEventListener('click', e => {
+  const b = e.target.closest('button.csw'); if(!b) return;
+  state.settings.customColor = b.dataset.color || null;
   applyCustomColor(); save();
 });
 document.getElementById('btnColorReset').addEventListener('click', () => {
@@ -8230,7 +8409,8 @@ function applyCycleUI(){
   document.getElementById('tabCiclo').hidden = !on;
   document.getElementById('cycleLenRow').hidden = !on;
   document.getElementById('cycleMarginRow').hidden = !on;
-  document.getElementById('cicloReplayRow').hidden = !on;
+  document.getElementById('btnCicloReplay').hidden = !on;
+  document.getElementById('cycleMore').hidden = !on;
   updateTabsCompact();
   document.getElementById('cycleLen').value = state.avgCycleLength;
   document.getElementById('marginOut').textContent = state.marginPercent + '%';
@@ -8246,7 +8426,8 @@ function applyFinUI(){
   const enabled = !!state.finEnabled;
   const visible = enabled && isPremium();
   document.getElementById('tabFin').hidden = !visible;
-  document.getElementById('finReplayRow').hidden = !visible;
+  document.getElementById('btnFinReplay').hidden = !visible;
+  document.getElementById('btnFinGo').hidden = !visible;
   const plat = window.Capacitor?.getPlatform?.();
   document.getElementById('finCardRow').hidden = !visible || plat !== 'ios';
   document.getElementById('finWalletRow').hidden = !visible || plat !== 'android';
