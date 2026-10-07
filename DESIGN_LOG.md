@@ -89,6 +89,39 @@ Registro vivo de decisiones. Claude lo lee al empezar cada sesión con la skill 
 - Probar con personas autistas si "Sin coste" y "Toca para asignar cucharas" se entienden sin explicación, y si 14 días de eventos importados de golpe es demasiado ruido en la vista de Hoy (2026-09-29, sin hacer).
 - Comprobar en móvil real que el calendario de Google llega a Spoony en iOS (cuenta añadida en Ajustes → Calendario → Cuentas) y en Android (2026-09-29, sin hacer; el simulador de iOS solo tiene el calendario local).
 
+## Propuestas para el futuro (2026-10-07, sin decidir ni construir)
+Ideas para que Spoony aprenda mejor de lo que la persona apunta. Todo con datos que ya se guardan, en el móvil, sin IA externa ni avisos nuevos en Hoy.
+
+**Que no aprenda de lo que no debe**
+1. Marcar un día como "no cuenta para aprender" (enfermedad, viaje, fiesta), desde el menú "…" del día.
+2. Ver y borrar lo aprendido de cada actividad (últimas 5 muestras con fecha, borrar una o reiniciar).
+
+**Coste de las actividades**
+3. Coste según el cansancio con el que llegas (hoy se usa la media de las últimas 5 veces sin distinguir).
+4. Dar más peso a las veces recientes.
+5. Coste aprendido por calendario para lo importado (hoy entra como "Sin coste"), siempre como sugerencia que se confirma.
+6. Frase neutra en Patrones o en la ficha cuando se subestima una actividad de forma constante.
+
+**Energía estimada**
+7. Autocalibración: corregir con el desvío medio entre estimación y check-in (los datos ya se guardan en `estSnap`).
+8. Usar el check-out (energía y tolerancia sensorial) como señal de cansancio.
+9. Aprender la sensibilidad al cansancio y el ritmo de recuperación de cada persona (hoy son constantes fijas).
+10. Decir cuándo la estimación es poco segura por falta de datos.
+
+**Planificación en el calendario (nunca avisos en Hoy)**
+11. Recuperación habitual tras una actividad, en una línea en el detalle del día.
+12. Proponer días tipo a partir de semanas repetidas.
+13. Marcar en la vista de semana el día con más margen cuando hay muchos días cargados seguidos, sin texto de alarma.
+
+**Patrones (Premium)**
+14. Actividades que cuestan más de lo esperado y las que más recargan.
+15. Día de la semana más y menos cargado, comparado solo con la propia media.
+16. Relación entre la tolerancia sensorial y la energía del día siguiente.
+
+**Orden sugerido:** 1 y 7 primero (poco coste, mejoran lo demás); después 3 y 5; después 2.
+
+**No hacer:** predecir burnout o meltdown (descartado el 2026-09-30); volver a poner avisos de "te vas a pasar" en Hoy; analizar notas escritas; sacar conclusiones de tareas no hechas; enviar datos a un servidor para aprender.
+
 ## Deuda de accesibilidad conocida
 - Hardcodeo de € en el módulo de Finanzas (detectado en la auditoría de lanzamiento del 2026-09-17, sigue abierto).
 

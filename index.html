@@ -213,6 +213,82 @@ button.task-body{text-align:left;background:none;border:none;padding:0;font:inhe
   border:1px solid color-mix(in srgb,var(--line) 22%,transparent);
   box-shadow:0 1px 2px rgba(90,40,55,.04),0 8px 24px rgba(90,40,55,.05)}
 :root[data-contrast="alto"] #s-set .group{border-color:var(--line);box-shadow:none}
+/* ---------- Ciclo ---------- */
+#s-ciclo{--cyc-card:color-mix(in srgb,var(--surface) 55%,#fff);--cyc-edge:color-mix(in srgb,var(--line) 22%,transparent);
+  --cyc-sep:color-mix(in srgb,var(--line) 30%,transparent);--cyc-tint:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+:root[data-contrast="alto"] #s-ciclo{--cyc-edge:var(--line);--cyc-sep:var(--line)}
+.cyc-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cyc-q{width:24px;height:24px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
+  background:transparent;color:var(--accent);font-size:13px;font-weight:700;line-height:1;position:relative}
+.cyc-q::after{content:"";position:absolute;inset:-10px}
+.cyc-q[hidden]{display:none}
+.cyc-hero{position:relative;margin:4px 0 22px}
+.cyc-waves{display:block;width:100%;height:auto;overflow:visible}
+.cyc-w1{fill:color-mix(in srgb,var(--spoon) 13%,transparent)}
+.cyc-w2{fill:color-mix(in srgb,var(--accent) 10%,transparent)}
+.cyc-l1{fill:none;stroke:color-mix(in srgb,var(--accent) 70%,transparent);stroke-width:2;stroke-linecap:round}
+.cyc-l2{fill:none;stroke:color-mix(in srgb,var(--spoon) 40%,transparent);stroke-width:1.4;stroke-linecap:round}
+.cyc-now{stroke:color-mix(in srgb,var(--accent) 55%,transparent);stroke-width:1.2;stroke-dasharray:3 4}
+.cyc-halo{fill:color-mix(in srgb,var(--accent) 16%,transparent)}
+.cyc-dot{fill:var(--accent);stroke:var(--cyc-card);stroke-width:2.5}
+.cyc-mark{position:absolute;left:50%;top:-6px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;
+  padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--bg) 82%,transparent);line-height:1.15;z-index:1}
+.cyc-mark span{font-size:13px;color:var(--ink-soft)}
+.cyc-mark strong{font-size:17px;color:var(--accent);font-weight:700}
+.cyc-mark[hidden]{display:none}
+.cyc-waves{margin-top:30px}
+.cyc-strip{display:flex;align-items:center;justify-content:space-between;gap:2px;margin-top:10px}
+.cyc-strip[hidden]{display:none}
+.cyc-arrow{width:36px;height:44px;flex:none;display:grid;place-items:center;padding:0;border:0;background:transparent;color:var(--accent)}
+.cyc-arrow .ic{width:20px;height:20px}
+.cyc-days{flex:1;display:flex;align-items:center;justify-content:space-between;min-width:0}
+.cyc-days button{flex:1 1 0;min-width:0;height:44px;padding:0;border:0;background:transparent;color:var(--ink-soft);font-size:16px;font-variant-numeric:tabular-nums}
+.cyc-days button.is-today:not([aria-current]){color:var(--accent);font-weight:700}
+.cyc-days button[aria-current]{flex:0 0 44px;width:44px;border-radius:50%;background:var(--accent);color:#FFF8F9;font-weight:700;font-size:17px;
+  box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 28%,transparent)}
+.cyc-card{margin:0 0 14px;padding:18px;border-radius:24px;background:var(--cyc-card);border:1px solid var(--cyc-edge);
+  box-shadow:0 1px 2px rgba(90,40,55,.04),0 8px 24px rgba(90,40,55,.05)}
+:root[data-contrast="alto"] .cyc-card{box-shadow:none}
+.cyc-card:empty{display:none}
+.cyc-log-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.cyc-log-head h2{margin:0;font-size:19px}
+.cyc-log-head span{font-size:14px;color:var(--ink-soft)}
+.cyc-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--cyc-sep)}
+.cyc-log-head + .cyc-row{border-top:0}
+.cyc-row[hidden]{display:none}
+.cyc-row-scale{flex-wrap:wrap}
+.cyc-lab{flex:1;font-size:16px;font-weight:600;color:var(--ink)}
+.cyc-ico{width:22px;height:22px;flex:none;color:var(--accent)}
+.cyc-ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cyc-ico-lg{width:42px;height:42px;padding:10px;box-sizing:border-box;border-radius:50%;background:var(--cyc-tint)}
+.cyc-pills{display:flex;gap:8px}
+.cyc-pills .chip{min-width:64px;min-height:44px;margin:0;border-radius:999px;background:transparent;
+  border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.cyc-scale-wrap{flex:0 0 100%}
+#s-ciclo .scale{gap:8px}
+#s-ciclo .scale button{min-height:46px;padding:0;border-radius:999px;background:transparent;
+  border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);color:var(--ink);font-size:16px}
+#s-ciclo .scale button[aria-pressed="true"],#s-ciclo .cyc-pills .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#FFF8F9;font-weight:600}
+#s-ciclo .scale-lab{margin-top:8px}
+#s-ciclo .scale button,#s-ciclo .cyc-pills .chip,.cyc-days button{corner-shape:round}
+.cyc-head{display:flex;align-items:center;gap:14px;width:100%;padding:0;border:0;background:transparent;text-align:left;color:inherit;font:inherit}
+button.cyc-head{min-height:44px}
+.cyc-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cyc-t{font-size:14px;color:var(--ink-soft)}
+.cyc-main{font-size:18px;font-weight:700;color:var(--ink);line-height:1.25}
+.cyc-s{font-size:14px;color:var(--ink-soft);line-height:1.35}
+.cyc-chev{width:20px;height:20px;flex:none;color:color-mix(in srgb,var(--accent) 70%,transparent)}
+.cyc-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--cyc-sep);display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.cyc-foot p{margin:0;font-size:14px;color:var(--ink-soft)}
+.cyc-link{padding:8px 0;min-height:44px;border:0;background:transparent;color:var(--accent);font-size:15px;font-weight:600}
+.cyc-hist{list-style:none;margin:10px 0 0;padding:0}
+.cyc-hist li{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--cyc-sep);font-size:15px;color:var(--ink)}
+.cyc-hist li:first-child{border-top:0}
+.cyc-dots{display:flex;flex-wrap:wrap;gap:2.5px;max-width:170px}
+.cyc-dots i{width:4px;height:4px;border-radius:50%;background:color-mix(in srgb,var(--accent) 28%,transparent)}
+.cyc-dots i.on{background:var(--accent)}
+.cyc-empty{margin:10px 0 0;font-size:14px;color:var(--ink-soft)}
+.cyc-info .hint{margin:0 0 10px}
 #s-set .group .row,#s-set .group .ocrow{border-bottom-color:var(--set-sep)}
 #s-set .setnav-item::before,#s-set .setlink::before,#s-set #langPick .chip::after{background:var(--set-sep) !important}
 #s-set .setnav-t{font-weight:500}
@@ -693,9 +769,8 @@ span.check{cursor:default}
 .dp-energy-lab{font-size:16px;color:var(--ink-soft)}
 .dp-energy-val{display:flex;align-items:center;gap:12px;margin:2px 0 6px !important;font-size:44px;line-height:1.1;font-weight:800;letter-spacing:-0.03em;color:var(--accent)}
 .dp-energy-val[hidden]{display:none}
-.dp-energy-val .cal-eye{width:30px;height:30px}
-.dp-energy-val .cal-over{width:24px;height:5px;border-radius:3px}
 .dp-energy-msg{font-size:16px;color:var(--ink)}
+.dp-energy-msg[hidden]{display:none}
 .dp-energy-why{margin-top:4px !important;font-size:14px;color:var(--ink-soft)}
 .mini{display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r-row);padding:11px 13px;margin-bottom:8px}
@@ -1644,36 +1719,54 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
 
   <!-- ===== CICLO ===== -->
   <section class="screen" id="s-ciclo">
-    <header class="top">
+    <header class="top cyc-top">
       <h1 class="title" data-i18n="Ciclo">Ciclo</h1>
-      <p class="sub" id="cycleHead"></p>
-      <p class="legend" id="cycleFaseAviso" hidden data-i18n="No sirve para evitar ni para buscar un embarazo.">No sirve para evitar ni para buscar un embarazo.</p>
+      <p class="sub cyc-sub"><span id="cycleHead"></span><button type="button" class="cyc-q" id="cycPhaseHelp" hidden data-i18n-aria="Qué significa la fase" aria-label="Qué significa la fase">?</button></p>
     </header>
 
-    <div class="card">
-      <h2 data-i18n="Registro de hoy">Registro de hoy</h2>
-      <div class="field">
-        <label data-i18n="Sangrado">Sangrado</label>
-        <div class="chips" id="cycBleed" role="group" data-i18n-aria="Sangrado" aria-label="Sangrado">
+    <div class="cyc-hero" id="cycHero">
+      <div class="cyc-mark" id="cycMark" aria-hidden="true"><span id="cycMarkTop"></span><strong id="cycMarkDay"></strong></div>
+      <svg class="cyc-waves" id="cycWaves" viewBox="0 0 340 170" role="img" aria-hidden="true"></svg>
+      <div class="cyc-strip" id="cycStrip">
+        <button type="button" class="cyc-arrow" data-cycshift="-1" data-i18n-aria="Día anterior" aria-label="Día anterior"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <div class="cyc-days" id="cycDays" role="group" data-i18n-aria="Días del ciclo" aria-label="Días del ciclo"></div>
+        <button type="button" class="cyc-arrow" data-cycshift="1" data-i18n-aria="Día siguiente" aria-label="Día siguiente"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
+    </div>
+
+    <div class="cyc-card cyc-log">
+      <div class="cyc-log-head"><h2 id="cycLogTitle" data-i18n="Registro de hoy">Registro de hoy</h2><span id="cycLogDate"></span></div>
+      <div class="cyc-row">
+        <span class="cyc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.6c3.2 3.7 5 6.2 5 8.5a5 5 0 0 1-10 0c0-2.3 1.8-4.8 5-8.5z"/></svg></span>
+        <span class="cyc-lab" data-i18n="Sangrado">Sangrado</span>
+        <div class="cyc-pills" id="cycBleed" role="group" data-i18n-aria="Sangrado" aria-label="Sangrado">
           <button class="chip" data-bleed="si" aria-pressed="false" data-i18n="Sí">Sí</button>
           <button class="chip" data-bleed="no" aria-pressed="false" data-i18n="No">No</button>
         </div>
       </div>
-      <div class="field">
-        <label data-i18n="Dolor físico">Dolor físico</label>
-        <div class="scale" id="cycPain"></div>
-        <div class="scale-lab"><span data-i18n="Ninguno">Ninguno</span><span data-i18n="Mucho">Mucho</span></div>
+      <div class="cyc-row cyc-row-scale" id="cycIntField" hidden>
+        <span class="cyc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8.5 6.5c2 2.3 3 3.9 3 5.3a3 3 0 0 1-6 0c0-1.4 1-3 3-5.3zM15.5 9.5c2 2.3 3 3.9 3 5.3a3 3 0 0 1-6 0c0-1.4 1-3 3-5.3z"/></svg></span>
+        <span class="cyc-lab" data-i18n="Intensidad del sangrado">Intensidad del sangrado</span>
+        <div class="cyc-scale-wrap">
+          <div class="scale" id="cycIntensity"></div>
+          <div class="scale-lab"><span data-i18n="Muy leve">Muy leve</span><span data-i18n="Muy fuerte">Muy fuerte</span></div>
+        </div>
       </div>
-      <div class="field" id="cycIntField" hidden>
-        <label data-i18n="Intensidad del sangrado">Intensidad del sangrado</label>
-        <div class="scale" id="cycIntensity"></div>
-        <div class="scale-lab"><span data-i18n="Muy leve">Muy leve</span><span data-i18n="Muy fuerte">Muy fuerte</span></div>
+      <div class="cyc-row cyc-row-scale">
+        <span class="cyc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3 6 13.5h5.5L10.5 21 18 10.5h-5.5z"/></svg></span>
+        <span class="cyc-lab" data-i18n="Dolor físico">Dolor físico</span>
+        <div class="cyc-scale-wrap">
+          <div class="scale" id="cycPain"></div>
+          <div class="scale-lab"><span data-i18n="Ninguno">Ninguno</span><span data-i18n="Mucho">Mucho</span></div>
+        </div>
       </div>
     </div>
 
-    <div class="card" id="cycleNext"></div>
+    <div class="cyc-card" id="cycleNext"></div>
 
-    <div class="card" id="cyclePattern"></div>
+    <div class="cyc-card" id="cyclePattern"></div>
+
+    <div class="cyc-card" id="cycleHist"></div>
   </section>
 
   <!-- ===== FINANZAS ===== -->
@@ -2662,6 +2755,14 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
   </div>
 </dialog>
 
+<dialog id="dlgCycInfo">
+  <div class="sheet">
+    <h2 id="cycInfoTitle"></h2>
+    <div id="cycInfoBody" class="cyc-info"></div>
+    <div class="bigrow"><button class="primary" id="cycInfoClose" data-i18n="Cerrar">Cerrar</button></div>
+  </div>
+</dialog>
+
 <dialog id="dlgLibList">
   <div class="sheet acts-sheet">
     <div class="sheet-grab" aria-hidden="true"></div>
@@ -2848,7 +2949,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <section class="dp-energy" id="dEnergy" hidden>
       <svg class="dp-energy-wave" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120C45 120 55 40 95 40s55 60 105 20V120z"/><path d="M20 120C60 120 75 62 118 62s50 40 82 22V120z"/></svg>
       <p class="dp-energy-lab" data-i18n="Energía estimada">Energía estimada</p>
-      <p class="dp-energy-val" id="dEnergyValRow"><span id="dEnergyVal"></span><span id="dEnergyInd"></span></p>
+      <p class="dp-energy-val" id="dEnergyValRow"><span id="dEnergyVal"></span></p>
       <p class="dp-energy-msg" id="dEnergyMsg"></p>
       <p class="dp-energy-why" id="dEnergyWhy"></p>
     </section>
@@ -3689,10 +3790,34 @@ const EN = {
  "Alta": "High",
  "Media": "Medium",
  "Baja": "Low",
- "Lo planificado pasa de lo estimado. Planifícalo con calma.": "What's planned goes over the estimate. Plan it calmly.",
- "Día cargado, planifícalo con calma.": "Busy day, plan it calmly.",
- "Lo planificado cabe en lo estimado.": "What's planned fits the estimate.",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "Qué significa la fase": "What the phase means",
+ "Día anterior": "Previous day",
+ "Día siguiente": "Next day",
+ "Días del ciclo": "Cycle days",
+ "Registro del día": "Day log",
+ "Día {n} — Fase estimada: {fase}": "Day {n} — Estimated phase: {fase}",
+ "Apunta un día de sangrado para empezar a contar.": "Log a bleeding day to start counting.",
+ "Día {n}": "Day {n}",
+ "Aún sin estimar": "Not estimated yet",
+ "Apunta un día de sangrado para empezar.": "Log a bleeding day to start.",
+ "Mañana": "Tomorrow",
+ "En {n} días": "In {n} days",
+ "Estimación basada en tus ciclos registrados.": "Estimate based on your logged cycles.",
+ "Estimación basada en la duración media de Ajustes.": "Estimate based on the average length in Settings.",
+ "¿Cómo calculamos esto?": "How do we calculate this?",
+ "La fase se calcula con la duración de tu ciclo: la ovulación, unos días alrededor de la mitad; antes, la folicular; después, la lútea.": "The phase is based on your cycle length: ovulation, a few days around the middle; before it, follicular; after it, luteal.",
+ "Tus patrones": "Your patterns",
+ "Aún necesitamos más datos": "We need more data",
+ "Tus cucharas bajan {span}": "Your spoons drop {span}",
+ "Sin bajadas que se repitan": "No repeating drops",
+ "Faltan días con tareas apuntadas dentro de tus ciclos.": "Your cycles still need more days with tasks logged.",
+ "Registra 2 ciclos completos para empezar a detectar tus patrones.": "Log 2 full cycles to start spotting your patterns.",
+ "En tus últimos ciclos.": "In your latest cycles.",
+ "Últimos ciclos": "Latest cycles",
+ "{n} días": "{n} days",
+ "Aquí aparecerán tus ciclos cuando tengas uno completo.": "Your cycles will show here once you have a full one.",
+ "Fase estimada: {fase}": "Estimated phase: {fase}",
  "A qué hora se reinician tus cucharas. Súbela si te acuestas tarde o trabajas de noche.": "At what time your spoons reset. Move it later if you go to bed late or work nights.",
  "Desde esta hora, Spoony te propone hacer el check-out.": "From this time, Spoony suggests doing your check-out.",
  "Qué porcentaje de las cucharas de hoy resta cada vez que lo marcas.": "What percentage of today's spoons it takes each time you log one.",
@@ -5557,88 +5682,169 @@ function paintScale(id, val){
   document.getElementById(id).innerHTML = [1,2,3,4,5]
     .map(v => `<button data-v="${v}" aria-pressed="${v === val}">${v}</button>`).join('');
 }
+/* Día del ciclo de cualquier fecha. En el futuro se cuenta desde la próxima
+   estimación, para que la tira y la gráfica sigan dando la vuelta. */
+let cycSel = null;
+const cycKey = () => cycSel || todayKey();
+function cycDayNum(k){
+  if(!(state.cycleLogs || []).length) return null;
+  if(k > todayKey()){
+    const nx = nextCycleStart();
+    if(nx && k >= nx.date) return daysBetween(nx.date, k) % nx.length + 1;
+  }
+  return cycleDayOn(k);
+}
+function cycPhaseOn(k, n){
+  const run = k <= todayKey() ? bleedRunFrom(lastStartOn(k)) : typicalBleedDays();
+  return cyclePhase(n, effectiveCycleLength(), run || typicalBleedDays());
+}
+/* Forma de la onda a lo largo del ciclo (0 = inicio del sangrado): baja al
+   empezar, sube hacia la mitad y hace una segunda loma más suave después. */
+const cycWave = t => {
+  const tau = Math.PI * 2;
+  return 0.5 - 0.26 * Math.cos(tau * t) + 0.09 * Math.sin(tau * 2 * t - 1.1) + 0.03 * Math.cos(tau * 3 * t);
+};
+function renderCycHero(){
+  const svg = document.getElementById('cycWaves');
+  const k = cycKey(), n = cycDayNum(k), L = effectiveCycleLength();
+  const W = 340, H = 170, top = 30, bot = 10, mid = W / 2;
+  const pos = n == null ? 0.42 : (n - 1) / L;
+  const y = v => top + (1 - v) * (H - top - bot);
+  const steps = 68;
+  const path = (shift, amp, lift) => {
+    const pts = [];
+    for(let i = 0; i <= steps; i++){
+      const x = i / steps * W;
+      const t = pos + (x - mid) / W + shift;
+      const v = 0.5 + (cycWave(((t % 1) + 1) % 1) - 0.5) * amp + lift;
+      pts.push([x, y(v)]);
+    }
+    return pts;
+  };
+  const line = pts => pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+  const area = pts => line(pts) + `L${W} ${H}L0 ${H}Z`;
+  const back = path(0.07, 0.8, 0.1), midw = path(-0.05, 0.9, 0.04), main = path(0, 1, 0);
+  const cy = main[Math.round(steps / 2)][1];
+  const has = n != null;
+  svg.innerHTML = `<defs><linearGradient id="cycFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--accent)" stop-opacity=".16"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area(back)}" class="cyc-w1"/>
+    <path d="${area(midw)}" class="cyc-w2"/>
+    <path d="${area(main)}" fill="url(#cycFade)"/>
+    <path d="${line(midw)}" class="cyc-l2"/>
+    <path d="${line(main)}" class="cyc-l1"/>
+    ${has ? `<line x1="${mid}" y1="4" x2="${mid}" y2="${H}" class="cyc-now"/>
+    <circle cx="${mid}" cy="${cy.toFixed(1)}" r="11" class="cyc-halo"/>
+    <circle cx="${mid}" cy="${cy.toFixed(1)}" r="6.5" class="cyc-dot"/>` : ''}`;
+  const mark = document.getElementById('cycMark');
+  mark.hidden = !has;
+  if(has){
+    const isToday = k === todayKey();
+    document.getElementById('cycMarkTop').textContent = isToday ? tr('Hoy')
+      : new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'short', day:'numeric', month:'short'});
+    document.getElementById('cycMarkDay').textContent = trf('Día {n}', {n});
+  }
+  document.getElementById('cycStrip').hidden = !has;
+  if(!has) return;
+  document.getElementById('cycDays').innerHTML = [-4,-3,-2,-1,0,1,2,3,4].map(o => {
+    const d = shiftKey(k, o), dn = cycDayNum(d);
+    const full = new Date(d + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long', day:'numeric', month:'long'});
+    return `<button type="button" data-cycday="${d}"${o === 0 ? ' aria-current="date"' : ''}${d === todayKey() ? ' class="is-today"' : ''}
+      aria-label="${esc(full)}${dn != null ? ' · ' + esc(trf('Día {n}', {n:dn})) : ''}">${dn ?? '·'}</button>`;
+  }).join('');
+}
 function renderCycle(){
   if(!state.cycleEnabled) return;
-  const k = todayKey();
-  const head = document.getElementById('cycleHead');
-  const dayNum = (state.cycleLogs || []).length ? cycleDayOn(k) : null;
-  head.textContent = dayNum == null
-    ? tr('Todavía no hay ningún día de sangrado apuntado, así que no hay día de ciclo que contar.')
-    : trf('Día {n} del ciclo — Fase estimada: {fase}', {n:dayNum, fase:tr(cyclePhase(dayNum, effectiveCycleLength(), bleedRunFrom(lastStartOn(k))))});
-  document.getElementById('cycleFaseAviso').hidden = dayNum == null;
+  const today = todayKey(), k = cycKey();
+  const n = cycDayNum(today);
+  document.getElementById('cycleHead').textContent = n == null
+    ? tr('Apunta un día de sangrado para empezar a contar.')
+    : trf('Día {n} — Fase estimada: {fase}', {n, fase:tr(cycPhaseOn(today, n))});
+  document.getElementById('cycPhaseHelp').hidden = n == null;
+  renderCycHero();
 
+  const isToday = k === today;
+  const title = document.getElementById('cycLogTitle');
+  title.textContent = tr(isToday ? 'Registro de hoy' : 'Registro del día');
+  const date = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long', day:'numeric', month:'long'});
+  document.getElementById('cycLogDate').textContent = date.charAt(0).toUpperCase() + date.slice(1);
   const log = cycleLog(k);
   const bleeding = log ? log.bleeding : null;
   document.querySelectorAll('#cycBleed .chip').forEach(c =>
     c.setAttribute('aria-pressed', bleeding === null ? 'false' : c.dataset.bleed === (bleeding ? 'si' : 'no')));
-  const cycIntField = document.getElementById('cycIntField');
-  cycIntField.hidden = !bleeding;
-  document.getElementById('cycPain').closest('.field').style.marginBottom = bleeding ? '' : '0';
+  document.getElementById('cycIntField').hidden = !bleeding;
   paintScale('cycIntensity', log ? log.bleedingIntensity : null);
   paintScale('cycPain', log ? log.pain : null);
   renderCyclePrediction();
   renderCyclePattern();
+  renderCycleHist();
 }
-/* Estimación del siguiente sangrado. Funciona desde el primer ciclo apuntado,
-   aunque sea antiguo, y se va estrechando según hay ciclos medidos: primero
-   con la media escrita a mano, después con la media real y su horquilla.
-   Se dice siempre que es estimación, y nunca se estima cómo va a sentirse. */
-function renderCyclePrediction(){
-  const el = document.getElementById('cycleNext');
+const CYC_ICON = {
+  cal:'<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+  chart:'<path d="M4 19.5h16"/><path d="M4 15.5c2.5 0 3-6 5.5-6s3 4 5.5 4 2.5-7 5-7"/>',
+  hist:'<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.2l3 1.8"/>'
+};
+const cycHeadRow = (icon, title, main, sub, attrs) => {
+  const inner = `<span class="cyc-ico cyc-ico-lg" aria-hidden="true"><svg viewBox="0 0 24 24">${CYC_ICON[icon]}</svg></span>
+    <span class="cyc-txt"><span class="cyc-t">${title}</span><strong class="cyc-main">${main}</strong>${sub ? `<span class="cyc-s">${sub}</span>` : ''}</span>`;
+  return attrs ? `<button type="button" class="cyc-head" ${attrs}>${inner}<svg class="ic cyc-chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>`
+    : `<div class="cyc-head">${inner}</div>`;
+};
+/* Hoja de información: el detalle largo vive aquí para que la pantalla quede limpia. */
+const dlgCycInfo = document.getElementById('dlgCycInfo');
+function openCycInfo(title, html){
+  document.getElementById('cycInfoTitle').textContent = title;
+  document.getElementById('cycInfoBody').innerHTML = html;
+  openDialog(dlgCycInfo);
+}
+document.getElementById('cycInfoClose').addEventListener('click', () => dlgCycInfo.close());
+function cycPredictionDetail(){
   const starts = cycleStarts();
-  if(!starts.length){
-    el.innerHTML = `<h2>${tr('Próximo ciclo')}</h2>
-      <p>${tr('En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.')}</p>`;
-    return;
-  }
-  const { date, jumps, length } = nextCycleStart();
-  const falta = daysBetween(todayKey(), date);
-  const cuando = falta === 0 ? tr('es hoy') : falta === 1 ? tr('es mañana') : trf('faltan {n} días', {n:falta});
+  if(!starts.length) return `<p class="hint">${tr('En cuanto apuntes un día de sangrado aparece aquí la estimación del siguiente.')}</p>`;
+  const { jumps, length } = nextCycleStart();
   const lens = cycleLengths().slice(-6);
-  const min = lens.length ? Math.min(...lens) : null;
-  const max = lens.length ? Math.max(...lens) : null;
-
+  const min = lens.length ? Math.min(...lens) : null, max = lens.length ? Math.max(...lens) : null;
   let base;
   if(!lens.length){
     base = trf('Estimado con la duración media que tienes puesta en Ajustes ({n} días). Cuando apuntes el siguiente sangrado, la estimación pasará a usar tus ciclos reales.', {n:length});
   }else{
     const medidos = trf(lens.length === 1 ? '{n} ciclo medido' : '{n} ciclos medidos', {n:lens.length});
-    base = min === max
-      ? trf('Estimado con {medidos}: {min} días.', {medidos, min})
+    base = min === max ? trf('Estimado con {medidos}: {min} días.', {medidos, min})
       : trf('Estimado con {medidos}: entre {min} y {max} días, media {avg}.', {medidos, min, max, avg:length});
   }
-
-  /* Horquilla real: si los ciclos medidos no duran todos lo mismo, la fecha
-     tampoco es un punto. Con datos antiguos el salto multiplica el margen. */
-  let horquilla = '';
+  let out = `<p class="hint">${base}</p>`;
   if(lens.length && min !== max){
-    const desde = shiftKey(starts[starts.length-1], min * jumps);
-    const hasta = shiftKey(starts[starts.length-1], max * jumps);
-    horquilla = `<p>${trf('Con tu variación de siempre, caería entre el {desde} y el {hasta}.', {desde:fmtDate(desde), hasta:fmtDate(hasta)})}</p>`;
+    const desde = shiftKey(starts[starts.length-1], min * jumps), hasta = shiftKey(starts[starts.length-1], max * jumps);
+    out += `<p class="hint">${trf('Con tu variación de siempre, caería entre el {desde} y el {hasta}.', {desde:fmtDate(desde), hasta:fmtDate(hasta)})}</p>`;
   }
-  const viejo = jumps > 1
-    ? `<p>${trf('Tu último sangrado apuntado es del {fecha}, así que esta estimación salta {n} ciclos y es más floja. Apuntar el siguiente la endereza.', {fecha:fmtDate(starts[starts.length-1]), n:jumps})}</p>`
-    : '';
-
-  el.innerHTML = `<h2>${tr('Próximo ciclo')}</h2>
-    <p><strong>${trf('Estimado: {fecha}', {fecha:fmtDate(date)})}</strong> — ${cuando}.</p>
-    ${horquilla}
-    <p>${base}</p>
-    ${viejo}
-    <p>${tr('Es una estimación a partir de lo que has apuntado, no una certeza.')}</p>`;
+  if(jumps > 1) out += `<p class="hint">${trf('Tu último sangrado apuntado es del {fecha}, así que esta estimación salta {n} ciclos y es más floja. Apuntar el siguiente la endereza.', {fecha:fmtDate(starts[starts.length-1]), n:jumps})}</p>`;
+  out += `<p class="hint">${tr('La fase se calcula con la duración de tu ciclo: la ovulación, unos días alrededor de la mitad; antes, la folicular; después, la lútea.')}</p>`;
+  out += `<p class="hint">${tr('Es una estimación a partir de lo que has apuntado, no una certeza.')} ${tr('No sirve para evitar ni para buscar un embarazo.')}</p>`;
+  return out;
+}
+function renderCyclePrediction(){
+  const el = document.getElementById('cycleNext');
+  const starts = cycleStarts();
+  if(!starts.length){
+    el.innerHTML = cycHeadRow('cal', tr('Próximo ciclo'), tr('Aún sin estimar'), tr('Apunta un día de sangrado para empezar.'));
+    return;
+  }
+  const { date } = nextCycleStart();
+  const falta = daysBetween(todayKey(), date);
+  const cuando = falta === 0 ? tr('Hoy') : falta === 1 ? tr('Mañana') : trf('En {n} días', {n:falta});
+  const fecha = new Date(date + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long', day:'numeric', month:'long'});
+  const measured = cycleLengths().length > 0;
+  el.innerHTML = cycHeadRow('cal', tr('Próximo ciclo'), esc(fecha), cuando, `data-cycopen="${date}"`)
+    + `<div class="cyc-foot"><p>${tr(measured ? 'Estimación basada en tus ciclos registrados.' : 'Estimación basada en la duración media de Ajustes.')}</p>
+       <button type="button" class="cyc-link" id="cycHow">${tr('¿Cómo calculamos esto?')} ›</button></div>`;
 }
 /* Descripción de lo ya ocurrido: se promedia, por cada día del ciclo, lo que
    se gastó ese día en los ciclos ya cerrados, y se busca la racha seguida que
    queda por debajo de la media. No predice nada ni habla de hormonas. */
-function renderCyclePattern(){
-  const el = document.getElementById('cyclePattern');
+function cyclePatternInfo(){
   const starts = cycleStarts();
   const closed = Math.max(0, starts.length - 1);
-  if(closed < 2){
-    el.innerHTML = `<h2>${tr('Patrón')}</h2>
-      <p>${trf('Hacen falta dos ciclos completos para poder describir un patrón. Llevas {n}.', {n:closed})}</p>`;
-    return;
-  }
+  if(closed < 2) return { closed, ready:false };
   const perDay = [];
   for(let i = 0; i < starts.length - 1; i++){
     const n = daysBetween(starts[i], starts[i+1]);
@@ -5651,46 +5857,82 @@ function renderCyclePattern(){
   }
   const avgByDay = perDay.map(a => (a && a.length >= 2) ? a.reduce((x,y)=>x+y,0) / a.length : null);
   const vals = avgByDay.filter(v => v != null);
-  if(vals.length < 5){
-    el.innerHTML = `<h2>${tr('Patrón')}</h2>
-      <p>${trf('Tienes {n} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.', {n:closed})}</p>`;
-    return;
-  }
+  if(vals.length < 5) return { closed, ready:false, fewTasks:true };
   const overall = vals.reduce((a,b)=>a+b,0) / vals.length;
   let best = null, cur = null;
   avgByDay.forEach((v, i) => {
     if(v != null && v < overall){
-      cur = cur || { from:i, to:i };
-      cur.to = i;
+      cur = cur || { from:i, to:i }; cur.to = i;
       if(!best || (cur.to - cur.from) > (best.to - best.from)) best = { ...cur };
-    }else{
-      cur = null;
-    }
+    }else cur = null;
   });
-  const span = best
-    ? (best.from === best.to ? trf('el día {n}', {n:best.from+1}) : trf('entre el día {a} y el día {b}', {a:best.from+1, b:best.to+1}))
-    : null;
-  let suggestion = '';
-  if(best){
-    const spanVals = avgByDay.slice(best.from, best.to+1).filter(v => v != null);
-    const spanAvg = spanVals.reduce((a,b)=>a+b,0) / spanVals.length;
-    const drop = Math.round((1 - spanAvg/overall) * 100);
-    if(drop > 0 && drop !== state.marginPercent){
-      suggestion = `<p class="insight">${trf('Según tus datos, tus cucharas bajan una media del {n}% estos días.', {n:drop})}
-        ${trf('¿Actualizar tu margen a {n}%?', {n:drop})}</p>
-        <button class="add" id="btnApplyMarginSuggestion" data-margin="${drop}">${trf('Actualizar margen a {n}%', {n:drop})}</button>`;
-    }
-  }
-  el.innerHTML = `<h2>${tr('Patrón')}</h2>` + (span
-    ? `<p>${trf('En tus últimos ciclos, tus cucharas bajaron {span}.', {span})}</p>
-       <p>${tr('Es lo que ya pasó, no una previsión de lo que va a pasar.')}</p>${suggestion}`
-    : `<p>${tr('De momento no hay ninguna bajada que se repita de un ciclo a otro.')}</p>`);
+  if(!best) return { closed, ready:true, span:null };
+  const span = best.from === best.to ? trf('el día {n}', {n:best.from+1}) : trf('entre el día {a} y el día {b}', {a:best.from+1, b:best.to+1});
+  const spanVals = avgByDay.slice(best.from, best.to+1).filter(v => v != null);
+  const drop = Math.round((1 - (spanVals.reduce((a,b)=>a+b,0) / spanVals.length) / overall) * 100);
+  return { closed, ready:true, span, drop };
 }
-document.getElementById('cyclePattern').addEventListener('click', e => {
+function renderCyclePattern(){
+  const el = document.getElementById('cyclePattern');
+  const p = cyclePatternInfo();
+  const main = !p.ready ? tr('Aún necesitamos más datos')
+    : p.span ? trf('Tus cucharas bajan {span}', {span:p.span}) : tr('Sin bajadas que se repitan');
+  const sub = !p.ready ? (p.fewTasks ? tr('Faltan días con tareas apuntadas dentro de tus ciclos.') : tr('Registra 2 ciclos completos para empezar a detectar tus patrones.'))
+    : tr('En tus últimos ciclos.');
+  el.innerHTML = cycHeadRow('chart', tr('Tus patrones'), main, sub, 'data-cycpattern');
+}
+function cyclePatternDetail(){
+  const p = cyclePatternInfo();
+  if(!p.ready) return `<p class="hint">${p.fewTasks
+    ? trf('Tienes {n} ciclos completos, pero todavía faltan días con tareas apuntadas para poder describir nada.', {n:p.closed})
+    : trf('Hacen falta dos ciclos completos para poder describir un patrón. Llevas {n}.', {n:p.closed})}</p>`;
+  if(!p.span) return `<p class="hint">${tr('De momento no hay ninguna bajada que se repita de un ciclo a otro.')}</p>`;
+  let out = `<p class="hint">${trf('En tus últimos ciclos, tus cucharas bajaron {span}.', {span:p.span})}</p>
+    <p class="hint">${tr('Es lo que ya pasó, no una previsión de lo que va a pasar.')}</p>`;
+  if(p.drop > 0 && p.drop !== state.marginPercent){
+    out += `<p class="insight">${trf('Según tus datos, tus cucharas bajan una media del {n}% estos días.', {n:p.drop})} ${trf('¿Actualizar tu margen a {n}%?', {n:p.drop})}</p>
+      <button class="add" id="btnApplyMarginSuggestion" data-margin="${p.drop}">${trf('Actualizar margen a {n}%', {n:p.drop})}</button>`;
+  }
+  return out;
+}
+/* Últimos ciclos cerrados: un punto por día, los de sangrado en granate. */
+function renderCycleHist(){
+  const el = document.getElementById('cycleHist');
+  const s = cycleStarts();
+  const rows = [];
+  for(let i = s.length - 2; i >= 0 && rows.length < 3; i--){
+    const len = daysBetween(s[i], s[i+1]), bleed = bleedRunFrom(s[i]);
+    const d = new Date(s[i] + 'T12:00:00').toLocaleDateString(LOCALE(), {day:'numeric', month:'short'}).replace('.', '').replace('sept', 'sep');
+    const dots = Array.from({length:Math.min(len, 40)}, (_, j) => `<i${j < bleed ? ' class="on"' : ''}></i>`).join('');
+    rows.push(`<li><span>${esc(d)} — ${trf('{n} días', {n:len})}</span><span class="cyc-dots" aria-hidden="true">${dots}</span></li>`);
+  }
+  el.innerHTML = `<div class="cyc-head"><span class="cyc-ico cyc-ico-lg" aria-hidden="true"><svg viewBox="0 0 24 24">${CYC_ICON.hist}</svg></span>
+    <span class="cyc-txt"><strong class="cyc-main">${tr('Últimos ciclos')}</strong></span></div>`
+    + (rows.length ? `<ul class="cyc-hist">${rows.join('')}</ul>` : `<p class="cyc-empty">${tr('Aquí aparecerán tus ciclos cuando tengas uno completo.')}</p>`);
+}
+document.getElementById('s-ciclo').addEventListener('click', e => {
+  const shift = e.target.closest('[data-cycshift]');
+  if(shift){ cycSel = shiftKey(cycKey(), +shift.dataset.cycshift); if(cycSel === todayKey()) cycSel = null; renderCycle(); return; }
+  const dayB = e.target.closest('[data-cycday]');
+  if(dayB){ cycSel = dayB.dataset.cycday === todayKey() ? null : dayB.dataset.cycday; renderCycle(); return; }
+  if(e.target.closest('#cycPhaseHelp')){
+    const n = cycDayNum(todayKey());
+    openCycInfo(trf('Fase estimada: {fase}', {fase:tr(cycPhaseOn(todayKey(), n))}),
+      `<p class="hint">${tr('La fase se calcula con la duración de tu ciclo: la ovulación, unos días alrededor de la mitad; antes, la folicular; después, la lútea.')}</p>
+       <p class="hint">${tr('Es una estimación a partir de lo que has apuntado, no una certeza.')} ${tr('No sirve para evitar ni para buscar un embarazo.')}</p>`);
+    return;
+  }
+  if(e.target.closest('#cycHow')){ openCycInfo(tr('¿Cómo calculamos esto?'), cycPredictionDetail()); return; }
+  const open = e.target.closest('[data-cycopen]');
+  if(open){ calRef = selectedDay = open.dataset.cycopen; dCycleOpen = false; renderDaySheet(); openDialog(dlgDay); return; }
+  if(e.target.closest('[data-cycpattern]')) openCycInfo(tr('Tus patrones'), cyclePatternDetail());
+});
+document.getElementById('cycInfoBody').addEventListener('click', e => {
   const b = e.target.closest('#btnApplyMarginSuggestion'); if(!b) return;
   state.marginPercent = Math.min(90, Math.max(0, +b.dataset.margin));
   document.getElementById('marginOut').textContent = state.marginPercent + '%';
   save(); renderMeter(); renderCycle();
+  document.getElementById('cycInfoBody').innerHTML = cyclePatternDetail();
 });
 
 /* typical budget: what a normal day has looked like lately */
@@ -5875,7 +6117,7 @@ function estimateEnergy(k, m = energyModel()){
     cycle, cycleLower: cDiff <= -0.5, cycleCost: factor >= 1.05, reserve: Math.round(reserve * 100), factor,
     level: estLevel(value, m.max) };
 }
-const estLevel = (v, max) => { const pct = max ? v / max : 0; return pct >= 0.65 ? 'Alta' : pct >= 0.375 ? 'Media' : 'Baja'; };
+const estLevel = (v, max) => { const pct = max ? v / max : 0; return pct >= 0.70 ? 'Alta' : pct >= 0.45 ? 'Media' : 'Baja'; };
 /* Comparación en Patrones: la última estimación del día (guardada en silencio
    al hacer su check-in) frente a lo que apuntaste. Mínimo 7 días. */
 const NEED_EST = 7;
@@ -8077,19 +8319,14 @@ function renderDayEnergy(k){
   const e = open ? estimateEnergy(k) : null;
   box.hidden = !open; if(!open) return;
   document.getElementById('dEnergyValRow').hidden = !e;
+  document.getElementById('dEnergyMsg').hidden = !!e;
   if(!e){
     document.getElementById('dEnergyMsg').textContent = tr('Aún no hay suficientes check-in para estimarla.');
     document.getElementById('dEnergyWhy').textContent = tr('Se calcula con tus check-in de días anteriores.');
     return;
   }
-  const planned = Math.round(dayLoad(k).planned * e.factor);
   const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long'});
   document.getElementById('dEnergyVal').textContent = tr(e.level);
-  const over = planned > e.value, edge = !over && planned > 0 && planned >= e.value * CAL_EDGE;
-  document.getElementById('dEnergyInd').innerHTML = over ? '<i class="cal-over" role="img" aria-label="' + tr('Límite superado') + '"></i>'
-    : edge ? `<svg class="cal-eye" viewBox="0 0 24 24" role="img" aria-label="${tr('Previsión alta')}"><use href="#eye"/></svg>` : '';
-  document.getElementById('dEnergyMsg').textContent = tr(over ? 'Lo planificado pasa de lo estimado. Planifícalo con calma.'
-    : edge ? 'Día cargado, planifícalo con calma.' : planned > 0 ? 'Lo planificado cabe en lo estimado.' : 'Todavía no hay nada planificado.');
   const why = [];
   if(e.streak && e.lower) why.push(trf(e.streak === 1 ? 'Vienes de un día cargado: puede que tengas menos energía que un {dia} habitual.' : 'Vienes de {n} días cargados: puede que tengas menos energía que un {dia} habitual.', {n:e.streak, dia:wd}));
   else if(e.lower) why.push(tr('Los últimos días fueron cargados y el cansancio todavía puede notarse.'));
@@ -8551,7 +8788,7 @@ function cycleLogFor(k){
   if(!l){ l = { date:k, bleeding:false, bleedingIntensity:null, pain:null }; state.cycleLogs.push(l); }
   return l;
 }
-function todayCycleLog(){ return cycleLogFor(todayKey()); }
+function todayCycleLog(){ return cycleLogFor(cycKey()); }
 document.getElementById('cycBleed').addEventListener('click', e => {
   const b = e.target.closest('[data-bleed]'); if(!b) return;
   const l = todayCycleLog();
@@ -8949,6 +9186,7 @@ window.addEventListener('online', () => { if(auth && syncAllowed()) syncNow(); }
   ['dlgDeleteSeries', 'delSeriesCancel'],
   ['dlgLibList', 'libListClose'],
   ['dlgWhyMargin', 'whyMarginClose'],
+  ['dlgCycInfo', 'cycInfoClose'],
   ['dlgCardGuide', 'cardGuideClose'],
   ['dlgWalletGuide', 'walletGuideClose'],
   ['dlgCheckout', 'coCancel'],
