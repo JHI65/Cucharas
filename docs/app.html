@@ -1180,6 +1180,21 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 /* ---- Hoy ---- */
 .hoy-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-top:18px}
 .hoy-title{font-size:32px;font-weight:800;line-height:1.1;letter-spacing:-0.02em}
+.hoy-title.is-date{font-size:26px}
+.hoy-back{display:inline-flex;align-items:center;min-height:36px;margin-top:8px;padding:0 14px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
+  background:transparent;color:var(--accent);font-size:15px;font-weight:600}
+.hoy-back[hidden]{display:none}
+.hoy-nav .sr-nav{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+.hoy-nav .sr-nav:focus-visible{position:static;width:auto;height:auto;margin:6px 6px 0 0;padding:6px 10px;clip:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#s-hoy{touch-action:pan-y pinch-zoom}
+.hoy-locked{margin:0 0 10px;font-size:14px;color:var(--ink-soft)}
+.hoy-locked[hidden]{display:none}
+#hoyMeter[hidden]{display:none}
+#hEnergy{margin:14px 0 22px}
+#taskList .check:disabled{opacity:.55}
+#taskList.ro .chev-btn{visibility:hidden}
+#btnTaskMenu[hidden]{display:none}
+#taskList.ro .task-body:disabled{color:inherit;opacity:1}
 #s-hoy .hoy-top .sub{font-size:14px;margin-top:3px}
 #s-hoy .meter{margin-top:4px}
 /* Cabecera de Hoy fija (hasta "Tareas"): solo la lista de tareas pasa por
@@ -1648,13 +1663,22 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
     <div class="hoy-pin" id="hoyPin">
     <header class="top hoy-top">
       <div>
-        <h1 class="title hoy-title" data-i18n="Hoy">Hoy</h1>
+        <h1 class="title hoy-title" id="hoyTitle">Hoy</h1>
         <p class="sub" id="todayDate"></p>
+        <button type="button" class="hoy-back" id="hoyBack" hidden data-i18n="Volver a hoy">Volver a hoy</button>
+        <span class="hoy-nav"><button type="button" class="sr-nav" data-hoystep="-1" data-i18n="Día anterior">Día anterior</button><button type="button" class="sr-nav" data-hoystep="1" data-i18n="Día siguiente">Día siguiente</button></span>
       </div>
       <button class="quick-add" id="btnQuickAdd" data-i18n-aria="Añadir tarea" aria-label="Añadir tarea"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
     </header>
 
-    <div class="meter">
+    <section class="dp-energy" id="hEnergy" hidden>
+      <svg class="dp-energy-wave" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120C45 120 55 40 95 40s55 60 105 20V120z"/><path d="M20 120C60 120 75 62 118 62s50 40 82 22V120z"/></svg>
+      <p class="dp-energy-lab" data-i18n="Energía estimada">Energía estimada</p>
+      <p class="dp-energy-val" id="hEnergyValRow"><span id="hEnergyVal"></span></p>
+      <p class="dp-energy-msg" id="hEnergyMsg"></p>
+      <p class="dp-energy-why" id="hEnergyWhy"></p>
+    </section>
+    <div class="meter" id="hoyMeter">
       <button class="meter-hit" id="btnAdjustBudget" data-i18n-aria="Ver tu energía de hoy" aria-label="Ver tu energía de hoy"></button>
       <p class="energy-count" id="spoonCount"></p>
       <div class="spoons" id="spoonRow" role="img" data-i18n-aria="Cucharas restantes" aria-label="Cucharas restantes"></div>
@@ -1677,6 +1701,7 @@ textarea,.sheet,.tabs,.tabs button{corner-shape:squircle}
       </div>
     </div>
     </div>
+    <p class="hoy-locked" id="hoyLocked" hidden></p>
     <div id="taskList"></div>
     <button class="add" id="btnAddTask"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="Añadir tarea">Añadir tarea</span></button>
 
@@ -3791,6 +3816,19 @@ const EN = {
  "Media": "Medium",
  "Baja": "Low",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "Volver a hoy": "Back to today",
+ "Ayer": "Yesterday",
+ "Hace {n} días": "{n} days ago",
+ "Dentro de {n} días": "In {n} days",
+ "Sin check-in ese día.": "No check-in that day.",
+ "por debajo de lo asignado": "below what was assigned",
+ "Lo apuntado pasa de tus cucharas.": "What's logged goes over your spoons.",
+ "No quedan cucharas.": "No spoons left.",
+ "Toda la energía disponible.": "All energy available.",
+ "Queda más de la mitad de la energía.": "More than half the energy left.",
+ "Queda menos de la mitad de la energía.": "Less than half the energy left.",
+ "Lo apuntado para este día suma {planned} y tiene {effective}.": "What's logged for this day adds up to {planned} and it has {effective}.",
+ "Nada apuntado este día.": "Nothing logged this day.",
  "Qué significa la fase": "What the phase means",
  "Día anterior": "Previous day",
  "Día siguiente": "Next day",
@@ -4223,6 +4261,10 @@ const nextMonthKey = k => {
   m++; if(m > 12){ m = 1; y++; }
   return `${y}-${String(m).padStart(2,'0')}`;
 };
+/* Día que se ve en Hoy: null es hoy. Deslizar cambia solo esta vista; todo lo
+   demás (avisos, widget, check-in al abrir) sigue mirando el día de verdad. */
+let hoyView = null;
+const hoyKey = () => hoyView || todayKey();
 const day = (k=todayKey()) => {
   if(!state.days[k]) state.days[k] = { budget:null, tasks:[], note:'', extras:[] };
   return state.days[k];
@@ -5090,8 +5132,9 @@ function spoonsLeft(d, k){
   return { budget, effective, marginAmount, gasto, recarga, left: budget - gasto + recarga - marginAmount + extras };
 }
 function renderMeter(){
-  const d = day();
-  const { budget, effective, marginAmount, gasto, recarga, left } = spoonsLeft(d, todayKey());
+  const k = hoyKey(), d = day(k), isToday = !hoyView;
+  renderHoyHead();
+  const { budget, effective, marginAmount, gasto, recarga, left } = spoonsLeft(d, k);
   const row = document.getElementById('spoonRow');
   const total = Math.ceil(Math.max(budget, left, 0));
   row.innerHTML = total ? spoonRowHTML(left, total, marginAmount) : `<span class="lib-note">${tr('Sin cucharas asignadas todavía.')}</span>`;
@@ -5100,16 +5143,24 @@ function renderMeter(){
     : trf('{left} de {budget} cucharas restantes', {left:fmtN(left), budget:fmtN(budget)}));
   const c = document.getElementById('spoonCount');
   c.className = 'energy-count' + (left < 0 ? ' overdrawn' : '');
-  if(d.budget == null) c.innerHTML = `<span class="none">${tr('Sin cucharas asignadas todavía.')}</span>`;
+  const future = d.budget == null && k > todayKey();
+  document.getElementById('hoyMeter').hidden = future;
+  if(future) renderDayEnergy(k, 'h'); else document.getElementById('hEnergy').hidden = true;
+  if(d.budget == null) c.innerHTML = `<span class="none">${tr(k < todayKey() ? 'Sin check-in ese día.' : 'Sin cucharas asignadas todavía.')}</span>`;
   else c.innerHTML = left < 0
-    ? `<span class="big">−${fmtN(Math.abs(left))}</span><span class="lab">${tr('por debajo de lo asignado hoy')}</span>`
+    ? `<span class="big">−${fmtN(Math.abs(left))}</span><span class="lab">${tr(isToday ? 'por debajo de lo asignado hoy' : 'por debajo de lo asignado')}</span>`
     : `<span class="big">${fmtN(left)}</span><span class="of">${trf('de {budget}', {budget:`<b>${fmtN(budget)}</b>`})}</span><span class="lab">${tr('cucharas disponibles')}</span>`;
   if(d.budget == null) row.innerHTML = '';
 
   /* Mensaje de contexto: describe el estado, no juzga ni pide nada. La
      segunda línea es el desglose de hechos (gastado, recuperado, margen). */
   const untouched = !gasto && !recarga && !(d.extras || []).length;
-  const line1 = left < 0 ? 'Has pasado de tus cucharas de hoy.'
+  const line1 = !isToday ? (left < 0 ? 'Lo apuntado pasa de tus cucharas.'
+      : left === 0 ? 'No quedan cucharas.'
+      : untouched ? 'Toda la energía disponible.'
+      : left >= effective / 2 ? 'Queda más de la mitad de la energía.'
+      : 'Queda menos de la mitad de la energía.')
+    : left < 0 ? 'Has pasado de tus cucharas de hoy.'
     : left === 0 ? 'No te quedan cucharas hoy.'
     : untouched ? 'Hoy tienes toda tu energía.'
     : left >= effective / 2 ? 'Te queda más de la mitad de tu energía.'
@@ -5132,7 +5183,7 @@ function renderMeter(){
   /* aviso de día cargado: dice el hecho, no juzga. */
   const planned = d.tasks.reduce((a,t) => a + (t.real ?? t.est), 0);
   const notice = document.getElementById('spoonNotice');
-  const msg = (effective > 0 && planned > effective) ? trf('Lo apuntado para hoy suma {planned} y tienes {effective}.', {planned:fmtN(planned), effective:fmtN(effective)}) : '';
+  const msg = (effective > 0 && planned > effective) ? trf(isToday ? 'Lo apuntado para hoy suma {planned} y tienes {effective}.' : 'Lo apuntado para este día suma {planned} y tiene {effective}.', {planned:fmtN(planned), effective:fmtN(effective)}) : '';
   notice.textContent = msg;
   notice.hidden = !msg;
 
@@ -5142,10 +5193,19 @@ function renderMeter(){
   refreshEnergySheets();
 }
 function renderTasks(){
-  const d = day();
+  const k = hoyKey(), d = day(k);
+  const editable = dayEditAllowed(k), canCheck = editable && k <= todayKey();
+  const lock = document.getElementById('hoyLocked');
+  lock.hidden = editable; if(!editable) lock.textContent = tr('Con la versión gratis, este día es de solo lectura. Hoy y mañana siempre se pueden editar.');
+  document.getElementById('btnAddTask').hidden = !editable;
+  document.getElementById('btnQuickAdd').hidden = !editable;
+  document.getElementById('btnPeak').hidden = !!hoyView;
+  document.getElementById('btnTaskMenu').hidden = !!hoyView;
   const el = document.getElementById('taskList');
+  el.classList.toggle('ro', !editable);
+  el.classList.toggle('nocheck', !canCheck);
   if(!d.tasks.length){
-    el.innerHTML = `<p class="tasks-empty">${tr('Nada apuntado. Añade solo lo que de verdad va a pasar hoy.')}</p>`;
+    el.innerHTML = `<p class="tasks-empty">${tr(hoyView ? 'Nada apuntado este día.' : 'Nada apuntado. Añade solo lo que de verdad va a pasar hoy.')}</p>`;
     return;
   }
   /* de más temprano a más tarde; las que no tienen hora van al final, en el orden en que se añadieron */
@@ -5169,13 +5229,13 @@ function renderTasks(){
       ? `<button class="task-body" data-trow="${t.id}" aria-expanded="${isOpen}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`
-      : `<button class="task-body" data-edit="${t.id}" aria-label="${trf('Editar {name}', {name:esc(t.name)})}">
+      : `<button class="task-body" data-edit="${t.id}"${editable ? '' : ' disabled'} aria-label="${trf('Editar {name}', {name:esc(t.name)})}">
           <span class="task-name">${timeTag}${esc(t.name)}</span>${meta}
         </button>`;
     const chev = t.done ? `<button class="chev-btn" data-trow="${t.id}" aria-expanded="${isOpen}" aria-label="${trf('{action} de {name}', {action:tr(isOpen?'Ocultar detalle':'Ver detalle'), name:esc(t.name)})}"><svg class="chev ${isOpen?'':'closed'}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-next"/></svg></button>` : '';
     return `
     <div class="task ${t.done?'done':''}">
-      <button class="check ${t.done?'on':''}" data-toggle="${t.id}" aria-label="${trf('{action} {name}', {action:tr(t.done?'Desmarcar':'Marcar'), name:esc(t.name)})}" aria-pressed="${t.done}">
+      <button class="check ${t.done?'on':''}" data-toggle="${t.id}"${canCheck ? '' : ' disabled'} aria-label="${trf('{action} {name}', {action:tr(t.done?'Desmarcar':'Marcar'), name:esc(t.name)})}" aria-pressed="${t.done}">
         <svg viewBox="0 0 16 16"><use href="#tick"/></svg>
       </button>
       ${body}
@@ -6379,7 +6439,7 @@ const fmtTaskTime = t => t.time ? (t.timeEnd ? `${t.time}–${t.timeEnd}` : t.ti
    sí sola. En vez de un temporizador (que podría cerrarla mientras alguien
    todavía la está leyendo), se pliega al cambiar de pestaña o de app. */
 function collapseOpenTasks(){
-  day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
+  day(hoyKey()).tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
 }
 document.addEventListener('visibilitychange', () => {
   if(document.hidden && currentTab === 'hoy'){ collapseOpenTasks(); renderTasks(); }
@@ -6485,7 +6545,7 @@ function setOpen(i, focus = true){
 }
 document.getElementById('tabs').addEventListener('click', e => {
   const b = e.target.closest('button[data-go]'); if(!b) return;
-  if(currentTab === 'hoy' && b.dataset.go !== 'hoy') collapseOpenTasks();
+  if(currentTab === 'hoy' && b.dataset.go !== 'hoy'){ collapseOpenTasks(); hoyView = null; }
   currentTab = b.dataset.go;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.getElementById('s-' + currentTab).classList.add('on');
@@ -6743,11 +6803,11 @@ const peaksOf = d => d ? (d.extras || []).filter(e => e.type === 'pico-sensorial
 /* Picos sensoriales de hoy y de ayer: deshacer un pico es un ajuste de
    cucharas, así que vive en esta misma hoja. Frases descriptivas, no preguntas. */
 function refreshPeakInfo(){
-  const picos = peaksOf(day());
+  const picos = peaksOf(day(hoyKey()));
   document.getElementById('ciPeakRow').hidden = !picos;
   if(picos) document.getElementById('ciPeakInfo').textContent =
     trf(picos===1 ? '{n} pico sensorial apuntado hoy.' : '{n} picos sensoriales apuntados hoy.', {n:picos});
-  const yPeaks = peaksOf(state.days[shiftKey(todayKey(), -1)]);
+  const yPeaks = peaksOf(state.days[shiftKey(hoyKey(), -1)]);
   document.getElementById('ciYesterday').hidden = !yPeaks;
   if(yPeaks) document.getElementById('ciYInfo').textContent =
     trf(yPeaks===1 ? 'Ayer tuviste {n} pico sensorial.' : 'Ayer tuviste {n} picos sensoriales.', {n:yPeaks});
@@ -6756,12 +6816,12 @@ function refreshPeakInfo(){
 }
 function openCheckin(){
   ciRange.max = state.settings.max;
-  ciRange.value = day().budget ?? Math.round(state.settings.max * 0.65);
+  ciRange.value = day(hoyKey()).budget ?? Math.round(state.settings.max * 0.65);
   document.getElementById('ciPresets').innerHTML = ciPresetValues(state.settings.max)
     .map(v => `<button type="button" class="ci-chip" data-ci="${v}" aria-pressed="false" aria-label="${trf(v === 1 ? '{n} cuchara' : '{n} cucharas', {n:v})}, ${tr(ciWordFor(v))}">${v} ${tr(ciWordFor(v))}</button>`).join('');
-  document.getElementById('ciMarginRow').hidden = !precautionReason(todayKey());
-  document.getElementById('ciMarginOff').checked = !!day().marginOff;
-  document.getElementById('ciNote').value = day().checkinNote || '';
+  document.getElementById('ciMarginRow').hidden = !precautionReason(hoyKey());
+  document.getElementById('ciMarginOff').checked = !!day(hoyKey()).marginOff;
+  document.getElementById('ciNote').value = day(hoyKey()).checkinNote || '';
   refreshPeakInfo(); ciSync();
   openDialog(dlgCheckin);
 }
@@ -6780,17 +6840,17 @@ document.getElementById('ciMarginCancel').addEventListener('click', () => dlgCiM
 document.getElementById('ciMarginOk').addEventListener('click', () => { ciMarginOff.checked = true; dlgCiMargin.close(); });
 function ciKeepNote(){
   const note = document.getElementById('ciNote').value.trim();
-  if(note) day().checkinNote = note; else delete day().checkinNote;
+  if(note) day(hoyKey()).checkinNote = note; else delete day(hoyKey()).checkinNote;
 }
 document.getElementById('ciSave').addEventListener('click', () => {
   /* Guarda en silencio la última estimación del día, antes de que cuente el check-in. */
-  if(!day().estSnap && ciOf(todayKey()) == null){
+  if(!hoyView && !day().estSnap && ciOf(todayKey()) == null){
     const e = estimateEnergy(todayKey());
     if(e) day().estSnap = { v:e.woke };
   }
-  day().budget = +ciRange.value;
-  day().marginOff = ciMarginOff.checked;
-  delete day().budgetUnanswered;
+  day(hoyKey()).budget = +ciRange.value;
+  day(hoyKey()).marginOff = ciMarginOff.checked;
+  delete day(hoyKey()).budgetUnanswered;
   ciKeepNote();
   save();
   dlgCheckin.close();
@@ -6799,8 +6859,8 @@ document.getElementById('ciSave').addEventListener('click', () => {
 /* "Ahora no" (y tocar fuera): el día no se queda sin cucharas ni bloquea la
    app. Usa la media reciente y marca el día como no respondido. */
 document.getElementById('ciSkip').addEventListener('click', () => {
-  day().budget = typicalBudget();
-  day().budgetUnanswered = true;
+  day(hoyKey()).budget = typicalBudget();
+  day(hoyKey()).budgetUnanswered = true;
   ciKeepNote();
   save(); dlgCheckin.close(); renderAll();
 });
@@ -6819,7 +6879,7 @@ function enRow(key, num, ic, title, sub){
     : `<li><div class="en-row static"><span class="en-num">${num}</span>${icon}${text}</div></li>`;
 }
 function renderEnergy(){
-  const d = day(), k = todayKey();
+  const d = day(hoyKey()), k = hoyKey();
   const { budget, marginAmount, gasto, recarga } = spoonsLeft(d, k);
   const count = document.getElementById('spoonCount');
   const c = document.getElementById('enCount');
@@ -6842,7 +6902,7 @@ function renderEnergy(){
   document.getElementById('enList').innerHTML = rows.join('');
 }
 function openEnergy(){
-  if(day().budget == null){ openCheckin(); return; }
+  if(day(hoyKey()).budget == null){ if(hoyKey() <= todayKey() && dayEditAllowed(hoyKey())) openCheckin(); return; }
   renderEnergy(); openDialog(dlgEnergy);
 }
 /* Cualquier cambio del día (deshacer un pico, check-out, presupuesto) vuelve
@@ -6877,8 +6937,8 @@ function adSync(){
 }
 function openAdjust(){
   const max = state.settings.max;
-  adRange.max = Math.max(max, day().budget ?? 0);
-  adRange.value = day().budget ?? Math.round(max * 0.65);
+  adRange.max = Math.max(max, day(hoyKey()).budget ?? 0);
+  adRange.value = day(hoyKey()).budget ?? Math.round(max * 0.65);
   document.getElementById('adPresets').innerHTML = AD_PRESETS.map(([n, p]) => {
     const v = adPresetValue(p);
     return `<button type="button" class="ad-chip" data-ad="${v}" aria-pressed="false"><b>${tr(n)}</b>${fmtN(v)}</button>`;
@@ -6893,8 +6953,8 @@ document.getElementById('adPresets').addEventListener('click', e => {
 document.getElementById('adCancel').addEventListener('click', () => dlgAdjust.close());
 document.getElementById('adX').addEventListener('click', () => dlgAdjust.close());
 document.getElementById('adSave').addEventListener('click', () => {
-  day().budget = +adRange.value;
-  delete day().budgetUnanswered;
+  day(hoyKey()).budget = +adRange.value;
+  delete day(hoyKey()).budgetUnanswered;
   save(); dlgAdjust.close(); renderAll();
 });
 sheetDragClose(dlgAdjust.querySelector('.ad-sheet'), 'adCancel');
@@ -6902,7 +6962,7 @@ sheetDragClose(dlgAdjust.querySelector('.ad-sheet'), 'adCancel');
 /* Margen del ciclo */
 const dlgEnMargin = document.getElementById('dlgEnMargin');
 function renderEnMargin(){
-  const d = day(), k = todayKey();
+  const d = day(hoyKey()), k = hoyKey();
   const reason = precautionReason(k);
   if(!reason){ dlgEnMargin.close(); return; }
   const off = !!d.marginOff;
@@ -6925,7 +6985,7 @@ function renderEnMargin(){
   document.getElementById('emBtnsOff').hidden = !off;
 }
 function openEnMargin(){ renderEnMargin(); openDialog(dlgEnMargin); }
-function setMarginOff(off){ day().marginOff = off; save(); renderAll(); }
+function setMarginOff(off){ day(hoyKey()).marginOff = off; save(); renderAll(); }
 document.getElementById('emX').addEventListener('click', () => dlgEnMargin.close());
 document.getElementById('emNotApply').addEventListener('click', () => { setMarginOff(true); dlgEnMargin.close(); });
 document.getElementById('emRemove').addEventListener('click', () => { setMarginOff(true); dlgEnMargin.close(); });
@@ -6936,7 +6996,7 @@ sheetDragClose(dlgEnMargin.querySelector('.en-detail'), 'emX');
 const dlgEnPeaks = document.getElementById('dlgEnPeaks');
 const peakTime = e => e.at ? new Date(e.at).toLocaleTimeString(state.settings.lang === 'en' ? 'en-GB' : 'es-ES', {hour:'2-digit', minute:'2-digit'}) : tr('Sin hora');
 function renderEnPeaks(){
-  const peaks = (day().extras || []).filter(e => e.type === 'pico-sensorial');
+  const peaks = (day(hoyKey()).extras || []).filter(e => e.type === 'pico-sensorial');
   if(!peaks.length){ dlgEnPeaks.close(); return; }
   const sum = peaks.reduce((a,e)=>a+(e.coste||0), 0);
   document.getElementById('epSub').textContent =
@@ -6959,7 +7019,7 @@ sheetDragClose(dlgEnPeaks.querySelector('.en-detail'), 'epX');
 /* Sobrestimulación: viene de la tolerancia sensorial del check-out. */
 const dlgEnOver = document.getElementById('dlgEnOver');
 function renderEnOver(){
-  const d = day();
+  const d = day(hoyKey());
   const over = (d.extras || []).find(e => e.type === 'sobrestimulacion');
   if(!over){ dlgEnOver.close(); return; }
   document.getElementById('eoAmount').innerHTML = spoonsTxt(over.coste);
@@ -7264,8 +7324,50 @@ tkEl('tkManage').addEventListener('click', () => {
   dlgTask.close();
   renderLib(); actsShow('actsList', 0); openDialog(dlgLibList);
 });
-document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(todayKey()));
-document.getElementById('btnQuickAdd').addEventListener('click', () => openTaskSheet(todayKey()));
+/* Cabecera de Hoy según el día que se esté viendo. */
+function renderHoyHead(){
+  const k = hoyKey(), t = document.getElementById('hoyTitle');
+  document.getElementById('hoyBack').hidden = !hoyView;
+  t.classList.toggle('is-date', !!hoyView);
+  if(!hoyView){ t.textContent = tr('Hoy'); document.getElementById('todayDate').textContent = fmtDate(k); return; }
+  const full = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long', day:'numeric', month:'long'});
+  t.textContent = full.charAt(0).toUpperCase() + full.slice(1);
+  const n = daysBetween(todayKey(), k);
+  document.getElementById('todayDate').textContent = n === -1 ? tr('Ayer') : n === 1 ? tr('Mañana')
+    : n < 0 ? trf('Hace {n} días', {n:-n}) : trf('Dentro de {n} días', {n});
+}
+function hoyGo(key, dir){
+  hoyView = key === todayKey() ? null : key;
+  collapsedTasks.clear();
+  day(hoyKey()).tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
+  renderAll();
+  window.scrollTo(0, 0);
+  const cls = dir > 0 ? 'cal-in-next' : 'cal-in-prev';
+  document.querySelectorAll('#s-hoy .hoy-top > div, #s-hoy .meter, #taskList').forEach(el => {
+    el.classList.remove('cal-in-next', 'cal-in-prev'); void el.offsetWidth; if(dir) el.classList.add(cls);
+  });
+}
+const hoyStep = dir => hoyGo(shiftKey(hoyKey(), dir), dir);
+document.getElementById('hoyBack').addEventListener('click', () => hoyGo(todayKey(), hoyKey() < todayKey() ? 1 : -1));
+document.querySelectorAll('[data-hoystep]').forEach(b => b.addEventListener('click', () => hoyStep(+b.dataset.hoystep)));
+/* Deslizar en horizontal sobre Hoy = día anterior o siguiente. Mismo criterio
+   que el calendario: solo un gesto largo y claramente horizontal. */
+(() => {
+  const el = document.getElementById('s-hoy');
+  let x0 = 0, y0 = 0, on = false;
+  el.addEventListener('touchstart', e => {
+    on = e.touches.length === 1 && !e.target.closest('input, textarea, select, .stepper, .task-menu');
+    if(on){ x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
+  }, { passive:true });
+  el.addEventListener('touchend', e => {
+    if(!on) return; on = false;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if(Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy) * 1.5) hoyStep(dx < 0 ? 1 : -1);
+  }, { passive:true });
+  el.addEventListener('touchcancel', () => { on = false; }, { passive:true });
+})();
+document.getElementById('btnAddTask').addEventListener('click', () => openTaskSheet(hoyKey()));
+document.getElementById('btnQuickAdd').addEventListener('click', () => openTaskSheet(hoyKey()));
 
 /* Menú del selector "Hoy" de Tareas: se abre y se cierra solo al tocar, sin
    animación. Tocar fuera o Escape lo cierra sin hacer nada. */
@@ -7301,14 +7403,14 @@ document.getElementById('btnPeak').addEventListener('click', () => {
    nunca la sobrestimulación de check-out. Se puede tocar varias veces
    seguidas para deshacer más de uno. */
 document.getElementById('btnUndoPeak').addEventListener('click', () => {
-  const d = day();
+  const d = day(hoyKey());
   const idx = (d.extras || []).map(e => e.type).lastIndexOf('pico-sensorial');
   if(idx === -1) return;
   d.extras.splice(idx, 1);
   save(); renderAll(); refreshPeakInfo();
 });
 document.getElementById('btnUndoYPeak').addEventListener('click', () => {
-  const d = state.days[shiftKey(todayKey(), -1)]; if(!d) return;
+  const d = state.days[shiftKey(hoyKey(), -1)]; if(!d) return;
   const idx = (d.extras || []).map(e => e.type).lastIndexOf('pico-sensorial');
   if(idx === -1) return;
   d.extras.splice(idx, 1);
@@ -7513,11 +7615,12 @@ function setTaskDone(t, done, at = Date.now()){
   return true;
 }
 document.getElementById('taskList').addEventListener('click', e => {
+  if(!dayEditAllowed(hoyKey())) return;
   const editBtn = e.target.closest('[data-edit]');
-  if(editBtn){ openTaskEdit(editBtn.dataset.edit); return; }
+  if(editBtn){ openTaskEdit(editBtn.dataset.edit, hoyKey()); return; }
   const tog = e.target.closest('[data-toggle]');
   if(tog){
-    const t = day().tasks.find(x => x.id === tog.dataset.toggle);
+    const t = day(hoyKey()).tasks.find(x => x.id === tog.dataset.toggle);
     setTaskDone(t, !t.done);
     save(); renderAll();
     if(t.done) revealTask(t.id);
@@ -7534,7 +7637,7 @@ document.getElementById('taskList').addEventListener('click', e => {
   }
   const ent = e.target.closest('[data-ent]');
   if(ent){
-    const t = day().tasks.find(x => x.id === ent.dataset.ent);
+    const t = day(hoyKey()).tasks.find(x => x.id === ent.dataset.ent);
     const v = ent.dataset.val;
     t.entorno = (t.entorno === v) ? null : v;
     save(); renderAll();
@@ -7542,7 +7645,7 @@ document.getElementById('taskList').addEventListener('click', e => {
   }
   const rec = e.target.closest('[data-rec]');
   if(rec){
-    const t = day().tasks.find(x => x.id === rec.dataset.rec);
+    const t = day(hoyKey()).tasks.find(x => x.id === rec.dataset.rec);
     const m = +rec.dataset.min;
     t.recovery = (t.recovery === m) ? null : m;
     save(); renderAll();
@@ -7551,7 +7654,7 @@ document.getElementById('taskList').addEventListener('click', e => {
   }
   const adj = e.target.closest('[data-real]');
   if(adj){
-    const t = day().tasks.find(x => x.id === adj.dataset.real);
+    const t = day(hoyKey()).tasks.find(x => x.id === adj.dataset.real);
     const v = (t.real ?? t.est) + (+adj.dataset.delta);
     t.real = t.est < 0 ? Math.min(0, v) : Math.max(0, v);
     if(t.cal?.noCost){
@@ -8008,7 +8111,7 @@ const CHECKOUT_HOUR_DEFAULT = 21;
 const checkoutHour = () => state.settings?.checkoutHour ?? CHECKOUT_HOUR_DEFAULT;
 let coNudgeDismissed = false;
 function coNudgeDue(){
-  if(!state.settings.introSeen || day().checkout || currentTab !== 'hoy') return false;
+  if(!state.settings.introSeen || hoyView || day().checkout || currentTab !== 'hoy') return false;
   const h = new Date().getHours();
   return h >= checkoutHour() || h < dayStartHour();
 }
@@ -8313,20 +8416,21 @@ function renderDaySheet(){
 }
 /* Tarjeta de energía estimada: solo para hoy sin check-in y días futuros.
    Una palabra, sin cantidades; la frase compara con lo planificado. */
-function renderDayEnergy(k){
-  const box = document.getElementById('dEnergy');
+function renderDayEnergy(k, p = 'd'){
+  const $ = id => document.getElementById(p + id);
+  const box = $('Energy');
   const open = k >= todayKey() && ciOf(k) == null;
   const e = open ? estimateEnergy(k) : null;
   box.hidden = !open; if(!open) return;
-  document.getElementById('dEnergyValRow').hidden = !e;
-  document.getElementById('dEnergyMsg').hidden = !!e;
+  $('EnergyValRow').hidden = !e;
+  $('EnergyMsg').hidden = !!e;
   if(!e){
-    document.getElementById('dEnergyMsg').textContent = tr('Aún no hay suficientes check-in para estimarla.');
-    document.getElementById('dEnergyWhy').textContent = tr('Se calcula con tus check-in de días anteriores.');
+    $('EnergyMsg').textContent = tr('Aún no hay suficientes check-in para estimarla.');
+    $('EnergyWhy').textContent = tr('Se calcula con tus check-in de días anteriores.');
     return;
   }
   const wd = new Date(k + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long'});
-  document.getElementById('dEnergyVal').textContent = tr(e.level);
+  $('EnergyVal').textContent = tr(e.level);
   const why = [];
   if(e.streak && e.lower) why.push(trf(e.streak === 1 ? 'Vienes de un día cargado: puede que tengas menos energía que un {dia} habitual.' : 'Vienes de {n} días cargados: puede que tengas menos energía que un {dia} habitual.', {n:e.streak, dia:wd}));
   else if(e.lower) why.push(tr('Los últimos días fueron cargados y el cansancio todavía puede notarse.'));
@@ -8338,7 +8442,7 @@ function renderDayEnergy(k){
     why.push(tr(e.cycleLower || e.cycleCost || e.reserve ? 'Día de ciclo: sueles tener menos energía.' : 'Día de ciclo.'));
   }
   if(!why.length) why.push(e.by === 'weekday' ? trf('Según tus {dia} anteriores.', {dia:wd.endsWith('s') ? wd : wd + 's'}) : tr('Según tus últimos check-in.'));
-  document.getElementById('dEnergyWhy').textContent = why.join(' ');
+  $('EnergyWhy').textContent = why.join(' ');
 }
 /* Registro de ciclo de cualquier día: el mismo campo que "Registro de hoy"
    pero sobre el día que se esté mirando en el calendario, pasado o futuro,
@@ -9219,7 +9323,7 @@ window.addEventListener('online', () => { if(auth && syncAllowed()) syncNow(); }
 let bootDay = todayKey();
 document.addEventListener('visibilitychange', () => {
   if(document.hidden || todayKey() === bootDay) return;
-  bootDay = todayKey();
+  bootDay = todayKey(); hoyView = null;
   document.getElementById('todayDate').textContent = fmtDate(bootDay);
   collapsedTasks.clear();
   day().tasks.forEach(t => { if(t.done) collapsedTasks.add(t.id); });
@@ -9370,6 +9474,7 @@ nativeOn('App', 'appStateChange', d => { if(d.isActive) applyWidgetEvents(); });
 nativeOn('App', 'appUrlOpen', data => {
   const m = /^spoony:\/\/(today|task\/([\w-]+))/.exec(data.url || '');
   if(!m) return;
+  hoyView = null;
   document.querySelector('#tabs button[data-go="hoy"]')?.click();
   const t = m[2] && day().tasks.find(x => x.id === m[2]);
   if(t && !t.done) openTaskEdit(t.id);
