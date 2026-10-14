@@ -1186,7 +1186,7 @@ dialog::backdrop{background:rgba(58,64,58,.35)}
 .hoy-back[hidden]{display:none}
 .hoy-nav .sr-nav{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
 .hoy-nav .sr-nav:focus-visible{position:static;width:auto;height:auto;margin:6px 6px 0 0;padding:6px 10px;clip:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
-#s-hoy{touch-action:pan-y pinch-zoom}
+body:has(#s-hoy.on){touch-action:pan-y pinch-zoom}
 .hoy-locked{margin:0 0 10px;font-size:14px;color:var(--ink-soft)}
 .hoy-locked[hidden]{display:none}
 #hoyMeter[hidden]{display:none}
@@ -3816,6 +3816,8 @@ const EN = {
  "Media": "Medium",
  "Baja": "Low",
  "Todavía no hay nada planificado.": "Nothing planned yet.",
+ "Con {n} día de retraso": "{n} day late",
+ "Con {n} días de retraso": "{n} days late",
  "Volver a hoy": "Back to today",
  "Ayer": "Yesterday",
  "Hace {n} días": "{n} days ago",
@@ -5623,12 +5625,23 @@ const daysBetween = (a, b) =>
 
    Un inicio de ciclo no es cualquier día de sangrado: es el primero de una
    racha, o sea el que viene precedido de un día sin sangrado o sin registro. */
+/* Un día suelto sin apuntar no parte la regla en dos: los días de sangrado
+   separados por hasta BLEED_GAP días son la misma tanda. Y un sangrado que
+   llega a menos de MIN_CYCLE días del inicio anterior se trata como manchado,
+   no como ciclo nuevo, para que no hunda la duración media. */
+const BLEED_GAP = 3, MIN_CYCLE = 14;
+const bleedDates = () => (state.cycleLogs || [])
+  .filter(l => l.bleeding && l.date <= todayKey()).map(l => l.date).sort();
 function cycleStarts(){
-  return (state.cycleLogs || [])
-    .filter(l => l.bleeding && l.date <= todayKey())
-    .map(l => l.date)
-    .sort()
-    .filter(k => { const p = cycleLog(shiftKey(k, -1)); return !(p && p.bleeding); });
+  const out = [];
+  let prev = null;
+  bleedDates().forEach(d => {
+    if(prev == null || daysBetween(prev, d) > BLEED_GAP){
+      if(!out.length || daysBetween(out[out.length-1], d) >= MIN_CYCLE) out.push(d);
+    }
+    prev = d;
+  });
+  return out;
 }
 function lastStartOn(k){
   const s = cycleStarts().filter(x => x <= k);
@@ -5641,13 +5654,16 @@ function cycleDayOn(k){
 /* Días seguidos de sangrado desde un inicio: es lo que dura la fase menstrual
    de ese ciclo en concreto, en vez de un número fijo de manual. */
 function bleedRunFrom(startKey){
-  let n = 0, k = startKey;
-  while(n < 30 && k <= todayKey()){
-    const l = cycleLog(k);
-    if(!l || !l.bleeding) break;
-    n++; k = shiftKey(k, 1);
+  if(!startKey) return 0;
+  const dates = bleedDates(), next = cycleStarts().find(x => x > startKey);
+  let end = null;
+  for(const d of dates){
+    if(d < startKey) continue;
+    if(next && d >= next) break;
+    if(end && daysBetween(end, d) > BLEED_GAP) break;
+    end = d;
   }
-  return n;
+  return end ? daysBetween(startKey, end) + 1 : 0;
 }
 /* Duraciones ya medidas: la distancia entre dos inicios consecutivos. Con un
    solo inicio apuntado todavía no hay ninguna, y manda el ajuste de Ajustes. */
@@ -5672,13 +5688,18 @@ function nextCycleStart(){
   const L = Math.max(10, effectiveCycleLength());
   const today = todayKey();
   let k = shiftKey(s[s.length-1], L), jumps = 1;
-  while(k < today && jumps < 200){ k = shiftKey(k, L); jumps++; }
-  return { date:k, jumps, length:L };
+  /* Con retraso de hasta medio ciclo se mantiene la fecha esperada (y se dice
+     cuánto lleva de retraso); más allá, la estimación salta al siguiente. */
+  while(daysBetween(k, today) > Math.floor(L / 2) && jumps < 200){ k = shiftKey(k, L); jumps++; }
+  return { date:k, jumps, length:L, late: Math.max(0, daysBetween(k, today)) };
 }
 /* Cuánto suele durar el sangrado: la media de las tandas ya apuntadas. Si no
    hay ninguna tanda apuntada no se estima nada en el calendario. */
 function typicalBleedDays(){
-  const runs = cycleStarts().map(bleedRunFrom).filter(n => n > 0);
+  const st = cycleStarts(), last = st[st.length-1];
+  const ongoing = last && daysBetween(last, todayKey()) < bleedRunFrom(last) + BLEED_GAP;
+  let runs = st.map(bleedRunFrom).filter(n => n > 0);
+  if(ongoing && runs.length > 1) runs = runs.slice(0, -1);
   if(!runs.length) return 0;
   return Math.max(1, Math.round(runs.reduce((a,b) => a+b, 0) / runs.length));
 }
@@ -5692,7 +5713,8 @@ function estBleedDays(fromKey, toKey){
   const nx = nextCycleStart(), run = typicalBleedDays();
   if(!nx || !run) return out;
   const today = todayKey();
-  let s = nx.date, guard = 0;
+  /* Con retraso, el sangrado que no llegó no se pinta: se estima el siguiente, igual que la tira de Ciclo. */
+  let s = nx.date > today ? nx.date : shiftKey(nx.date, nx.length), guard = 0;
   while(s <= toKey && guard++ < 60){
     for(let i = 0; i < run; i++){
       const k = shiftKey(s, i);
@@ -5750,7 +5772,8 @@ function cycDayNum(k){
   if(!(state.cycleLogs || []).length) return null;
   if(k > todayKey()){
     const nx = nextCycleStart();
-    if(nx && k >= nx.date) return daysBetween(nx.date, k) % nx.length + 1;
+    const anchor = nx && (nx.date > todayKey() ? nx.date : shiftKey(nx.date, nx.length));
+    if(anchor && k >= anchor) return daysBetween(anchor, k) % nx.length + 1;
   }
   return cycleDayOn(k);
 }
@@ -5889,9 +5912,10 @@ function renderCyclePrediction(){
     el.innerHTML = cycHeadRow('cal', tr('Próximo ciclo'), tr('Aún sin estimar'), tr('Apunta un día de sangrado para empezar.'));
     return;
   }
-  const { date } = nextCycleStart();
+  const { date, late } = nextCycleStart();
   const falta = daysBetween(todayKey(), date);
-  const cuando = falta === 0 ? tr('Hoy') : falta === 1 ? tr('Mañana') : trf('En {n} días', {n:falta});
+  const cuando = late ? trf(late === 1 ? 'Con {n} día de retraso' : 'Con {n} días de retraso', {n:late})
+    : falta === 0 ? tr('Hoy') : falta === 1 ? tr('Mañana') : trf('En {n} días', {n:falta});
   const fecha = new Date(date + 'T12:00:00').toLocaleDateString(LOCALE(), {weekday:'long', day:'numeric', month:'long'});
   const measured = cycleLengths().length > 0;
   el.innerHTML = cycHeadRow('cal', tr('Próximo ciclo'), esc(fecha), cuando, `data-cycopen="${date}"`)
@@ -7353,10 +7377,11 @@ document.querySelectorAll('[data-hoystep]').forEach(b => b.addEventListener('cli
 /* Deslizar en horizontal sobre Hoy = día anterior o siguiente. Mismo criterio
    que el calendario: solo un gesto largo y claramente horizontal. */
 (() => {
-  const el = document.getElementById('s-hoy');
+  const el = document;
   let x0 = 0, y0 = 0, on = false;
   el.addEventListener('touchstart', e => {
-    on = e.touches.length === 1 && !e.target.closest('input, textarea, select, .stepper, .task-menu');
+    on = e.touches.length === 1 && currentTab === 'hoy' && !document.querySelector('dialog[open]')
+      && document.getElementById('tour').hidden && !e.target.closest('input, textarea, select, .stepper, .task-menu, #tabs, dialog');
     if(on){ x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
   }, { passive:true });
   el.addEventListener('touchend', e => {
