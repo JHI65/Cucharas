@@ -56,6 +56,9 @@ html,body{
    (position:sticky) dejaría de pegarse. En body basta clip, que no crea
    contenedor de scroll. */
 html{overflow-x:hidden}
+/* Sin rebote al pasar del principio o del final: en iOS lo fijo (la barra de
+   pestañas) sube con el rebote y deja un hueco vacío debajo. */
+html,body{overscroll-behavior-y:none}
 body{overflow-x:clip}
 /* Barra de scroll invisible en toda la app, para que se sienta nativa: en
    iOS no hace falta (el indicador del sistema ya se oculta solo), pero en
@@ -894,6 +897,10 @@ input[type=color]{
    etiquetas siguen más grandes que a tamaño normal. */
 :root[data-text-scale="1.3"] .tabs.compact{zoom:1.15}
 .tabs svg{width:21px;height:21px}
+/* Con el teclado abierto (Android encoge la pantalla y la barra fija sube
+   con él) la barra tapaba el campo que se estaba escribiendo. Se esconde
+   mientras haya un campo de texto activo. */
+html.typing .tabs{display:none}
 .tabs svg.tab-spoon{width:21px;height:23px}
 
 /* ---- Sheet ---- */
@@ -5278,6 +5285,7 @@ function renderTasks(){
   }).join('') + '</div>';
   pinHoyTop();
 }
+let rechargeCloseTimer = null;
 const ACT_ICONS = [
   [/gente|amig|social|famil|quedar|fiesta|people|friend|visit/, 'people'],
   [/duch|baño|aseo|shower|bath/, 'shower'],
@@ -7691,7 +7699,10 @@ document.getElementById('taskList').addEventListener('click', e => {
       if(item && item.samples.length && taskLib(t)){ item.samples[item.samples.length-1] = t.real; }
     }
     save(); renderAll();
-    if(t.est < 0) closeAdjustPanel(t.id);
+    if(t.est < 0){
+      clearTimeout(rechargeCloseTimer);
+      rechargeCloseTimer = setTimeout(() => closeAdjustPanel(t.id), 1500);
+    }
   }
 });
 
@@ -8607,6 +8618,24 @@ function applyTextScale(){
     c.setAttribute('aria-pressed', +c.dataset.scale === v));
   sizeTabsGap();
 }
+const isTypingField = el => el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable
+  || (el.tagName === 'INPUT' && !/^(checkbox|radio|range|button|submit|reset|color|file)$/i.test(el.type)));
+let typingTimer;
+document.addEventListener('focusin', e => {
+  if(!isTypingField(e.target)) return;
+  clearTimeout(typingTimer); document.documentElement.classList.add('typing');
+});
+/* Con retraso: al saltar de un campo a otro no debe parpadear la barra. */
+document.addEventListener('focusout', () => {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    if(isTypingField(document.activeElement)) return;
+    document.documentElement.classList.remove('typing');
+    /* iOS no siempre devuelve la vista a su sitio al cerrar el teclado y lo
+       fijo abajo se queda flotando más arriba; recolocar el scroll lo recalcula. */
+    setTimeout(() => { window.scrollTo(window.scrollX, window.scrollY); sizeTabsGap(); }, 250);
+  }, 120);
+});
 function sizeTabsGap(){
   const r = document.getElementById('tabs').getBoundingClientRect();
   if(!r.height) return;
